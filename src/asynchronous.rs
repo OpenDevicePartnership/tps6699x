@@ -2,10 +2,18 @@
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::{Error, PdError, PortId};
 
+use crate::registers;
+
 /// Wrapper to allow implementing device_driver traits on our I2C bus
 pub struct Port<'a, B: I2c> {
     bus: &'a mut B,
     addr: u8,
+}
+
+impl<'a, B: I2c> Port<'a, B> {
+    pub fn into_registers(self) -> registers::Registers<Port<'a, B>> {
+        registers::Registers::new(self)
+    }
 }
 
 impl<B: I2c> device_driver::AsyncRegisterInterface for Port<'_, B> {
@@ -95,6 +103,23 @@ impl<B: I2c> Tps6699x<B> {
             addr,
         })
     }
+
+    /// Clear interrupts on a port, returns asserted interrupts
+    pub async fn clear_interrupt(
+        &mut self,
+        port: PortId,
+    ) -> Result<registers::field_sets::IntEventBus1, Error<B::Error>> {
+        let p = self.borrow_port(port)?;
+        let mut registers = p.into_registers();
+
+        let flags = registers.int_event_bus_1().read_async().await?;
+        // Clear interrupt if anything is set
+        if flags != registers::field_sets::IntEventBus1::new_zero() {
+            registers.int_clear_bus_1().write_async(|r| *r = flags).await?;
+        }
+
+        Ok(flags)
+    }
 }
 
 #[cfg(test)]
@@ -111,6 +136,15 @@ mod test {
 
     const PORT0: PortId = PortId(0);
     const PORT1: PortId = PortId(1);
+
+    /// Default I2C addresse for testing
+    const PORT0_ADDR0: u8 = 0x20;
+    /// Default I2C addresse for testing
+    const PORT1_ADDR0: u8 = 0x24;
+    /// Default I2C addresse for testing
+    const PORT0_ADDR1: u8 = 0x21;
+    /// Default I2C addresse for testing
+    const PORT1_ADDR1: u8 = 0x25;
 
     /// Test helper for reading successfully from a port
     async fn test_read_port_success(
@@ -282,5 +316,62 @@ mod test {
     async fn test_write_ports_1() {
         test_write_ports_success(ADDR1).await;
         test_write_ports_failure(ADDR1).await;
+    }
+
+    fn create_register_read<const N: usize, R: Into<[u8; N]>>(addr: u8, reg: u8, value: R) -> Vec<Transaction> {
+        // +1 for the length byte
+        let mut response = Vec::with_capacity(N + 1);
+        response.push(N as u8);
+        response.splice(1..1, value.into().iter().cloned());
+
+        vec![Transaction::write_read(addr, vec![reg], response)]
+    }
+
+    fn create_register_write<const N: usize, R: Into<[u8; N]>>(addr: u8, reg: u8, value: R) -> Vec<Transaction> {
+        // +1 for the register + length byte
+        let mut response = Vec::with_capacity(N + 2);
+        response.push(reg);
+        response.push(N as u8);
+        response.splice(2..2, value.into().iter().cloned());
+
+        vec![Transaction::write(addr, response)]
+    }
+
+    async fn test_clear_interrupt(tps6699x: &mut Tps6699x<Mock>, port: PortId, expected_addr: u8) {
+        use registers::field_sets::IntEventBus1;
+
+        // Create a fully asserted interrupt register
+        let int = !IntEventBus1::new_zero();
+        let mut transactions = Vec::new();
+
+        // Read the interrupt register
+        transactions.extend(create_register_read(expected_addr, 0x14, int).into_iter());
+
+        // Write to the interrupt clear register
+        transactions.extend(create_register_write(expected_addr, 0x18, int).into_iter());
+        tps6699x.bus.update_expectations(&transactions);
+
+        assert_eq!(tps6699x.clear_interrupt(port).await.unwrap(), int);
+        tps6699x.bus.done();
+    }
+
+    /// Test clearing interrupts with address set 0
+    #[tokio::test]
+    async fn test_clear_interrupt_0() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new(mock, ADDR0);
+
+        test_clear_interrupt(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        test_clear_interrupt(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    /// Test clearing interrupts with address set 0
+    #[tokio::test]
+    async fn test_clear_interrupt_1() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new(mock, ADDR1);
+
+        test_clear_interrupt(&mut tps6699x, PORT0, PORT0_ADDR1).await;
+        test_clear_interrupt(&mut tps6699x, PORT1, PORT1_ADDR1).await;
     }
 }

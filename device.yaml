@@ -1,0 +1,298 @@
+config:
+  register_address_type: u8
+  default_byte_order: LE
+  default_bit_order: LSB0
+  defmt_feature: defmt
+
+# These are better named int_event_i2c*, but device_driver has issues breaking those names up
+IntEventBus1:
+  type: register
+  address: 0x14
+  size_bits: 88
+  reset_value: 0x0000000000000002000008
+  access: "RO"
+  description:  Asserted interrupts for I2C1
+  fields:
+    # Controllor flags
+    # Port-specific flags
+    HardReset:
+      base: bool
+      start: 1
+      description: A PD hard reset has been performed
+    PlugEvent:
+      base: bool
+      start: 3
+      description: A plug has been inserted or removed
+    PowerSwapCompleted:
+      base: bool
+      start: 4
+      description: Power swap completed
+    DataSwapCompleted:
+      base: bool
+      start: 5
+      description: Data swap completed
+    FastRoleSwapCompleted:
+      base: bool
+      start: 6
+      description: Fast role swap completed
+    SourceCapUpdated:
+      base: bool
+      start: 7
+      description: Source capabilities updated
+    Overcurrent:
+      base: bool
+      start: 9
+      description: Overcurrent
+    AttentionReceived:
+      base: bool
+      start: 10
+      description: Attention received
+    VDMReceived:
+      base: bool
+      start: 11
+      description: VDM received
+    NewConsumerContract:
+      base: bool
+      start: 12
+      description: New contract as consumer
+    NewProviderContract:
+      base: bool
+      start: 13
+      description: New contract as provider
+    SourceCapsReceived:
+      base: bool
+      start: 14
+      description: Source capabilities received
+    SinkCapsReceived:
+      base: bool
+      start: 15
+      description: Sink capabilities received
+    PowerSwapRequested:
+      base: bool
+      start: 17
+      description: Power swap requested
+    DataSwapRequested:
+      base: bool
+      start: 18
+      description: Data swap requested
+    UsbHostPresent:
+      base: bool
+      start: 20
+      description: USB host present
+    UsbHostNotPresent:
+      base: bool
+      start: 21
+      description: Set when USB host status transitions to anything other than present
+    PowerPathSwitchChanged:
+      base: bool
+      start: 23
+      description: Power path status register changed
+    PowerStatusUpdated:
+      base: bool
+      start: 24
+      description: Power status register changed
+    DataStatusUpdated:
+      base: bool
+      start: 25
+      description: Data status register changed
+    StatusUpdated:
+      base: bool
+      start: 26
+      description: Status register changed
+    PdStatusUpdated:
+      base: bool
+      start: 27
+      description: PD status register changed
+    Cmd1Completed:
+      base: bool
+      start: 30
+      description: Command 1 completed
+    Cmd2Completed:
+      base: bool
+      start: 31
+      description: Command 2 completed
+    DeviceIncompatible:
+      base: bool
+      start: 32
+      description: Device lacks PD or has incompatible PD version
+    CannotSource:
+      base: bool
+      start: 33
+      description: Source cannot supply requested voltage or current
+    CanSourceLater:
+      base: bool
+      start: 34
+      description: Source can supply requested voltage or current later
+    PowerEventError:
+      base: bool
+      start: 35
+      description: Voltage or current exceeded
+    NoCapsResponse:
+      base: bool
+      start: 36
+      description: Device did not response to get caps message
+    ProtocolError:
+      base: bool
+      start: 38
+      description: Unexpected message received from partner
+    SinkTransitionCompleted:
+      base: bool
+      start: 42
+      description: Sink transition completed
+    PlugEarlyNotification:
+      base: bool
+      start: 43
+      description: Plug connected but not debounced
+    ProchotNotification:
+      base: bool
+      start: 44
+      description: Prochot asserted
+    SourceCannotProvide:
+      base: bool
+      start: 46
+      description: Source cannot produce negociated voltage or current
+    AmEntryFail:
+      base: bool
+      start: 48
+      description: Alternate mode entry failed
+    AmEntered:
+      base: bool
+      start: 49
+      description: Alternate mode entered
+    DiscoverModeCompleted:
+      base: bool
+      start: 51
+      description: Discover modes process completed
+    ExitModeCompleted:
+      base: bool
+      start: 52
+      description: Exit mode process completed
+    DataResetStarted:
+      base: bool
+      start: 53
+      description: Data reset process started
+    UsbStatusUpdated:
+      base: bool
+      start: 54
+      description: USB status updated
+    ConnectionManagerUpdated:
+      base: bool
+      start: 55
+      description: Connection manager updated
+    UsvidModeEntered:
+      base: bool
+      start: 56
+      description: User VID alternate mode entered
+    UsvidModeExited:
+      base: bool
+      start: 57
+      description: User VID alternate mode entered
+    UsvidAttentionVdmReceived:
+      base: bool
+      start: 58
+      description: User VID SVDM attention received
+    UsvidOtherVdmReceived:
+      base: bool
+      start: 59
+      description: User VID SVDM non-attention or unstructured VDM received
+    ExternalDcDcEvent:
+      base: bool
+      start: 61
+      description: External DCDC event
+    DpSidStatusUpdated:
+      base: bool
+      start: 62
+      description: DP SID status register changed
+    IntelVidStatusUpdated:
+      base: bool
+      start: 63
+      description: Intel VID status register changed
+    Pd3StatusUpdated:
+      base: bool
+      start: 64
+      description: PD3 status register changed
+    TxMemoryBufferEmpty:
+      base: bool
+      start: 65
+      description: TX memory buffer empty
+    MbrdBufferReady:
+      base: bool
+      start: 66
+      description: Buffer for mbrd command received and ready
+    SocAckTimeout:
+      base: bool
+      start: 70
+      description: SOC ack timeout
+    NotSupportedReceived:
+      base: bool
+      start: 71
+      description: Not supported PD message received
+    CrossbarError:
+      base: bool
+      start: 72
+      description: Error configuring the crossbar mux
+    MailboxUpdated:
+      base: bool
+      start: 73
+      description: Mailbox updated
+    BusError:
+      base: bool
+      start: 74
+      description: I2C error communicating with external bus
+    ExternalDcDcStatusChanged:
+      base: bool
+      start: 75
+      description: External DCDC status changed
+    FrsSignalReceived:
+      base: bool
+      start: 76
+      description: Fast role swap signal received
+    ChunkResponseReceived:
+      base: bool
+      start: 77
+      description: Chunk response received
+    ChunkRequestReceived:
+      base: bool
+      start: 78
+      description: Chunk request received
+    AlertMessageReceived:
+      base: bool
+      start: 79
+      description: Alert message received
+    PatchLoaded:
+      base: bool
+      start: 80
+      description: Patch loaded to device
+    ReadyF211:
+      base: bool
+      start: 81
+      description: Ready for F211 image
+    BootError:
+      base: bool
+      start: 84
+      description: Boot error
+    ReadyForDataBlock:
+      base: bool
+      start: 85
+      description: Ready for data block
+
+IntMaskBus1:
+  type: ref
+  target: IntEventBus1
+  description: Masked interrupts for I2C1
+  override:
+    type: register
+    address: 0x16
+    reset_value: 0x0000000F000000CD33380A
+    access: RW
+
+IntClearBus1:
+  type: ref
+  target: IntEventBus1
+  description: Interrupt clear for I2C1
+  override:
+    type: register
+    address: 0x18
+    reset_value: 0x0000000000000000000000
+    access: RW
+
