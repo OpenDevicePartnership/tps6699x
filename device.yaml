@@ -296,3 +296,100 @@ IntClearBus1:
     reset_value: 0x0000000000000000000000
     access: RW
 
+Status:
+  type: register
+  address: 0x1A
+  access: RO
+  size_bits: 40
+  reset_value: 0x0000000000
+  description: Port status
+  fields:
+    PlugPresent:
+      base: bool
+      start: 0
+      description: Plug present
+    ConnectionState:
+      base: uint
+      start: 1
+      end: 4
+      description: Connection state
+      conversion:
+        name: PlugMode
+        NotConnected: 0x0
+        Disabled: 0x1
+        Audio: 0x2
+        Debug: 0x3
+        # No connection, but Ra detected
+        RaDetected: 0x4
+        Reserved: 0x5
+        # Connection, but no Ra detected
+        ConnectedNoRa: 0x6
+        Connected: 0x7
+    PlugOrientation:
+      base: bool
+      start: 4
+      description: Connector oreintation, 0 for normal, 1 for flipped
+    PortRole:
+      base: bool
+      start: 5
+      description: PD role, 0 for sink, 1 for source
+    DataRole:
+      base: bool
+      start: 6
+      description: Data role, 0 for UFP, 1 for DFP
+    ErpMode:
+      base: bool
+      start: 7
+      description: Is EPR mode active
+    VbusStatus:
+      base: uint
+      start: 20
+      end: 22
+      description: Vbus status
+      conversion:
+        name: VbusMode
+        AtVsafe0: 0x0
+        Atvsafe5: 0x1
+        Normal: 0x2
+        Other: 0x3
+    UsbHost:
+      base: uint
+      start: 22
+      end: 24
+      description: USB host mode
+      conversion:
+        name: UsbHostMode
+        NoHost: 0x0
+        AttachedNoData: 0x1
+        AttachedNoPd: 0x2
+        HostPresent: 0x3
+    Legacy:
+      base: uint
+      start: 24
+      end: 26
+      description: Legacy mode stotus
+      conversion:
+        name: LegacyMode
+        NoLegacy: 0x0
+        LegacySink: 0x01
+        LegacySource: 0x2
+        LegacySinkDeadBattery: 0x03
+    BistInProgress:
+      base: bool
+      start: 27
+      description: If a BIST is in progress
+    SocAckTimeout:
+      base: bool
+      start: 30
+      description: Set when the SOC acknolwedgement has timed out
+    AmStatus:
+      base: uint
+      start: 32
+      end: 34
+      description: Alternate mode entry status
+      conversion:
+        name: AmStatus
+        NoneAttempted: 0x0
+        EntrySuccessful: 0x1
+        EntryFailed: 0x2
+        PartialSuccess: 0x3
