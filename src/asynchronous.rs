@@ -137,6 +137,18 @@ impl<B: I2c> Tps6699x<B> {
             .read_async()
             .await
     }
+
+    /// Get active RDO contract
+    pub async fn get_active_rdo_contract(
+        &mut self,
+        port: PortId,
+    ) -> Result<registers::field_sets::ActiveRdoContract, Error<B::Error>> {
+        self.borrow_port(port)?
+            .into_registers()
+            .active_rdo_contract()
+            .read_async()
+            .await
+    }
 }
 
 #[cfg(test)]
@@ -454,5 +466,36 @@ mod test {
 
         test_get_active_pdo_contract(&mut tps6699x, PORT0, PORT0_ADDR1).await;
         test_get_active_pdo_contract(&mut tps6699x, PORT1, PORT1_ADDR1).await;
+    }
+
+    async fn test_get_active_rdo_contract(tps6699x: &mut Tps6699x<Mock>, port: PortId, expected_addr: u8) {
+        use registers::field_sets::ActiveRdoContract;
+
+        let mut transactions = Vec::new();
+        // Read status register
+        transactions.extend(create_register_read(expected_addr, 0x35, ActiveRdoContract::new_zero()).into_iter());
+        tps6699x.bus.update_expectations(&transactions);
+
+        let active_rdo_contract = tps6699x.get_active_rdo_contract(port).await.unwrap();
+        assert_eq!(active_rdo_contract, ActiveRdoContract::new_zero());
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_active_rdo_contract_ports_0() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new(mock, ADDR0);
+
+        test_get_active_rdo_contract(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        test_get_active_rdo_contract(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    #[tokio::test]
+    async fn test_get_active_rdo_contract_ports_1() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new(mock, ADDR1);
+
+        test_get_active_rdo_contract(&mut tps6699x, PORT0, PORT0_ADDR1).await;
+        test_get_active_rdo_contract(&mut tps6699x, PORT1, PORT1_ADDR1).await;
     }
 }

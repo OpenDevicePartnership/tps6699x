@@ -412,3 +412,62 @@ ActivePdoContract:
       start: 32
       end: 41
       description: Bits 20-29 of the first PDO
+
+ActiveRdoContract:
+  type: register
+  address: 0x35
+  access: RO
+  size_bits: 96
+  reset_value: 0x000000000000000000000000
+  description: Active PDO contract
+  fields:
+    MinMaxOpCurrent:
+      base: uint
+      start: 0
+      end: 9
+      description: Min/Max operating current
+    OpCurrent:
+      base: uint
+      start: 10
+      end: 19
+      description: Operating current
+    EprModeCapable:
+      base: bool
+      start: 22
+      description: EPR mode capable
+    UnchunkedSupported:
+      base: bool
+      start: 23
+      description: Unchunked supported
+    NoUsbSuspend:
+      base: bool
+      start: 24
+      description: No USB suspend
+    UsbCommCapable:
+      base: bool
+      start: 25
+      description: USB communication capable
+    CapabilityMismatch:
+      base: bool
+      start: 26
+      description: Capability mismatch
+    GiveBack:
+      base: bool
+      start: 27
+      description: Give back
+    ObjectPosition:
+      base: uint
+      start: 28
+      end: 31
+      description: Object position
+    SourceEprModeDo:
+      base: uint
+      start: 32
+      end: 63
+      description: Source EPR mode data object
+    SinkEprModeDo:
+      base: uint
+      start: 64
+      end: 95
+      description: Sink EPR mode data object
+    
