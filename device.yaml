@@ -393,3 +393,22 @@ Status:
         EntrySuccessful: 0x1
         EntryFailed: 0x2
         PartialSuccess: 0x3
+
+ActivePdoContract:
+  type: register
+  address: 0x34
+  access: RO
+  size_bits: 48
+  reset_value: 0x000000000000
+  description: Active PDO contract
+  fields:
+    ActivePdo:
+      base: uint
+      start: 0
+      end: 31
+      description: Active PDO
+    FirstPdoControl:
+      base: uint
+      start: 32
+      end: 41
+      description: Bits 20-29 of the first PDO
