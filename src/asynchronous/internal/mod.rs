@@ -1,4 +1,5 @@
-//! Asynchronous TPS6699x driver
+//! This module implements a low-level TPS6699x driver. The super module provides a high-level API
+//! that uses standard PD types and provides functions that implement features that may occur over several interrupts
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::{Error, PdError, PortId};
 
