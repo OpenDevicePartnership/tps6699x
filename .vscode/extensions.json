@@ -1,0 +1,9 @@
+{
+	"recommendations": [
+		"rust-lang.rust-analyzer",
+		"tamasfe.even-better-toml",
+		"probe-rs.probe-rs-debugger",
+		"marus25.cortex-debug",
+		"rioj7.command-variable",
+	],
+}

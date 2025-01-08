@@ -1,0 +1,96 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Probe-Rs Build (debug)",
+            "type": "process",
+            "command": "cargo",
+            "args": ["build", "--bin", "${input:binName}"],
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/examples/rt685s-evk"
+            },
+            "group": {
+                "kind": "build",
+            }
+        },
+        {
+            "label": "Cargo Build (debug)",
+            "type": "process",
+            "command": "cargo",
+            "args": ["build", "--bin", "${input:binName-prompt}"],
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/examples/rt685s-evk"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Cargo Build (release)",
+            "type": "process",
+            "command": "cargo",
+            "args": ["build", "--bin", "${input:binName-prompt}", "--release"],
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/examples/rt685s-evk"
+            },
+            "group": "build"
+        },
+        {
+            "label": "Cargo Run (debug)",
+            "type": "process",
+            "command": "cargo",
+            "args": ["run", "--bin", "${input:binName-prompt}"],
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/examples/rt685s-evk"
+            },
+            "group": "none"
+        },
+        {
+            "label": "Cargo Run (release)",
+            "type": "process",
+            "command": "cargo",
+            "args": ["run", "--bin", "${input:binName-prompt}", "--release"],
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/examples/rt685s-evk"
+            },
+            "group": "none"
+        },
+        {
+            "label": "Cargo Clean",
+            "type": "process",
+            "command": "cargo",
+            "args": ["clean"],
+            "problemMatcher": [],
+            "group": "build"
+        },
+    ],
+    "inputs": [
+        {
+            "id": "binName",
+            "type": "command",
+            "command": "extension.commandvariable.remember",
+            "args": { "key": "bin_name" }
+        },
+        {
+            "id": "binName-prompt",
+            "type": "promptString",
+            "description": "Enter the name of the binary to build",
+        }
+    ]
+}

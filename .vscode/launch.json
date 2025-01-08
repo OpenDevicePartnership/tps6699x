@@ -1,0 +1,58 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "preLaunchTask": "Probe-Rs Build (debug)",
+            "type": "probe-rs-debug",
+            "request": "launch",
+            "name": "probe_rs Debug (launch)",
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": "probe-rs",
+            "chip": "MIMXRT685SFVKB",
+            "flashingConfig": {
+                "flashingEnabled": true,
+            },
+            "coreConfigs": [
+                {
+                    "programBinary": "examples/rt685s-evk/target/thumbv8m.main-none-eabihf/debug/${input:binName}",
+                    "svdFile": ".vscode/MIMXRT685S_cm33.svd",
+                    "rttEnabled": true,
+                }
+            ],
+            "env": {
+                //"RUST_LOG": "Debug"
+            },
+            "consoleLogLevel": "Console"
+        },
+        {
+            "type": "probe-rs-debug",
+            "request": "attach",
+            "name": "probe_rs Debug (attach)",
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": "probe-rs",
+            "chip": "MIMXRT685SFVKB",
+            "coreConfigs": [
+                {
+                    "programBinary": "examples/rt685s-evk/target/thumbv8m.main-none-eabihf/debug/${input:binName}",
+                    "svdFile": ".vscode/MIMXRT685S_cm33.svd",
+                    "rttEnabled": true,
+                }
+            ],
+            "env": {
+                //"RUST_LOG": "Debug"
+            },
+            "consoleLogLevel": "Console"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "binName",
+            "type": "command",
+            "command": "extension.commandvariable.promptStringRemember",
+            "args": {
+                "key": "bin_name",
+                "description": "Enter the name of the binary to debug",
+            }
+        }
+    ]
+}

@@ -1,0 +1,48 @@
+[package]
+name = "type-c-test"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.79"
+
+[dependencies]
+embassy-imxrt = { git = "https://github.com/pop-project/embassy-imxrt", features = [
+    "defmt",
+    "time-driver",
+    "time",
+] }
+cortex-m = { version = "0.7.7", features = [
+    "inline-asm",
+    "critical-section-single-core",
+] }
+cortex-m-rt = "0.7.3"
+defmt = "0.3.0"
+defmt-rtt = "0.4.0"
+panic-probe = { version = "0.3.1", features = ["print-defmt"] }
+
+embassy-sync = { git = "https://github.com/embassy-rs/embassy", features = [
+    "defmt",
+] }
+embassy-executor = { git = "https://github.com/embassy-rs/embassy", features = [
+    "arch-cortex-m",
+    "executor-thread",
+    "executor-interrupt",
+    "defmt",
+] }
+embassy-futures = { git = "https://github.com/embassy-rs/embassy" }
+embassy-time = { git = "https://github.com/embassy-rs/embassy", features = [
+    "defmt",
+    "defmt-timestamp-uptime",
+] }
+futures = { version = "0.3.30", default-features = false, features = [
+    "async-await",
+] }
+mimxrt685s-pac = { version = "0.1.5", features = [
+    "rt",
+    "critical-section",
+    "defmt",
+] }
+rand = { version = "0.8.5", default-features = false }
+
+mimxrt600-fcb = "0.1.0"
+tps6699x = { path = "../../.", features = ["defmt"] }
+embedded-usb-pd = { path = "../../../embedded-usb-pd"}
