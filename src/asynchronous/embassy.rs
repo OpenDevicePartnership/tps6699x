@@ -92,7 +92,7 @@ pub struct Interrupt<'a, M: RawMutex, B: I2c, INT: Wait> {
 }
 
 impl<'a, M: RawMutex, B: I2c, INT: Wait> Interrupt<'a, M, B, INT> {
-    async fn borrow_inner(&mut self) -> MutexGuard<'_, M, internal::Tps6699x<B>> {
+    async fn lock_inner(&mut self) -> MutexGuard<'_, M, internal::Tps6699x<B>> {
         self.controller.inner.lock().await
     }
 
@@ -102,7 +102,7 @@ impl<'a, M: RawMutex, B: I2c, INT: Wait> Interrupt<'a, M, B, INT> {
             int.wait_for_low().await.unwrap();
         }
 
-        let mut inner = self.borrow_inner().await;
+        let mut inner = self.lock_inner().await;
         let p0_flags = inner.clear_interrupt(PortId(0)).await?;
         let p1_flags = inner.clear_interrupt(PortId(1)).await?;
 
