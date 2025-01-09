@@ -1,18 +1,17 @@
 //! High-level API that uses embassy_sync wakers
 // This code holds refcells across await points but this is controlled within the code using scope
 #![allow(clippy::await_holding_refcell_ref)]
-use core::{
-    cell::{RefCell, RefMut},
-    future::poll_fn,
-};
+use core::cell::{RefCell, RefMut};
+use core::future::poll_fn;
 
 use embassy_sync::waitqueue::AtomicWaker;
-use embedded_hal_async::{digital::Wait, i2c::I2c};
+use embedded_hal_async::digital::Wait;
+use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::{Error, PortId};
 
-use crate::{asynchronous::internal, registers::field_sets::IntEventBus1};
-
+use crate::asynchronous::internal;
 use crate::command::{Command, ReturnValue};
+use crate::registers::field_sets::IntEventBus1;
 
 pub struct Controller<B: I2c, INT: Wait> {
     inner: RefCell<internal::Tps6699x<B>>,
@@ -58,12 +57,11 @@ impl<'a, B: I2c, INT: Wait> Tps6699x<'a, B, INT> {
         &mut self,
         port: PortId,
         cmd: Command,
-        indata: Option<&[u8]>,
         outdata: Option<&mut [u8]>,
     ) -> Result<ReturnValue, Error<B::Error>> {
         {
             let mut inner = self.borrow_inner();
-            inner.send_command(port, cmd, indata).await?;
+            inner.send_command(port, cmd).await?;
         }
 
         self.wait_command_complete().await;

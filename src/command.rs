@@ -1,10 +1,32 @@
 use embedded_usb_pd::PdError;
 
+pub const REG_DATA1: u8 = 0x09;
+// Register is 512 bits
+pub const REG_DATA1_LEN: usize = 64;
+pub const CMD_SUCCESS: u32 = 0;
+// '!CMD'
+pub const CMD_UNKNOWN: u32 = 0x444E4321;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u32)]
+pub enum Operation {
+    /// Cold reset
+    Gaid = 0x01,
+}
+
+#[derive(Debug, Clone, Copy)]
 #[repr(u32)]
 pub enum Command {
     /// Cold reset
-    Gaid = 0x01,
+    Reset,
+}
+
+impl Command {
+    pub fn operation(&self) -> Operation {
+        match self {
+            Command::Reset => Operation::Gaid,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

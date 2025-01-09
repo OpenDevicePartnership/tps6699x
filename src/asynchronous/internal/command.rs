@@ -1,25 +1,18 @@
 //! Support for 4CC commands which communicate through the CMD1 and DATA1 registers
 //! The DATA1 register exceeds the 128 bit limit of the device driver crate so we have to handle it manually
-use super::*;
 use device_driver::AsyncRegisterInterface;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::Error;
 
-use crate::command::{Command, ReturnValue};
-
-const REG_DATA1: u8 = 0x09;
-// Register is 512 bits
-const REG_DATA1_LEN: usize = 64;
-const CMD_SUCCESS: u32 = 0;
-// '!CMD'
-const CMD_UNKNOWN: u32 = 0x444E4321;
+use super::*;
+use crate::command::{Command, Operation, ReturnValue, CMD_SUCCESS, CMD_UNKNOWN, REG_DATA1, REG_DATA1_LEN};
 
 // These are controller-level commands, we use borrow_port just for convenience
 impl<B: I2c> Tps6699x<B> {
-    pub async fn send_command(
+    pub async fn send_raw_command(
         &mut self,
         port: PortId,
-        cmd: Command,
+        cmd: Operation,
         data: Option<&[u8]>,
     ) -> Result<(), Error<B::Error>> {
         let mut registers = self.borrow_port(port)?.into_registers();
@@ -32,6 +25,18 @@ impl<B: I2c> Tps6699x<B> {
         }
 
         registers.cmd_1().write_async(|r| r.set_command(cmd as u32)).await
+    }
+
+    async fn send_reset_command(&mut self, port: PortId) -> Result<(), Error<B::Error>> {
+        // Arguments are two bytes that control FW bank selection, currently unused
+        let args = [0u8; 2];
+        self.send_raw_command(port, Operation::Gaid, Some(&args)).await
+    }
+
+    pub async fn send_command(&mut self, port: PortId, cmd: Command) -> Result<(), Error<B::Error>> {
+        match cmd {
+            Command::Reset => self.send_reset_command(port).await,
+        }
     }
 
     pub async fn read_command_result(
@@ -51,6 +56,13 @@ impl<B: I2c> Tps6699x<B> {
 
         let mut buf = [0u8; REG_DATA1_LEN];
 
+        if let Some(ref data) = data {
+            if data.len() > REG_DATA1_LEN - 1 {
+                // Data length too long
+                return PdError::InvalidParams.into();
+            }
+        }
+
         // First byte is return value
         let read_len = match data {
             Some(ref data) => data.len() + 1,
@@ -66,7 +78,7 @@ impl<B: I2c> Tps6699x<B> {
 
         // Overwrite return value
         if let Some(data) = data {
-            data.copy_from_slice(&buf[1..data.len()]);
+            data.copy_from_slice(&buf[1..=data.len()]);
         }
 
         Ok(ret)
