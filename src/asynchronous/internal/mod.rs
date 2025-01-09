@@ -5,6 +5,9 @@ use embedded_usb_pd::{Error, PdError, PortId};
 
 use crate::registers;
 
+mod command;
+pub use command::*;
+
 /// Wrapper to allow implementing device_driver traits on our I2C bus
 pub struct Port<'a, B: I2c> {
     bus: &'a mut B,

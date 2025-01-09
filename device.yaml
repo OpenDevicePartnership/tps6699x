@@ -4,6 +4,36 @@ config:
   default_bit_order: LSB0
   defmt_feature: defmt
 
+Cmd1:
+  type: register
+  address: 0x08
+  size_bits: 32
+  reset_value: 0x0
+  access: RW
+  description: Command 1 register
+  fields:
+    Command:
+      base: uint
+      start: 0
+      end: 31
+      description: Command value
+
+# The device driver crate doesn't support registers over 128 bits
+# Leaving this in for documentation purposes
+#Data1:
+#  type: register
+#  address: 0x09
+#  size_bits: 512
+#  reset_value: 0x0
+#  access: RW
+#  description: Data 1 register
+#  fields:
+#    Data:
+#      base: uint
+#      start: 0
+#      end: 511
+#      description: Data value
+
 # These are better named int_event_i2c*, but device_driver has issues breaking those names up
 IntEventBus1:
   type: register
