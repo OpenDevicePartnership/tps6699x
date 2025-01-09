@@ -5,8 +5,10 @@ use core::cell::{RefCell, RefMut};
 use core::future::poll_fn;
 
 use embassy_sync::waitqueue::AtomicWaker;
+use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::digital::Wait;
 use embedded_hal_async::i2c::I2c;
+use embedded_usb_pd::asynchronous::controller::PdController;
 use embedded_usb_pd::{Error, PortId};
 
 use crate::asynchronous::internal;
@@ -69,6 +71,12 @@ impl<'a, B: I2c, INT: Wait> Tps6699x<'a, B, INT> {
             let mut inner = self.borrow_inner();
             inner.read_command_result(port, outdata).await
         }
+    }
+}
+
+impl<'a, B: I2c, INT: Wait> PdController<B::Error> for Tps6699x<'a, B, INT> {
+    async fn reset(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<B::Error>> {
+        self.borrow_inner().reset(delay).await
     }
 }
 

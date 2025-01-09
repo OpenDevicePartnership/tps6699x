@@ -1,11 +1,15 @@
 //! This module implements a low-level TPS6699x driver. The super module provides a high-level API
 //! that uses standard PD types and provides functions that implement features that may occur over several interrupts
-use embedded_hal_async::i2c::I2c;
+use embedded_hal_async::{delay::DelayNs, i2c::I2c};
 use embedded_usb_pd::{Error, PdError, PortId};
 
-use crate::registers;
+use crate::{command::Command, registers};
 
 mod command;
+
+/// Delay after reset before we can assume the controller is ready
+// Derived from experimentation
+const RESET_DELAY_MS: u32 = 1500;
 
 /// Wrapper to allow implementing device_driver traits on our I2C bus
 pub struct Port<'a, B: I2c> {
@@ -151,6 +155,20 @@ impl<B: I2c> Tps6699x<B> {
             .active_rdo_contract()
             .read_async()
             .await
+    }
+
+    /// Reset the controller
+    // This command doesn't trigger an interrupt on completion so it can stay here
+    pub async fn reset(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<B::Error>> {
+        // This is a controller-level command, shouldn't matter which port we use
+        self.send_command(PortId(0), Command::Reset).await?;
+
+        delay.delay_ms(RESET_DELAY_MS).await;
+
+        // Check return value, the reset should clear the command result
+        let _ = self.read_command_result(PortId(0), None).await?;
+
+        Ok(())
     }
 }
 
