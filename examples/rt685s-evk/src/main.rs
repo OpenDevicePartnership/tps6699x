@@ -10,6 +10,7 @@ use embassy_imxrt::i2c::master::{I2cMaster, Speed};
 use embassy_imxrt::i2c::Async;
 use embassy_imxrt::{self, bind_interrupts, peripherals};
 use embassy_sync::blocking_mutex::raw::NoopRawMutex;
+use embedded_usb_pd::asynchronous::controller::PdController;
 use embedded_usb_pd::PortId;
 use mimxrt600_fcb::FlexSPIFlashConfigurationBlock;
 use static_cell::StaticCell;
@@ -38,6 +39,13 @@ async fn interrupt_task(mut interrupt: Interrupt<'static>) {
 
 #[embassy_executor::task]
 async fn pd_task(mut pd: Tps6699x<'static>) {
+    info!("Reseting PD controller");
+
+    let mut delay = embassy_time::Delay;
+
+    pd.reset(&mut delay).await.unwrap();
+    info!("PD controller reset complete");
+
     loop {
         let (p0_flags, p1_flags) = pd.wait_interrupt().await;
 
