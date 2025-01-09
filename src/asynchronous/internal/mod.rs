@@ -1,9 +1,11 @@
 //! This module implements a low-level TPS6699x driver. The super module provides a high-level API
 //! that uses standard PD types and provides functions that implement features that may occur over several interrupts
-use embedded_hal_async::{delay::DelayNs, i2c::I2c};
+use embedded_hal_async::delay::DelayNs;
+use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::{Error, PdError, PortId};
 
-use crate::{command::Command, registers};
+use crate::command::Command;
+use crate::registers;
 
 mod command;
 
@@ -182,6 +184,7 @@ mod test {
     use std::vec::Vec;
 
     use super::*;
+    use crate::command::{Operation, ReturnValue};
     use crate::{ADDR0, ADDR1};
 
     const PORT0: PortId = PortId(0);
@@ -518,5 +521,95 @@ mod test {
 
         test_get_active_rdo_contract(&mut tps6699x, PORT0, PORT0_ADDR1).await;
         test_get_active_rdo_contract(&mut tps6699x, PORT1, PORT1_ADDR1).await;
+    }
+
+    async fn test_send_raw_command(tps6699x: &mut Tps6699x<Mock>, port: PortId, expected_addr: u8) {
+        use registers::field_sets::Cmd1;
+
+        let mut transactions = Vec::new();
+        let mut cmd = Cmd1::new_zero();
+
+        cmd.set_command(Operation::Gaid as u32);
+
+        // Test without data
+        transactions.extend(create_register_write(expected_addr, 0x08, cmd).into_iter());
+        tps6699x.bus.update_expectations(&transactions);
+        tps6699x.send_raw_command(port, Operation::Gaid, None).await.unwrap();
+        tps6699x.bus.done();
+
+        // Test with data
+        transactions.clear();
+        transactions.extend(create_register_write(expected_addr, 0x09, [0xaa, 0xbb]));
+        transactions.extend(create_register_write(expected_addr, 0x08, cmd).into_iter());
+        tps6699x.bus.update_expectations(&transactions);
+        tps6699x
+            .send_raw_command(port, Operation::Gaid, Some(&[0xaa, 0xbb]))
+            .await
+            .unwrap();
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_send_raw_command_ports_0() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new(mock, ADDR0);
+
+        test_send_raw_command(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        test_send_raw_command(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    #[tokio::test]
+    async fn test_send_raw_command_ports_1() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new(mock, ADDR1);
+
+        test_send_raw_command(&mut tps6699x, PORT0, PORT0_ADDR1).await;
+        test_send_raw_command(&mut tps6699x, PORT1, PORT1_ADDR1).await;
+    }
+
+    async fn test_read_command_result(tps6699x: &mut Tps6699x<Mock>, port: PortId, expected_addr: u8) {
+        use registers::field_sets::Cmd1;
+
+        let mut transactions = Vec::new();
+        let mut cmd = Cmd1::new_zero();
+
+        cmd.set_command(Operation::Gaid as u32);
+
+        // Return value, but no data
+        transactions.extend(create_register_read(expected_addr, 0x08, [0x00, 0x00, 0x00, 0x00]).into_iter());
+        transactions.extend(create_register_read(expected_addr, 0x09, [0x00]).into_iter());
+        tps6699x.bus.update_expectations(&transactions);
+        let ret = tps6699x.read_command_result(port, None).await.unwrap();
+        assert_eq!(ret, ReturnValue::Success);
+        tps6699x.bus.done();
+
+        // Return value and data
+        let mut buf = [0u8; 2];
+        transactions.clear();
+        transactions.extend(create_register_read(expected_addr, 0x08, [0x00, 0x00, 0x00, 0x00]).into_iter());
+        transactions.extend(create_register_read(expected_addr, 0x09, [0x00, 0x02, 0x03]).into_iter());
+        tps6699x.bus.update_expectations(&transactions);
+        let ret = tps6699x.read_command_result(port, Some(&mut buf)).await.unwrap();
+        assert_eq!(ret, ReturnValue::Success);
+        assert_eq!(buf, [0x02, 0x03]);
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_read_command_results_ports_0() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new(mock, ADDR0);
+
+        test_read_command_result(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        test_read_command_result(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    #[tokio::test]
+    async fn test_read_command_results_ports_1() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new(mock, ADDR1);
+
+        test_read_command_result(&mut tps6699x, PORT0, PORT0_ADDR1).await;
+        test_read_command_result(&mut tps6699x, PORT1, PORT1_ADDR1).await;
     }
 }
