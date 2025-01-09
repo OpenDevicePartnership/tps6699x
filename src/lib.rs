@@ -1,6 +1,7 @@
 #![no_std]
 
 pub mod asynchronous;
+pub mod command;
 
 /// I2C address set 0
 pub const ADDR0: [u8; 2] = [0x20, 0x24];
