@@ -1,9 +1,12 @@
 //! High-level API that uses embassy_sync wakers
 // This code holds refcells across await points but this is controlled within the code using scope
 #![allow(clippy::await_holding_refcell_ref)]
-use core::cell::{RefCell, RefMut};
+use core::cell::RefCell;
 use core::future::poll_fn;
 
+use embassy_sync::blocking_mutex::raw::{NoopRawMutex, RawMutex};
+use embassy_sync::mutex::{Mutex, MutexGuard};
+use embassy_sync::signal::Signal;
 use embassy_sync::waitqueue::AtomicWaker;
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::digital::Wait;
@@ -15,33 +18,35 @@ use crate::asynchronous::internal;
 use crate::command::{Command, ReturnValue};
 use crate::registers::field_sets::IntEventBus1;
 
-pub struct Controller<B: I2c, INT: Wait> {
-    inner: RefCell<internal::Tps6699x<B>>,
+pub struct Controller<M: RawMutex, B: I2c, INT: Wait> {
+    inner: Mutex<M, internal::Tps6699x<B>>,
     int: RefCell<INT>,
     command_waker: AtomicWaker,
+    interrupt_waker: Signal<NoopRawMutex, (IntEventBus1, IntEventBus1)>,
 }
 
-impl<B: I2c, INT: Wait> Controller<B, INT> {
+impl<M: RawMutex, B: I2c, INT: Wait> Controller<M, B, INT> {
     pub fn new(bus: B, int: INT, addr: [u8; 2]) -> Result<Self, Error<B::Error>> {
         Ok(Self {
-            inner: RefCell::new(internal::Tps6699x::new(bus, addr)),
+            inner: Mutex::new(internal::Tps6699x::new(bus, addr)),
             int: RefCell::new(int),
             command_waker: AtomicWaker::new(),
+            interrupt_waker: Signal::new(),
         })
     }
 
-    pub fn make_parts(&mut self) -> (Tps6699x<'_, B, INT>, Interrupt<'_, B, INT>) {
+    pub fn make_parts(&mut self) -> (Tps6699x<'_, M, B, INT>, Interrupt<'_, M, B, INT>) {
         let tps = Tps6699x { controller: self };
         let interrupt = Interrupt { controller: self };
         (tps, interrupt)
     }
 }
 
-pub struct Tps6699x<'a, B: I2c, INT: Wait> {
-    controller: &'a Controller<B, INT>,
+pub struct Tps6699x<'a, M: RawMutex, B: I2c, INT: Wait> {
+    controller: &'a Controller<M, B, INT>,
 }
 
-impl<'a, B: I2c, INT: Wait> Tps6699x<'a, B, INT> {
+impl<'a, M: RawMutex, B: I2c, INT: Wait> Tps6699x<'a, M, B, INT> {
     async fn wait_command_complete(&mut self) {
         poll_fn(|cx| {
             self.controller.command_waker.register(cx.waker());
@@ -50,8 +55,8 @@ impl<'a, B: I2c, INT: Wait> Tps6699x<'a, B, INT> {
         .await;
     }
 
-    pub fn borrow_inner(&mut self) -> RefMut<'_, internal::Tps6699x<B>> {
-        self.controller.inner.borrow_mut()
+    pub async fn lock_inner(&mut self) -> MutexGuard<'_, M, internal::Tps6699x<B>> {
+        self.controller.inner.lock().await
     }
 
     /// Execute the given command
@@ -62,36 +67,40 @@ impl<'a, B: I2c, INT: Wait> Tps6699x<'a, B, INT> {
         outdata: Option<&mut [u8]>,
     ) -> Result<ReturnValue, Error<B::Error>> {
         {
-            let mut inner = self.borrow_inner();
+            let mut inner = self.lock_inner().await;
             inner.send_command(port, cmd).await?;
         }
 
         self.wait_command_complete().await;
         {
-            let mut inner = self.borrow_inner();
+            let mut inner = self.lock_inner().await;
             inner.read_command_result(port, outdata).await
         }
     }
-}
 
-impl<'a, B: I2c, INT: Wait> PdController<B::Error> for Tps6699x<'a, B, INT> {
-    async fn reset(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<B::Error>> {
-        self.borrow_inner().reset(delay).await
+    pub async fn wait_interrupt(&mut self) -> (IntEventBus1, IntEventBus1) {
+        self.controller.interrupt_waker.wait().await
     }
 }
 
-pub struct Interrupt<'a, B: I2c, INT: Wait> {
-    controller: &'a Controller<B, INT>,
+impl<'a, M: RawMutex, B: I2c, INT: Wait> PdController<B::Error> for Tps6699x<'a, M, B, INT> {
+    async fn reset(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<B::Error>> {
+        self.lock_inner().await.reset(delay).await
+    }
 }
 
-impl<'a, B: I2c, INT: Wait> Interrupt<'a, B, INT> {
-    fn borrow_inner(&mut self) -> RefMut<'_, internal::Tps6699x<B>> {
-        self.controller.inner.borrow_mut()
+pub struct Interrupt<'a, M: RawMutex, B: I2c, INT: Wait> {
+    controller: &'a Controller<M, B, INT>,
+}
+
+impl<'a, M: RawMutex, B: I2c, INT: Wait> Interrupt<'a, M, B, INT> {
+    async fn borrow_inner(&mut self) -> MutexGuard<'_, M, internal::Tps6699x<B>> {
+        self.controller.inner.lock().await
     }
 
     async fn check_interrupt(&mut self, port: PortId) -> Result<IntEventBus1, Error<B::Error>> {
         let flags = {
-            let mut inner = self.borrow_inner();
+            let mut inner = self.borrow_inner().await;
             inner.clear_interrupt(port).await?
         };
 
@@ -113,6 +122,7 @@ impl<'a, B: I2c, INT: Wait> Interrupt<'a, B, INT> {
         let p0_flags = self.check_interrupt(PortId(0)).await?;
         let p1_flags = self.check_interrupt(PortId(1)).await?;
 
+        self.controller.interrupt_waker.signal((p0_flags, p1_flags));
         Ok((p0_flags, p1_flags))
     }
 }
