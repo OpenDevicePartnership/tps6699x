@@ -7,7 +7,7 @@ rust-version = "1.83"
 
 [dependencies]
 embedded-hal-async = "1.0.0"
-embedded-usb-pd = { path = "../embedded-usb-pd", default-features = false }
+embedded-usb-pd = { git = "https://github.com/RobertZ2011/embedded-usb-pd.git", branch = "initial-work", default-features = false }
 device-driver = { version = "=1.0.0-rc.1", default-features = false, features = [
     "yaml",
 ] }
