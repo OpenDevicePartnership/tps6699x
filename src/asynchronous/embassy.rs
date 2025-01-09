@@ -2,12 +2,10 @@
 // This code holds refcells across await points but this is controlled within the code using scope
 #![allow(clippy::await_holding_refcell_ref)]
 use core::cell::RefCell;
-use core::future::poll_fn;
 
 use embassy_sync::blocking_mutex::raw::{NoopRawMutex, RawMutex};
 use embassy_sync::mutex::{Mutex, MutexGuard};
 use embassy_sync::signal::Signal;
-use embassy_sync::waitqueue::AtomicWaker;
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::digital::Wait;
 use embedded_hal_async::i2c::I2c;
@@ -21,7 +19,6 @@ use crate::registers::field_sets::IntEventBus1;
 pub struct Controller<M: RawMutex, B: I2c, INT: Wait> {
     inner: Mutex<M, internal::Tps6699x<B>>,
     int: RefCell<INT>,
-    command_waker: AtomicWaker,
     interrupt_waker: Signal<NoopRawMutex, (IntEventBus1, IntEventBus1)>,
 }
 
@@ -30,7 +27,6 @@ impl<M: RawMutex, B: I2c, INT: Wait> Controller<M, B, INT> {
         Ok(Self {
             inner: Mutex::new(internal::Tps6699x::new(bus, addr)),
             int: RefCell::new(int),
-            command_waker: AtomicWaker::new(),
             interrupt_waker: Signal::new(),
         })
     }
@@ -47,14 +43,6 @@ pub struct Tps6699x<'a, M: RawMutex, B: I2c, INT: Wait> {
 }
 
 impl<'a, M: RawMutex, B: I2c, INT: Wait> Tps6699x<'a, M, B, INT> {
-    async fn wait_command_complete(&mut self) {
-        poll_fn(|cx| {
-            self.controller.command_waker.register(cx.waker());
-            core::task::Poll::<()>::Pending
-        })
-        .await;
-    }
-
     pub async fn lock_inner(&mut self) -> MutexGuard<'_, M, internal::Tps6699x<B>> {
         self.controller.inner.lock().await
     }
@@ -81,6 +69,16 @@ impl<'a, M: RawMutex, B: I2c, INT: Wait> Tps6699x<'a, M, B, INT> {
     pub async fn wait_interrupt(&mut self) -> (IntEventBus1, IntEventBus1) {
         self.controller.interrupt_waker.wait().await
     }
+
+    async fn wait_command_complete(&mut self) {
+        loop {
+            let (p0_flags, p1_flags) = self.wait_interrupt().await;
+
+            if p0_flags.cmd_1_completed() || p1_flags.cmd_1_completed() {
+                break;
+            }
+        }
+    }
 }
 
 impl<'a, M: RawMutex, B: I2c, INT: Wait> PdController<B::Error> for Tps6699x<'a, M, B, INT> {
@@ -98,31 +96,16 @@ impl<'a, M: RawMutex, B: I2c, INT: Wait> Interrupt<'a, M, B, INT> {
         self.controller.inner.lock().await
     }
 
-    async fn check_interrupt(&mut self, port: PortId) -> Result<IntEventBus1, Error<B::Error>> {
-        let flags = {
-            let mut inner = self.borrow_inner().await;
-            inner.clear_interrupt(port).await?
-        };
-
-        if flags.cmd_1_completed() {
-            // Each port can execute commands, but this implementation is single threaded
-            // so only one command can be in progress at a time
-            self.controller.command_waker.wake();
-        }
-
-        Ok(flags)
-    }
-
     pub async fn process_interrupt(&mut self) -> Result<(IntEventBus1, IntEventBus1), Error<B::Error>> {
         {
             let mut int = self.controller.int.borrow_mut();
             int.wait_for_low().await.unwrap();
         }
 
-        let p0_flags = self.check_interrupt(PortId(0)).await?;
-        let p1_flags = self.check_interrupt(PortId(1)).await?;
+        let mut inner = self.borrow_inner().await;
+        let p0_flags = inner.clear_interrupt(PortId(0)).await?;
+        let p1_flags = inner.clear_interrupt(PortId(1)).await?;
 
-        self.controller.interrupt_waker.signal((p0_flags, p1_flags));
         Ok((p0_flags, p1_flags))
     }
 }
