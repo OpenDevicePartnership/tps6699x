@@ -183,6 +183,17 @@ impl<B: I2c> Tps6699x<B> {
             .await?;
         Mode::try_from(mode.mode()).map_err(Error::Pd)
     }
+
+    /// Get FW version
+    pub async fn get_fw_version(&mut self) -> Result<u32, Error<B::Error>> {
+        // This is a controller-level command, shouldn't matter which port we use
+        self.borrow_port(PortId(0))?
+            .into_registers()
+            .version()
+            .read_async()
+            .await
+            .map(|r| r.version())
+    }
 }
 
 #[cfg(test)]

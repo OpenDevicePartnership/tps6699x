@@ -18,6 +18,20 @@ Mode:
       end: 31
       description: Controller operation mode
 
+Version:
+  type: register
+  address: 0x0F
+  size_bits: 32
+  reset_value: 0x0
+  access: RO
+  description: Boot FW version
+  fields:
+    Version:
+      base: uint
+      start: 0
+      end: 31
+      description: Boot FW version
+
 
 Cmd1:
   type: register

@@ -49,6 +49,9 @@ async fn pd_task(mut pd: Tps6699x<'static>) {
         let mut inner = pd.lock_inner().await;
         let mode = inner.get_mode().await.unwrap();
         info!("Mode: {}", mode);
+
+        let version = inner.get_fw_version().await.unwrap();
+        info!("FW Version: {}", version);
     }
 
     loop {
