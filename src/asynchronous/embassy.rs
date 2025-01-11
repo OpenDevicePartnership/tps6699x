@@ -52,11 +52,12 @@ impl<'a, M: RawMutex, B: I2c, INT: Wait> Tps6699x<'a, M, B, INT> {
         &mut self,
         port: PortId,
         cmd: Command,
+        indata: Option<&[u8]>,
         outdata: Option<&mut [u8]>,
     ) -> Result<ReturnValue, Error<B::Error>> {
         {
             let mut inner = self.lock_inner().await;
-            inner.send_command(port, cmd).await?;
+            inner.send_raw_command(port, cmd, indata).await?;
         }
 
         self.wait_command_complete().await;
@@ -102,9 +103,15 @@ impl<'a, M: RawMutex, B: I2c, INT: Wait> Interrupt<'a, M, B, INT> {
             int.wait_for_low().await.unwrap();
         }
 
-        let mut inner = self.lock_inner().await;
-        let p0_flags = inner.clear_interrupt(PortId(0)).await?;
-        let p1_flags = inner.clear_interrupt(PortId(1)).await?;
+        let (p0_flags, p1_flags) = {
+            let mut inner = self.lock_inner().await;
+            let p0_flags = inner.clear_interrupt(PortId(0)).await?;
+            let p1_flags = inner.clear_interrupt(PortId(1)).await?;
+
+            (p0_flags, p1_flags)
+        };
+
+        self.controller.interrupt_waker.signal((p0_flags, p1_flags));
 
         Ok((p0_flags, p1_flags))
     }

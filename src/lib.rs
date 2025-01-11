@@ -15,3 +15,13 @@ pub mod registers {
         manifest: "device.yaml"
     );
 }
+
+/// Converts a 4-byte string into a u32
+const fn u32_from_str(value: &str) -> u32 {
+    if value.len() != command::CMD_LEN {
+        panic!("Invalid command string")
+    }
+
+    let bytes = value.as_bytes();
+    u32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]).to_le()
+}

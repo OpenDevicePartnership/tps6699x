@@ -1,31 +1,31 @@
 use embedded_usb_pd::PdError;
 
+use crate::u32_from_str;
+
 pub const REG_DATA1: u8 = 0x09;
 // Register is 512 bits
 pub const REG_DATA1_LEN: usize = 64;
-pub const CMD_SUCCESS: u32 = 0;
-// '!CMD'
-pub const CMD_UNKNOWN: u32 = 0x444E4321;
+
+/// Delay after reset before we can assume the controller is ready
+// Derived from experimentation
+pub const RESET_DELAY_MS: u32 = 1500;
+
+pub const CMD_LEN: usize = 4;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
-pub enum Operation {
-    /// Cold reset
-    Gaid = 0x01,
-}
-
-#[derive(Debug, Clone, Copy)]
-#[repr(u32)]
 pub enum Command {
-    /// Cold reset
-    Reset,
+    /// Previous command succeeded
+    Success = 0,
+    /// Invalid Command
+    Invalid = u32_from_str("!CMD"),
+    /// Cold-reset
+    Gaid = u32_from_str("GAID"),
 }
 
-impl Command {
-    pub fn operation(&self) -> Operation {
-        match self {
-            Command::Reset => Operation::Gaid,
-        }
+impl PartialEq<u32> for Command {
+    fn eq(&self, other: &u32) -> bool {
+        *self as u32 == *other
     }
 }
 

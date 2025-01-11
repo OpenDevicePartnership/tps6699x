@@ -4,14 +4,10 @@ use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::{Error, PdError, PortId};
 
-use crate::command::Command;
+use crate::command::{Command, RESET_DELAY_MS};
 use crate::registers;
 
 mod command;
-
-/// Delay after reset before we can assume the controller is ready
-// Derived from experimentation
-const RESET_DELAY_MS: u32 = 1500;
 
 /// Wrapper to allow implementing device_driver traits on our I2C bus
 pub struct Port<'a, B: I2c> {
@@ -160,15 +156,18 @@ impl<B: I2c> Tps6699x<B> {
     }
 
     /// Reset the controller
-    // This command doesn't trigger an interrupt on completion so it can stay here
+    // This command doesn't trigger an interrupt on completion so it fits here better
     pub async fn reset(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<B::Error>> {
         // This is a controller-level command, shouldn't matter which port we use
-        self.send_command(PortId(0), Command::Reset).await?;
+        let port = PortId(0);
+        self.send_raw_command_unchecked(port, Command::Gaid, None).await?;
 
         delay.delay_ms(RESET_DELAY_MS).await;
 
-        // Check return value, the reset should clear the command result
-        let _ = self.read_command_result(PortId(0), None).await?;
+        // Command register should be set to success value
+        if !self.check_command_complete(port).await? {
+            return PdError::InvalidParams.into();
+        }
 
         Ok(())
     }
@@ -184,7 +183,7 @@ mod test {
     use std::vec::Vec;
 
     use super::*;
-    use crate::command::{Operation, ReturnValue};
+    use crate::command::{ReturnValue, REG_DATA1_LEN};
     use crate::{ADDR0, ADDR1};
 
     const PORT0: PortId = PortId(0);
@@ -529,21 +528,23 @@ mod test {
         let mut transactions = Vec::new();
         let mut cmd = Cmd1::new_zero();
 
-        cmd.set_command(Operation::Gaid as u32);
+        cmd.set_command(Command::Gaid as u32);
 
         // Test without data
         transactions.extend(create_register_write(expected_addr, 0x08, cmd).into_iter());
+        transactions.extend(create_register_read(expected_addr, 0x08, cmd).into_iter());
         tps6699x.bus.update_expectations(&transactions);
-        tps6699x.send_raw_command(port, Operation::Gaid, None).await.unwrap();
+        tps6699x.send_raw_command(port, Command::Gaid, None).await.unwrap();
         tps6699x.bus.done();
 
         // Test with data
         transactions.clear();
         transactions.extend(create_register_write(expected_addr, 0x09, [0xaa, 0xbb]));
         transactions.extend(create_register_write(expected_addr, 0x08, cmd).into_iter());
+        transactions.extend(create_register_read(expected_addr, 0x08, cmd).into_iter());
         tps6699x.bus.update_expectations(&transactions);
         tps6699x
-            .send_raw_command(port, Operation::Gaid, Some(&[0xaa, 0xbb]))
+            .send_raw_command(port, Command::Gaid, Some(&[0xaa, 0xbb]))
             .await
             .unwrap();
         tps6699x.bus.done();
@@ -568,16 +569,11 @@ mod test {
     }
 
     async fn test_read_command_result(tps6699x: &mut Tps6699x<Mock>, port: PortId, expected_addr: u8) {
-        use registers::field_sets::Cmd1;
-
         let mut transactions = Vec::new();
-        let mut cmd = Cmd1::new_zero();
-
-        cmd.set_command(Operation::Gaid as u32);
 
         // Return value, but no data
         transactions.extend(create_register_read(expected_addr, 0x08, [0x00, 0x00, 0x00, 0x00]).into_iter());
-        transactions.extend(create_register_read(expected_addr, 0x09, [0x00]).into_iter());
+        transactions.extend(create_register_read(expected_addr, 0x09, [0x00; REG_DATA1_LEN]).into_iter());
         tps6699x.bus.update_expectations(&transactions);
         let ret = tps6699x.read_command_result(port, None).await.unwrap();
         assert_eq!(ret, ReturnValue::Success);
@@ -587,7 +583,11 @@ mod test {
         let mut buf = [0u8; 2];
         transactions.clear();
         transactions.extend(create_register_read(expected_addr, 0x08, [0x00, 0x00, 0x00, 0x00]).into_iter());
-        transactions.extend(create_register_read(expected_addr, 0x09, [0x00, 0x02, 0x03]).into_iter());
+
+        let mut expected = [0x00; REG_DATA1_LEN];
+        let _ = &mut expected[1..3].copy_from_slice(&[0x02, 0x03]);
+        transactions.extend(create_register_read(expected_addr, 0x09, expected).into_iter());
+
         tps6699x.bus.update_expectations(&transactions);
         let ret = tps6699x.read_command_result(port, Some(&mut buf)).await.unwrap();
         assert_eq!(ret, ReturnValue::Success);

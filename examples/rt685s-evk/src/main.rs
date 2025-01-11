@@ -39,10 +39,9 @@ async fn interrupt_task(mut interrupt: Interrupt<'static>) {
 
 #[embassy_executor::task]
 async fn pd_task(mut pd: Tps6699x<'static>) {
-    info!("Reseting PD controller");
-
     let mut delay = embassy_time::Delay;
 
+    info!("Reseting PD controller");
     pd.reset(&mut delay).await.unwrap();
     info!("PD controller reset complete");
 
