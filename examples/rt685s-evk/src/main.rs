@@ -45,6 +45,12 @@ async fn pd_task(mut pd: Tps6699x<'static>) {
     pd.reset(&mut delay).await.unwrap();
     info!("PD controller reset complete");
 
+    {
+        let mut inner = pd.lock_inner().await;
+        let mode = inner.get_mode().await.unwrap();
+        info!("Mode: {}", mode);
+    }
+
     loop {
         let (p0_flags, p1_flags) = pd.wait_interrupt().await;
 

@@ -4,6 +4,21 @@ config:
   default_bit_order: LSB0
   defmt_feature: defmt
 
+Mode:
+  type: register
+  address: 0x03
+  size_bits: 32
+  reset_value: 0x0
+  access: RO
+  description: Controller operation mode
+  fields:
+    Mode:
+      base: uint
+      start: 0
+      end: 31
+      description: Controller operation mode
+
+
 Cmd1:
   type: register
   address: 0x08
