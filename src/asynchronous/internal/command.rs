@@ -87,4 +87,21 @@ impl<B: I2c> Tps6699x<B> {
 
         Ok(ret)
     }
+
+    /// Reset the controller
+    // This command doesn't trigger an interrupt on completion so it fits here better
+    pub async fn reset(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<B::Error>> {
+        // This is a controller-level command, shouldn't matter which port we use
+        let port = PortId(0);
+        self.send_raw_command_unchecked(port, Command::Gaid, None).await?;
+
+        delay.delay_ms(RESET_DELAY_MS).await;
+
+        // Command register should be set to success value
+        if !self.check_command_complete(port).await? {
+            return PdError::InvalidParams.into();
+        }
+
+        Ok(())
+    }
 }

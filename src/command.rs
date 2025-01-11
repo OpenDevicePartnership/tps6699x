@@ -21,6 +21,11 @@ pub enum Command {
     Invalid = u32_from_str("!CMD"),
     /// Cold-reset
     Gaid = u32_from_str("GAID"),
+
+    /// Tomcat firmware update mode enter
+    Tfus = u32_from_str("TFUs"),
+    /// Tomcat firmware update mode exit
+    Tfue = u32_from_str("TFUe"),
 }
 
 impl PartialEq<u32> for Command {
