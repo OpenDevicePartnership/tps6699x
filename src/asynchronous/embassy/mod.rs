@@ -23,6 +23,8 @@ use crate::command::{
 use crate::registers::field_sets::IntEventBus1;
 use crate::{registers, Mode, TFUE_TIMEOUT_MS, TFUS_TIMEOUT_MS};
 
+pub mod task;
+
 pub struct Controller<M: RawMutex, B: I2c> {
     inner: Mutex<M, internal::Tps6699x<B>>,
     interrupt_waker: Signal<NoopRawMutex, (IntEventBus1, IntEventBus1)>,

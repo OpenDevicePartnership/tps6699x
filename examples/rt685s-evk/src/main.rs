@@ -5,14 +5,11 @@ use core::default::Default;
 
 use defmt::*;
 use embassy_executor::Spawner;
-use embassy_futures::yield_now;
 use embassy_imxrt::gpio::{Input, Inverter, Pull};
 use embassy_imxrt::i2c::master::{I2cMaster, Speed};
 use embassy_imxrt::i2c::Async;
 use embassy_imxrt::{self, bind_interrupts, peripherals};
 use embassy_sync::blocking_mutex::raw::NoopRawMutex;
-use embassy_time::Timer;
-use embedded_io_async::{Seek, SeekFrom};
 use embedded_usb_pd::asynchronous::controller::PdController;
 use embedded_usb_pd::PortId;
 use mimxrt600_fcb::FlexSPIFlashConfigurationBlock;
@@ -27,26 +24,21 @@ bind_interrupts!(struct Irqs {
 });
 
 type Bus<'a> = I2cMaster<'a, Async>;
-type Int<'a> = Input<'a>;
-type Controller<'a> = embassy::Controller<NoopRawMutex, Bus<'a>, Int<'a>>;
+type Controller<'a> = embassy::Controller<NoopRawMutex, Bus<'a>>;
 
-type Interrupt<'a> = embassy::Interrupt<'a, NoopRawMutex, Bus<'a>, Int<'a>>;
-type Tps6699x<'a> = embassy::Tps6699x<'a, NoopRawMutex, Bus<'a>, Int<'a>>;
+type Interrupt<'a> = embassy::Interrupt<'a, NoopRawMutex, Bus<'a>>;
+type Tps6699x<'a> = embassy::Tps6699x<'a, NoopRawMutex, Bus<'a>>;
 
 #[embassy_executor::task]
-async fn interrupt_task(mut interrupt: Interrupt<'static>) {
-    loop {
-        if let Err(e) = interrupt.process_interrupt().await {
-            error!("Error processing interrupt: {:?}", e);
-        }
-    }
+async fn interrupt_task(mut int_in: Input<'static>, mut interrupt: Interrupt<'static>) {
+    embassy::task::interrupt_task(&mut int_in, [&mut interrupt]).await;
 }
 
 #[embassy_executor::task]
 async fn pd_task(mut pd: Tps6699x<'static>) {
     let mut delay = embassy_time::Delay;
 
-    let fw = include_bytes!("../885_MIS-TCPM0-0.0.1.bin");
+    //let fw = include_bytes!("../885_MIS-TCPM0-0.0.1.bin");
 
     info!("Reseting PD controller");
     pd.reset(&mut delay).await.unwrap();
@@ -58,7 +50,6 @@ async fn pd_task(mut pd: Tps6699x<'static>) {
     let version = pd.get_fw_version().await.unwrap();
     info!("FW Version: {}", version);
 
-    yield_now().await;
     /*info!("Entering firmware update mode");
     pd.fw_update_mode_enter().await.unwrap();
 
@@ -121,10 +112,10 @@ async fn main(spawner: Spawner) {
     let device = I2cMaster::new_async(p.FLEXCOMM2, p.PIO0_18, p.PIO0_17, Irqs, Speed::Standard, p.DMA0_CH5).unwrap();
 
     static CONTROLLER: StaticCell<Controller<'static>> = StaticCell::new();
-    let controller = CONTROLLER.init(Controller::new(device, int_in, ADDR0).unwrap());
+    let controller = CONTROLLER.init(Controller::new(device, ADDR0).unwrap());
     let (pd, interrupt) = controller.make_parts();
 
-    spawner.must_spawn(interrupt_task(interrupt));
+    spawner.must_spawn(interrupt_task(int_in, interrupt));
     spawner.must_spawn(pd_task(pd));
 }
 
