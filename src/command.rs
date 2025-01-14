@@ -9,6 +9,9 @@ pub const REG_DATA1_LEN: usize = 64;
 /// Delay after reset before we can assume the controller is ready
 // Derived from experimentation
 pub const RESET_DELAY_MS: u32 = 1500;
+pub const TFUS_DELAY_MS: u32 = 500;
+pub const TFUS_TIMEOUT_MS: u32 = TFUS_DELAY_MS + 250;
+pub const TFUE_TIMEOUT_MS: u32 = 250;
 
 pub const CMD_LEN: usize = 4;
 
@@ -103,12 +106,18 @@ impl TryFrom<u8> for ReturnValue {
     }
 }
 
+pub const PD_FW_HEADER_BLOCK_INDEX: usize = 0;
+pub const PD_FW_DATA_BLOCK_START_INDEX: usize = 1;
+pub const PD_FW_APP_CONFIG_BLOCK_INDEX: usize = 0x12;
+
 pub const PD_FW_IMAGE_ID_LENGTH: usize = 4;
 pub const PD_FW_HEADER_METADATA_OFFSET: usize = PD_FW_IMAGE_ID_LENGTH;
 pub const PD_FW_HEADER_METADATA_LENGTH: usize = 8;
 pub const PD_FW_APP_IMAGE_SIZE_OFFSET: usize = 0x4F8;
 pub const PD_FW_HEADER_BLOCK_OFFSET: usize = PD_FW_HEADER_METADATA_OFFSET + PD_FW_HEADER_METADATA_LENGTH;
 pub const PD_FW_HEADER_BLOCK_LENGTH: usize = 0x800;
+pub const TFUI_BURST_WRITE_DELAY_MS: u64 = 250;
+pub const TFUD_BURST_WRITE_DELAY_MS: u64 = 150;
 pub const BURST_WRITE_SIZE: usize = 256;
 pub const PD_FW_DATA_BLOCK_SIZE: usize = 0x4000;
 pub const PD_FW_DATA_BLOCK_METADATA_SIZE: usize = 8;
@@ -205,6 +214,43 @@ pub enum TfuqBlockStatus {
     SpecialCmdFailed,
 }
 
+impl TryFrom<u8> for TfuqBlockStatus {
+    type Error = PdError;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            0x0 => Ok(TfuqBlockStatus::Success),
+            0x1 => Ok(TfuqBlockStatus::InvalidTfuState),
+            0x2 => Ok(TfuqBlockStatus::InvalidHeaderSize),
+            0x3 => Ok(TfuqBlockStatus::InvalidDataBlock),
+            0x4 => Ok(TfuqBlockStatus::InvalidDataSize),
+            0x5 => Ok(TfuqBlockStatus::InvalidSlaveAddress),
+            0x6 => Ok(TfuqBlockStatus::InvalidTimeout),
+            0x7 => Ok(TfuqBlockStatus::MaxAppConfigUpdate),
+            0x8 => Ok(TfuqBlockStatus::HeaderRxInProgress),
+            0x9 => Ok(TfuqBlockStatus::HeaderValidAndAuthentic),
+            0xA => Ok(TfuqBlockStatus::HeaderNotValid),
+            0xB => Ok(TfuqBlockStatus::HeaderKeyNotValid),
+            0xC => Ok(TfuqBlockStatus::HeaderRootAuthFailure),
+            0xD => Ok(TfuqBlockStatus::HeaderFwheaderAuthFailure),
+            0xE => Ok(TfuqBlockStatus::DataRxInProgress),
+            0xF => Ok(TfuqBlockStatus::DataValidAndAuthentic),
+            0x10 => Ok(TfuqBlockStatus::DataValidButRepeated),
+            0x11 => Ok(TfuqBlockStatus::DataNotValid),
+            0x12 => Ok(TfuqBlockStatus::DataInvalidId),
+            0x13 => Ok(TfuqBlockStatus::DataAuthFailure),
+            0x14 => Ok(TfuqBlockStatus::F911IdNotValid),
+            0x15 => Ok(TfuqBlockStatus::F911DataNotValid),
+            0x16 => Ok(TfuqBlockStatus::F911AuthFailure),
+            0x17 => Ok(TfuqBlockStatus::ImageDownloadTimeout),
+            0x18 => Ok(TfuqBlockStatus::BlockDownloadTimeout),
+            0x19 => Ok(TfuqBlockStatus::BlockWriteFailed),
+            0x1A => Ok(TfuqBlockStatus::SpecialCmdFailed),
+            _ => Err(PdError::InvalidParams),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct TfuqArgs {
@@ -232,7 +278,7 @@ pub struct TfuqReturnValue {
     pub current_state: u8,
     pub image_write_status: u8,
     pub blocks_written_bitfield: u16,
-    pub data_block_status: [u8; 13],
+    pub block_status: [u8; 13],
     pub num_of_header_bytes_received: u32,
     pub num_of_data_bytes_received: u32,
     pub num_of_app_config_updates: u16,
@@ -260,7 +306,7 @@ impl TfuqReturnValue {
             current_state,
             image_write_status,
             blocks_written_bitfield,
-            data_block_status,
+            block_status: data_block_status,
             num_of_header_bytes_received,
             num_of_data_bytes_received,
             num_of_app_config_updates,

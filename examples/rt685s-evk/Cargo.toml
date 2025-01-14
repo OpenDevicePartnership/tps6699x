@@ -36,6 +36,9 @@ embassy-time = { git = "https://github.com/embassy-rs/embassy", features = [
     "defmt",
     "defmt-timestamp-uptime",
 ] }
+embassy-embedded-hal = { git = "https://github.com/embassy-rs/embassy", features = [
+    "defmt",
+] }
 futures = { version = "0.3.30", default-features = false, features = [
     "async-await",
 ] }

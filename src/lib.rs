@@ -10,9 +10,6 @@ pub const ADDR0: [u8; 2] = [0x20, 0x24];
 /// I2C address set 1
 pub const ADDR1: [u8; 2] = [0x21, 0x25];
 
-pub const TFUS_TIMEOUT_MS: u64 = 250;
-pub const TFUE_TIMEOUT_MS: u64 = 250;
-
 pub mod registers {
     use device_driver;
     device_driver::create_device!(

@@ -1,11 +1,14 @@
 //! Support for 4CC commands which communicate through the CMD1 and DATA1 registers
 //! The DATA1 register exceeds the 128 bit limit of the device driver crate so we have to handle it manually
+use defmt::error;
 use device_driver::AsyncRegisterInterface;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::Error;
 
 use super::*;
-use crate::command::{ReturnValue, REG_DATA1, REG_DATA1_LEN};
+use crate::command::{
+    ResetArgs, ReturnValue, REG_DATA1, REG_DATA1_LEN, RESET_ARGS_LEN, RESET_FEATURE_ENABLE, TFUS_DELAY_MS,
+};
 
 // These are controller-level commands, we use borrow_port just for convenience
 impl<B: I2c> Tps6699x<B> {
@@ -102,8 +105,49 @@ impl<B: I2c> Tps6699x<B> {
             return PdError::Busy.into();
         }
 
-        self.clear_interrupt(PortId(0)).await?;
-        self.clear_interrupt(PortId(1)).await?;
+        Ok(())
+    }
+
+    /// Enter firmware update mode
+    // This command doesn't trigger an interrupt on completion so it fits here better
+    pub async fn execute_tfus(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<B::Error>> {
+        // This is a controller-level command, shouldn't matter which port we use
+        let port = PortId(0);
+        self.send_raw_command_unchecked(port, Command::Tfus, None).await?;
+
+        delay.delay_ms(TFUS_DELAY_MS).await;
+
+        // Confirm we're in the correct mode
+        let mode = self.get_mode().await?;
+        if mode != Mode::F211 {
+            error!("Failed to enter firmware update mode, mode: {:?}", mode);
+            return Err(PdError::InvalidMode.into());
+        }
+        Ok(())
+    }
+
+    /// Complete firmware update
+    // This command doesn't trigger an interrupt on completion so it fits here better
+    pub async fn execute_tfuc(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<B::Error>> {
+        let mut arg_bytes = [0u8; RESET_ARGS_LEN];
+
+        let args = ResetArgs {
+            switch_banks: 0,
+            copy_bank: RESET_FEATURE_ENABLE,
+        };
+
+        args.encode_into_slice(&mut arg_bytes).map_err(Error::Pd)?;
+
+        // This is a controller-level command, shouldn't matter which port we use
+        let port = PortId(0);
+        self.send_raw_command_unchecked(port, Command::Tfuc, None).await?;
+
+        delay.delay_ms(RESET_DELAY_MS).await;
+
+        // Command register should be set to success value
+        if !self.check_command_complete(port).await? {
+            return PdError::Busy.into();
+        }
 
         Ok(())
     }

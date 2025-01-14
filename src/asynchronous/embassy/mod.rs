@@ -1,11 +1,11 @@
 //! High-level API that uses embassy_sync wakers
 // This code holds refcells across await points but this is controlled within the code using scope
 
-use defmt::debug;
+use defmt::{debug, info};
 use embassy_sync::blocking_mutex::raw::{NoopRawMutex, RawMutex};
 use embassy_sync::mutex::{Mutex, MutexGuard};
 use embassy_sync::signal::Signal;
-use embassy_time::{with_timeout, Duration, Timer};
+use embassy_time::{with_timeout, Duration};
 use embedded_hal::digital::InputPin;
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::i2c::I2c;
@@ -13,16 +13,11 @@ use embedded_usb_pd::asynchronous::controller::PdController;
 use embedded_usb_pd::{Error, PdError, PortId};
 
 use crate::asynchronous::internal;
-use crate::command::{
-    Command, ResetArgs, ReturnValue, TfudArgs, TfuiArgs, TfuqArgs, TfuqBlockStatus, TfuqCommandType, TfuqReturnValue,
-    TfuqStatusQuery, BURST_WRITE_SIZE, PD_FW_APP_CONFIG_METADATA_SIZE, PD_FW_APP_IMAGE_SIZE_OFFSET,
-    PD_FW_DATA_BLOCK_METADATA_SIZE, PD_FW_DATA_BLOCK_SIZE, PD_FW_HEADER_BLOCK_LENGTH, PD_FW_HEADER_BLOCK_OFFSET,
-    PD_FW_HEADER_METADATA_LENGTH, PD_FW_HEADER_METADATA_OFFSET, PD_FW_IMAGE_ID_LENGTH, RESET_ARGS_LEN,
-    RESET_FEATURE_ENABLE, TFUQ_RETURN_LEN,
-};
+use crate::command::*;
 use crate::registers::field_sets::IntEventBus1;
-use crate::{registers, Mode, TFUE_TIMEOUT_MS, TFUS_TIMEOUT_MS};
+use crate::{registers, Mode};
 
+pub mod fw_update;
 pub mod task;
 
 pub struct Controller<M: RawMutex, B: I2c> {
@@ -129,115 +124,50 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         }
     }
 
-    pub async fn fw_update_mode_enter(&mut self) -> Result<(), Error<B::Error>> {
-        let result = with_timeout(
-            Duration::from_millis(TFUS_TIMEOUT_MS),
-            self.execute_command_int_type(PortId(0), Command::Tfus, None, None, |flags| {
-                defmt::info!("Checking command interrupt");
-                flags.boot_error()
-            }),
+    pub(crate) async fn fw_update_mode_enter(&mut self) -> Result<(), Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        let mut delay = embassy_time::Delay;
+
+        with_timeout(
+            Duration::from_millis(TFUS_TIMEOUT_MS.into()),
+            inner.execute_tfus(&mut delay),
         )
         .await
-        .map_err(|_| PdError::Timeout.into())??;
-
-        defmt::debug!("Write command: {:?}", result);
-        if result == ReturnValue::Abort {
-            return Err(PdError::Busy.into());
-        } else if result != ReturnValue::Success {
-            return Err(PdError::Failed.into());
-        }
-
-        // Confirm we're in the correct mode
-        let mode = self.get_mode().await?;
-        defmt::info!("Mode: {}", mode);
-        if mode != Mode::F211 {
-            return Err(PdError::InvalidMode.into());
-        }
-        Ok(())
+        .map_err(|_| PdError::Timeout.into())?
     }
 
-    async fn burst_write(&mut self, address: u8, data: &[u8]) -> Result<(), Error<B::Error>> {
-        let mut inner = self.lock_inner().await;
-        for chunk in data.chunks(BURST_WRITE_SIZE) {
-            inner.bus.write(address, chunk).await.map_err(Error::Bus)?;
-        }
+    pub(crate) async fn fw_update_init(&mut self, args: &TfuiArgs) -> Result<ReturnValue, Error<B::Error>> {
+        let mut args_buf = [0u8; PD_FW_HEADER_METADATA_LENGTH as usize];
 
-        Ok(())
-    }
-
-    fn get_image_size(image: &[u8]) -> Result<u32, Error<B::Error>> {
-        if image.len() < PD_FW_APP_IMAGE_SIZE_OFFSET + 4 {
-            return PdError::InvalidParams.into();
-        }
-
-        let image_size_data = &image[PD_FW_APP_IMAGE_SIZE_OFFSET..PD_FW_APP_IMAGE_SIZE_OFFSET + 4];
-        Ok(u32::from_le_bytes([
-            image_size_data[0],
-            image_size_data[1],
-            image_size_data[2],
-            image_size_data[3],
-        ]))
-    }
-
-    // TODO: make this use Seek and Read traits
-    pub async fn fw_update_init(&mut self, image: &[u8]) -> Result<(), Error<B::Error>> {
-        let mut buf = [0u8; PD_FW_HEADER_METADATA_LENGTH as usize];
-
-        // Get TFUi args from image
-        if PD_FW_HEADER_METADATA_OFFSET + PD_FW_HEADER_METADATA_LENGTH > image.len() {
-            return Err(PdError::InvalidParams.into());
-        }
-
-        buf.copy_from_slice(
-            &image[PD_FW_HEADER_METADATA_OFFSET as usize
-                ..(PD_FW_HEADER_METADATA_OFFSET + PD_FW_HEADER_METADATA_LENGTH) as usize],
-        );
-
-        let tfui_args = TfuiArgs::decode_from_slice(&buf).map_err(Error::Pd)?;
-        defmt::info!("Tfui args: {:?}", tfui_args);
-
-        self.execute_command(PortId(0), Command::Tfui, Some(&buf), None).await?;
-
-        debug!("Transfering header block");
-        let header_block = &image
-            [PD_FW_HEADER_BLOCK_OFFSET as usize..(PD_FW_HEADER_BLOCK_OFFSET + PD_FW_HEADER_BLOCK_LENGTH) as usize];
-        debug!(
-            "Header block offset: {:?}, size {}",
-            PD_FW_HEADER_BLOCK_OFFSET,
-            header_block.len()
-        );
-
-        self.burst_write(tfui_args.broadcast_u16_address as u8, header_block)
-            .await?;
-
-        Timer::after_millis(250).await;
-        debug!("Validing header");
-        self.fw_update_validate_stream().await?;
-
-        Ok(())
+        args.encode_into_slice(&mut args_buf).map_err(Error::Pd)?;
+        self.execute_command(PortId(0), Command::Tfui, Some(&args_buf), None)
+            .await
     }
 
     pub async fn fw_update_mode_exit(&mut self) -> Result<(), Error<B::Error>> {
-        defmt::info!("Exiting firmware update mode");
+        info!("Exiting firmware update mode");
         let result = with_timeout(
-            Duration::from_millis(TFUE_TIMEOUT_MS),
+            Duration::from_millis(TFUE_TIMEOUT_MS.into()),
             self.execute_command(PortId(0), Command::Tfue, None, None),
         )
         .await;
 
         // Reset the controller if we failed to exit fw update mode
         if result.is_err() || result.unwrap()? != ReturnValue::Success {
-            defmt::info!("Failed to exit, attempting to reset");
+            info!("Failed to exit, attempting to reset");
             let mut delay = embassy_time::Delay;
             self.reset(&mut delay).await?;
             return Err(PdError::Failed.into());
         }
 
-        defmt::info!("Exit firmware update mode complete");
+        info!("Exit firmware update mode complete");
         Ok(())
     }
 
-    pub async fn fw_update_validate_stream(&mut self) -> Result<TfuqBlockStatus, Error<B::Error>> {
+    pub(crate) async fn fw_update_validate_stream(
+        &mut self,
+        block_index: usize,
+    ) -> Result<TfuqBlockStatus, Error<B::Error>> {
         let args = TfuqArgs {
             command: TfuqCommandType::QueryTfuStatus,
             status_query: TfuqStatusQuery::StatusInProgress,
@@ -249,7 +179,7 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         args.encode_into_slice(&mut arg_bytes).map_err(Error::Pd)?;
 
         let result = with_timeout(
-            Duration::from_millis(TFUE_TIMEOUT_MS),
+            Duration::from_millis(TFUE_TIMEOUT_MS.into()),
             self.execute_command(PortId(0), Command::Tfuq, Some(&arg_bytes), Some(&mut return_bytes)),
         )
         .await;
@@ -259,110 +189,57 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
             return PdError::Timeout.into();
         }
 
+        if result.unwrap()? != ReturnValue::Success {
+            debug!("Validate stream failed");
+            return PdError::Failed.into();
+        }
+
         let data = TfuqReturnValue::decode_from_slice(&return_bytes).map_err(Error::Pd)?;
-        debug!("Validate stream result: {:?}", data);
-
-        Ok(TfuqBlockStatus::Success)
+        TfuqBlockStatus::try_from(data.block_status[block_index]).map_err(Error::Pd)
     }
 
-    const fn data_block_metadata_offset(block: usize) -> usize {
-        PD_FW_HEADER_BLOCK_OFFSET
-            + PD_FW_HEADER_BLOCK_LENGTH
-            + (block * (PD_FW_DATA_BLOCK_SIZE + PD_FW_DATA_BLOCK_METADATA_SIZE))
-    }
+    pub(crate) async fn fw_update_stream_data(&mut self, args: &TfudArgs) -> Result<(), Error<B::Error>> {
+        let mut arg_bytes = [0u8; TFUD_ARGS_LEN];
 
-    const fn block_offset(metadata_offset: usize) -> usize {
-        metadata_offset + PD_FW_DATA_BLOCK_METADATA_SIZE
-    }
-
-    const fn app_config_block_metadata_offset(num_data_blocks: usize, app_size: usize) -> usize {
-        app_size
-            + PD_FW_IMAGE_ID_LENGTH
-            + PD_FW_HEADER_METADATA_LENGTH
-            + PD_FW_HEADER_BLOCK_LENGTH
-            + num_data_blocks * PD_FW_DATA_BLOCK_METADATA_SIZE
-    }
-
-    async fn fw_update_stream_data(
-        &mut self,
-        image: &[u8],
-        metadata_offset: usize,
-        metadata_size: usize,
-    ) -> Result<(), Error<B::Error>> {
-        debug!(
-            "Metadata offset: {}, offset: {}",
-            metadata_offset,
-            Self::block_offset(metadata_offset)
-        );
-        let arg_bytes = &image[metadata_offset..metadata_offset + metadata_size];
-
-        let args = TfudArgs::decode_from_slice(arg_bytes).map_err(Error::Pd)?;
         debug!("TFUd args: {:?}", args);
+        TfudArgs::encode_into_slice(args, &mut arg_bytes).map_err(Error::Pd)?;
 
         let result = with_timeout(
-            Duration::from_millis(TFUE_TIMEOUT_MS),
+            Duration::from_millis(TFUE_TIMEOUT_MS.into()),
             self.execute_command(PortId(0), Command::Tfud, Some(&arg_bytes), None),
         )
         .await;
 
         if result.is_err() {
-            debug!("Validate stream timeout");
+            debug!("Stream data timeout");
             return PdError::Timeout.into();
         }
 
-        let data_len = args.data_len as usize;
-        let block = &image[Self::block_offset(metadata_offset)..Self::block_offset(metadata_offset) + data_len];
-        self.burst_write(args.broadcast_u16_address as u8, block).await?;
-
-        let status = self.fw_update_validate_stream().await?;
-        debug!("Data block status: {:?}", status);
-
-        Timer::after_millis(150).await;
-
-        Ok(())
-    }
-
-    pub async fn fw_update_load_app_image(
-        &mut self,
-        image: &[u8],
-        num_data_blocks: usize,
-    ) -> Result<(), Error<B::Error>> {
-        for i in 0..num_data_blocks {
-            self.fw_update_stream_data(
-                image,
-                Self::data_block_metadata_offset(i),
-                PD_FW_DATA_BLOCK_METADATA_SIZE,
-            )
-            .await?;
+        if result.unwrap()? != ReturnValue::Success {
+            debug!("Stream data failed");
+            return PdError::Failed.into();
         }
 
         Ok(())
     }
 
-    pub async fn fw_update_load_app_config(
-        &mut self,
-        image: &[u8],
-        num_data_blocks: usize,
-    ) -> Result<(), Error<B::Error>> {
-        let app_size = Self::get_image_size(image)? as usize;
-        debug!("App size: {}", app_size);
-        let metadata_offset = Self::app_config_block_metadata_offset(num_data_blocks, app_size);
-        self.fw_update_stream_data(image, metadata_offset, PD_FW_APP_CONFIG_METADATA_SIZE)
-            .await
-    }
+    pub(crate) async fn fw_update_complete(&mut self) -> Result<(), Error<B::Error>> {
+        let result = with_timeout(
+            Duration::from_millis(TFUE_TIMEOUT_MS.into()),
+            self.execute_command(PortId(0), Command::Tfuc, None, None),
+        )
+        .await;
 
-    pub async fn fw_update_complete(&mut self) -> Result<(), Error<B::Error>> {
-        let mut arg_bytes = [0u8; RESET_ARGS_LEN];
+        if result.is_err() {
+            debug!("Complete timeout");
+            return PdError::Timeout.into();
+        }
 
-        let args = ResetArgs {
-            switch_banks: 0,
-            copy_bank: RESET_FEATURE_ENABLE,
-        };
+        if result.unwrap()? != ReturnValue::Success {
+            debug!("Complete failed");
+            return PdError::Failed.into();
+        }
 
-        args.encode_into_slice(&mut arg_bytes).map_err(Error::Pd)?;
-
-        self.execute_command(PortId(0), Command::Tfuc, Some(&arg_bytes), None)
-            .await?;
         Ok(())
     }
 }
