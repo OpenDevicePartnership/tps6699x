@@ -1,16 +1,13 @@
 //! High-level API that uses embassy_sync wakers
 // This code holds refcells across await points but this is controlled within the code using scope
-#![allow(clippy::await_holding_refcell_ref)]
-use core::cell::RefCell;
-use core::num;
 
 use defmt::debug;
 use embassy_sync::blocking_mutex::raw::{NoopRawMutex, RawMutex};
 use embassy_sync::mutex::{Mutex, MutexGuard};
 use embassy_sync::signal::Signal;
 use embassy_time::{with_timeout, Duration, Timer};
+use embedded_hal::digital::InputPin;
 use embedded_hal_async::delay::DelayNs;
-use embedded_hal_async::digital::Wait;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::asynchronous::controller::PdController;
 use embedded_usb_pd::{Error, PdError, PortId};
@@ -26,33 +23,31 @@ use crate::command::{
 use crate::registers::field_sets::IntEventBus1;
 use crate::{registers, Mode, TFUE_TIMEOUT_MS, TFUS_TIMEOUT_MS};
 
-pub struct Controller<M: RawMutex, B: I2c, INT: Wait> {
+pub struct Controller<M: RawMutex, B: I2c> {
     inner: Mutex<M, internal::Tps6699x<B>>,
-    int: RefCell<INT>,
     interrupt_waker: Signal<NoopRawMutex, (IntEventBus1, IntEventBus1)>,
 }
 
-impl<M: RawMutex, B: I2c, INT: Wait> Controller<M, B, INT> {
-    pub fn new(bus: B, int: INT, addr: [u8; 2]) -> Result<Self, Error<B::Error>> {
+impl<M: RawMutex, B: I2c> Controller<M, B> {
+    pub fn new(bus: B, addr: [u8; 2]) -> Result<Self, Error<B::Error>> {
         Ok(Self {
             inner: Mutex::new(internal::Tps6699x::new(bus, addr)),
-            int: RefCell::new(int),
             interrupt_waker: Signal::new(),
         })
     }
 
-    pub fn make_parts(&mut self) -> (Tps6699x<'_, M, B, INT>, Interrupt<'_, M, B, INT>) {
+    pub fn make_parts(&mut self) -> (Tps6699x<'_, M, B>, Interrupt<'_, M, B>) {
         let tps = Tps6699x { controller: self };
         let interrupt = Interrupt { controller: self };
         (tps, interrupt)
     }
 }
 
-pub struct Tps6699x<'a, M: RawMutex, B: I2c, INT: Wait> {
-    controller: &'a Controller<M, B, INT>,
+pub struct Tps6699x<'a, M: RawMutex, B: I2c> {
+    controller: &'a Controller<M, B>,
 }
 
-impl<'a, M: RawMutex, B: I2c, INT: Wait> Tps6699x<'a, M, B, INT> {
+impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     pub async fn lock_inner(&mut self) -> MutexGuard<'_, M, internal::Tps6699x<B>> {
         self.controller.inner.lock().await
     }
@@ -286,13 +281,18 @@ impl<'a, M: RawMutex, B: I2c, INT: Wait> Tps6699x<'a, M, B, INT> {
             + num_data_blocks * PD_FW_DATA_BLOCK_METADATA_SIZE
     }
 
-    async fn fw_update_stream_data(&mut self, image: &[u8], metadata_offset: usize) -> Result<(), Error<B::Error>> {
+    async fn fw_update_stream_data(
+        &mut self,
+        image: &[u8],
+        metadata_offset: usize,
+        metadata_size: usize,
+    ) -> Result<(), Error<B::Error>> {
         debug!(
             "Metadata offset: {}, offset: {}",
             metadata_offset,
             Self::block_offset(metadata_offset)
         );
-        let arg_bytes = &image[metadata_offset..metadata_offset + PD_FW_DATA_BLOCK_METADATA_SIZE];
+        let arg_bytes = &image[metadata_offset..metadata_offset + metadata_size];
 
         let args = TfudArgs::decode_from_slice(arg_bytes).map_err(Error::Pd)?;
         debug!("TFUd args: {:?}", args);
@@ -326,8 +326,12 @@ impl<'a, M: RawMutex, B: I2c, INT: Wait> Tps6699x<'a, M, B, INT> {
         num_data_blocks: usize,
     ) -> Result<(), Error<B::Error>> {
         for i in 0..num_data_blocks {
-            self.fw_update_stream_data(image, Self::data_block_metadata_offset(i))
-                .await?;
+            self.fw_update_stream_data(
+                image,
+                Self::data_block_metadata_offset(i),
+                PD_FW_DATA_BLOCK_METADATA_SIZE,
+            )
+            .await?;
         }
 
         Ok(())
@@ -341,7 +345,8 @@ impl<'a, M: RawMutex, B: I2c, INT: Wait> Tps6699x<'a, M, B, INT> {
         let app_size = Self::get_image_size(image)? as usize;
         debug!("App size: {}", app_size);
         let metadata_offset = Self::app_config_block_metadata_offset(num_data_blocks, app_size);
-        self.fw_update_stream_data(image, metadata_offset).await
+        self.fw_update_stream_data(image, metadata_offset, PD_FW_APP_CONFIG_METADATA_SIZE)
+            .await
     }
 
     pub async fn fw_update_complete(&mut self) -> Result<(), Error<B::Error>> {
@@ -360,45 +365,60 @@ impl<'a, M: RawMutex, B: I2c, INT: Wait> Tps6699x<'a, M, B, INT> {
     }
 }
 
-impl<'a, M: RawMutex, B: I2c, INT: Wait> PdController<B::Error> for Tps6699x<'a, M, B, INT> {
+impl<'a, M: RawMutex, B: I2c> PdController<B::Error> for Tps6699x<'a, M, B> {
     async fn reset(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<B::Error>> {
         self.lock_inner().await.reset(delay).await
     }
 }
 
-pub struct Interrupt<'a, M: RawMutex, B: I2c, INT: Wait> {
-    controller: &'a Controller<M, B, INT>,
+pub struct Interrupt<'a, M: RawMutex, B: I2c> {
+    controller: &'a Controller<M, B>,
 }
 
-impl<'a, M: RawMutex, B: I2c, INT: Wait> Interrupt<'a, M, B, INT> {
+impl<'a, M: RawMutex, B: I2c> Interrupt<'a, M, B> {
     async fn lock_inner(&mut self) -> MutexGuard<'_, M, internal::Tps6699x<B>> {
         self.controller.inner.lock().await
     }
 
-    pub async fn process_interrupt(&mut self) -> Result<(IntEventBus1, IntEventBus1), Error<B::Error>> {
-        let mut int = self.controller.int.borrow_mut();
-        int.wait_for_low().await.unwrap();
+    pub async fn process_interrupt(
+        &mut self,
+        int: &mut impl InputPin,
+    ) -> Result<(IntEventBus1, IntEventBus1), Error<B::Error>> {
+        let mut flags = [IntEventBus1::new_zero(); 2];
 
-        let (p0_flags, p1_flags) = {
+        {
             let mut inner = self.lock_inner().await;
-            let p0_flags = inner.clear_interrupt(PortId(0)).await;
-            if let Err(_) = p0_flags {
-                defmt::error!("Error clearing interrupt");
+            for port in 0..2 {
+                let port_id = PortId(port);
+
+                // Early exit if checking the last port cleared the interrupt
+                // TODO: better error handling
+                let result = int.is_high();
+                if result.is_err() || !result.unwrap() {
+                    flags[port as usize] = IntEventBus1::new_zero();
+                }
+
+                let result = inner.clear_interrupt(port_id).await;
+                if let Err(e) = result {
+                    match e {
+                        Error::Pd(PdError::Busy) => {
+                            // Under certain conditions the controller will not respond to reads while processing a command
+                            // This is a normal condition and should be ignored
+                            continue;
+                        }
+                        _ => {
+                            defmt::error!("Error processing interrupt on port {}", port);
+                            return Err(e);
+                        }
+                    }
+                }
+
+                flags[port as usize] = result.unwrap_or(IntEventBus1::new_zero());
             }
-            defmt::info!("Checking P1");
-            let p1_flags = inner.clear_interrupt(PortId(1)).await;
-            if let Err(_) = p1_flags {
-                defmt::error!("Error clearing interrupt");
-            }
+        }
 
-            (
-                p0_flags.unwrap_or(IntEventBus1::new_zero()),
-                p1_flags.unwrap_or(IntEventBus1::new_zero()),
-            )
-        };
-
-        self.controller.interrupt_waker.signal((p0_flags, p1_flags));
-
-        Ok((p0_flags, p1_flags))
+        let flags = (flags[0], flags[1]);
+        self.controller.interrupt_waker.signal(flags);
+        Ok(flags)
     }
 }
