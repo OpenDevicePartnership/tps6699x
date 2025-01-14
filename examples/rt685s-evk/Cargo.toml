@@ -5,7 +5,8 @@ edition = "2021"
 rust-version = "1.79"
 
 [dependencies]
-embassy-imxrt = { git = "https://github.com/pop-project/embassy-imxrt", features = [
+#git = "https://github.com/pop-project/embassy-imxrt"
+embassy-imxrt = { path = "../../../embassy-imxrt", features = [
     "defmt",
     "time-driver",
     "time",
@@ -20,6 +21,7 @@ defmt-rtt = "0.4.0"
 panic-probe = { version = "0.3.1", features = ["print-defmt"] }
 
 embedded-hal-async = "1.0.0"
+embedded-io-async = "0.6.1"
 embassy-sync = { git = "https://github.com/embassy-rs/embassy", features = [
     "defmt",
 ] }
@@ -44,7 +46,7 @@ mimxrt685s-pac = { version = "0.1.5", features = [
 ] }
 rand = { version = "0.8.5", default-features = false }
 
-embedded-usb-pd = { git = "https://github.com/RobertZ2011/embedded-usb-pd.git", branch = "initial-work" }
+embedded-usb-pd = { path = "../../../embedded-usb-pd", features = ["defmt"] }
 
 mimxrt600-fcb = "0.1.0"
 tps6699x = { path = "../../.", features = ["defmt", "embassy"] }

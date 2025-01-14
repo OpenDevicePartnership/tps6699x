@@ -3,13 +3,16 @@
 #![allow(clippy::await_holding_refcell_ref)]
 use core::default::Default;
 
-use defmt::info;
+use defmt::*;
 use embassy_executor::Spawner;
+use embassy_futures::yield_now;
 use embassy_imxrt::gpio::{Input, Inverter, Pull};
 use embassy_imxrt::i2c::master::{I2cMaster, Speed};
 use embassy_imxrt::i2c::Async;
 use embassy_imxrt::{self, bind_interrupts, peripherals};
 use embassy_sync::blocking_mutex::raw::NoopRawMutex;
+use embassy_time::Timer;
+use embedded_io_async::{Seek, SeekFrom};
 use embedded_usb_pd::asynchronous::controller::PdController;
 use embedded_usb_pd::PortId;
 use mimxrt600_fcb::FlexSPIFlashConfigurationBlock;
@@ -33,7 +36,9 @@ type Tps6699x<'a> = embassy::Tps6699x<'a, NoopRawMutex, Bus<'a>, Int<'a>>;
 #[embassy_executor::task]
 async fn interrupt_task(mut interrupt: Interrupt<'static>) {
     loop {
-        let _ = interrupt.process_interrupt().await.unwrap();
+        if let Err(e) = interrupt.process_interrupt().await {
+            error!("Error processing interrupt: {:?}", e);
+        }
     }
 }
 
@@ -41,21 +46,41 @@ async fn interrupt_task(mut interrupt: Interrupt<'static>) {
 async fn pd_task(mut pd: Tps6699x<'static>) {
     let mut delay = embassy_time::Delay;
 
+    let fw = include_bytes!("../885_MIS-TCPM0-0.0.1.bin");
+
     info!("Reseting PD controller");
     pd.reset(&mut delay).await.unwrap();
     info!("PD controller reset complete");
 
-    {
-        let mut inner = pd.lock_inner().await;
-        let mode = inner.get_mode().await.unwrap();
-        info!("Mode: {}", mode);
+    let mode = pd.get_mode().await.unwrap();
+    info!("Mode: {}", mode);
 
-        let version = inner.get_fw_version().await.unwrap();
-        info!("FW Version: {}", version);
-    }
+    let version = pd.get_fw_version().await.unwrap();
+    info!("FW Version: {}", version);
+
+    yield_now().await;
+    /*info!("Entering firmware update mode");
+    pd.fw_update_mode_enter().await.unwrap();
+
+    info!("Initializing firmware update");
+    pd.fw_update_init(fw.as_slice()).await.unwrap();
+
+    info!("Sending app image");
+    pd.fw_update_load_app_image(fw.as_slice(), 11).await.unwrap();
+
+    info!("Sending ap config");
+    pd.fw_update_load_app_config(fw.as_slice(), 11).await.unwrap();
+
+    info!("Completing FW update");
+    pd.fw_update_complete().await.unwrap();*/
+
+    /*info!("Exiting firmware update mode");
+    pd.fw_update_mode_exit().await.unwrap();*/
 
     loop {
-        let (p0_flags, p1_flags) = pd.wait_interrupt().await;
+        let (p0_flags, p1_flags) = pd
+            .wait_interrupt(true, |flags| *flags != IntEventBus1::new_zero())
+            .await;
 
         let (port, flags) = if p0_flags != IntEventBus1::new_zero() {
             (PortId(0), p0_flags)

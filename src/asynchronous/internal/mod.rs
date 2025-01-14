@@ -71,7 +71,10 @@ impl<B: I2c> device_driver::AsyncRegisterInterface for Port<'_, B> {
             .map_err(Error::Bus)?;
 
         let len = buf[0] as usize;
-        if len > data.len() {
+
+        if len == 0xFF || len == 0 {
+            PdError::Busy.into()
+        } else if len > data.len() {
             PdError::InvalidParams.into()
         } else {
             data.copy_from_slice(&buf[1..len + 1]);
@@ -81,7 +84,7 @@ impl<B: I2c> device_driver::AsyncRegisterInterface for Port<'_, B> {
 }
 
 pub struct Tps6699x<B: I2c> {
-    bus: B,
+    pub(super) bus: B,
     /// I2C addresses for ports
     addr: [u8; 2],
 }
@@ -164,7 +167,10 @@ impl<B: I2c> Tps6699x<B> {
             .mode()
             .read_async()
             .await?;
-        Mode::try_from(mode.mode()).map_err(Error::Pd)
+        defmt::info!("Read mode: {}", mode);
+        let mode = Mode::try_from(mode.mode()).map_err(Error::Pd)?;
+        defmt::info!("Got mode {}", mode);
+        Ok(mode)
     }
 
     /// Get FW version

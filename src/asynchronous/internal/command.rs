@@ -5,7 +5,7 @@ use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::Error;
 
 use super::*;
-use crate::command::{ReturnValue, REG_DATA1, REG_DATA1_LEN};
+use crate::command::{ReturnValue, REG_DATA1, REG_DATA1_LEN, RESET_MODE_RECHECK_INTERVAL_MS};
 
 // These are controller-level commands, we use borrow_port just for convenience
 impl<B: I2c> Tps6699x<B> {
@@ -60,7 +60,7 @@ impl<B: I2c> Tps6699x<B> {
         data: Option<&mut [u8]>,
     ) -> Result<ReturnValue, Error<B::Error>> {
         if !self.check_command_complete(port).await? {
-            return PdError::InProgress.into();
+            return PdError::Busy.into();
         }
 
         if let Some(ref data) = data {
@@ -99,8 +99,11 @@ impl<B: I2c> Tps6699x<B> {
 
         // Command register should be set to success value
         if !self.check_command_complete(port).await? {
-            return PdError::InvalidParams.into();
+            return PdError::Busy.into();
         }
+
+        self.clear_interrupt(PortId(0)).await?;
+        self.clear_interrupt(PortId(1)).await?;
 
         Ok(())
     }
