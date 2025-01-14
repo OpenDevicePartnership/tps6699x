@@ -8,8 +8,7 @@ pub const REG_DATA1_LEN: usize = 64;
 
 /// Delay after reset before we can assume the controller is ready
 // Derived from experimentation
-pub const RESET_DELAY_MS: u32 = 1600;
-pub const RESET_MODE_RECHECK_INTERVAL_MS: u32 = 100;
+pub const RESET_DELAY_MS: u32 = 1500;
 
 pub const CMD_LEN: usize = 4;
 

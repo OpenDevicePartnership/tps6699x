@@ -5,7 +5,7 @@ use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::Error;
 
 use super::*;
-use crate::command::{ReturnValue, REG_DATA1, REG_DATA1_LEN, RESET_MODE_RECHECK_INTERVAL_MS};
+use crate::command::{ReturnValue, REG_DATA1, REG_DATA1_LEN};
 
 // These are controller-level commands, we use borrow_port just for convenience
 impl<B: I2c> Tps6699x<B> {
