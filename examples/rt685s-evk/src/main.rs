@@ -13,7 +13,6 @@ use embassy_imxrt::{self, bind_interrupts, peripherals};
 use embassy_sync::blocking_mutex::raw::NoopRawMutex;
 use embassy_sync::mutex::Mutex;
 use embassy_sync::once_lock::OnceLock;
-use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::asynchronous::controller::PdController;
 use embedded_usb_pd::PortId;
 use mimxrt600_fcb::FlexSPIFlashConfigurationBlock;
@@ -56,8 +55,10 @@ async fn pd_task(mut pd: Tps6699x<'static>) {
 
     {
         info!("Performing PD FW update");
-        let mut fw_updater = embassy::fw_update::FwUpdater::new([&mut pd]);
-        fw_updater.perform_fw_update(fw.as_slice()).await.unwrap();
+        let mut controllers = [&mut pd];
+        embassy::fw_update::perform_fw_update(&mut controllers, fw.as_slice())
+            .await
+            .unwrap();
     }
 
     loop {
@@ -106,7 +107,7 @@ async fn main(spawner: Spawner) {
         Mutex::new(I2cMaster::new_async(p.FLEXCOMM2, p.PIO0_18, p.PIO0_17, Irqs, Speed::Standard, p.DMA0_CH5).unwrap())
     });
 
-    let device = I2cDevice::new(&bus);
+    let device = I2cDevice::new(bus);
 
     static CONTROLLER: StaticCell<Controller<'static>> = StaticCell::new();
     let controller = CONTROLLER.init(Controller::new(device, ADDR0).unwrap());

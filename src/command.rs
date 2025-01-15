@@ -108,7 +108,7 @@ impl TryFrom<u8> for ReturnValue {
 
 pub const PD_FW_HEADER_BLOCK_INDEX: usize = 0;
 pub const PD_FW_DATA_BLOCK_START_INDEX: usize = 1;
-pub const PD_FW_APP_CONFIG_BLOCK_INDEX: usize = 0x12;
+pub const PD_FW_APP_CONFIG_BLOCK_INDEX: usize = 12;
 
 pub const PD_FW_IMAGE_ID_LENGTH: usize = 4;
 pub const PD_FW_HEADER_METADATA_OFFSET: usize = PD_FW_IMAGE_ID_LENGTH;
@@ -123,6 +123,7 @@ pub const PD_FW_DATA_BLOCK_SIZE: usize = 0x4000;
 pub const PD_FW_DATA_BLOCK_METADATA_SIZE: usize = 8;
 pub const PD_FW_APP_CONFIG_SIZE: usize = 0x800;
 pub const PD_FW_APP_CONFIG_METADATA_SIZE: usize = 0x8;
+pub const RESET_TIMEOUT_MS: u32 = 2000;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]

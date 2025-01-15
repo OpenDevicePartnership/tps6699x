@@ -72,9 +72,7 @@ impl<B: I2c> device_driver::AsyncRegisterInterface for Port<'_, B> {
 
         let len = buf[0] as usize;
 
-        if len == 0xFF || len == 0 {
-            PdError::Busy.into()
-        } else if len > data.len() {
+        if len > data.len() {
             PdError::InvalidParams.into()
         } else {
             data.copy_from_slice(&buf[1..len + 1]);
@@ -167,9 +165,7 @@ impl<B: I2c> Tps6699x<B> {
             .mode()
             .read_async()
             .await?;
-        defmt::info!("Read mode: {}", mode);
         let mode = Mode::try_from(mode.mode()).map_err(Error::Pd)?;
-        defmt::info!("Got mode {}", mode);
         Ok(mode)
     }
 

@@ -2,6 +2,7 @@
 //! The DATA1 register exceeds the 128 bit limit of the device driver crate so we have to handle it manually
 use defmt::error;
 use device_driver::AsyncRegisterInterface;
+use embassy_time::Timer;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::Error;
 
@@ -110,12 +111,12 @@ impl<B: I2c> Tps6699x<B> {
 
     /// Enter firmware update mode
     // This command doesn't trigger an interrupt on completion so it fits here better
-    pub async fn execute_tfus(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<B::Error>> {
+    pub async fn execute_tfus(&mut self) -> Result<(), Error<B::Error>> {
         // This is a controller-level command, shouldn't matter which port we use
         let port = PortId(0);
         self.send_raw_command_unchecked(port, Command::Tfus, None).await?;
 
-        delay.delay_ms(TFUS_DELAY_MS).await;
+        Timer::after_millis(TFUS_DELAY_MS.into()).await;
 
         // Confirm we're in the correct mode
         let mode = self.get_mode().await?;
@@ -128,7 +129,7 @@ impl<B: I2c> Tps6699x<B> {
 
     /// Complete firmware update
     // This command doesn't trigger an interrupt on completion so it fits here better
-    pub async fn execute_tfuc(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<B::Error>> {
+    pub async fn execute_tfuc(&mut self) -> Result<(), Error<B::Error>> {
         let mut arg_bytes = [0u8; RESET_ARGS_LEN];
 
         let args = ResetArgs {
@@ -142,11 +143,13 @@ impl<B: I2c> Tps6699x<B> {
         let port = PortId(0);
         self.send_raw_command_unchecked(port, Command::Tfuc, None).await?;
 
-        delay.delay_ms(RESET_DELAY_MS).await;
+        Timer::after_millis(RESET_DELAY_MS.into()).await;
 
-        // Command register should be set to success value
-        if !self.check_command_complete(port).await? {
-            return PdError::Busy.into();
+        // Confirm we're in the correct mode
+        let mode = self.get_mode().await?;
+        if mode != Mode::App1 {
+            error!("Failed to enter normal mode, mode: {:?}", mode);
+            return Err(PdError::InvalidMode.into());
         }
 
         Ok(())
