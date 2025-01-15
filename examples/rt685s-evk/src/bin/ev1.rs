@@ -80,11 +80,11 @@ async fn main(spawner: Spawner) {
     });
 
     static CONTROLLER0: StaticCell<Controller<'static>> = StaticCell::new();
-    let controller0 = CONTROLLER0.init(Controller::new(I2cDevice::new(bus), ADDR0).unwrap());
+    let controller0 = CONTROLLER0.init(Controller::new(I2cDevice::new(bus), ADDR0, false).unwrap());
     let (pd0, interrupt0) = controller0.make_parts();
 
     static CONTROLLER1: StaticCell<Controller<'static>> = StaticCell::new();
-    let controller1 = CONTROLLER1.init(Controller::new(I2cDevice::new(bus), ADDR1).unwrap());
+    let controller1 = CONTROLLER1.init(Controller::new(I2cDevice::new(bus), ADDR1, true).unwrap());
     let (pd1, interrupt1) = controller1.make_parts();
 
     spawner.must_spawn(interrupt_task(int_in, interrupt0, interrupt1));

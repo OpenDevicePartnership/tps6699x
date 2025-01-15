@@ -5,8 +5,7 @@ edition = "2021"
 rust-version = "1.79"
 
 [dependencies]
-#git = "https://github.com/pop-project/embassy-imxrt"
-embassy-imxrt = { path = "../../../embassy-imxrt", features = [
+embassy-imxrt = { git = "https://github.com/pop-project/embassy-imxrt", features = [
     "defmt",
     "time-driver",
     "time",

@@ -30,14 +30,16 @@ pub struct Controller<M: RawMutex, B: I2c> {
     inner: Mutex<M, internal::Tps6699x<B>>,
     interrupt_waker: Signal<NoopRawMutex, (IntEventBus1, IntEventBus1)>,
     interrupts_enabled: [AtomicBool; NUM_PORTS],
+    hack_disable_port_1: AtomicBool,
 }
 
 impl<M: RawMutex, B: I2c> Controller<M, B> {
-    pub fn new(bus: B, addr: [u8; NUM_PORTS]) -> Result<Self, Error<B::Error>> {
+    pub fn new(bus: B, addr: [u8; NUM_PORTS], hack_disable_port_1: bool) -> Result<Self, Error<B::Error>> {
         Ok(Self {
             inner: Mutex::new(internal::Tps6699x::new(bus, addr)),
             interrupt_waker: Signal::new(),
             interrupts_enabled: [AtomicBool::new(true), AtomicBool::new(true)],
+            hack_disable_port_1: AtomicBool::new(hack_disable_port_1),
         })
     }
 
@@ -321,10 +323,18 @@ impl<'a, M: RawMutex, B: I2c> Interrupt<'a, M, B> {
                 self.controller.interrupts_enabled[0].load(core::sync::atomic::Ordering::SeqCst),
                 self.controller.interrupts_enabled[1].load(core::sync::atomic::Ordering::SeqCst),
             ];
+            let hack_disable_port_1 = self
+                .controller
+                .hack_disable_port_1
+                .load(core::sync::atomic::Ordering::SeqCst);
 
             let mut inner = self.lock_inner().await;
             for port in 0..NUM_PORTS {
                 let port_id = PortId(port as u8);
+
+                if port_id == PORT1 && hack_disable_port_1 {
+                    continue;
+                }
 
                 if !interrupts_enabled[port] {
                     continue;

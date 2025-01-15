@@ -78,7 +78,7 @@ async fn main(spawner: Spawner) {
     let device = I2cDevice::new(bus);
 
     static CONTROLLER: StaticCell<Controller<'static>> = StaticCell::new();
-    let controller = CONTROLLER.init(Controller::new(device, ADDR0).unwrap());
+    let controller = CONTROLLER.init(Controller::new(device, ADDR0, true).unwrap());
     let (pd, interrupt) = controller.make_parts();
 
     spawner.must_spawn(interrupt_task(int_in, interrupt));
