@@ -3,7 +3,7 @@
 
 use core::sync::atomic::AtomicBool;
 
-use defmt::error;
+use defmt::{error, warn};
 use embassy_sync::blocking_mutex::raw::{NoopRawMutex, RawMutex};
 use embassy_sync::mutex::{Mutex, MutexGuard};
 use embassy_sync::signal::Signal;
@@ -173,14 +173,14 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
 
         // Reset the controller if we failed to exit fw update mode
         if result.is_err() {
-            error!("FW update exit timeout, attempting to reset");
+            warn!("FW update exit timeout, attempting to reset");
             let mut delay = embassy_time::Delay;
             self.reset(&mut delay).await?;
             return Ok(());
         }
 
         if result.unwrap()? != ReturnValue::Success {
-            error!("FW update exit command error, attempting to reset");
+            warn!("FW update exit command error, attempting to reset");
             let mut delay = embassy_time::Delay;
             self.reset(&mut delay).await?;
             return Ok(());
@@ -276,6 +276,10 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         for port in 0..2 {
             self.enable_interrupt(PortId(port), enabled).unwrap();
         }
+    }
+
+    pub async fn get_customer_use(&mut self) -> Result<u64, Error<B::Error>> {
+        self.lock_inner().await.get_customer_use().await
     }
 }
 

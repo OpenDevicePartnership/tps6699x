@@ -179,6 +179,16 @@ impl<B: I2c> Tps6699x<B> {
             .await
             .map(|r| r.version())
     }
+
+    pub async fn get_customer_use(&mut self) -> Result<u64, Error<B::Error>> {
+        // This is a controller-level command, shouldn't matter which port we use
+        self.borrow_port(PortId(0))?
+            .into_registers()
+            .customer_use()
+            .read_async()
+            .await
+            .map(|r| r.customer_use())
+    }
 }
 
 #[cfg(test)]

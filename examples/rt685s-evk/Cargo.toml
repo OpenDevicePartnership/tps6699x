@@ -49,7 +49,9 @@ mimxrt685s-pac = { version = "0.1.5", features = [
 ] }
 rand = { version = "0.8.5", default-features = false }
 
-embedded-usb-pd = { path = "../../../embedded-usb-pd", features = ["defmt"] }
+embedded-usb-pd = { git = "https://github.com/RobertZ2011/embedded-usb-pd.git", branch = "initial-work", features = [
+    "defmt",
+] }
 
 mimxrt600-fcb = "0.1.0"
 tps6699x = { path = "../../.", features = ["defmt", "embassy"] }

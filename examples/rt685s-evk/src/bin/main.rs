@@ -1,6 +1,5 @@
 #![no_std]
 #![no_main]
-#![allow(clippy::await_holding_refcell_ref)]
 use core::default::Default;
 
 use defmt::*;
@@ -13,12 +12,9 @@ use embassy_imxrt::{self, bind_interrupts, peripherals};
 use embassy_sync::blocking_mutex::raw::NoopRawMutex;
 use embassy_sync::mutex::Mutex;
 use embassy_sync::once_lock::OnceLock;
-use embedded_usb_pd::asynchronous::controller::PdController;
-use embedded_usb_pd::PortId;
 use mimxrt600_fcb::FlexSPIFlashConfigurationBlock;
 use static_cell::StaticCell;
 use tps6699x::asynchronous::embassy;
-use tps6699x::registers::field_sets::IntEventBus1;
 use tps6699x::ADDR0;
 use {defmt_rtt as _, panic_probe as _};
 
@@ -39,61 +35,33 @@ async fn interrupt_task(mut int_in: Input<'static>, mut interrupt: Interrupt<'st
 
 #[embassy_executor::task]
 async fn pd_task(mut pd: Tps6699x<'static>) {
-    let mut delay = embassy_time::Delay;
+    let fw = include_bytes!("../../TPS66994_Host.bin");
 
-    let fw = include_bytes!("../885_MIS-TCPM0-0.0.1.bin");
+    let mut controllers = [&mut pd];
 
-    info!("Reseting PD controller");
-    pd.reset(&mut delay).await.unwrap();
-    info!("PD controller reset complete");
+    let target_version = embassy::fw_update::get_customer_use_data(fw.as_slice()).unwrap();
+    info!("Target FW Version: {:#x}", target_version);
 
-    let mode = pd.get_mode().await.unwrap();
-    info!("Mode: {}", mode);
-
-    let version = pd.get_fw_version().await.unwrap();
-    info!("FW Version: {}", version);
-
-    {
-        info!("Performing PD FW update");
-        let mut controllers = [&mut pd];
-        embassy::fw_update::perform_fw_update(&mut controllers, fw.as_slice())
-            .await
-            .unwrap();
+    for (i, controller) in controllers.iter_mut().enumerate() {
+        let version = controller.get_customer_use().await.unwrap();
+        info!("Controller {}: Current FW Version: {:#x}", i, version);
     }
 
-    loop {
-        let (p0_flags, p1_flags) = pd
-            .wait_interrupt(true, |flags| *flags != IntEventBus1::new_zero())
-            .await;
+    info!("Performing PD FW update");
+    embassy::fw_update::perform_fw_update(&mut controllers, fw.as_slice())
+        .await
+        .unwrap();
 
-        let (port, flags) = if p0_flags != IntEventBus1::new_zero() {
-            (PortId(0), p0_flags)
-        } else if p1_flags != IntEventBus1::new_zero() {
-            (PortId(1), p1_flags)
+    for (i, controller) in controllers.iter_mut().enumerate() {
+        let version = controller.get_customer_use().await.unwrap();
+        if version != target_version {
+            error!(
+                "Controller {}: Failed to update FW, target version: {:#x}, current version: {:#x}",
+                i, version, target_version
+            );
         } else {
-            continue;
-        };
-
-        info!("Got interrupt({}): {}", port, flags);
-
-        let mut inner = pd.lock_inner().await;
-        info!("Getting port status");
-        let status = inner.get_port_status(port).await.unwrap();
-        info!("Port status: {}", status);
-
-        if !status.plug_present() {
-            info!("Plug removed: {}", port.0);
-            continue;
+            info!("Controller {}: FW update complete", i);
         }
-
-        info!("Plug connected: {} ", port.0);
-
-        let pdo = inner.get_active_pdo_contract(port).await.unwrap();
-        info!("PDO: {}", pdo);
-
-        let rdo = inner.get_active_rdo_contract(port).await.unwrap();
-        info!("RDO: {}", rdo);
-        info!("Done");
     }
 }
 

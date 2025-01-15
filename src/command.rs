@@ -8,9 +8,10 @@ pub const REG_DATA1_LEN: usize = 64;
 
 /// Delay after reset before we can assume the controller is ready
 // Derived from experimentation
-pub const RESET_DELAY_MS: u32 = 1500;
+pub const RESET_DELAY_MS: u32 = 1600;
+pub const RESET_TIMEOUT_MS: u32 = RESET_DELAY_MS + 100;
 pub const TFUS_DELAY_MS: u32 = 500;
-pub const TFUS_TIMEOUT_MS: u32 = TFUS_DELAY_MS + 250;
+pub const TFUS_TIMEOUT_MS: u32 = TFUS_DELAY_MS + 100;
 pub const TFUE_TIMEOUT_MS: u32 = 250;
 
 pub const CMD_LEN: usize = 4;
@@ -123,7 +124,8 @@ pub const PD_FW_DATA_BLOCK_SIZE: usize = 0x4000;
 pub const PD_FW_DATA_BLOCK_METADATA_SIZE: usize = 8;
 pub const PD_FW_APP_CONFIG_SIZE: usize = 0x800;
 pub const PD_FW_APP_CONFIG_METADATA_SIZE: usize = 0x8;
-pub const RESET_TIMEOUT_MS: u32 = 2000;
+pub const PD_FW_CUSTOMER_USE_OFFSET: usize = 0x2A0AE;
+pub const PD_FW_CUSTOMER_USE_LENGTH: usize = 8;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]

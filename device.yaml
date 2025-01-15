@@ -18,6 +18,20 @@ Mode:
       end: 31
       description: Controller operation mode
 
+CustomerUse:
+  type: register
+  address: 0x06
+  size_bits: 64
+  reset_value: 0x0
+  access: RW
+  description: Customer use
+  fields:
+    CustomerUse:
+      base: uint
+      start: 0
+      end: 63
+      description: Controller operation mode
+
 Version:
   type: register
   address: 0x0F

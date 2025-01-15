@@ -1,4 +1,4 @@
-use defmt::{debug, error, info};
+use defmt::{error, info, warn};
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use embassy_time::Timer;
 use embedded_hal_async::i2c::I2c;
@@ -72,11 +72,6 @@ async fn fw_update_init<'a, M: RawMutex, B: I2c>(
 
     let header_block =
         &image[PD_FW_HEADER_BLOCK_OFFSET as usize..(PD_FW_HEADER_BLOCK_OFFSET + PD_FW_HEADER_BLOCK_LENGTH) as usize];
-    debug!(
-        "Header block offset: {:?}, size {}",
-        PD_FW_HEADER_BLOCK_OFFSET,
-        header_block.len()
-    );
 
     info!("Broadcasting header block");
     burst_write(controllers, tfui_args.broadcast_u16_address as u8, header_block).await?;
@@ -138,6 +133,24 @@ fn get_image_size(image: &[u8]) -> Result<u32, PdError> {
     ]))
 }
 
+pub fn get_customer_use_data(image: &[u8]) -> Result<u64, PdError> {
+    if image.len() < PD_FW_CUSTOMER_USE_OFFSET + PD_FW_CUSTOMER_USE_LENGTH {
+        return Err(PdError::InvalidParams);
+    }
+
+    let customer_use_data = &image[PD_FW_CUSTOMER_USE_OFFSET..PD_FW_CUSTOMER_USE_OFFSET + PD_FW_CUSTOMER_USE_LENGTH];
+    Ok(u64::from_le_bytes([
+        customer_use_data[0],
+        customer_use_data[1],
+        customer_use_data[2],
+        customer_use_data[3],
+        customer_use_data[4],
+        customer_use_data[5],
+        customer_use_data[6],
+        customer_use_data[7],
+    ]))
+}
+
 // Data block indices start at 1
 fn data_block_index_to_block_index(block_index: usize) -> usize {
     block_index + PD_FW_DATA_BLOCK_START_INDEX
@@ -150,15 +163,9 @@ async fn fw_update_stream_data<'a, M: RawMutex, B: I2c>(
     metadata_offset: usize,
     metadata_size: usize,
 ) -> Result<(), Error<B::Error>> {
-    debug!(
-        "Metadata offset: {}, offset: {}",
-        metadata_offset,
-        block_offset(metadata_offset)
-    );
     let arg_bytes = &image[metadata_offset..metadata_offset + metadata_size];
 
     let args = TfudArgs::decode_from_slice(arg_bytes).map_err(Error::Pd)?;
-    debug!("TFUd args: {:?}", args);
 
     for (i, controller) in controllers.iter_mut().enumerate() {
         info!("Controller {}: Streaming data block", i);
@@ -204,7 +211,7 @@ async fn fw_update_load_app_image<'a, M: RawMutex, B: I2c>(
     num_data_blocks: usize,
 ) -> Result<(), Error<B::Error>> {
     for i in 0..num_data_blocks {
-        info!("Broadcasting data block {}", i);
+        info!("Broadcasting block {}", i + 1);
         fw_update_stream_data(
             controllers,
             image,
@@ -224,7 +231,6 @@ async fn fw_update_load_app_config<'a, M: RawMutex, B: I2c>(
     num_data_blocks: usize,
 ) -> Result<(), Error<B::Error>> {
     let app_size = get_image_size(image).map_err(Error::Pd)? as usize;
-    debug!("App size: {}", app_size);
     let metadata_offset = app_config_block_metadata_offset(num_data_blocks, app_size);
     info!("Broadcasting app config block");
     fw_update_stream_data(
@@ -243,7 +249,7 @@ async fn fw_update_complete<'a, M: RawMutex, B: I2c>(
     for (i, controller) in controllers.iter_mut().enumerate() {
         info!("Controller {}: Completing FW update", i);
         if let Err(_) = controller.fw_update_complete().await {
-            error!("Controller {}: Failed to complete FW update", i);
+            warn!("Controller {}: Failed to complete FW update, attempting to exit", i);
             let _ = controller.fw_update_mode_exit().await;
         }
     }

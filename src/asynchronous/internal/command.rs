@@ -141,7 +141,8 @@ impl<B: I2c> Tps6699x<B> {
 
         // This is a controller-level command, shouldn't matter which port we use
         let port = PortId(0);
-        self.send_raw_command_unchecked(port, Command::Tfuc, None).await?;
+        self.send_raw_command_unchecked(port, Command::Tfuc, Some(&arg_bytes))
+            .await?;
 
         Timer::after_millis(RESET_DELAY_MS.into()).await;
 
