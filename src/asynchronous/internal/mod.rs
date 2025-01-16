@@ -1,5 +1,6 @@
 //! This module implements a low-level TPS6699x driver. The super module provides a high-level API
 //! that uses standard PD types and provides functions that implement features that may occur over several interrupts
+use defmt::debug;
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::{Error, PdError, PortId};
@@ -35,6 +36,12 @@ impl<B: I2c> device_driver::AsyncRegisterInterface for Port<'_, B> {
         // Sized to accommodate up to 255 bytes of data
         let mut buf = [0u8; 257];
 
+        debug!(
+            "PD write, address: {:#x}, register: {:#x}, length: {}",
+            self.addr,
+            address,
+            data.len()
+        );
         // Buffer length is sent as a byte
         if data.len() > 255 {
             return Err(PdError::InvalidParams.into());
@@ -60,6 +67,13 @@ impl<B: I2c> device_driver::AsyncRegisterInterface for Port<'_, B> {
         let mut buf = [0u8; 256];
         let full_len = data.len() + 1;
         let reg = [address];
+
+        debug!(
+            "PD read, address: {:#x}, register: {:#x}, length: {}",
+            self.addr,
+            address,
+            data.len()
+        );
 
         if data.is_empty() {
             return Err(PdError::InvalidParams.into());
