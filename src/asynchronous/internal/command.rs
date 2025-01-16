@@ -148,7 +148,7 @@ impl<B: I2c> Tps6699x<B> {
 
         // Confirm we're in the correct mode
         let mode = self.get_mode().await?;
-        if mode != Mode::App1 {
+        if mode != Mode::App0 && mode != Mode::App1 {
             error!("Failed to enter normal mode, mode: {:?}", mode);
             return Err(PdError::InvalidMode.into());
         }

@@ -8,7 +8,7 @@ pub const REG_DATA1_LEN: usize = 64;
 
 /// Delay after reset before we can assume the controller is ready
 // Derived from experimentation
-pub const RESET_DELAY_MS: u32 = 1600;
+pub const RESET_DELAY_MS: u32 = 2000;
 pub const RESET_TIMEOUT_MS: u32 = RESET_DELAY_MS + 100;
 pub const TFUS_DELAY_MS: u32 = 500;
 pub const TFUS_TIMEOUT_MS: u32 = TFUS_DELAY_MS + 100;
