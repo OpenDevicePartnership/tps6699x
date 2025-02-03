@@ -285,7 +285,9 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     }
 }
 
-impl<'a, M: RawMutex, B: I2c> PdController<B::Error> for Tps6699x<'a, M, B> {
+impl<'a, M: RawMutex, B: I2c> PdController for Tps6699x<'a, M, B> {
+    type BusError = B::Error;
+
     async fn reset(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<B::Error>> {
         self.enable_interrupts(false);
         let result = {
