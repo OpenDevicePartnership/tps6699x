@@ -8,10 +8,10 @@ rust-version = "1.83"
 [dependencies]
 embedded-hal-async = "1.0.0"
 embedded-hal = "1.0.0"
-embedded-usb-pd = { git = "https://github.com/RobertZ2011/embedded-usb-pd.git", branch = "initial-work", default-features = false, features = [
+embedded-usb-pd = { git = "../embedded-usb-pd", default-features = false, features = [
     "defmt",
 ] }
-device-driver = { version = "=1.0.0-rc.1", default-features = false, features = [
+device-driver = { version = "1.0.3", default-features = false, features = [
     "yaml",
 ] }
 defmt = { version = "0.3.0", optional = true }
