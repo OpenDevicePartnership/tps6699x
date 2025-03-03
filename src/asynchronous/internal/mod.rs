@@ -233,6 +233,19 @@ impl<B: I2c> Tps6699x<B> {
             .await
     }
 
+    /// Set port control
+    pub async fn set_port_control(
+        &mut self,
+        port: PortId,
+        control: registers::field_sets::PortControl,
+    ) -> Result<(), Error<B::Error>> {
+        self.borrow_port(port)?
+            .into_registers()
+            .port_control()
+            .write_async(|r| *r = control)
+            .await
+    }
+
     /// Get global system config
     pub async fn get_system_config(&mut self) -> Result<registers::field_sets::SystemConfig, Error<B::Error>> {
         // This is a controller-level command, shouldn't matter which port we use
