@@ -9,6 +9,7 @@ embassy-imxrt = { git = "https://github.com/OpenDevicePartnership/embassy-imxrt"
     "defmt",
     "time-driver",
     "time",
+    "mimxrt685s",
 ] }
 cortex-m = { version = "0.7.7", features = [
     "inline-asm",

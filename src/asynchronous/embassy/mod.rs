@@ -153,6 +153,33 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         self.lock_inner().await.get_port_control(port).await
     }
 
+    /// Wrapper for `set_port_control`
+    pub async fn set_port_control(
+        &mut self,
+        port: PortId,
+        control: registers::field_sets::PortControl,
+    ) -> Result<(), Error<B::Error>> {
+        self.lock_inner().await.set_port_control(port, control).await
+    }
+
+    /// Wrapper for `get_system_config`
+    pub async fn get_system_config(&mut self) -> Result<registers::field_sets::SystemConfig, Error<B::Error>> {
+        self.lock_inner().await.get_system_config().await
+    }
+
+    /// Wrapper for `set_system_config`
+    pub async fn set_system_config(
+        &mut self,
+        config: registers::field_sets::SystemConfig,
+    ) -> Result<(), Error<B::Error>> {
+        self.lock_inner().await.set_system_config(config).await
+    }
+
+    /// Wrapper for `enable_source`
+    pub async fn enable_source(&mut self, port: PortId, enable: bool) -> Result<(), Error<B::Error>> {
+        self.lock_inner().await.enable_source(port, enable).await
+    }
+
     /// Returns the number of ports
     pub fn num_ports(&self) -> usize {
         self.controller.num_ports
