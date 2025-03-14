@@ -537,6 +537,221 @@ PowerPathStatus:
         Vbus: 0x2
         Unknown: catch_all
 
+SystemConfig:
+  type: register
+  address: 0x27
+  access: RW
+  size_bits: 119
+  reset_value: 0x000000000000000034003318671205
+  description: Global system configuration
+  fields:
+    PaVconnConfig:
+      base: bool
+      start: 0
+      description: Enable PA VCONN
+    PbVconnConfig:
+      base: bool
+      start: 2
+      description: Enable PB VCONN
+    PaPp5vVbusSwConfig:
+      base: uint
+      start: 8
+      end: 11
+      description: PA PP5V VBUS configuration
+      conversion:
+        name: VbusSwConfig
+        Disabled: 0x0
+        Source: 0x1
+        Reserved: catch_all
+    PbPp5vVbusSwConfig:
+      base: uint
+      start: 11
+      end: 14
+      description: PB PP5V VBUS configuration
+      conversion: VbusSwConfig
+    IlimOverShoot:
+      base: uint
+      start: 14
+      end: 16
+      description: PP_5V ILIM configuration
+      conversion:
+        name: IlimOverShoot
+        NoOvershoot: 0x0
+        Overshoot100ma: 0x1
+        Overshoot200ma: 0x2
+        Reserved: catch_all
+    PaPpextVbusSwConfig:
+      base: uint
+      start: 16
+      end: 19
+      description: PA PPEXT configuration
+      conversion:
+        name: PpextVbusSwConfig
+        Unused: 0x0
+        Source: 0x1
+        Sink: 0x2
+        SinkWaitSrdy: 0x3
+        BiDirectional: 0x4
+        BiDirectionalWaitSrdy: 0x5
+        Reserved: catch_all
+    PbPpextVbusSwConfig:
+      base: uint
+      start: 19
+      end: 22
+      description: PB PPEXT configuration
+      conversion: PpextVbusSwConfig
+    RcpThreshold:
+      base: uint
+      start: 22
+      end: 24
+      description: Threshold used for RCP on PP_EXT
+      conversion:
+        name: RcpThreshold
+        Threshold6mv: 0x0
+        Threshold8mv: 0x1
+        Threshold10mv: 0x2
+        Threshold12mv: 0x3
+    MultiPortSinkPolicyHighestPower:
+      base: bool
+      start: 24
+      description: Automatic sink-path coordination, true for highest power, false for no sink management
+    TbtControllerType:
+      base: uint
+      start: 26
+      end: 29
+      description: Type of TBT controller
+      conversion:
+        name: TbtControllerType
+        Default: 0x0
+        Ar: 0x1
+        Tr: 0x2
+        Icl: 0x3
+        Gr: 0x4
+        Br: 0x5
+        Reserved: catch_all
+    EnableOneUfpPolicy:
+      base: bool
+      start: 29
+      description: Enable bit for simple UFP policy manager
+    EnableSpm:
+      base: bool
+      start: 30
+      description: Enable bit for simple source power management
+    MultiPortSinkNonOverlapTime:
+      base: uint
+      start: 31
+      end: 33
+      description: Delay configuration for MultiPortSinkPolicy
+      conversion:
+        name: MultiPortSinkNonOverlapTime
+        Delay1ms: 0x0
+        Delay5ms: 0x1
+        Delay10ms: 0x2
+        Delay15ms: 0x3
+    EnableI2cMultiControllerMode:
+      base: bool
+      start: 33
+      description: Enables I2C Multi Controller mode
+    I2cTimeout:
+      base: uint
+      start: 34
+      end: 37
+      description: I2C bus timeout
+      conversion:
+        name: I2cTimeout
+        Timeout25ms: 0x0
+        Timeout50ms: 0x1
+        Timeout75ms: 0x2
+        Timeout100ms: 0x3
+        Timeout125ms: 0x4
+        Timeout150ms: 0x5
+        Timeout175ms: 0x6
+        Timeout1000ms: 0x7
+    DisableEepromUpdates:
+      base: bool
+      start: 37
+      description: EEPROM updates not allowed if this bit asserted
+    EmulateSinglePort:
+      base: bool
+      start: 38
+      description: Enable only port A
+    MinimumCurrentAdvertisement1A5:
+      base: bool
+      start: 39
+      description: SPM minimum current advertisement, true for 1.5 A, false for USB default
+    UsbDefaultCurrent:
+      base: uint
+      start: 43
+      end: 45
+      description: Value for USB default current
+      conversion:
+        name: UsbDefaultCurrent
+        UsbDefault: 0x0
+        Current900ma: 0x1
+        Current150ma: 0x2
+        Reserved: catch_all
+    EprSupportedAsSource:
+      base: bool
+      start: 45
+      description: EPR supported as source
+    EprSupportedAsSink:
+      base: bool
+      start: 46
+      description: EPR supported as sink
+    EnableLowPowerModeAmEntryExit:
+      base: bool
+      start: 47
+      description: Enable AM entry/exit on low-power mode exit/entry
+    CrossbarPollingMode:
+      base: bool
+      start: 54
+      description: Enable crossbar polling mode
+    CrossbarConfigType1Extended:
+      base: bool
+      start: 55
+      description: Enable crossbar type 1 extended write
+    ExternalDcdcStatusPollingInterval:
+      base: uint
+      start: 56
+      end: 64
+      description: External DCDC Status Polling Interval
+    Port1I2c2TargetAddress:
+      base: uint
+      start: 64
+      end: 72
+      description: Target address for Port 1 on I2C2s
+    Port2I2c2TargetAddress:
+      base: uint
+      start: 72
+      end: 78
+      description: Target address for Port 2 on I2C2s
+    VsysPreventsHighPower:
+      base: bool
+      start: 80
+      description: Halts setting up external DCDC configuration until 5V power is present from the system
+    WaitForVin3v3:
+      base: bool
+      start: 81
+      description: Stalls the PD in PTCH mode until Vsys is present
+    WaitForMinimumPower:
+      base: bool
+      start: 82
+      description: Stalls the PD in PTCH mode until a power connection is made that meets the needed conditions
+    SourcePolicyMode:
+      base: uint
+      start: 103
+      end: 105
+      description: Source Policy Mode
+    WaitForNgpio:
+      base: bool
+      start: 110
+      description: Wait for nGPIO from battery charger
+    DeadBatteryAutoClear:
+      base: uint
+      start: 111
+      end: 118
+      description: Moisture Detection State
+
 PortControl:
   type: register
   address: 0x29

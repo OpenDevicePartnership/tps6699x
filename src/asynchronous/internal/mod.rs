@@ -2,7 +2,8 @@
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::{Error, PdError, PortId};
 
-use crate::{registers, Mode, MAX_SUPPORTED_PORTS, PORT0, TPS66993_NUM_PORTS, TPS66994_NUM_PORTS};
+use crate::registers::{self};
+use crate::{Mode, MAX_SUPPORTED_PORTS, PORT0, PORT1, TPS66993_NUM_PORTS, TPS66994_NUM_PORTS};
 
 mod command;
 
@@ -228,6 +229,61 @@ impl<B: I2c> Tps6699x<B> {
             .port_control()
             .read_async()
             .await
+    }
+
+    /// Set port control
+    pub async fn set_port_control(
+        &mut self,
+        port: PortId,
+        control: registers::field_sets::PortControl,
+    ) -> Result<(), Error<B::Error>> {
+        self.borrow_port(port)?
+            .into_registers()
+            .port_control()
+            .write_async(|r| *r = control)
+            .await
+    }
+
+    /// Get global system config
+    pub async fn get_system_config(&mut self) -> Result<registers::field_sets::SystemConfig, Error<B::Error>> {
+        // This is a controller-level command, shouldn't matter which port we use
+        self.borrow_port(PORT0)?
+            .into_registers()
+            .system_config()
+            .read_async()
+            .await
+    }
+
+    /// Set global system config
+    pub async fn set_system_config(
+        &mut self,
+        config: registers::field_sets::SystemConfig,
+    ) -> Result<(), Error<B::Error>> {
+        // This is a controller-level command, shouldn't matter which port we use
+        self.borrow_port(PORT0)?
+            .into_registers()
+            .system_config()
+            .write_async(|r| *r = config)
+            .await
+    }
+
+    /// Enable/disable sourcing on a given port
+    pub async fn enable_source(&mut self, port: PortId, enable: bool) -> Result<(), Error<B::Error>> {
+        let mut config = self.get_system_config().await?;
+
+        let enable = if enable {
+            registers::VbusSwConfig::Source
+        } else {
+            registers::VbusSwConfig::Disabled
+        };
+        match port {
+            PORT0 => config.set_pa_pp_5_v_vbus_sw_config(enable),
+            PORT1 => config.set_pb_pp_5_v_vbus_sw_config(enable),
+            _ => return PdError::InvalidPort.into(),
+        }
+
+        self.set_system_config(config).await?;
+        Ok(())
     }
 }
 

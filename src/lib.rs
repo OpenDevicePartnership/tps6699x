@@ -51,6 +51,16 @@ pub mod registers {
         }
     }
 
+    impl From<type_c::Current> for TypecCurrent {
+        fn from(value: type_c::Current) -> Self {
+            match value {
+                type_c::Current::UsbDefault => TypecCurrent::UsbDefault,
+                type_c::Current::Current1A5 => TypecCurrent::Current1A5,
+                type_c::Current::Current3A0 => TypecCurrent::Current3A0,
+            }
+        }
+    }
+
     impl TryFrom<PdCcPullUp> for type_c::Current {
         type Error = PdError;
 
@@ -60,6 +70,16 @@ pub mod registers {
                 PdCcPullUp::Current1A5 => Ok(type_c::Current::Current1A5),
                 PdCcPullUp::Current3A0 => Ok(type_c::Current::Current3A0),
                 _ => Err(PdError::InvalidParams),
+            }
+        }
+    }
+
+    impl From<type_c::Current> for PdCcPullUp {
+        fn from(value: type_c::Current) -> Self {
+            match value {
+                type_c::Current::UsbDefault => PdCcPullUp::UsbDefault,
+                type_c::Current::Current1A5 => PdCcPullUp::Current1A5,
+                type_c::Current::Current3A0 => PdCcPullUp::Current3A0,
             }
         }
     }
