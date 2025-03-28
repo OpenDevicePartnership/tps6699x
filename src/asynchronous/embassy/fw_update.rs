@@ -1,6 +1,6 @@
 use bincode::config;
 use embassy_sync::blocking_mutex::raw::RawMutex;
-use embassy_time::{with_timeout, Delay, Duration};
+use embassy_time::{with_timeout, Duration};
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::{Error, PdError};
