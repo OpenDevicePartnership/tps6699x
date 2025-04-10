@@ -95,31 +95,11 @@ checksum = "f798d2d157e547aa99aab0967df39edd0b70307312b6f8bd2848e6abe40896e0"
 
 [[package]]
 name = "bitfield"
-version = "0.18.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c7e6caee68becd795bfd65f1a026e4d00d8f0c2bc9be5eb568e1015f9ce3c34"
-dependencies = [
- "bitfield-macros 0.18.1",
-]
-
-[[package]]
-name = "bitfield"
 version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "786e53b0c071573a28956cec19a92653e42de34c683e2f6e86c197a349fba318"
 dependencies = [
- "bitfield-macros 0.19.0",
-]
-
-[[package]]
-name = "bitfield-macros"
-version = "0.18.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "331afbb18ce7b644c0b428726d369c5dd37ca0b815d72a459fcc2896c3c8ad32"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "bitfield-macros",
 ]
 
 [[package]]
@@ -398,7 +378,7 @@ checksum = "48c757948c5ede0e46177b7add2e67155f70e33c07fea8284df6576da70b3719"
 [[package]]
 name = "embassy-embedded-hal"
 version = "0.3.0"
-source = "git+https://github.com/embassy-rs/embassy#5158482eb95d2ec5c25d0d65991e7df2d5733e10"
+source = "git+https://github.com/embassy-rs/embassy#7e78e5829ce239b2e5a4afab0ca7f9ed895425fa"
 dependencies = [
  "defmt 0.3.100",
  "embassy-futures",
@@ -416,7 +396,7 @@ dependencies = [
 [[package]]
 name = "embassy-executor"
 version = "0.7.0"
-source = "git+https://github.com/embassy-rs/embassy#5158482eb95d2ec5c25d0d65991e7df2d5733e10"
+source = "git+https://github.com/embassy-rs/embassy#7e78e5829ce239b2e5a4afab0ca7f9ed895425fa"
 dependencies = [
  "cortex-m",
  "critical-section",
@@ -428,7 +408,7 @@ dependencies = [
 [[package]]
 name = "embassy-executor-macros"
 version = "0.6.2"
-source = "git+https://github.com/embassy-rs/embassy#5158482eb95d2ec5c25d0d65991e7df2d5733e10"
+source = "git+https://github.com/embassy-rs/embassy#7e78e5829ce239b2e5a4afab0ca7f9ed895425fa"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -439,12 +419,12 @@ dependencies = [
 [[package]]
 name = "embassy-futures"
 version = "0.1.1"
-source = "git+https://github.com/embassy-rs/embassy#5158482eb95d2ec5c25d0d65991e7df2d5733e10"
+source = "git+https://github.com/embassy-rs/embassy#7e78e5829ce239b2e5a4afab0ca7f9ed895425fa"
 
 [[package]]
 name = "embassy-hal-internal"
 version = "0.2.0"
-source = "git+https://github.com/embassy-rs/embassy#5158482eb95d2ec5c25d0d65991e7df2d5733e10"
+source = "git+https://github.com/embassy-rs/embassy#7e78e5829ce239b2e5a4afab0ca7f9ed895425fa"
 dependencies = [
  "cortex-m",
  "critical-section",
@@ -455,7 +435,7 @@ dependencies = [
 [[package]]
 name = "embassy-imxrt"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embassy-imxrt#27dd2857491e9874d8d8771c9d73fd03e4ef1ef2"
+source = "git+https://github.com/OpenDevicePartnership/embassy-imxrt#93e5b0c2315447ebf38316dd612fc2cd3cfd8ba8"
 dependencies = [
  "cfg-if",
  "cortex-m",
@@ -476,7 +456,7 @@ dependencies = [
  "embedded-io",
  "embedded-io-async",
  "fixed",
- "mimxrt600-fcb 0.2.1",
+ "mimxrt600-fcb 0.2.2",
  "mimxrt633s-pac",
  "mimxrt685s-pac 0.4.0",
  "nb 1.1.0",
@@ -488,7 +468,7 @@ dependencies = [
 [[package]]
 name = "embassy-sync"
 version = "0.6.2"
-source = "git+https://github.com/embassy-rs/embassy#5158482eb95d2ec5c25d0d65991e7df2d5733e10"
+source = "git+https://github.com/embassy-rs/embassy#7e78e5829ce239b2e5a4afab0ca7f9ed895425fa"
 dependencies = [
  "cfg-if",
  "critical-section",
@@ -502,7 +482,7 @@ dependencies = [
 [[package]]
 name = "embassy-time"
 version = "0.4.0"
-source = "git+https://github.com/embassy-rs/embassy#5158482eb95d2ec5c25d0d65991e7df2d5733e10"
+source = "git+https://github.com/embassy-rs/embassy#7e78e5829ce239b2e5a4afab0ca7f9ed895425fa"
 dependencies = [
  "cfg-if",
  "critical-section",
@@ -518,7 +498,7 @@ dependencies = [
 [[package]]
 name = "embassy-time-driver"
 version = "0.2.0"
-source = "git+https://github.com/embassy-rs/embassy#5158482eb95d2ec5c25d0d65991e7df2d5733e10"
+source = "git+https://github.com/embassy-rs/embassy#7e78e5829ce239b2e5a4afab0ca7f9ed895425fa"
 dependencies = [
  "document-features",
 ]
@@ -526,7 +506,7 @@ dependencies = [
 [[package]]
 name = "embassy-time-queue-utils"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#5158482eb95d2ec5c25d0d65991e7df2d5733e10"
+source = "git+https://github.com/embassy-rs/embassy#7e78e5829ce239b2e5a4afab0ca7f9ed895425fa"
 dependencies = [
  "embassy-executor",
  "heapless 0.8.0",
@@ -615,7 +595,7 @@ dependencies = [
 [[package]]
 name = "embedded-services"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-services#8809657c67ef77a39dfa675cee7c551566d68c8a"
+source = "git+https://github.com/OpenDevicePartnership/embedded-services#74d85560b2e6c47406c764fdecced1165a1a3603"
 dependencies = [
  "bitfield 0.17.0",
  "bitflags 2.9.0",
@@ -663,9 +643,9 @@ dependencies = [
 [[package]]
 name = "embedded-usb-pd"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-usb-pd#d91252d11f60cb6dabb123472ce23b7a745488d8"
+source = "git+https://github.com/OpenDevicePartnership/embedded-usb-pd#64f62c3d02b34e31f3abd2ecad4c5d159cc450eb"
 dependencies = [
- "bitfield 0.18.1",
+ "bitfield 0.19.0",
  "defmt 0.3.100",
  "embedded-hal-async",
 ]
@@ -888,18 +868,18 @@ dependencies = [
 
 [[package]]
 name = "mimxrt600-fcb"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8507a7a1dd730be91a79e2b7a4af1e186a020e9bac06ff17dd760efc99f43e9c"
+checksum = "b1ebf867c0f22d440f0ad393c28d2007af23c08953b9111379dd711083ae19a9"
 dependencies = [
  "bitfield 0.15.0",
 ]
 
 [[package]]
 name = "mimxrt633s-pac"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a1edd8317cebedee09f61910c2a5612576254367b1ca74375ee987b4db20df2"
+checksum = "843c1c63c367293e4fa270cc161b5bdfef55b4c6a0a18768f737241fb24be70c"
 dependencies = [
  "cortex-m",
  "cortex-m-rt",
@@ -1162,7 +1142,7 @@ dependencies = [
 [[package]]
 name = "storage_bus"
 version = "0.1.1"
-source = "git+https://github.com/OpenDevicePartnership/embedded-services#8809657c67ef77a39dfa675cee7c551566d68c8a"
+source = "git+https://github.com/OpenDevicePartnership/embedded-services#74d85560b2e6c47406c764fdecced1165a1a3603"
 dependencies = [
  "embassy-executor",
  "embassy-sync",

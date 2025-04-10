@@ -83,31 +83,11 @@ dependencies = [
 
 [[package]]
 name = "bitfield"
-version = "0.18.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c7e6caee68becd795bfd65f1a026e4d00d8f0c2bc9be5eb568e1015f9ce3c34"
-dependencies = [
- "bitfield-macros 0.18.1",
-]
-
-[[package]]
-name = "bitfield"
 version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "786e53b0c071573a28956cec19a92653e42de34c683e2f6e86c197a349fba318"
 dependencies = [
- "bitfield-macros 0.19.0",
-]
-
-[[package]]
-name = "bitfield-macros"
-version = "0.18.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "331afbb18ce7b644c0b428726d369c5dd37ca0b815d72a459fcc2896c3c8ad32"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "bitfield-macros",
 ]
 
 [[package]]
@@ -273,7 +253,7 @@ checksum = "48c757948c5ede0e46177b7add2e67155f70e33c07fea8284df6576da70b3719"
 [[package]]
 name = "embassy-sync"
 version = "0.6.2"
-source = "git+https://github.com/embassy-rs/embassy#5158482eb95d2ec5c25d0d65991e7df2d5733e10"
+source = "git+https://github.com/embassy-rs/embassy#7e78e5829ce239b2e5a4afab0ca7f9ed895425fa"
 dependencies = [
  "cfg-if",
  "critical-section",
@@ -287,7 +267,7 @@ dependencies = [
 [[package]]
 name = "embassy-time"
 version = "0.4.0"
-source = "git+https://github.com/embassy-rs/embassy#5158482eb95d2ec5c25d0d65991e7df2d5733e10"
+source = "git+https://github.com/embassy-rs/embassy#7e78e5829ce239b2e5a4afab0ca7f9ed895425fa"
 dependencies = [
  "cfg-if",
  "critical-section",
@@ -303,7 +283,7 @@ dependencies = [
 [[package]]
 name = "embassy-time-driver"
 version = "0.2.0"
-source = "git+https://github.com/embassy-rs/embassy#5158482eb95d2ec5c25d0d65991e7df2d5733e10"
+source = "git+https://github.com/embassy-rs/embassy#7e78e5829ce239b2e5a4afab0ca7f9ed895425fa"
 dependencies = [
  "document-features",
 ]
@@ -388,9 +368,9 @@ dependencies = [
 [[package]]
 name = "embedded-usb-pd"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-usb-pd#d91252d11f60cb6dabb123472ce23b7a745488d8"
+source = "git+https://github.com/OpenDevicePartnership/embedded-usb-pd#64f62c3d02b34e31f3abd2ecad4c5d159cc450eb"
 dependencies = [
- "bitfield 0.18.1",
+ "bitfield",
  "defmt 0.3.100",
  "embedded-hal-async",
 ]
@@ -751,7 +731,7 @@ name = "tps6699x"
 version = "0.1.0"
 dependencies = [
  "bincode",
- "bitfield 0.19.0",
+ "bitfield",
  "defmt 0.3.100",
  "device-driver",
  "embassy-sync",

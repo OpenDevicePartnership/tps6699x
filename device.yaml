@@ -450,6 +450,50 @@ Status:
         EntryFailed: 0x2
         PartialSuccess: 0x3
 
+UsbStatus:
+  type: register
+  address: 0x24
+  access: RO
+  size_bits: 72
+  reset_value: 0x0
+  description: Power path status
+  fields:
+    EudoSopSentStatus:
+      base: uint
+      start: 0
+      end: 2
+      description: Enter USB4 mode status
+      conversion:
+        name: EudoSopSentStatus
+        NoEnterUsb: 0x0
+        EnterUsbTimeout: 0x1
+        EnterUsbFailure: 0x2
+        SuccessfulEnterUsb: 0x3
+    Usb4RequiredPlugMode:
+      base: uint
+      start: 2
+      end: 4
+      description: USB4 plug mode requirement
+      conversion:
+        name: Usb4RequiredPlugMode
+        None: 0x0
+        Reserved: 0x1
+        USB4: 0x2
+        TBT3: 0x3
+    UsbModeActiveOnPlug:
+      base: bool
+      start: 4
+      description: USB4 mode active on plug
+    UsbReentryNeeded:
+      base: bool
+      start: 6
+      description: USB re-entry is needed
+    EnterUsbDataObject:
+      base: uint
+      start: 8
+      end: 39
+      description: Enter_USB Data Object (EUDO)
+
 PowerPathStatus:
   type: register
   address: 0x26
@@ -1081,3 +1125,81 @@ PdStatus:
         RequestedByHostDataControl: 0x3
         ExitUsb4FollowingDrSwap: 0x4
         Reserved: catch_all
+
+UserVidStatus:
+  type: register
+  address: 0x57
+  access: RO
+  size_bits: 16
+  reset_value: 0x0
+  fields:
+    UsvidDetected:
+      base: bool
+      start: 0
+      description: Asserted when a User VID has been detected.
+    UsvidActive:
+      base: bool
+      start: 1
+      description: Asserted when a User VID is active.
+    UsvidErrorCode:
+      base: uint
+      start: 2
+      end: 5
+      description: Error code
+    Mode1:
+      base: bool
+      start: 9
+      description: Asserted when Mode1 has been entered
+    Mode2:
+      base: bool
+      start: 10
+      description: Asserted when Mode2 has been entered
+    Mode3:
+      base: bool
+      start: 11
+      description: Asserted when Mode3 has been entered
+    Mode4:
+      base: bool
+      start: 12
+      description: Asserted when Mode4 has been entered
+
+IntelVidStatus:
+  type: register
+  address: 0x59
+  access: RO
+  size_bits: 88
+  reset_value: 0x0
+  description: Intel VID status
+  fields:
+    IntelVidDetected:
+      base: bool
+      start: 0
+      description: Indicates if Intel VID is detected.
+    TbtModeActive:
+      base: bool
+      start: 1
+      description: Indicates if TBT Mode is active.
+    ForcedTbtMode:
+      base: bool
+      start: 2
+      description: Retimer in TBT state and ready for FW update
+    TbtAttentionData:
+      base: uint
+      start: 8
+      end: 39
+      description: Attention message contents
+    TbtEnterModeData:
+      base: uint
+      start: 40
+      end: 55
+      description: Data for TBT Enter mode message
+    TbtModeDataRxSop:
+      base: uint
+      start: 56
+      end: 71
+      description: Data for Discover Modes response
+    TbtModeDataRxSopPrime:
+      base: uint
+      start: 72
+      end: 87
+      description: Data for Discover Modes (SOP')

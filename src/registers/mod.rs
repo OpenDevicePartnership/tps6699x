@@ -1,7 +1,11 @@
 use device_driver;
+use embedded_usb_pd::type_c::ConnectionState;
 use embedded_usb_pd::{type_c, PdError};
 
+use crate::Mode;
+
 pub mod boot_flags;
+pub mod dp_status;
 
 device_driver::create_device!(
     device_name: Registers,
@@ -19,6 +23,12 @@ pub const REG_DATA1_LEN: usize = 64;
 pub const REG_BOOT_FLAGS: u8 = 0x2D;
 /// Boot flags register length
 pub const REG_BOOT_FLAGS_LEN: usize = 44;
+
+/// DP status register
+/// This register is 304 bits and exceeds the maximum support by device_driver
+pub const REG_DP_STATUS: u8 = 0x58;
+/// DP status register length
+pub const REG_DP_STATUS_LEN: usize = 38;
 
 impl TryFrom<TypecCurrent> for type_c::Current {
     type Error = PdError;
@@ -62,6 +72,29 @@ impl From<type_c::Current> for PdCcPullUp {
             type_c::Current::UsbDefault => PdCcPullUp::UsbDefault,
             type_c::Current::Current1A5 => PdCcPullUp::Current1A5,
             type_c::Current::Current3A0 => PdCcPullUp::Current3A0,
+        }
+    }
+}
+
+impl From<PlugMode> for Option<ConnectionState> {
+    fn from(value: PlugMode) -> Self {
+        match value {
+            PlugMode::Debug => Some(ConnectionState::DebugAccessory),
+            PlugMode::Audio => Some(ConnectionState::AudioAccessory),
+            PlugMode::Connected | PlugMode::ConnectedNoRa => Some(ConnectionState::Attached),
+            _ => None,
+        }
+    }
+}
+
+impl From<Mode> for &str {
+    fn from(value: Mode) -> Self {
+        match value {
+            Mode::Boot => "BOOT",
+            Mode::F211 => "F211",
+            Mode::App0 => "APP0",
+            Mode::App1 => "APP1",
+            Mode::Wtpr => "WTPR",
         }
     }
 }

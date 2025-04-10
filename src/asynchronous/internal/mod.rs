@@ -1,6 +1,7 @@
 //! Asynchronous, low-level TPS6699x driver. This module provides a low-level interface
 use device_driver::AsyncRegisterInterface;
 use embedded_hal_async::i2c::I2c;
+use embedded_usb_pd::pdinfo::AltMode;
 use embedded_usb_pd::{Error, PdError, PortId};
 
 use crate::{registers, Mode, MAX_SUPPORTED_PORTS, PORT0, PORT1, TPS66993_NUM_PORTS, TPS66994_NUM_PORTS};
@@ -300,6 +301,69 @@ impl<B: I2c> Tps6699x<B> {
             .await?;
 
         Ok(registers::boot_flags::BootFlagsRaw(buf))
+    }
+
+    /// Get DP status
+    pub async fn get_dp_status(&mut self, port: PortId) -> Result<registers::dp_status::DpStatus, Error<B::Error>> {
+        let mut buf = [0u8; registers::REG_DP_STATUS_LEN];
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .read_register(
+                registers::REG_DP_STATUS,
+                (registers::REG_DP_STATUS_LEN * 8) as u32,
+                &mut buf,
+            )
+            .await?;
+
+        Ok(registers::dp_status::DpStatusRaw(buf))
+    }
+
+    /// Get Intel VID status
+    pub async fn get_intel_vid_status(
+        &mut self,
+        port: PortId,
+    ) -> Result<registers::field_sets::IntelVidStatus, Error<B::Error>> {
+        self.borrow_port(port)?
+            .into_registers()
+            .intel_vid_status()
+            .read_async()
+            .await
+    }
+
+    /// Get USB status
+    pub async fn get_usb_status(&mut self, port: PortId) -> Result<registers::field_sets::UsbStatus, Error<B::Error>> {
+        self.borrow_port(port)?.into_registers().usb_status().read_async().await
+    }
+
+    /// Get user VID status
+    pub async fn get_user_vid_status(
+        &mut self,
+        port: PortId,
+    ) -> Result<registers::field_sets::UserVidStatus, Error<B::Error>> {
+        self.borrow_port(port)?
+            .into_registers()
+            .user_vid_status()
+            .read_async()
+            .await
+    }
+
+    /// Get complete alt-mode status
+    pub async fn get_alt_mode_status(&mut self, port: PortId) -> Result<AltMode, Error<B::Error>> {
+        let dp_status = self.get_dp_status(port).await?;
+        let usb_status = self.get_usb_status(port).await?;
+        let user_vid_status = self.get_user_vid_status(port).await?;
+        let intel_vid_status = self.get_intel_vid_status(port).await?;
+
+        Ok(AltMode::new(
+            user_vid_status.mode_1(),
+            user_vid_status.mode_2(),
+            user_vid_status.mode_3(),
+            user_vid_status.mode_4(),
+            dp_status.dp_mode_active() != 0,
+            intel_vid_status.tbt_mode_active(),
+            usb_status.eudo_sop_sent_status() == registers::EudoSopSentStatus::SuccessfulEnterUsb,
+        ))
     }
 }
 
