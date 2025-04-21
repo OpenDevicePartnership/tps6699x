@@ -21,8 +21,15 @@ pub async fn interrupt_task<const N: usize, M: RawMutex, B: I2c, INT: Wait + Inp
         }
 
         for interrupt in &mut interrupts {
-            if interrupt.process_interrupt(int).await.is_err() {
-                warn!("Error processing interrupt");
+            if let Err(e) = interrupt.process_interrupt(int).await {
+                #[cfg(feature = "defmt")]
+                {
+                    warn!("Error processing interrupt: {}", e);
+                }
+                #[cfg(not(feature = "defmt"))]
+                {
+                    warn!("Error processing interrupt");
+                }
             }
         }
 
