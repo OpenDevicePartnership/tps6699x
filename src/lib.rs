@@ -6,6 +6,7 @@ pub mod asynchronous;
 pub mod command;
 pub mod fmt;
 pub mod registers;
+pub mod stream;
 
 pub(crate) mod fw_update;
 

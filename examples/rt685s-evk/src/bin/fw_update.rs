@@ -16,9 +16,11 @@ use embassy_time::Delay;
 use mimxrt600_fcb::FlexSPIFlashConfigurationBlock;
 use static_cell::StaticCell;
 use tps6699x::asynchronous::embassy as pd_controller;
-use tps6699x::asynchronous::fw_update;
+use tps6699x::asynchronous::fw_update::Updater;
 use tps6699x::ADDR0;
 use {defmt_rtt as _, panic_probe as _};
+
+const CHUNK_LENGTH: usize = 1024;
 
 bind_interrupts!(struct Irqs {
     FLEXCOMM2 => embassy_imxrt::i2c::InterruptHandler<peripherals::FLEXCOMM2>;
@@ -50,12 +52,14 @@ async fn main(spawner: Spawner) {
     let controller = CONTROLLER.init(Controller::new_tps66994(device, ADDR0).unwrap());
     let (mut pd, interrupt) = controller.make_parts();
 
+    let mut delay = Delay;
+    info!("Resetting PD controller");
+    pd.reset(&mut delay).await.unwrap();
+
     info!("Spawing PD interrupt task");
     spawner.must_spawn(interrupt_task(int_in, interrupt));
 
     let pd_fw_bytes = [0u8].as_slice(); //include_bytes!("../../fw.bin").as_slice();
-    let mut pd_fw = fw_update::SliceImage::new(pd_fw_bytes);
-    let mut delay = Delay;
 
     let mut controllers = [&mut pd];
     for (i, controller) in controllers.iter_mut().enumerate() {
@@ -64,18 +68,34 @@ async fn main(spawner: Spawner) {
     }
 
     info!("Performing PD FW update");
-    match fw_update::perform_fw_update(&mut delay, [&mut pd], &mut pd_fw).await {
-        Ok(_) => info!("PD FW update complete"),
-        Err(e) => error!("PD FW update failed: {:?}", e),
-    }
+    {
+        let mut controllers = [&mut pd];
+        let mut updater: Updater<1, _> = Updater::default();
 
-    let mut controllers = [&mut pd];
-    for (i, controller) in controllers.iter_mut().enumerate() {
-        let customer_use = controller.get_customer_use().await.unwrap();
-        info!(
-            "Controller {}: FW update complete, customer use: {:#x}",
-            i, customer_use
-        );
+        if let Err(e) = updater.start_fw_update(&mut controllers, &mut delay).await {
+            error!("Failed to start FW update: {:?}", e);
+            updater.exit_fw_update_mode(&mut controllers, &mut delay).await.unwrap();
+            return;
+        }
+
+        for chunk in pd_fw_bytes.chunks(CHUNK_LENGTH) {
+            if let Err(e) = updater.write_bytes(&mut controllers, &mut delay, chunk).await {
+                error!("Failed to write FW update chunk: {:?}", e);
+                updater.exit_fw_update_mode(&mut controllers, &mut delay).await.unwrap();
+                return;
+            }
+        }
+
+        updater.complete_fw_update(&mut controllers, &mut delay).await.unwrap();
+
+        let mut controllers = [&mut pd];
+        for (i, controller) in controllers.iter_mut().enumerate() {
+            let customer_use = controller.get_customer_use().await.unwrap();
+            info!(
+                "Controller {}: FW update complete, customer use: {:#x}",
+                i, customer_use
+            );
+        }
     }
 }
 

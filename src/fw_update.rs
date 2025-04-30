@@ -10,6 +10,8 @@ pub const IMAGE_ID_LEN: usize = 4;
 
 /// App image size offset
 pub const APP_IMAGE_SIZE_OFFSET: usize = 0x4F8;
+/// App image size length
+pub const APP_IMAGE_SIZE_LEN: usize = 4;
 
 /// Header metadata offset
 pub const HEADER_METADATA_OFFSET: usize = IMAGE_ID_LEN;
@@ -33,5 +35,3 @@ pub const MAX_METADATA_LEN: usize = 8;
 pub const TFUI_BURST_WRITE_DELAY_MS: u32 = 250;
 /// Delay after sending burst write for TFUd command
 pub const TFUD_BURST_WRITE_DELAY_MS: u32 = 150;
-/// Max data to send in a single burst write
-pub const BURST_WRITE_SIZE: usize = 256;

@@ -189,7 +189,7 @@ pub(crate) const RESET_TIMEOUT_MS: u32 = RESET_DELAY_MS + 100;
 pub(crate) const TFUI_ARGS_LEN: usize = 8;
 
 /// Arguments for TFUi command
-#[derive(Debug, Clone, Copy, Decode, Encode, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Decode, Encode, PartialEq, Eq, Default)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct TfuiArgs {
     pub num_data_blocks_tx: u16,
@@ -412,7 +412,7 @@ impl From<SrdySwitch> for u8 {
 /// Arguments for TFUd command
 #[allow(dead_code)]
 pub(crate) const TFUD_ARGS_LEN: usize = 8;
-#[derive(Debug, Decode, Encode, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Decode, Encode, Clone, Copy, PartialEq, Eq, Default)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct TfudArgs {
     pub block_number: u16,
