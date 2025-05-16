@@ -6,6 +6,7 @@ pub mod asynchronous;
 pub mod command;
 pub mod fmt;
 pub mod registers;
+pub mod stream;
 
 pub(crate) mod fw_update;
 
@@ -93,11 +94,14 @@ pub(crate) mod test {
     use std::vec;
     use std::vec::Vec;
 
+    use bincode::encode_into_slice;
     use embedded_hal_async::delay::DelayNs;
     use embedded_hal_mock::eh1::i2c::Transaction;
     use tokio::time::sleep;
 
     use super::*;
+    use crate::command::{TfudArgs, TfuiArgs, TFUD_ARGS_LEN};
+    use crate::fw_update::{APP_IMAGE_SIZE_OFFSET, HEADER_BLOCK_LEN, HEADER_METADATA_OFFSET};
 
     pub const PORT0_ADDR0: u8 = ADDR0[0];
     pub const PORT1_ADDR0: u8 = ADDR0[1];
@@ -130,5 +134,156 @@ pub(crate) mod test {
         async fn delay_ns(&mut self, ns: u32) {
             sleep(Duration::from_nanos(ns as u64)).await;
         }
+    }
+
+    /// Mock default data block size
+    pub const MOCK_DEFAULT_DATA_BLOCK_SIZE: u16 = 0x4000;
+    /// Mock last data block size
+    pub const MOCK_LAST_DATA_BLOCK_SIZE: u16 = 0x1800;
+    /// Mock app config size
+    pub const MOCK_APP_CONFIG_SIZE: u16 = 0x800;
+    /// Mock default timeout for this block in seconds
+    pub const MOCK_TIMEOUT_SECS: u16 = 255;
+    /// Mock broadcast address
+    pub const MOCK_BROADCAST_ADDR: u16 = 0x77;
+    /// Mock overall update timeout
+    pub const MOCK_UPDATE_TIMEOUT: u16 = 3000;
+    /// Mock default data block count
+    pub const MOCK_DEFAULT_DATA_BLOCK_COUNT: u16 = 11;
+    /// Mock FW update app size
+    pub const MOCK_APP_SIZE: u32 = 0x29800;
+
+    /// Helper function to generate block header arguments
+    const fn mock_data_block_header(block_number: u16) -> TfudArgs {
+        TfudArgs {
+            block_number,
+            data_len: MOCK_DEFAULT_DATA_BLOCK_SIZE,
+            timeout_secs: MOCK_TIMEOUT_SECS,
+            broadcast_u16_address: MOCK_BROADCAST_ADDR,
+        }
+    }
+
+    /// Mock update header
+    pub const MOCK_UPDATE_HEADER: TfuiArgs = TfuiArgs {
+        num_data_blocks_tx: MOCK_DEFAULT_DATA_BLOCK_COUNT,
+        data_len: HEADER_BLOCK_LEN as u16,
+        timeout_secs: MOCK_UPDATE_TIMEOUT,
+        broadcast_u16_address: MOCK_BROADCAST_ADDR,
+    };
+
+    // Data block indexes start at block index 1
+    /// Mock data block header 0
+    pub const MOCK_DATA_BLOCK_HEADER_0: TfudArgs = mock_data_block_header(1);
+    /// Mock data block header 0 offset
+    pub const MOCK_DATA_BLOCK_HEADER_0_OFFSET: usize = 0x80c;
+
+    /// Mock data block header 1
+    pub const MOCK_DATA_BLOCK_HEADER_1: TfudArgs = mock_data_block_header(2);
+    /// Mock data block header 1 offset
+    pub const MOCK_DATA_BLOCK_HEADER_1_OFFSET: usize = 0x4814;
+
+    /// Mock data block header 2
+    pub const MOCK_DATA_BLOCK_HEADER_2: TfudArgs = mock_data_block_header(3);
+    /// Mock data block header 2 offset
+    pub const MOCK_DATA_BLOCK_HEADER_2_OFFSET: usize = 0x881c;
+
+    /// Mock data block header 3
+    pub const MOCK_DATA_BLOCK_HEADER_3: TfudArgs = mock_data_block_header(4);
+    /// Mock data block header 3 offset
+    pub const MOCK_DATA_BLOCK_HEADER_3_OFFSET: usize = 0xc824;
+
+    /// Mock data block header 4
+    pub const MOCK_DATA_BLOCK_HEADER_4: TfudArgs = mock_data_block_header(5);
+    /// Mock data block header 4 offset
+    pub const MOCK_DATA_BLOCK_HEADER_4_OFFSET: usize = 0x1082c;
+
+    /// Mock data block header 5
+    pub const MOCK_DATA_BLOCK_HEADER_5: TfudArgs = mock_data_block_header(6);
+    /// Mock data block header 5 offset
+    pub const MOCK_DATA_BLOCK_HEADER_5_OFFSET: usize = 0x14834;
+
+    /// Mock data block header 6
+    pub const MOCK_DATA_BLOCK_HEADER_6: TfudArgs = mock_data_block_header(7);
+    /// Mock data block header 6 offset
+    pub const MOCK_DATA_BLOCK_HEADER_6_OFFSET: usize = 0x1883c;
+
+    /// Mock data block header 7
+    pub const MOCK_DATA_BLOCK_HEADER_7: TfudArgs = mock_data_block_header(8);
+    /// Mock data block header 7 offset
+    pub const MOCK_DATA_BLOCK_HEADER_7_OFFSET: usize = 0x1c844;
+
+    /// Mock data block header 8
+    pub const MOCK_DATA_BLOCK_HEADER_8: TfudArgs = mock_data_block_header(9);
+    /// Mock data block header 8 offset
+    pub const MOCK_DATA_BLOCK_HEADER_8_OFFSET: usize = 0x2084c;
+
+    /// Mock data block header 9
+    pub const MOCK_DATA_BLOCK_HEADER_9: TfudArgs = mock_data_block_header(10);
+    /// Mock data block header 9 offset
+    pub const MOCK_DATA_BLOCK_HEADER_9_OFFSET: usize = 0x24854;
+
+    /// Mock data block header 10
+    pub const MOCK_DATA_BLOCK_HEADER_10: TfudArgs = TfudArgs {
+        block_number: 11,
+        data_len: MOCK_LAST_DATA_BLOCK_SIZE,
+        timeout_secs: MOCK_TIMEOUT_SECS,
+        broadcast_u16_address: MOCK_BROADCAST_ADDR,
+    };
+    /// Mock data block header 10 offset
+    pub const MOCK_DATA_BLOCK_HEADER_10_OFFSET: usize = 0x2885c;
+
+    /// Mock app config header
+    pub const APP_CONFIG_HEADER: TfudArgs = TfudArgs {
+        block_number: 12,
+        data_len: MOCK_APP_CONFIG_SIZE,
+        timeout_secs: MOCK_TIMEOUT_SECS,
+        broadcast_u16_address: MOCK_BROADCAST_ADDR,
+    };
+    /// Mock app config header offset
+    pub const APP_CONFIG_HEADER_OFFSET: usize = 0x2a064;
+
+    /// Generates a mock FW update that contains no actual data, just headers
+    pub fn generate_mock_fw() -> Vec<u8> {
+        let mut buf = [0u8; TFUD_ARGS_LEN];
+        let mut data: Vec<(usize, Vec<u8>)> = Vec::new();
+        let config = bincode::config::standard().with_fixed_int_encoding();
+
+        // Encode the update header
+        encode_into_slice(MOCK_UPDATE_HEADER, &mut buf, config).unwrap();
+        data.push((HEADER_METADATA_OFFSET, buf.clone().into()));
+
+        // Encode the app size
+        data.push((APP_IMAGE_SIZE_OFFSET, MOCK_APP_SIZE.to_le_bytes().into()));
+
+        // Encode the data block headers
+        let headers = [
+            (MOCK_DATA_BLOCK_HEADER_0_OFFSET, MOCK_DATA_BLOCK_HEADER_0),
+            (MOCK_DATA_BLOCK_HEADER_1_OFFSET, MOCK_DATA_BLOCK_HEADER_1),
+            (MOCK_DATA_BLOCK_HEADER_2_OFFSET, MOCK_DATA_BLOCK_HEADER_2),
+            (MOCK_DATA_BLOCK_HEADER_3_OFFSET, MOCK_DATA_BLOCK_HEADER_3),
+            (MOCK_DATA_BLOCK_HEADER_4_OFFSET, MOCK_DATA_BLOCK_HEADER_4),
+            (MOCK_DATA_BLOCK_HEADER_5_OFFSET, MOCK_DATA_BLOCK_HEADER_5),
+            (MOCK_DATA_BLOCK_HEADER_6_OFFSET, MOCK_DATA_BLOCK_HEADER_6),
+            (MOCK_DATA_BLOCK_HEADER_7_OFFSET, MOCK_DATA_BLOCK_HEADER_7),
+            (MOCK_DATA_BLOCK_HEADER_8_OFFSET, MOCK_DATA_BLOCK_HEADER_8),
+            (MOCK_DATA_BLOCK_HEADER_9_OFFSET, MOCK_DATA_BLOCK_HEADER_9),
+            (MOCK_DATA_BLOCK_HEADER_10_OFFSET, MOCK_DATA_BLOCK_HEADER_10),
+        ];
+
+        for (offset, header) in headers.iter() {
+            encode_into_slice(header, &mut buf, config).unwrap();
+            data.push((*offset, buf.clone().into()));
+        }
+
+        // Encode the app config header
+        encode_into_slice(APP_CONFIG_HEADER, &mut buf, config).unwrap();
+        data.push((APP_CONFIG_HEADER_OFFSET, buf.clone().into()));
+
+        let mut buffer = vec![0; 171 * 1024];
+        for (offset, bytes) in data {
+            buffer[offset as usize..offset as usize + bytes.len()].copy_from_slice(&bytes);
+        }
+
+        buffer
     }
 }

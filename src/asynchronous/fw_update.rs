@@ -1,15 +1,24 @@
+//! Streaming FW update implementation
 use core::future::Future;
 use core::iter::zip;
+use core::marker::PhantomData;
 
 use bincode::config;
 use embedded_hal_async::delay::DelayNs;
-use embedded_io_async::{Read, ReadExactError, Seek, SeekFrom};
-use embedded_usb_pd::{Error as DeviceError, PdError};
+use embedded_usb_pd::{Error, PdError};
 
 use super::interrupt::InterruptController;
-use crate::command::*;
-use crate::fw_update::*;
-use crate::{error, info, warn, PORT0};
+use crate::command::{ReturnValue, TfudArgs, TfuiArgs, TfuqBlockStatus};
+use crate::fw_update::{
+    State, APP_CONFIG_BLOCK_INDEX, DATA_BLOCK_LEN, DATA_BLOCK_METADATA_LEN, DATA_BLOCK_START_INDEX, HEADER_BLOCK_INDEX,
+    HEADER_BLOCK_LEN, HEADER_BLOCK_OFFSET, HEADER_METADATA_LEN, HEADER_METADATA_OFFSET, IMAGE_ID_LEN, MAX_METADATA_LEN,
+    TFUD_BURST_WRITE_DELAY_MS, TFUI_BURST_WRITE_DELAY_MS, UPDATE_CHUNK_LENGTH,
+};
+use crate::stream::*;
+use crate::{debug, error, info, trace, warn, PORT0};
+
+/// Size of args_buffer used for reading various metadata
+const BUFFER_LENGTH: usize = MAX_METADATA_LEN;
 
 /// Trait for updating the firmware of a target device
 pub trait UpdateTarget: InterruptController {
@@ -17,476 +26,667 @@ pub trait UpdateTarget: InterruptController {
     fn fw_update_mode_enter(
         &mut self,
         delay: &mut impl DelayNs,
-    ) -> impl Future<Output = Result<(), DeviceError<Self::BusError>>>;
+    ) -> impl Future<Output = Result<(), Error<Self::BusError>>>;
 
     /// Start FW update
     fn fw_update_init(
         &mut self,
         delay: &mut impl DelayNs,
         args: &TfuiArgs,
-    ) -> impl Future<Output = Result<ReturnValue, DeviceError<Self::BusError>>>;
+    ) -> impl Future<Output = Result<ReturnValue, Error<Self::BusError>>>;
 
     /// Abort FW update
     fn fw_update_mode_exit(
         &mut self,
         delay: &mut impl DelayNs,
-    ) -> impl Future<Output = Result<(), DeviceError<Self::BusError>>>;
+    ) -> impl Future<Output = Result<(), Error<Self::BusError>>>;
 
     /// Validate the most recent block supplied to the device
     fn fw_update_validate_stream(
         &mut self,
         delay: &mut impl DelayNs,
         block_index: usize,
-    ) -> impl Future<Output = Result<TfuqBlockStatus, DeviceError<Self::BusError>>>;
+    ) -> impl Future<Output = Result<TfuqBlockStatus, Error<Self::BusError>>>;
 
     /// Stream a block to the device
     fn fw_update_stream_data(
         &mut self,
         delay: &mut impl DelayNs,
         args: &TfudArgs,
-    ) -> impl Future<Output = Result<(), DeviceError<Self::BusError>>>;
+    ) -> impl Future<Output = Result<(), Error<Self::BusError>>>;
 
     /// Complete the FW update process
     fn fw_update_complete(
         &mut self,
         delay: &mut impl DelayNs,
-    ) -> impl Future<Output = Result<(), DeviceError<Self::BusError>>>;
+    ) -> impl Future<Output = Result<(), Error<Self::BusError>>>;
 
     /// Write data to all supplied devices
     fn fw_update_burst_write(
         &mut self,
         address: u8,
         data: &[u8],
-    ) -> impl Future<Output = Result<(), DeviceError<Self::BusError>>>;
-}
-
-/// Trait for anything that can be used as an image for firmware update
-pub trait Image: Read + Seek {}
-
-/// Error type for the firmware update process
-#[derive(Debug)]
-#[cfg_attr(feature = "defmt", derive(defmt::Format))]
-pub enum Error<BE, IE> {
-    Bus(BE),
-    Pd(PdError),
-    Io(IE),
-    ReadExact(ReadExactError<IE>),
-}
-
-impl<BE, IE> From<DeviceError<BE>> for Error<BE, IE> {
-    fn from(e: DeviceError<BE>) -> Self {
-        match e {
-            DeviceError::Bus(e) => Error::Bus(e),
-            DeviceError::Pd(e) => Error::Pd(e),
-        }
-    }
-}
-
-/// Enter FW update mode on all controllers
-async fn enter_fw_update_mode<T: UpdateTarget>(
-    delay: &mut impl DelayNs,
-    controllers: &mut [&mut T],
-) -> Result<(), DeviceError<T::BusError>> {
-    for (i, controller) in controllers.iter_mut().enumerate() {
-        info!("Controller {}: Entering FW update mode", i);
-        if let Err(e) = controller.fw_update_mode_enter(delay).await {
-            info!("Controller {}: Failed to enter FW update mode", i);
-
-            exit_fw_update_mode(delay, controllers).await?;
-            return Err(e);
-        }
-    }
-
-    Ok(())
-}
-
-/// Exit FW update mode on all controllers
-async fn exit_fw_update_mode<T: UpdateTarget>(
-    delay: &mut impl DelayNs,
-    controllers: &mut [&mut T],
-) -> Result<(), DeviceError<T::BusError>> {
-    for (i, controller) in controllers.iter_mut().enumerate() {
-        info!("Controller {}: Exiting FW update mode", i);
-        if controller.fw_update_mode_exit(delay).await.is_err() {
-            info!("Controller {}: Failed to exit FW update mode", i);
-            // Don't return to allow the other controllers to exit FW update mode
-        }
-    }
-
-    Ok(())
-}
-
-/// Helper function to read from an image at a specific offset
-async fn read_from_exact<I: Image>(
-    image: &mut I,
-    offset: usize,
-    buf: &mut [u8],
-) -> Result<(), ReadExactError<I::Error>> {
-    image
-        .seek(SeekFrom::Start(offset as u64))
-        .await
-        .map_err(ReadExactError::Other)?;
-    image.read_exact(buf).await
-}
-
-/// Initialize FW update on all controller
-async fn fw_update_init<T: UpdateTarget, I: Image>(
-    delay: &mut impl DelayNs,
-    controllers: &mut [&mut T],
-    image: &mut I,
-) -> Result<TfuiArgs, Error<T::BusError, I::Error>> {
-    if controllers.is_empty() {
-        return Err(Error::Pd(PdError::InvalidParams));
-    }
-
-    let mut arg_bytes = [0u8; HEADER_METADATA_LEN];
-
-    // Get TFUi args from image header metadata
-    read_from_exact(image, HEADER_METADATA_OFFSET, &mut arg_bytes)
-        .await
-        .map_err(Error::ReadExact)?;
-    let (args, _) = bincode::decode_from_slice(&arg_bytes, config::standard().with_fixed_int_encoding())
-        .map_err(|_| Error::Pd(PdError::Serialize))?;
-
-    // Initialize FW update on all controllers
-    for (i, controller) in controllers.iter_mut().enumerate() {
-        info!("Controller {}: Initializing FW update", i);
-
-        match controller.fw_update_init(delay, &args).await {
-            Ok(ReturnValue::Success) => (),
-            Ok(r) => {
-                info!("Controller {}: Failed to initialize FW update, result {:#?}", i, r);
-                exit_fw_update_mode(delay, controllers).await?;
-                return Err(Error::Pd(PdError::Failed));
-            }
-            Err(e) => {
-                info!("Controller {}: Failed to initialize FW update", i);
-                exit_fw_update_mode(delay, controllers).await?;
-                return Err(e.into());
-            }
-        }
-    }
-
-    let mut buf = [0u8; BURST_WRITE_SIZE];
-    image
-        .seek(SeekFrom::Start(HEADER_BLOCK_OFFSET as u64))
-        .await
-        .map_err(Error::Io)?;
-
-    // Supply the header block to all controllers
-    info!("Broadcasting header block");
-    for _ in 0..HEADER_BLOCK_LEN / BURST_WRITE_SIZE {
-        image.read_exact(&mut buf).await.map_err(Error::ReadExact)?;
-        // All the controllers share the same bus, so just use the first controller
-        controllers[0]
-            .fw_update_burst_write(args.broadcast_u16_address as u8, &buf)
-            .await?;
-    }
-
-    delay.delay_ms(TFUI_BURST_WRITE_DELAY_MS).await;
-
-    // Validate the block on all controllers
-    for (i, controller) in controllers.iter_mut().enumerate() {
-        info!("Controller {}: Validating header block", i);
-        match controller.fw_update_validate_stream(delay, HEADER_BLOCK_INDEX).await {
-            Ok(TfuqBlockStatus::HeaderValidAndAuthentic) => (),
-            Ok(r) => {
-                error!("Controller {}: Header block validation failed, result {:#?}", i, r);
-                exit_fw_update_mode(delay, controllers).await?;
-                return Err(Error::Pd(PdError::Failed));
-            }
-            Err(_) => {
-                error!("Controller {}: Header block validation failed", i);
-                exit_fw_update_mode(delay, controllers).await?;
-                return Err(Error::Pd(PdError::Failed));
-            }
-        }
-    }
-
-    Ok(args)
+    ) -> impl Future<Output = Result<(), Error<Self::BusError>>>;
 }
 
 /// Computes the offset of a data block's metadata
-const fn data_block_metadata_offset(block: usize) -> usize {
+pub const fn data_block_metadata_offset(block: usize) -> usize {
     HEADER_BLOCK_OFFSET + HEADER_BLOCK_LEN + (block * (DATA_BLOCK_LEN + DATA_BLOCK_METADATA_LEN))
 }
 
 /// Computes the offset of a data block's data
-const fn block_offset(metadata_offset: usize) -> usize {
+pub const fn block_offset(metadata_offset: usize) -> usize {
     metadata_offset + DATA_BLOCK_METADATA_LEN
 }
 
 /// Computes the offset of the app config block's metadata
-const fn app_config_block_metadata_offset(num_data_blocks: usize, app_size: usize) -> usize {
+pub const fn app_config_block_metadata_offset(num_data_blocks: usize, app_size: usize) -> usize {
     app_size + IMAGE_ID_LEN + HEADER_METADATA_LEN + HEADER_BLOCK_LEN + num_data_blocks * DATA_BLOCK_METADATA_LEN
 }
 
-/// Get the size of the image
-async fn get_image_size<I: Image>(image: &mut I) -> Result<usize, ReadExactError<I::Error>> {
-    let mut image_size_data = [0; 4];
-    read_from_exact(image, APP_IMAGE_SIZE_OFFSET, &mut image_size_data).await?;
-    Ok(u32::from_le_bytes(image_size_data) as usize)
-}
-
 /// Converts a data block into a block index
-fn data_block_index_to_block_index(block_index: usize) -> usize {
+pub const fn data_block_index_to_block_index(block_index: usize) -> usize {
     block_index + DATA_BLOCK_START_INDEX
 }
 
-/// Stream and validate a block of data to all controllers
-async fn fw_update_stream_data<T: UpdateTarget, I: Image>(
-    delay: &mut impl DelayNs,
-    controllers: &mut [&mut T],
-    image: &mut I,
-    block_index: usize,
-    metadata_offset: usize,
-    metadata_size: usize,
-) -> Result<(), Error<T::BusError, I::Error>> {
-    if controllers.is_empty() {
-        return Err(Error::Pd(PdError::InvalidParams));
-    }
-
-    let mut arg_bytes = [0u8; MAX_METADATA_LEN];
-
-    // Get TFUd args from image
-    read_from_exact(image, metadata_offset, &mut arg_bytes[..metadata_size])
-        .await
-        .map_err(Error::ReadExact)?;
-
-    let (args, _) = bincode::decode_from_slice(&arg_bytes, config::standard().with_fixed_int_encoding())
-        .map_err(|_| Error::Pd(PdError::Serialize))?;
-
+/// Abort the FW update process
+async fn abort_fw_update<const N: usize, T: UpdateTarget>(controllers: &mut [&mut T; N], delay: &mut impl DelayNs) {
     for (i, controller) in controllers.iter_mut().enumerate() {
-        info!("Controller {}: Streaming data block", i);
-        if controller.fw_update_stream_data(delay, &args).await.is_err() {
-            error!("Controller {}: Failed to stream data block", i);
-            exit_fw_update_mode(delay, controllers).await?;
-            return Err(Error::Pd(PdError::Failed));
-        }
-    }
-
-    let data_len = args.data_len as usize;
-    let data_offset = block_offset(metadata_offset);
-    let mut buf = [0u8; BURST_WRITE_SIZE];
-
-    image
-        .seek(SeekFrom::Start(data_offset as u64))
-        .await
-        .map_err(Error::Io)?;
-
-    for _ in 0..data_len / BURST_WRITE_SIZE {
-        image.read_exact(&mut buf).await.map_err(Error::ReadExact)?;
-        // All the controllers share the same bus, so just use the first controller
-        controllers[0]
-            .fw_update_burst_write(args.broadcast_u16_address as u8, &buf)
-            .await?;
-    }
-
-    delay.delay_ms(TFUD_BURST_WRITE_DELAY_MS).await;
-
-    // Validate the block on all controllers
-    for (i, controller) in controllers.iter_mut().enumerate() {
-        info!("Controller {}: Validating block {}", i, block_index);
-        match controller.fw_update_validate_stream(delay, block_index).await {
-            Ok(TfuqBlockStatus::DataValidAndAuthentic)
-            | Ok(TfuqBlockStatus::DataValidButRepeated)
-            | Ok(TfuqBlockStatus::HeaderValidAndAuthentic) => (),
-            Ok(r) => {
-                error!("Controller {}: Block validation failed, result {:#?}", i, r);
-                exit_fw_update_mode(delay, controllers).await?;
-                return Err(Error::Pd(PdError::Failed));
-            }
-            Err(_) => {
-                error!("Controller {}: Block validation failed", i);
-                exit_fw_update_mode(delay, controllers).await?;
-                return Err(Error::Pd(PdError::Failed));
-            }
-        }
-    }
-    Ok(())
-}
-
-/// Load the app image to all controllers
-async fn fw_update_load_app_image<T: UpdateTarget, I: Image>(
-    delay: &mut impl DelayNs,
-    controllers: &mut [&mut T],
-    image: &mut I,
-    num_data_blocks: usize,
-) -> Result<(), Error<T::BusError, I::Error>> {
-    for i in 0..num_data_blocks {
-        info!("Broadcasting block {}", i + 1);
-        fw_update_stream_data(
-            delay,
-            controllers,
-            image,
-            data_block_index_to_block_index(i),
-            data_block_metadata_offset(i),
-            DATA_BLOCK_METADATA_LEN,
-        )
-        .await?;
-    }
-
-    Ok(())
-}
-
-/// Load the app config to all controllers
-async fn fw_update_load_app_config<T: UpdateTarget, I: Image>(
-    delay: &mut impl DelayNs,
-    controllers: &mut [&mut T],
-    image: &mut I,
-    num_data_blocks: usize,
-) -> Result<(), Error<T::BusError, I::Error>> {
-    let app_size = get_image_size(image).await.map_err(Error::ReadExact)? as usize;
-    let metadata_offset = app_config_block_metadata_offset(num_data_blocks, app_size);
-    info!("Broadcasting app config block");
-    fw_update_stream_data(
-        delay,
-        controllers,
-        image,
-        APP_CONFIG_BLOCK_INDEX,
-        metadata_offset,
-        APP_CONFIG_METADATA_LEN,
-    )
-    .await
-}
-
-/// Complete the FW update on all controllers
-async fn fw_update_complete<T: UpdateTarget, I: Image>(
-    delay: &mut impl DelayNs,
-    controllers: &mut [&mut T],
-) -> Result<(), Error<T::BusError, I::Error>> {
-    for (i, controller) in controllers.iter_mut().enumerate() {
-        info!("Controller {}: Completing FW update", i);
-        if controller.fw_update_complete(delay).await.is_err() {
-            warn!("Controller {}: Failed to complete FW update, attempting to exit", i);
-            controller.fw_update_mode_exit(delay).await?;
+        debug!("Controller {}: Exiting FW update mode", i);
+        if controller.fw_update_mode_exit(delay).await.is_err() {
+            debug!("Controller {}: Failed to exit FW update mode", i);
             // Don't return to allow the other controllers to exit FW update mode
         }
     }
-
-    Ok(())
 }
 
-/// Updates the firmware of all given controllers
-pub async fn perform_fw_update<const N: usize, T: UpdateTarget, I: Image>(
-    delay: &mut impl DelayNs,
-    mut controllers: [&mut T; N],
-    image: &mut I,
-) -> Result<(), Error<T::BusError, I::Error>> {
-    info!("Starting FW update");
+/// Initializes the FW update process
+pub struct BorrowedUpdater<const N: usize, T: UpdateTarget> {
+    /// Phantom target
+    _target: PhantomData<T>,
+}
 
-    // Disable all interrupts during the reset into FW update mode
-    let mut main_guards: [Option<T::Guard>; N] = [const { None }; N];
-    for (guard, controller) in zip(main_guards.iter_mut(), controllers.iter_mut()) {
-        *guard = Some(controller.disable_all_interrupts_guarded().await.map_err(Error::from)?);
+impl<const N: usize, T: UpdateTarget> Default for BorrowedUpdater<N, T> {
+    fn default() -> Self {
+        Self { _target: PhantomData }
+    }
+}
+
+impl<const N: usize, T: UpdateTarget> BorrowedUpdater<N, T> {
+    /// Enter FW update mode on all controllers
+    pub async fn start_fw_update(
+        &mut self,
+        controllers: &mut [&mut T; N],
+        delay: &mut impl DelayNs,
+    ) -> Result<BorrowedUpdaterInProgress<N, T>, Error<T::BusError>> {
+        for (i, controller) in controllers.iter_mut().enumerate() {
+            debug!("Controller {}: Entering FW update mode", i);
+            if let Err(e) = controller.fw_update_mode_enter(delay).await {
+                debug!("Controller {}: Failed to enter FW update mode", i);
+                abort_fw_update(controllers, delay).await;
+                return Err(e);
+            }
+        }
+
+        Ok(BorrowedUpdaterInProgress::new())
+    }
+}
+
+/// Handles writing FW and completing the update process
+pub struct BorrowedUpdaterInProgress<const N: usize, T: UpdateTarget> {
+    /// Stream
+    stream: Stream,
+    /// Current state of the updater
+    state: State,
+    /// Buffer used to store TfudArgs and TfuiArgs bytes before they are deserialized
+    args_buffer: [u8; BUFFER_LENGTH],
+    /// Update args
+    update_args: Option<TfuiArgs>,
+    /// Image size
+    image_size: usize,
+    /// Block args
+    block_args: Option<TfudArgs>,
+    /// Phantom target
+    _target: PhantomData<T>,
+}
+
+impl<const N: usize, T: UpdateTarget> BorrowedUpdaterInProgress<N, T> {
+    fn new() -> Self {
+        Self {
+            stream: Stream::Seeking(SeekingStream::new(0, HEADER_METADATA_OFFSET)),
+            state: State::UpdateArgs,
+            args_buffer: [0; BUFFER_LENGTH],
+            update_args: None,
+            image_size: 0,
+            block_args: None,
+            _target: PhantomData,
+        }
     }
 
-    enter_fw_update_mode(delay, controllers.as_mut_slice()).await?;
+    /// Initialize FW update on all controllers
+    async fn fw_update_init(
+        &mut self,
+        controllers: &mut [&mut T; N],
+        delay: &mut impl DelayNs,
+    ) -> Result<(), Error<T::BusError>> {
+        for (i, controller) in controllers.iter_mut().enumerate() {
+            debug!("Controller {}: Initializing FW update", i);
 
-    // Re-enable interrupts on port 0 only, other ports don't respond to interrupts in FW update mode
-    let mut port0_guards: [Option<T::Guard>; N] = [const { None }; N];
-    for (guard, controller) in zip(port0_guards.iter_mut(), controllers.iter_mut()) {
-        *guard = Some(
-            controller
-                .enable_interrupt_guarded(PORT0, true)
+            let update_args = self.update_args.ok_or(Error::Pd(PdError::InvalidParams))?;
+            match controller.fw_update_init(delay, &update_args).await {
+                Ok(ReturnValue::Success) => (),
+                Ok(r) => {
+                    debug!("Controller {}: Failed to initialize FW update, result {:#?}", i, r);
+                    return Err(Error::Pd(PdError::Failed));
+                }
+                Err(e) => {
+                    debug!("Controller {}: Failed to initialize FW update", i);
+                    return Err(e);
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Send data to all controllers on the burst write address
+    async fn fw_update_burst_write(
+        &mut self,
+        controllers: &mut [&mut T; N],
+        data: &[u8],
+    ) -> Result<(), Error<T::BusError>> {
+        for (i, controller) in controllers.iter_mut().enumerate() {
+            trace!("Controller {}: Sending burst write", i);
+            let update_args = self.update_args.ok_or(Error::Pd(PdError::InvalidParams))?;
+            if let Err(e) = controller
+                .fw_update_burst_write(update_args.broadcast_u16_address as u8, data)
                 .await
-                .map_err(Error::from)?,
+            {
+                debug!("Controller {}: Failed to send burst write", i);
+                return Err(e);
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Validate the most recent block supplied to the device
+    async fn fw_update_validate_stream(
+        &mut self,
+        controllers: &mut [&mut T],
+        delay: &mut impl DelayNs,
+        block_index: usize,
+    ) -> Result<(), Error<T::BusError>> {
+        for (i, controller) in controllers.iter_mut().enumerate() {
+            debug!("Controller {}: Validating stream", i);
+            match controller.fw_update_validate_stream(delay, block_index).await {
+                Ok(TfuqBlockStatus::HeaderValidAndAuthentic)
+                | Ok(TfuqBlockStatus::DataValidAndAuthentic)
+                | Ok(TfuqBlockStatus::DataValidButRepeated) => (),
+                Ok(r) => {
+                    error!("Controller {}: Header block validation failed, result {:#?}", i, r);
+                    return Err(Error::Pd(PdError::Failed));
+                }
+                Err(_) => {
+                    error!("Controller {}: Header block validation failed", i);
+                    return Err(Error::Pd(PdError::Failed));
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Stream block data to all controllers
+    async fn fw_update_stream_data(
+        &mut self,
+        controllers: &mut [&mut T; N],
+        delay: &mut impl DelayNs,
+        args: &TfudArgs,
+    ) -> Result<(), Error<T::BusError>> {
+        for (i, controller) in controllers.iter_mut().enumerate() {
+            debug!("Controller {}: Streaming data block", i);
+            if controller.fw_update_stream_data(delay, args).await.is_err() {
+                error!("Controller {}: Failed to stream data block", i);
+                return Err(Error::Pd(PdError::Failed));
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Supply update contents to the updater
+    pub async fn write_bytes(
+        &mut self,
+        controllers: &mut [&mut T; N],
+        delay: &mut impl DelayNs,
+        data: &[u8],
+    ) -> Result<bool, Error<T::BusError>> {
+        let mut data = data;
+
+        while !data.is_empty() && self.state != State::Complete {
+            match self.stream {
+                Stream::Seeking(stream) => {
+                    data = self.handle_seek(data, stream).await?;
+                }
+                Stream::Reading(stream) => {
+                    data = self.handle_read(controllers, delay, data, stream).await?;
+                }
+            }
+        }
+
+        Ok(self.state == State::Complete)
+    }
+
+    /// Handle seeking in the stream
+    async fn handle_seek<'c>(
+        &mut self,
+        data: &'c [u8],
+        mut stream: SeekingStream,
+    ) -> Result<&'c [u8], Error<T::BusError>> {
+        let data = stream.seek_bytes(data);
+        if data.is_empty() {
+            // Still waiting for more bytes, continue the current operation
+            self.stream = Stream::Seeking(stream);
+            return Ok(data);
+        }
+
+        let read_op = match self.state {
+            State::DataBlock(_) | State::ConfigBlock => {
+                let block_args = self.block_args.ok_or(Error::Pd(PdError::InvalidParams))?;
+                stream.start_read(self.state.next_read_block_args(&block_args).map_err(Error::Pd)?)
+            }
+            _ => stream.start_read(self.state.next_read().map_err(Error::Pd)?),
+        };
+
+        self.stream = Stream::Reading(read_op);
+
+        Ok(data)
+    }
+
+    /// Handle reading data from the stream
+    async fn handle_read<'c>(
+        &mut self,
+        controllers: &mut [&mut T; N],
+        delay: &mut impl DelayNs,
+        data: &'c [u8],
+        mut stream: ReadingStream,
+    ) -> Result<&'c [u8], Error<T::BusError>> {
+        let read_result = stream.read_bytes(data);
+
+        let op = match self.state {
+            State::UpdateArgs => {
+                trace!("Reading update args");
+                self.read_update_args(controllers, delay, &read_result).await
+            }
+            State::HeaderBlockStart => {
+                trace!("Reading header start");
+                self.process_header_start(controllers, &read_result).await
+            }
+            State::ImageSize => {
+                trace!("Reading image size");
+                self.read_image_size(controllers, &read_result).await
+            }
+            State::HeaderBlockRest => {
+                trace!("Reading header rest");
+                self.process_header_rest(controllers, delay, &read_result).await
+            }
+            State::DataBlockHeader(block_index) => {
+                trace!("Reading data block header: {}", block_index);
+                self.read_data_block_header(controllers, delay, &read_result).await
+            }
+            State::DataBlock(block_index) => {
+                trace!("Reading data block: {}", block_index);
+                self.read_data_block(controllers, delay, &read_result, block_index)
+                    .await
+            }
+            State::ConfigHeader => {
+                trace!("Reading config header");
+                self.read_config_block_header(controllers, delay, &read_result).await
+            }
+            State::ConfigBlock => {
+                trace!("Reading config block");
+                self.read_config_block(controllers, delay, &read_result).await
+            }
+            State::Complete => {
+                trace!("Read other: {:#?}", self.state);
+                Err(PdError::InvalidMode.into())
+            }
+        }?;
+
+        if let Some(op) = op {
+            // Start the next operation
+            self.stream = Stream::Seeking(stream.start_seek(op)?);
+        } else {
+            // Continue the current operation
+            self.stream = Stream::Reading(stream);
+        }
+
+        Ok(read_result.remaining_data)
+    }
+
+    /// Read update args and proceed to the next state
+    /// Returns the next stream operation or None if the current operation is not complete
+    async fn read_update_args(
+        &mut self,
+        controllers: &mut [&mut T; N],
+        delay: &mut impl DelayNs,
+        read_result: &ReadResult<'_>,
+    ) -> Result<Option<SeekOperation>, Error<T::BusError>> {
+        let current = read_result.read_state.current;
+        let read_len = read_result.read_data.len();
+
+        trace!(
+            "Read args: {} bytes to take, remaining: {}, current: {}, data: {:#?}",
+            read_len,
+            read_result.remaining(),
+            current,
+            read_result.read_data,
         );
+
+        self.args_buffer[current..current + read_len].copy_from_slice(read_result.read_data);
+
+        if read_result.is_complete() {
+            // We have the full header metadata
+            let (args, _) = bincode::decode_from_slice(&self.args_buffer, config::standard().with_fixed_int_encoding())
+                .map_err(|_| PdError::Serialize)?;
+            self.update_args = Some(args);
+            self.fw_update_init(controllers, delay).await?;
+            trace!("Got update args: {:#?}", self.update_args);
+
+            // Proceed to the next state
+            Ok(Some(self.state.next_seek().map_err(Error::Pd)?))
+        } else {
+            Ok(None)
+        }
     }
 
-    let tfui_args = fw_update_init(delay, controllers.as_mut_slice(), image).await?;
-    fw_update_load_app_image(
-        delay,
-        controllers.as_mut_slice(),
-        image,
-        tfui_args.num_data_blocks_tx as usize,
-    )
-    .await?;
-    fw_update_load_app_config(
-        delay,
-        controllers.as_mut_slice(),
-        image,
-        tfui_args.num_data_blocks_tx as usize,
-    )
-    .await?;
-    fw_update_complete::<T, I>(delay, controllers.as_mut_slice()).await?;
-
-    info!("FW update complete");
-
-    Ok(())
-}
-
-/// Simple wrapper around a slice to allow for use as a FW update image
-pub struct SliceImage<'a> {
-    image: &'a [u8],
-    pos: usize,
-}
-
-impl<'a> SliceImage<'a> {
-    pub fn new(image: &'a [u8]) -> Self {
-        Self { image, pos: 0 }
+    /// Process the first part of the update header block
+    /// Returns the next stream operation or None if the current operation is not complete
+    async fn process_header_start(
+        &mut self,
+        controllers: &mut [&mut T; N],
+        read_result: &ReadResult<'_>,
+    ) -> Result<Option<SeekOperation>, Error<T::BusError>> {
+        self.fw_update_burst_write(controllers, read_result.read_data).await?;
+        if read_result.is_complete() {
+            Ok(Some(self.state.next_seek().map_err(Error::Pd)?))
+        } else {
+            Ok(None)
+        }
     }
-}
 
-impl embedded_io_async::ErrorType for SliceImage<'_> {
-    type Error = embedded_io_async::ErrorKind;
-}
+    /// Process the rest of the update header block
+    /// Returns the next stream operation or None if the current operation is not complete
+    async fn process_header_rest(
+        &mut self,
+        controllers: &mut [&mut T; N],
+        delay: &mut impl DelayNs,
+        read_result: &ReadResult<'_>,
+    ) -> Result<Option<SeekOperation>, Error<T::BusError>> {
+        self.fw_update_burst_write(controllers, read_result.read_data).await?;
+        if read_result.is_complete() {
+            // Full header has been written
+            // Validate and proceed to the next state
+            delay.delay_ms(TFUI_BURST_WRITE_DELAY_MS).await;
+            trace!("Validing header");
+            self.fw_update_validate_stream(controllers, delay, HEADER_BLOCK_INDEX)
+                .await?;
+            trace!("Header validated");
+            Ok(Some(self.state.next_seek().map_err(Error::Pd)?))
+        } else {
+            Ok(None)
+        }
+    }
 
-impl Read for SliceImage<'_> {
-    async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
-        if buf.len() > self.image.len() - self.pos {
-            return Err(embedded_io_async::ErrorKind::InvalidInput);
+    /// Read update arguments for the current block
+    async fn read_block_args(&mut self, read_result: &ReadResult<'_>) -> Result<Option<TfudArgs>, Error<T::BusError>> {
+        self.block_args = None;
+        let current = read_result.read_state.current;
+        let read_len = read_result.read_data.len();
+        self.args_buffer[current..current + read_len].copy_from_slice(read_result.read_data);
+
+        if read_result.is_complete() {
+            // We have the full header metadata
+            let (args, _) = bincode::decode_from_slice(&self.args_buffer, config::standard().with_fixed_int_encoding())
+                .map_err(|_| PdError::Serialize)?;
+            self.block_args = Some(args);
+            Ok(self.block_args)
+        } else {
+            // Still waiting for the rest of the header
+            Ok(None)
+        }
+    }
+
+    /// Read data block header and proceed to the next state
+    /// Returns the next stream operation or None if the current operation is not complete
+    async fn read_data_block_header(
+        &mut self,
+        controllers: &mut [&mut T; N],
+        delay: &mut impl DelayNs,
+        read_result: &ReadResult<'_>,
+    ) -> Result<Option<SeekOperation>, Error<T::BusError>> {
+        if let Some(args) = self.read_block_args(read_result).await? {
+            // We have the full header metadata
+            self.fw_update_stream_data(controllers, delay, &args).await?;
+
+            Ok(Some(self.state.next_seek_nop(read_result.position)?))
+        } else {
+            Ok(None)
+        }
+    }
+
+    /// Read data block and proceed to the next state
+    /// Returns the next stream operation or None if the current operation is not complete
+    async fn read_data_block(
+        &mut self,
+        controllers: &mut [&mut T; N],
+        delay: &mut impl DelayNs,
+        read_result: &ReadResult<'_>,
+        block_index: usize,
+    ) -> Result<Option<SeekOperation>, Error<T::BusError>> {
+        self.fw_update_burst_write(controllers, read_result.read_data).await?;
+
+        if read_result.is_complete() {
+            // Full block has been written
+            // Validate and proceed to the next state
+            delay.delay_ms(TFUD_BURST_WRITE_DELAY_MS).await;
+            self.fw_update_validate_stream(controllers, delay, data_block_index_to_block_index(block_index))
+                .await?;
+
+            let update_args = self.update_args.ok_or(Error::Pd(PdError::InvalidParams))?;
+            Ok(Some(
+                self.state
+                    .next_seek_block_args(&update_args, self.image_size)
+                    .map_err(Error::Pd)?,
+            ))
+        } else {
+            Ok(None)
+        }
+    }
+
+    /// Read the image size from the header block and proceed to the next state
+    /// Returns the next stream operation or None if the current operation is not complete
+    async fn read_image_size(
+        &mut self,
+        controllers: &mut [&mut T; N],
+        read_result: &ReadResult<'_>,
+    ) -> Result<Option<SeekOperation>, Error<T::BusError>> {
+        let current = read_result.read_state.current;
+        let read_len = read_result.read_data.len();
+        self.args_buffer[current..current + read_len].copy_from_slice(read_result.read_data);
+        self.fw_update_burst_write(controllers, read_result.read_data).await?;
+        if read_result.is_complete() {
+            // We have the full image size
+            let (image_size, _): (u32, _) =
+                bincode::decode_from_slice(&self.args_buffer, config::standard().with_fixed_int_encoding())
+                    .map_err(|_| PdError::Serialize)?;
+
+            self.image_size = image_size as usize;
+            Ok(Some(self.state.next_seek_nop(read_result.position).map_err(Error::Pd)?))
+        } else {
+            Ok(None)
+        }
+    }
+
+    /// Read app config block header and proceed to the next state
+    /// Returns the next stream operation or None if the current operation is not complete
+    async fn read_config_block_header(
+        &mut self,
+        controllers: &mut [&mut T; N],
+        delay: &mut impl DelayNs,
+        read_result: &ReadResult<'_>,
+    ) -> Result<Option<SeekOperation>, Error<T::BusError>> {
+        if let Some(args) = self.read_block_args(read_result).await? {
+            // We have the full header metadata
+            self.fw_update_stream_data(controllers, delay, &args).await?;
+
+            Ok(Some(self.state.next_seek_nop(read_result.position)?))
+        } else {
+            Ok(None)
+        }
+    }
+
+    /// Read config block and proceed to the next state
+    /// Returns the next stream operation or None if the current operation is not complete
+    async fn read_config_block(
+        &mut self,
+        controllers: &mut [&mut T; N],
+        delay: &mut impl DelayNs,
+        read_result: &ReadResult<'_>,
+    ) -> Result<Option<SeekOperation>, Error<T::BusError>> {
+        self.fw_update_burst_write(controllers, read_result.read_data).await?;
+
+        if read_result.is_complete() {
+            // Full block has been written
+            // Validate and proceed to the next state
+            delay.delay_ms(TFUD_BURST_WRITE_DELAY_MS).await;
+            self.fw_update_validate_stream(controllers, delay, APP_CONFIG_BLOCK_INDEX)
+                .await?;
+
+            // Proceed to the next state
+            trace!("FW update complete");
+            Ok(Some(self.state.next_seek_nop(read_result.position).map_err(Error::Pd)?))
+        } else {
+            Ok(None)
+        }
+    }
+
+    /// Abort the FW update process
+    pub async fn abort_fw_update(self, controllers: &mut [&mut T; N], delay: &mut impl DelayNs) {
+        abort_fw_update(controllers, delay).await
+    }
+
+    /// Complete the FW update process
+    pub async fn complete_fw_update(
+        self,
+        controllers: &mut [&mut T; N],
+        delay: &mut impl DelayNs,
+    ) -> Result<(), Error<T::BusError>> {
+        // The update blob wasn't completely supplied
+        if self.state != State::Complete {
+            return Err(PdError::Failed.into());
         }
 
-        buf.copy_from_slice(&self.image[self.pos..self.pos + buf.len()]);
-        self.pos += buf.len();
-
-        Ok(buf.len())
-    }
-}
-
-impl Seek for SliceImage<'_> {
-    async fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Error> {
-        match pos {
-            SeekFrom::Start(p) => {
-                if p as usize > self.image.len() {
-                    return Err(embedded_io_async::ErrorKind::InvalidInput);
-                }
-                self.pos = p as usize;
-            }
-            SeekFrom::End(i) => {
-                if i > 0 || (-i) as usize > self.image.len() {
-                    return Err(embedded_io_async::ErrorKind::InvalidInput);
-                }
-
-                self.pos = (self.image.len() as i64 + i) as usize;
-            }
-            SeekFrom::Current(off) => {
-                let pos = self.pos as i64;
-                if pos + off < 0 || (pos + off) as usize > self.image.len() {
-                    return Err(embedded_io_async::ErrorKind::InvalidInput);
-                }
-
-                self.pos = (pos + off) as usize;
+        for (i, controller) in controllers.iter_mut().enumerate() {
+            debug!("Controller {}: Completing FW update", i);
+            if controller.fw_update_complete(delay).await.is_err() {
+                warn!("Controller {}: Failed to complete FW update, attempting to exit", i);
+                controller.fw_update_mode_exit(delay).await?;
+                // Don't return to allow the other controllers to exit FW update mode
             }
         }
 
-        Ok(self.pos as u64)
+        Ok(())
     }
 }
 
-impl Image for SliceImage<'_> {}
+/// Disable all interrupts during the reset into FW update mode
+pub async fn disable_all_interrupts<const N: usize, T: UpdateTarget>(
+    controllers: &mut [&mut T; N],
+) -> Result<[T::Guard; N], Error<T::BusError>> {
+    let mut guards = [const { None }; N];
+
+    for (guard, controller) in zip(guards.iter_mut(), controllers.iter_mut()) {
+        *guard = Some(controller.disable_all_interrupts_guarded().await?);
+    }
+
+    Ok(guards.map(|g| g.unwrap()))
+}
+
+/// Re-enable interrupts on port 0 only, other ports don't respond to interrupts in FW update mode
+pub async fn enable_port0_interrupts<const N: usize, T: UpdateTarget>(
+    controllers: &mut [&mut T; N],
+) -> Result<[T::Guard; N], Error<T::BusError>> {
+    let mut guards = [const { None }; N];
+
+    for (guard, controller) in zip(guards.iter_mut(), controllers.iter_mut()) {
+        *guard = Some(controller.enable_interrupt_guarded(PORT0, true).await?);
+    }
+
+    Ok(guards.map(|g| g.unwrap()))
+}
+
+/// General FW update function
+pub async fn perform_fw_update_borrowed<const N: usize, T: UpdateTarget>(
+    controllers: &mut [&mut T; N],
+    delay: &mut impl DelayNs,
+    pd_fw_bytes: &[u8],
+) -> Result<(), Error<T::BusError>> {
+    let mut updater = BorrowedUpdater::default();
+
+    // Disable all interrupts while we're entering FW update mode
+    let _guards = disable_all_interrupts(controllers).await?;
+    info!("Starting update");
+    let result = updater.start_fw_update(controllers, delay).await;
+    info!("Update started");
+
+    // Re-enable interrupts on port 0 only
+    let _guards = enable_port0_interrupts(controllers).await?;
+
+    match result {
+        Err(e) => {
+            error!("Failed to enter FW update mode");
+            Err(e)
+        }
+        Ok(mut updater) => {
+            info!("Sending chunks");
+            for chunk in pd_fw_bytes.chunks(UPDATE_CHUNK_LENGTH) {
+                if let Err(e) = updater.write_bytes(controllers, delay, chunk).await {
+                    error!("Failed to write chunk");
+                    updater.abort_fw_update(controllers, delay).await;
+                    return Err(e);
+                }
+            }
+
+            updater.complete_fw_update(controllers, delay).await
+        }
+    }
+}
 
 #[cfg(test)]
 mod test {
     use super::*;
     use crate::asynchronous::interrupt::InterruptGuard;
-    use crate::test::Delay;
+    use crate::test::{generate_mock_fw, Delay};
     use crate::MAX_SUPPORTED_PORTS;
+    extern crate std;
 
-    /// Simple mock update target for testing that does nothing
+    /// Simple mock update target for testing that validates the length of the data written
     #[derive(Debug)]
-    struct UpdateTargetNoop {}
+    struct UpdateTargetNoop {
+        pub expected_write_len: Option<usize>,
+        pub write_len: usize,
+    }
+
+    impl UpdateTargetNoop {
+        pub fn new() -> Self {
+            Self {
+                expected_write_len: None,
+                write_len: 0,
+            }
+        }
+    }
 
     struct UpdateInterruptGuard;
 
@@ -514,113 +714,72 @@ mod test {
     }
 
     impl UpdateTarget for UpdateTargetNoop {
-        async fn fw_update_mode_enter(&mut self, _delay: &mut impl DelayNs) -> Result<(), DeviceError<Self::BusError>> {
+        async fn fw_update_mode_enter(&mut self, _delay: &mut impl DelayNs) -> Result<(), Error<Self::BusError>> {
             Ok(())
         }
 
         async fn fw_update_init(
             &mut self,
             _delay: &mut impl DelayNs,
-            _args: &TfuiArgs,
-        ) -> Result<ReturnValue, DeviceError<Self::BusError>> {
+            args: &TfuiArgs,
+        ) -> Result<ReturnValue, Error<Self::BusError>> {
+            if let Some(expected_len) = self.expected_write_len {
+                if expected_len != self.write_len {
+                    panic!("Expected length {} but got {}", expected_len, self.write_len);
+                }
+            }
+            self.write_len = 0;
+            self.expected_write_len = Some(args.data_len as usize);
             Ok(ReturnValue::Success)
         }
 
-        async fn fw_update_mode_exit(&mut self, _delay: &mut impl DelayNs) -> Result<(), DeviceError<Self::BusError>> {
+        async fn fw_update_mode_exit(&mut self, _delay: &mut impl DelayNs) -> Result<(), Error<Self::BusError>> {
             Ok(())
         }
 
         async fn fw_update_validate_stream(
             &mut self,
             _delay: &mut impl DelayNs,
-            block_index: usize,
-        ) -> Result<TfuqBlockStatus, DeviceError<Self::BusError>> {
-            match block_index {
-                HEADER_BLOCK_INDEX => Ok(TfuqBlockStatus::HeaderValidAndAuthentic),
-                _ => Ok(TfuqBlockStatus::DataValidAndAuthentic),
-            }
+            _block_index: usize,
+        ) -> Result<TfuqBlockStatus, Error<Self::BusError>> {
+            Ok(TfuqBlockStatus::DataValidAndAuthentic)
         }
 
         async fn fw_update_stream_data(
             &mut self,
             _delay: &mut impl DelayNs,
-            _args: &TfudArgs,
-        ) -> Result<(), DeviceError<Self::BusError>> {
-            Ok(())
-        }
-
-        async fn fw_update_complete(&mut self, _delay: &mut impl DelayNs) -> Result<(), DeviceError<Self::BusError>> {
-            Ok(())
-        }
-
-        async fn fw_update_burst_write(
-            &mut self,
-            _address: u8,
-            _data: &[u8],
-        ) -> Result<(), DeviceError<Self::BusError>> {
-            Ok(())
-        }
-    }
-
-    /// Simple mock image for testing that panics if a seek backward is attempted
-    #[derive(Debug)]
-    struct ImageSeekForward {
-        pos: u64,
-    }
-
-    impl ImageSeekForward {
-        fn new() -> Self {
-            Self { pos: 0 }
-        }
-    }
-
-    impl Seek for ImageSeekForward {
-        async fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Error> {
-            match pos {
-                SeekFrom::Start(p) => {
-                    assert!(p >= self.pos);
-                    self.pos = p;
-                }
-                SeekFrom::End(_) => panic!("Seeking backwards is not supported"),
-                SeekFrom::Current(off) => {
-                    assert!(off >= 0);
-                    self.pos += off as u64;
+            args: &TfudArgs,
+        ) -> Result<(), Error<Self::BusError>> {
+            if let Some(expected_len) = self.expected_write_len {
+                if expected_len != self.write_len {
+                    panic!("Expected length {} but got {}", expected_len, self.write_len);
                 }
             }
+            self.write_len = 0;
+            self.expected_write_len = Some(args.data_len as usize);
+            Ok(())
+        }
 
-            Ok(self.pos)
+        async fn fw_update_complete(&mut self, _delay: &mut impl DelayNs) -> Result<(), Error<Self::BusError>> {
+            Ok(())
+        }
+
+        async fn fw_update_burst_write(&mut self, _address: u8, data: &[u8]) -> Result<(), Error<Self::BusError>> {
+            self.write_len += data.len();
+            Ok(())
         }
     }
 
-    #[derive(Debug)]
-    struct ErrorMock {}
-
-    impl embedded_io_async::Error for ErrorMock {
-        fn kind(&self) -> embedded_io_async::ErrorKind {
-            embedded_io_async::ErrorKind::Other
-        }
-    }
-
-    impl embedded_io_async::ErrorType for ImageSeekForward {
-        type Error = ErrorMock;
-    }
-
-    impl Read for ImageSeekForward {
-        async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
-            Ok(buf.len())
-        }
-    }
-
-    impl Image for ImageSeekForward {}
-
-    /// Test that the fw update only seeks forward
-    /// This ensures that the process will work if we're getting the update from another device
+    /// Test complete FW update flow
     #[tokio::test]
-    async fn test_fw_update_seek_forward() {
+    async fn test_fw_update() {
         let mut delay = Delay {};
-        let mut target = UpdateTargetNoop {};
-        let mut image = ImageSeekForward::new();
+        let mut target = UpdateTargetNoop::new();
+        let mut controllers = [&mut target];
+        let fw_mock = &generate_mock_fw();
 
-        perform_fw_update(&mut delay, [&mut target], &mut image).await.unwrap();
+        perform_fw_update_borrowed(&mut controllers, &mut delay, fw_mock)
+            .await
+            .unwrap();
     }
 }

@@ -16,7 +16,7 @@ use embassy_time::Delay;
 use mimxrt600_fcb::FlexSPIFlashConfigurationBlock;
 use static_cell::StaticCell;
 use tps6699x::asynchronous::embassy as pd_controller;
-use tps6699x::asynchronous::fw_update;
+use tps6699x::asynchronous::fw_update::perform_fw_update_borrowed;
 use tps6699x::ADDR0;
 use {defmt_rtt as _, panic_probe as _};
 
@@ -50,12 +50,14 @@ async fn main(spawner: Spawner) {
     let controller = CONTROLLER.init(Controller::new_tps66994(device, ADDR0).unwrap());
     let (mut pd, interrupt) = controller.make_parts();
 
+    let mut delay = Delay;
+    info!("Resetting PD controller");
+    pd.reset(&mut delay).await.unwrap();
+
     info!("Spawing PD interrupt task");
     spawner.must_spawn(interrupt_task(int_in, interrupt));
 
     let pd_fw_bytes = [0u8].as_slice(); //include_bytes!("../../fw.bin").as_slice();
-    let mut pd_fw = fw_update::SliceImage::new(pd_fw_bytes);
-    let mut delay = Delay;
 
     let mut controllers = [&mut pd];
     for (i, controller) in controllers.iter_mut().enumerate() {
@@ -64,10 +66,10 @@ async fn main(spawner: Spawner) {
     }
 
     info!("Performing PD FW update");
-    match fw_update::perform_fw_update(&mut delay, [&mut pd], &mut pd_fw).await {
-        Ok(_) => info!("PD FW update complete"),
-        Err(e) => error!("PD FW update failed: {:?}", e),
-    }
+    let mut controllers = [&mut pd];
+    perform_fw_update_borrowed(&mut controllers, &mut delay, pd_fw_bytes)
+        .await
+        .unwrap();
 
     let mut controllers = [&mut pd];
     for (i, controller) in controllers.iter_mut().enumerate() {
