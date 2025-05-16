@@ -301,6 +301,56 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         Ok(())
     }
 
+    /// Enable or disable the given power path
+    pub async fn retimer_force_pwr(&mut self, port: PortId, enable: bool) -> Result<(), Error<B::Error>> {
+        trace!("retimer_force_pwr: {}", enable);
+        let mut args = [0, 0x2A];
+        if enable {
+            args[0] = 1; // rising edge
+        }
+
+        self.execute_command(port, Command::Trig, TRIG_TIMEOUT_MS, Some(&args), None)
+            .await;
+
+        embassy_time::Timer::after(Duration::from_millis(50)).await;
+        Ok(())
+    }
+
+    /// Get retimer fw update state
+    pub async fn get_rt_fw_update_status(&mut self, port: PortId) -> Result<bool, Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        let rt_fw_update_mode = inner.get_intel_vid_status(port).await?.forced_tbt_mode();
+        trace!("rt_fw_update_mode: {}", rt_fw_update_mode);
+        Ok(rt_fw_update_mode)
+    }
+
+    /// set retimer fw update state
+    pub async fn set_rt_fw_update_state(&mut self, port: PortId) -> Result<(), Error<B::Error>> {
+        // Force RT Pwr On
+        self.retimer_force_pwr(port, true).await?;
+
+        let mut inner = self.lock_inner().await;
+        let mut port_control = inner.get_port_control(port).await?;
+        port_control.set_retimer_fw_update(true);
+        inner.set_port_control(port, port_control).await?;
+        Ok(())
+    }
+
+    /// clear retimer fw update state
+    pub async fn clear_rt_fw_update_state(&mut self, port: PortId) -> Result<(), Error<B::Error>> {
+        {
+            let mut inner = self.lock_inner().await;
+            let mut port_control = inner.get_port_control(port).await?;
+            port_control.set_retimer_fw_update(false);
+            inner.set_port_control(port, port_control).await?;
+        }
+
+        // Force RT Pwr Off
+        self.retimer_force_pwr(port, false).await?;
+
+        Ok(())
+    }
+
     /// Reset the device.
     pub async fn reset(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<B::Error>> {
         let _guard = self.disable_all_interrupts_guarded().await;

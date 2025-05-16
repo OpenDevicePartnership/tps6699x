@@ -45,6 +45,9 @@ pub enum Command {
     Srdy = u32_from_str("SRDY"),
     /// SRDY reset
     Sryr = u32_from_str("SRYR"),
+
+    /// Trigger an Input GPIO event
+    Trig = u32_from_str("Trig"),
 }
 
 impl Command {
@@ -419,6 +422,18 @@ pub struct TfudArgs {
     pub data_len: u16,
     pub timeout_secs: u16,
     pub broadcast_u16_address: u16,
+}
+
+/// Timeout for completion of TRIG command, determined by experimentation
+#[allow(dead_code)]
+pub(crate) const TRIG_TIMEOUT_MS: u32 = 500;
+#[allow(dead_code)]
+pub(crate) const TRIG_ARGS_LEN: usize = 2;
+#[derive(Debug, Decode, Encode, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct TrigArgs {
+    pub v_gpio_edge: u8,
+    pub v_gpio: u8,
 }
 
 #[cfg(test)]
