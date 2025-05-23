@@ -2,6 +2,7 @@
 use core::iter::zip;
 use core::sync::atomic::AtomicBool;
 
+use bincode::config;
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use embassy_sync::mutex::{Mutex, MutexGuard};
 use embassy_sync::signal::Signal;
@@ -297,6 +298,78 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         } else {
             self.execute_sryr(port).await?;
         }
+
+        Ok(())
+    }
+
+    /// Trigger virtual gpios
+    async fn virtual_gpio_trigger(
+        &mut self,
+        port: PortId,
+        edge: TrigVgpioEdge,
+        cmd: TrigVgpioCmd,
+    ) -> Result<ReturnValue, Error<B::Error>> {
+        let args = TrigArgs {
+            v_gpio_edge: edge,
+            v_gpio: cmd,
+        };
+        let mut args_buf = [0; TRIG_ARGS_LEN];
+
+        bincode::encode_into_slice(args, &mut args_buf, config::standard().with_fixed_int_encoding()).unwrap();
+
+        self.execute_command(port, Command::Trig, TRIG_TIMEOUT_MS, Some(&args_buf), None)
+            .await
+    }
+
+    /// Force retimer power on or off
+    pub async fn retimer_force_pwr(&mut self, port: PortId, enable: bool) -> Result<(), Error<B::Error>> {
+        trace!("retimer_force_pwr: {}", enable);
+
+        if enable {
+            let _ = self
+                .virtual_gpio_trigger(port, TrigVgpioEdge::RisingEdge, TrigVgpioCmd::RetimerForcePwr)
+                .await;
+        } else {
+            let _ = self
+                .virtual_gpio_trigger(port, TrigVgpioEdge::FallingEdge, TrigVgpioCmd::RetimerForcePwr)
+                .await;
+        }
+
+        embassy_time::Timer::after(Duration::from_millis(50)).await;
+        Ok(())
+    }
+
+    /// Get retimer fw update state
+    pub async fn get_rt_fw_update_status(&mut self, port: PortId) -> Result<bool, Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        let rt_fw_update_mode = inner.get_intel_vid_status(port).await?.forced_tbt_mode();
+        trace!("rt_fw_update_mode: {}", rt_fw_update_mode);
+        Ok(rt_fw_update_mode)
+    }
+
+    /// set retimer fw update state
+    pub async fn set_rt_fw_update_state(&mut self, port: PortId) -> Result<(), Error<B::Error>> {
+        // Force RT Pwr On
+        self.retimer_force_pwr(port, true).await?;
+
+        let mut inner = self.lock_inner().await;
+        let mut port_control = inner.get_port_control(port).await?;
+        port_control.set_retimer_fw_update(true);
+        inner.set_port_control(port, port_control).await?;
+        Ok(())
+    }
+
+    /// clear retimer fw update state
+    pub async fn clear_rt_fw_update_state(&mut self, port: PortId) -> Result<(), Error<B::Error>> {
+        {
+            let mut inner = self.lock_inner().await;
+            let mut port_control = inner.get_port_control(port).await?;
+            port_control.set_retimer_fw_update(false);
+            inner.set_port_control(port, port_control).await?;
+        }
+
+        // Force RT Pwr Off
+        self.retimer_force_pwr(port, false).await?;
 
         Ok(())
     }
