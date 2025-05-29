@@ -8,7 +8,7 @@ use embedded_usb_pd::{Error, PdError, PortId};
 
 use super::Tps6699x;
 use crate::command::*;
-use crate::{error, registers as regs, Mode, PORT0};
+use crate::{debug, error, registers as regs, Mode, PORT0};
 
 impl<B: I2c> Tps6699x<B> {
     /// Sends a command without verifying that it is valid
@@ -43,27 +43,25 @@ impl<B: I2c> Tps6699x<B> {
         self.send_command_unchecked(port, cmd, data).await?;
 
         delay.delay_us(cmd.valid_check_delay_us()).await;
-        if Command::Invalid
-            == self
-                .borrow_port(port)?
-                .into_registers()
-                .cmd_1()
-                .read_async()
-                .await?
-                .command()
-        {
-            return PdError::UnrecognizedCommand.into();
-        }
 
         Ok(())
     }
 
     /// Check if the command has completed
     pub async fn check_command_complete(&mut self, port: PortId) -> Result<bool, Error<B::Error>> {
-        let mut registers = self.borrow_port(port)?.into_registers();
-        let status = registers.cmd_1().read_async().await?.command();
+        let status = self
+            .borrow_port(port)?
+            .into_registers()
+            .cmd_1()
+            .read_async()
+            .await?
+            .command();
 
-        Ok(Command::Success == status)
+        match status {
+            val if val == Command::Success as u32 => Ok(true),
+            val if val == Command::Invalid as u32 => Err(PdError::UnrecognizedCommand.into()),
+            _ => Err(PdError::InvalidParams.into()),
+        }
     }
 
     /// Read the result of a command
@@ -72,8 +70,16 @@ impl<B: I2c> Tps6699x<B> {
         port: PortId,
         data: Option<&mut [u8]>,
     ) -> Result<ReturnValue, Error<B::Error>> {
-        if !self.check_command_complete(port).await? {
-            return PdError::Busy.into();
+        match self.check_command_complete(port).await {
+            Ok(true) => {
+                debug!("command completed");
+            }
+            Ok(false) => {
+                return PdError::Busy.into();
+            }
+            Err(e) => {
+                return Err(e);
+            }
         }
 
         if let Some(ref data) = data {
@@ -91,8 +97,9 @@ impl<B: I2c> Tps6699x<B> {
             .read_register(regs::REG_DATA1, (regs::REG_DATA1_LEN * 8) as u32, &mut buf)
             .await?;
 
-        let ret = ReturnValue::try_from(buf[0]).map_err(Error::Pd)?;
-
+        let return_code = buf[0] & 0x0F;
+        let ret = ReturnValue::try_from(return_code).map_err(Error::Pd)?;
+        debug!("read_command_result: ret: {:?}", ret);
         // Overwrite return value
         if let Some(data) = data {
             data.copy_from_slice(&buf[1..=data.len()]);

@@ -95,6 +95,10 @@ IntEventBus1:
       base: bool
       start: 7
       description: Source capabilities updated
+    SinkReady:
+      base: bool
+      start: 8
+      description: Sink ready
     Overcurrent:
       base: bool
       start: 9
@@ -143,6 +147,10 @@ IntEventBus1:
       base: bool
       start: 23
       description: Power path status register changed
+    PowerStatusUpdated:
+      base: bool
+      start: 24
+      description: Power status register changed
     DataStatusUpdated:
       base: bool
       start: 25

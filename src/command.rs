@@ -79,12 +79,14 @@ pub enum ReturnValue {
     Success = 0x00,
     /// Timed-out or aborted with ABRT command
     Abort = 0x01,
+    /// Reserved
+    Reserved = 0x02,
     /// Rejected
     Rejected = 0x03,
     /// RX buffer locked
     RxLocked = 0x04,
     /// Task specific result
-    Task0 = 0x05,
+    PdBusy = 0x05,
     /// Task specific result
     Task1 = 0x06,
     /// Task specific result
@@ -114,9 +116,10 @@ impl TryFrom<u8> for ReturnValue {
         match value {
             0x00 => Ok(ReturnValue::Success),
             0x01 => Ok(ReturnValue::Abort),
+            0x02 => Ok(ReturnValue::Reserved),
             0x03 => Ok(ReturnValue::Rejected),
             0x04 => Ok(ReturnValue::RxLocked),
-            0x05 => Ok(ReturnValue::Task0),
+            0x05 => Ok(ReturnValue::PdBusy),
             0x06 => Ok(ReturnValue::Task1),
             0x07 => Ok(ReturnValue::Task2),
             0x08 => Ok(ReturnValue::Task3),
