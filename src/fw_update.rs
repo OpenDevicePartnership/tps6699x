@@ -49,6 +49,22 @@ pub const TFUD_BURST_WRITE_DELAY_MS: u32 = 150;
 /// Default PD FW chunking size
 pub const UPDATE_CHUNK_LENGTH: usize = 1024;
 
+/// FW update configuration options
+#[derive(Clone, Default)]
+pub struct UpdateConfig {
+    /// Optional override for the broadcast address.
+    pub(crate) broadcast_addr: Option<u16>,
+}
+
+impl UpdateConfig {
+    /// Create a new update configuration with the given broadcast address override.
+    pub fn with_broadcast_addr(self, broadcast_addr: u16) -> Self {
+        Self {
+            broadcast_addr: Some(broadcast_addr),
+        }
+    }
+}
+
 /// Current update state
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]

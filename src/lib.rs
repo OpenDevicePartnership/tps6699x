@@ -8,7 +8,7 @@ pub mod fmt;
 pub mod registers;
 pub mod stream;
 
-pub(crate) mod fw_update;
+pub mod fw_update;
 
 /// I2C address set 0
 pub const ADDR0: [u8; 2] = [0x20, 0x24];

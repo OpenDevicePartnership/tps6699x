@@ -17,6 +17,7 @@ use mimxrt600_fcb::FlexSPIFlashConfigurationBlock;
 use static_cell::StaticCell;
 use tps6699x::asynchronous::embassy as pd_controller;
 use tps6699x::asynchronous::fw_update::perform_fw_update_borrowed;
+use tps6699x::fw_update::UpdateConfig;
 use tps6699x::ADDR0;
 use {defmt_rtt as _, panic_probe as _};
 
@@ -66,9 +67,11 @@ async fn main(spawner: Spawner) {
     }
 
     info!("Performing PD FW update");
+    let config = UpdateConfig::default();
+
     let mut controllers = [&mut pd];
     let mut guards = [const { None }; 2];
-    perform_fw_update_borrowed(&mut controllers, &mut guards, &mut delay, pd_fw_bytes)
+    perform_fw_update_borrowed(&mut controllers, &mut guards, &mut delay, config, pd_fw_bytes)
         .await
         .unwrap();
 
