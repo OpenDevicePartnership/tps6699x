@@ -95,6 +95,10 @@ IntEventBus1:
       base: bool
       start: 7
       description: Source capabilities updated
+    SinkReady:
+      base: bool
+      start: 8
+      description: Asserts under an implicit contract or an explicit contract when PS_RDY has been received
     Overcurrent:
       base: bool
       start: 9

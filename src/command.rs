@@ -7,6 +7,9 @@ use embedded_usb_pd::PdError;
 /// Length of a command
 const CMD_LEN: usize = 4;
 
+/// TaskResult is only defined for lower 4 bits
+pub const CMD_4CC_TASK_RETURN_CODE_MASK: u8 = 0x0F;
+
 /// Converts a 4-byte string into a u32
 const fn u32_from_str(value: &str) -> u32 {
     if value.len() != CMD_LEN {
@@ -48,6 +51,40 @@ pub enum Command {
 
     /// Trigger an Input GPIO event
     Trig = u32_from_str("Trig"),
+}
+
+impl TryFrom<u32> for Command {
+    type Error = PdError;
+
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        if Command::Success == value {
+            Ok(Command::Success)
+        } else if Command::Invalid == value {
+            Ok(Command::Invalid)
+        } else if Command::Gaid == value {
+            Ok(Command::Gaid)
+        } else if Command::Tfus == value {
+            Ok(Command::Tfus)
+        } else if Command::Tfui == value {
+            Ok(Command::Tfui)
+        } else if Command::Tfuq == value {
+            Ok(Command::Tfuq)
+        } else if Command::Tfue == value {
+            Ok(Command::Tfue)
+        } else if Command::Tfud == value {
+            Ok(Command::Tfud)
+        } else if Command::Tfuc == value {
+            Ok(Command::Tfuc)
+        } else if Command::Srdy == value {
+            Ok(Command::Srdy)
+        } else if Command::Sryr == value {
+            Ok(Command::Sryr)
+        } else if Command::Trig == value {
+            Ok(Command::Trig)
+        } else {
+            Err(PdError::InvalidParams)
+        }
+    }
 }
 
 impl Command {
