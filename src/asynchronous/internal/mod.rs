@@ -388,6 +388,13 @@ impl<B: I2c> Tps6699x<B> {
             usb_status.eudo_sop_sent_status() == registers::EudoSopSentStatus::SuccessfulEnterUsb,
         ))
     }
+
+    /// Set unconstrained power on a port
+    pub async fn set_unconstrained_power(&mut self, port: PortId, enable: bool) -> Result<(), Error<B::Error>> {
+        let mut control = self.get_port_control(port).await?;
+        control.set_unconstrained_power(enable);
+        self.set_port_control(port, control).await
+    }
 }
 
 #[cfg(test)]
