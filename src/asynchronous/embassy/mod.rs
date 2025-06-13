@@ -374,6 +374,21 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         Ok(())
     }
 
+    /// set retimer compliance
+    pub async fn set_rt_compliance(&mut self, port: PortId) -> Result<(), Error<B::Error>> {
+        {
+            // Force RT Pwr On
+            self.retimer_force_pwr(port, true).await?;
+
+            let mut inner = self.lock_inner().await;
+            let mut tbt_config = inner.get_tbt_config(port).await?;
+            tbt_config.set_retimer_compliance_support(true);
+            inner.set_tbt_config(port, tbt_config).await?;
+        }
+
+        Ok(())
+    }
+
     /// Reset the device.
     pub async fn reset(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<B::Error>> {
         let _guard = self.disable_all_interrupts_guarded().await;

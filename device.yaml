@@ -1118,6 +1118,72 @@ PdStatus:
         ExitUsb4FollowingDrSwap: 0x4
         Reserved: catch_all
 
+TbtConfig:
+  type: register
+  address: 0x52
+  access: RW
+  size_bits: 64
+  reset_value: 0x0
+  fields:
+    TbtVidEn:
+      base: bool
+      start: 0
+      description: Assert this bit to enable Thunderbolt VID.
+    TbtModeEn:
+      base: bool
+      start: 1
+      description: Assert this bit to enable TBT mode.
+    Advertise900maImplicitContract:
+      base: bool
+      start: 2
+      description: Advertise 900mA Implicit Contract.
+    I2C3PowerOnDelay:
+      base: uint
+      start: 3
+      end: 7
+      description: Delay for the Controller I2C commands at power on.
+    PL4HandlingEn:
+      base: bool
+      start: 7
+      description: Enable PL4 Handling.
+    TBTEmarkerOverride:
+      base: bool
+      start: 9
+      description: Configuration for non-responsive Cable Plug.
+    ANMinPowerRequired:
+      base: bool
+      start: 10
+      description: Power required for TBT mode entry.
+    DualTbtRetimerPresent:
+      base: bool
+      start: 12
+      description: Assert this bit when there is a second TBT retimer on this port.
+    TbtRetimerPresent:
+      base: bool
+      start: 13
+      description: Assert this bit when there is a TBT retimer on this port.
+    DataStatusHPDEvents:
+      base: bool
+      start: 14
+      description: This bit controls how HPD events are configured.
+    RetimerComplianceSupport:
+      base: bool
+      start: 15
+      description: Assert this bit causes the PD controller to place an attached Intel Retimer into compliance mode. 
+    LegacyTbtAdapter:
+      base: bool
+      start: 16
+      description: Legacy TBT Adapter. 
+    TbtAutoEntryAllowed:
+      base: bool
+      start: 49
+      description: Assert this bit to enable TBT auto-entry. 
+    SourceVCONNDelay:
+      base: uint
+      start: 56
+      end: 63
+      description: Configurable delay for BR.
+
 UserVidStatus:
   type: register
   address: 0x57

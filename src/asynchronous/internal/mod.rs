@@ -388,6 +388,24 @@ impl<B: I2c> Tps6699x<B> {
             usb_status.eudo_sop_sent_status() == registers::EudoSopSentStatus::SuccessfulEnterUsb,
         ))
     }
+
+    /// Get Tbt config
+    pub async fn get_tbt_config(&mut self, port: PortId) -> Result<registers::field_sets::TbtConfig, Error<B::Error>> {
+        self.borrow_port(port)?.into_registers().tbt_config().read_async().await
+    }
+
+    /// Set Tbt config
+    pub async fn set_tbt_config(
+        &mut self,
+        port: PortId,
+        config: registers::field_sets::TbtConfig,
+    ) -> Result<(), Error<B::Error>> {
+        self.borrow_port(port)?
+            .into_registers()
+            .tbt_config()
+            .write_async(|r| *r = config)
+            .await
+    }
 }
 
 #[cfg(test)]
