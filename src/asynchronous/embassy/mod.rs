@@ -437,6 +437,12 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         let mut inner = self.lock_inner().await;
         inner.get_alt_mode_status(port).await
     }
+
+    /// Set unconstrained power on a port
+    pub async fn set_unconstrained_power(&mut self, port: PortId, enable: bool) -> Result<(), Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.set_unconstrained_power(port, enable).await
+    }
 }
 
 impl<'a, M: RawMutex, B: I2c> interrupt::InterruptController for Tps6699x<'a, M, B> {
