@@ -4,6 +4,7 @@ use embedded_usb_pd::{type_c, PdError};
 
 use crate::Mode;
 
+pub mod autonegotiate_sink;
 pub mod boot_flags;
 pub mod dp_status;
 

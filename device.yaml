@@ -1169,15 +1169,15 @@ TbtConfig:
     RetimerComplianceSupport:
       base: bool
       start: 15
-      description: Assert this bit causes the PD controller to place an attached Intel Retimer into compliance mode. 
+      description: Assert this bit causes the PD controller to place an attached Intel Retimer into compliance mode.
     LegacyTbtAdapter:
       base: bool
       start: 16
-      description: Legacy TBT Adapter. 
+      description: Legacy TBT Adapter.
     TbtAutoEntryAllowed:
       base: bool
       start: 49
-      description: Assert this bit to enable TBT auto-entry. 
+      description: Assert this bit to enable TBT auto-entry.
     SourceVCONNDelay:
       base: uint
       start: 56
