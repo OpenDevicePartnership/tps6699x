@@ -51,6 +51,15 @@ pub enum Command {
     /// SRDY reset
     Sryr = u32_from_str("SRYR"),
 
+    /// Re-evaluate the Autonegotiate Sink register.
+    ///
+    /// # Input
+    /// None.
+    ///
+    /// # Output
+    /// Standard task return code.
+    Aneg = u32_from_str("ANeg"),
+
     /// Trigger an Input GPIO event
     Trig = u32_from_str("Trig"),
 }
@@ -81,6 +90,8 @@ impl TryFrom<u32> for Command {
             Ok(Command::Srdy)
         } else if Command::Sryr == value {
             Ok(Command::Sryr)
+        } else if Command::Aneg == value {
+            Ok(Command::Aneg)
         } else if Command::Trig == value {
             Ok(Command::Trig)
         } else {
@@ -144,6 +155,16 @@ pub enum ReturnValue {
     Task9 = 0x0E,
     /// Task specific result
     Task10 = 0x0F,
+}
+
+impl ReturnValue {
+    /// Returns `Ok(())` if the return value is `Success`, otherwise returns `error`.
+    pub fn success_or(self, error: PdError) -> Result<(), PdError> {
+        match self {
+            ReturnValue::Success => Ok(()),
+            _ => Err(error),
+        }
+    }
 }
 
 impl TryFrom<u8> for ReturnValue {

@@ -319,6 +319,16 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         Ok(())
     }
 
+    /// Trigger an `ANeg` command to autonegotiate the sink contract.
+    pub async fn autonegotiate_sink(&mut self, port: PortId) -> Result<(), Error<B::Error>> {
+        const TIMEOUT_MS: u32 = 1000; // arbitrary timeout
+        self.execute_command(port, Command::Aneg, TIMEOUT_MS, None, None)
+            .await?
+            .success_or(PdError::Failed)?;
+
+        Ok(())
+    }
+
     /// Trigger virtual gpios
     async fn virtual_gpio_trigger(
         &mut self,
