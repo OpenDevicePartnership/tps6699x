@@ -134,6 +134,23 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         self.lock_inner().await.get_active_rdo_contract(port).await
     }
 
+    /// Get the Autonegotiate Sink register (`0x37`).
+    pub async fn get_autonegotiate_sink(
+        &mut self,
+        port: PortId,
+    ) -> Result<registers::autonegotiate_sink::AutonegotiateSink, Error<B::Error>> {
+        self.lock_inner().await.get_autonegotiate_sink(port).await
+    }
+
+    /// Set the Autonegotiate Sink register (`0x37`).
+    pub async fn set_autonegotiate_sink(
+        &mut self,
+        port: PortId,
+        value: registers::autonegotiate_sink::AutonegotiateSink,
+    ) -> Result<(), Error<B::Error>> {
+        self.lock_inner().await.set_autonegotiate_sink(port, value).await
+    }
+
     /// Wrapper for `get_mode`
     pub async fn get_mode(&mut self) -> Result<Mode, Error<B::Error>> {
         self.lock_inner().await.get_mode().await

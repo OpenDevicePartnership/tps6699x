@@ -195,6 +195,42 @@ impl<B: I2c> Tps6699x<B> {
             .await
     }
 
+    /// Get the Autonegotiate Sink register (`0x37`).
+    pub async fn get_autonegotiate_sink(
+        &mut self,
+        port: PortId,
+    ) -> Result<registers::autonegotiate_sink::AutonegotiateSink, Error<B::Error>> {
+        let mut buf = [0u8; registers::autonegotiate_sink::LEN];
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .read_register(
+                registers::autonegotiate_sink::ADDR,
+                (registers::autonegotiate_sink::LEN * 8) as u32,
+                &mut buf,
+            )
+            .await?;
+
+        Ok(buf.into())
+    }
+
+    /// Set the Autonegotiate Sink register (`0x37`).
+    pub async fn set_autonegotiate_sink(
+        &mut self,
+        port: PortId,
+        value: registers::autonegotiate_sink::AutonegotiateSink,
+    ) -> Result<(), Error<B::Error>> {
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .write_register(
+                registers::autonegotiate_sink::ADDR,
+                (registers::autonegotiate_sink::LEN * 8) as u32,
+                value.as_bytes(),
+            )
+            .await
+    }
+
     /// Get controller operation mode
     pub async fn get_mode(&mut self) -> Result<Mode, Error<B::Error>> {
         // This is a controller-level command, shouldn't matter which port we use
