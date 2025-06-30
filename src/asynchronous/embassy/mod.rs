@@ -6,7 +6,7 @@ use bincode::config;
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use embassy_sync::mutex::{Mutex, MutexGuard};
 use embassy_sync::signal::Signal;
-use embassy_time::{with_timeout, Delay, Duration};
+use embassy_time::{with_timeout, Duration};
 use embedded_hal::digital::InputPin;
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::i2c::I2c;
@@ -15,7 +15,10 @@ use embedded_usb_pd::{Error, PdError, PortId};
 
 use super::interrupt::{self, InterruptController};
 use crate::asynchronous::internal;
-use crate::command::*;
+use crate::command::{
+    Command, ReturnValue, SrdySwitch, TrigArgs, TrigVgpioCmd, TrigVgpioEdge, SRDY_TIMEOUT_MS, SRYR_TIMEOUT_MS,
+    TRIG_ARGS_LEN, TRIG_TIMEOUT_MS,
+};
 use crate::registers::field_sets::IntEventBus1;
 use crate::{error, registers, trace, Mode, MAX_SUPPORTED_PORTS};
 
