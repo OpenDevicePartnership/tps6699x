@@ -348,13 +348,13 @@ impl<B: I2c> Tps6699x<B> {
 
     /// Get boot flags
     pub async fn get_boot_flags(&mut self) -> Result<registers::boot_flags::BootFlags, Error<B::Error>> {
-        let mut buf = [0u8; registers::REG_BOOT_FLAGS_LEN];
+        let mut buf = [0u8; registers::boot_flags::LEN];
         self.borrow_port(PORT0)?
             .into_registers()
             .interface()
             .read_register(
-                registers::REG_BOOT_FLAGS,
-                (registers::REG_BOOT_FLAGS_LEN * 8) as u32,
+                registers::boot_flags::ADDR,
+                (registers::boot_flags::LEN * 8) as u32,
                 &mut buf,
             )
             .await?;
@@ -364,13 +364,13 @@ impl<B: I2c> Tps6699x<B> {
 
     /// Get DP status
     pub async fn get_dp_status(&mut self, port: PortId) -> Result<registers::dp_status::DpStatus, Error<B::Error>> {
-        let mut buf = [0u8; registers::REG_DP_STATUS_LEN];
+        let mut buf = [0u8; registers::dp_status::LEN];
         self.borrow_port(port)?
             .into_registers()
             .interface()
             .read_register(
-                registers::REG_DP_STATUS,
-                (registers::REG_DP_STATUS_LEN * 8) as u32,
+                registers::dp_status::ADDR,
+                (registers::dp_status::LEN * 8) as u32,
                 &mut buf,
             )
             .await?;

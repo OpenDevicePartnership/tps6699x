@@ -2,7 +2,13 @@
 
 use bitfield::bitfield;
 
-use super::REG_DP_STATUS_LEN;
+/// The address of the DP status register.
+pub const ADDR: u8 = 0x58;
+
+/// The length of the DP status register, in bytes.
+///
+/// This exceeds the maximum supported length by the [`device_driver`] crate.
+pub const LEN: usize = 38;
 
 bitfield! {
     /// DP status register
@@ -44,4 +50,4 @@ bitfield! {
 
 /// The actual flags bitfield is generic over the size of the array
 /// Provide this type alias for convenience
-pub type DpStatus = DpStatusRaw<[u8; REG_DP_STATUS_LEN]>;
+pub type DpStatus = DpStatusRaw<[u8; LEN]>;
