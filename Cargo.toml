@@ -26,8 +26,8 @@ defmt = [
     "dep:defmt",
     "device-driver/defmt-03",
     "embassy-sync/defmt",
-    "embassy-time/defmt",
-    "embassy-time/defmt-timestamp-uptime",
+    "embassy-time?/defmt",
+    "embassy-time?/defmt-timestamp-uptime",
     "embedded-usb-pd/defmt",
 ]
 embassy = ["dep:embassy-sync", "dep:embassy-time"]
