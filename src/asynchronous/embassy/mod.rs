@@ -15,10 +15,7 @@ use embedded_usb_pd::{Error, PdError, PortId};
 
 use super::interrupt::{self, InterruptController};
 use crate::asynchronous::internal;
-use crate::command::{
-    Command, ReturnValue, SrdySwitch, TrigArgs, TrigVgpioCmd, TrigVgpioEdge, SRDY_TIMEOUT_MS, SRYR_TIMEOUT_MS,
-    TRIG_ARGS_LEN, TRIG_TIMEOUT_MS,
-};
+use crate::command::{trig, Command, ReturnValue, SrdySwitch, SRDY_TIMEOUT_MS, SRYR_TIMEOUT_MS};
 use crate::registers::field_sets::IntEventBus1;
 use crate::{error, registers, trace, Mode, MAX_SUPPORTED_PORTS};
 
@@ -326,18 +323,15 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     async fn virtual_gpio_trigger(
         &mut self,
         port: PortId,
-        edge: TrigVgpioEdge,
-        cmd: TrigVgpioCmd,
+        edge: trig::Edge,
+        cmd: trig::Cmd,
     ) -> Result<ReturnValue, Error<B::Error>> {
-        let args = TrigArgs {
-            v_gpio_edge: edge,
-            v_gpio: cmd,
-        };
-        let mut args_buf = [0; TRIG_ARGS_LEN];
+        let args = trig::Args { edge, cmd };
+        let mut args_buf = [0; trig::ARGS_LEN];
 
         bincode::encode_into_slice(args, &mut args_buf, config::standard().with_fixed_int_encoding()).unwrap();
 
-        self.execute_command(port, Command::Trig, TRIG_TIMEOUT_MS, Some(&args_buf), None)
+        self.execute_command(port, Command::Trig, trig::TIMEOUT_MS, Some(&args_buf), None)
             .await
     }
 
@@ -346,12 +340,12 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         trace!("retimer_force_pwr: {}", enable);
 
         let edge = if enable {
-            TrigVgpioEdge::RisingEdge
+            trig::Edge::Rising
         } else {
-            TrigVgpioEdge::FallingEdge
+            trig::Edge::Falling
         };
 
-        self.virtual_gpio_trigger(port, edge, TrigVgpioCmd::RetimerForcePwr)
+        self.virtual_gpio_trigger(port, edge, trig::Cmd::RetimerForcePwr)
             .await?;
 
         embassy_time::Timer::after(Duration::from_millis(50)).await;

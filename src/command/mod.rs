@@ -4,6 +4,8 @@ use bincode::error::{DecodeError, EncodeError};
 use bincode::{Decode, Encode};
 use embedded_usb_pd::PdError;
 
+pub mod trig;
+
 /// Length of a command
 const CMD_LEN: usize = 4;
 
@@ -460,56 +462,6 @@ pub struct TfudArgs {
     pub timeout_secs: u16,
     pub broadcast_u16_address: u16,
 }
-
-/// Timeout for completion of TRIG command, determined by experimentation
-#[allow(dead_code)]
-pub(crate) const TRIG_TIMEOUT_MS: u32 = 500;
-#[allow(dead_code)]
-pub(crate) const TRIG_ARGS_LEN: usize = 2;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(feature = "defmt", derive(defmt::Format))]
-#[repr(u8)]
-pub enum TrigVgpioCmd {
-    FaultInputPort1 = 0x21,
-    FaultInputPort2 = 0x22,
-    RetimerForcePwr = 0x2A,
-    RetimerHighCurrentContract = 0x2F,
-    I3cMasterIrq = 0x38,
-    Mreset = 0x45,
-}
-
-impl Encode for TrigVgpioCmd {
-    fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), EncodeError> {
-        let val = *self as u8;
-        Encode::encode(&val, encoder)
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(feature = "defmt", derive(defmt::Format))]
-#[repr(u8)]
-pub enum TrigVgpioEdge {
-    /// Trig Vgpio falling edge
-    FallingEdge = 0,
-    /// Trig Vgpio rising edge
-    RisingEdge = 1,
-}
-
-impl Encode for TrigVgpioEdge {
-    fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), EncodeError> {
-        let val = *self as u8;
-        Encode::encode(&val, encoder)
-    }
-}
-
-#[derive(Debug, Encode, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(feature = "defmt", derive(defmt::Format))]
-pub struct TrigArgs {
-    pub v_gpio_edge: TrigVgpioEdge,
-    pub v_gpio: TrigVgpioCmd,
-}
-
 #[cfg(test)]
 mod test {
     use bincode::config;
