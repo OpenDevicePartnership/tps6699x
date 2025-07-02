@@ -6,7 +6,7 @@ use bincode::config;
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use embassy_sync::mutex::{Mutex, MutexGuard};
 use embassy_sync::signal::Signal;
-use embassy_time::{with_timeout, Delay, Duration};
+use embassy_time::{with_timeout, Duration};
 use embedded_hal::digital::InputPin;
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::i2c::I2c;
@@ -15,7 +15,7 @@ use embedded_usb_pd::{Error, PdError, PortId};
 
 use super::interrupt::{self, InterruptController};
 use crate::asynchronous::internal;
-use crate::command::*;
+use crate::command::{trig, Command, ReturnValue, SrdySwitch, SRDY_TIMEOUT_MS, SRYR_TIMEOUT_MS};
 use crate::registers::field_sets::IntEventBus1;
 use crate::{error, registers, trace, Mode, MAX_SUPPORTED_PORTS};
 
@@ -132,6 +132,23 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         port: PortId,
     ) -> Result<registers::field_sets::ActiveRdoContract, Error<B::Error>> {
         self.lock_inner().await.get_active_rdo_contract(port).await
+    }
+
+    /// Get the Autonegotiate Sink register (`0x37`).
+    pub async fn get_autonegotiate_sink(
+        &mut self,
+        port: PortId,
+    ) -> Result<registers::autonegotiate_sink::AutonegotiateSink, Error<B::Error>> {
+        self.lock_inner().await.get_autonegotiate_sink(port).await
+    }
+
+    /// Set the Autonegotiate Sink register (`0x37`).
+    pub async fn set_autonegotiate_sink(
+        &mut self,
+        port: PortId,
+        value: registers::autonegotiate_sink::AutonegotiateSink,
+    ) -> Result<(), Error<B::Error>> {
+        self.lock_inner().await.set_autonegotiate_sink(port, value).await
     }
 
     /// Wrapper for `get_mode`
@@ -302,22 +319,29 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         Ok(())
     }
 
+    /// Trigger an `ANeg` command to autonegotiate the sink contract.
+    pub async fn autonegotiate_sink(&mut self, port: PortId) -> Result<(), Error<B::Error>> {
+        const TIMEOUT_MS: u32 = 1000; // arbitrary timeout
+        self.execute_command(port, Command::Aneg, TIMEOUT_MS, None, None)
+            .await?
+            .success_or(PdError::Failed)?;
+
+        Ok(())
+    }
+
     /// Trigger virtual gpios
     async fn virtual_gpio_trigger(
         &mut self,
         port: PortId,
-        edge: TrigVgpioEdge,
-        cmd: TrigVgpioCmd,
+        edge: trig::Edge,
+        cmd: trig::Cmd,
     ) -> Result<ReturnValue, Error<B::Error>> {
-        let args = TrigArgs {
-            v_gpio_edge: edge,
-            v_gpio: cmd,
-        };
-        let mut args_buf = [0; TRIG_ARGS_LEN];
+        let args = trig::Args { edge, cmd };
+        let mut args_buf = [0; trig::ARGS_LEN];
 
         bincode::encode_into_slice(args, &mut args_buf, config::standard().with_fixed_int_encoding()).unwrap();
 
-        self.execute_command(port, Command::Trig, TRIG_TIMEOUT_MS, Some(&args_buf), None)
+        self.execute_command(port, Command::Trig, trig::TIMEOUT_MS, Some(&args_buf), None)
             .await
     }
 
@@ -326,12 +350,12 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         trace!("retimer_force_pwr: {}", enable);
 
         let edge = if enable {
-            TrigVgpioEdge::RisingEdge
+            trig::Edge::Rising
         } else {
-            TrigVgpioEdge::FallingEdge
+            trig::Edge::Falling
         };
 
-        self.virtual_gpio_trigger(port, edge, TrigVgpioCmd::RetimerForcePwr)
+        self.virtual_gpio_trigger(port, edge, trig::Cmd::RetimerForcePwr)
             .await?;
 
         embassy_time::Timer::after(Duration::from_millis(50)).await;

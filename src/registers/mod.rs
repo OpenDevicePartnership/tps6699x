@@ -4,6 +4,7 @@ use embedded_usb_pd::{type_c, PdError};
 
 use crate::Mode;
 
+pub mod autonegotiate_sink;
 pub mod boot_flags;
 pub mod dp_status;
 
@@ -17,18 +18,6 @@ device_driver::create_device!(
 pub const REG_DATA1: u8 = 0x09;
 // Command data 1 register length
 pub const REG_DATA1_LEN: usize = 64;
-
-/// Boot flags register
-/// This register is 384 bits and exceeds the maximum support by device_driver
-pub const REG_BOOT_FLAGS: u8 = 0x2D;
-/// Boot flags register length
-pub const REG_BOOT_FLAGS_LEN: usize = 44;
-
-/// DP status register
-/// This register is 304 bits and exceeds the maximum support by device_driver
-pub const REG_DP_STATUS: u8 = 0x58;
-/// DP status register length
-pub const REG_DP_STATUS_LEN: usize = 38;
 
 impl TryFrom<TypecCurrent> for type_c::Current {
     type Error = PdError;

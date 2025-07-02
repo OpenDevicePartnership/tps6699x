@@ -1,7 +1,13 @@
 //! Types and functions related to register 0x2D, boot flags
 use bitfield::bitfield;
 
-use super::REG_BOOT_FLAGS_LEN;
+/// The address of the boot flags register.
+pub const ADDR: u8 = 0x2D;
+
+/// The length of the boot flags register, in bytes.
+///
+/// This exceeds the maximum supported length by the [`device_driver`] crate.
+pub const LEN: usize = 44;
 
 bitfield! {
     /// Boot flags register, bits 0-383
@@ -55,4 +61,4 @@ bitfield! {
 
 /// The actual flags bitfield is generic over the size of the array
 /// Provide this type alias for convenience
-pub type BootFlags = BootFlagsRaw<[u8; REG_BOOT_FLAGS_LEN]>;
+pub type BootFlags = BootFlagsRaw<[u8; LEN]>;
