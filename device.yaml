@@ -1261,3 +1261,17 @@ IntelVidStatus:
       start: 72
       end: 88
       description: Data for Discover Modes (SOP')
+
+RxAdo:
+  type: register
+  address: 0x74
+  access: RO
+  size_bits: 32
+  reset_value: 0x00000000
+  description: Received ADO
+  fields:
+    Ado:
+      base: uint
+      start: 0
+      end: 32
+      description: ADO

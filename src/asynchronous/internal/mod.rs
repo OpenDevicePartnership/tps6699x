@@ -449,6 +449,11 @@ impl<B: I2c> Tps6699x<B> {
         control.set_unconstrained_power(enable);
         self.set_port_control(port, control).await
     }
+
+    /// Get Rx ADO
+    pub async fn get_rx_ado(&mut self, port: PortId) -> Result<registers::field_sets::RxAdo, Error<B::Error>> {
+        self.borrow_port(port)?.into_registers().rx_ado().read_async().await
+    }
 }
 
 #[cfg(test)]
