@@ -449,6 +449,41 @@ impl<B: I2c> Tps6699x<B> {
         control.set_unconstrained_power(enable);
         self.set_port_control(port, control).await
     }
+
+    /// Get port config
+    pub async fn get_port_config(
+        &mut self,
+        port: PortId,
+    ) -> Result<registers::port_config::PortConfig, Error<B::Error>> {
+        let mut buf = [0u8; registers::port_config::LEN];
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .read_register(
+                registers::port_config::ADDR,
+                (registers::port_config::LEN * 8) as u32,
+                &mut buf,
+            )
+            .await?;
+        Ok(buf.into())
+    }
+
+    /// Set port config
+    pub async fn set_port_config(
+        &mut self,
+        port: PortId,
+        config: registers::port_config::PortConfig,
+    ) -> Result<(), Error<B::Error>> {
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .write_register(
+                registers::port_config::ADDR,
+                (registers::port_config::LEN * 8) as u32,
+                config.as_bytes(),
+            )
+            .await
+    }
 }
 
 #[cfg(test)]

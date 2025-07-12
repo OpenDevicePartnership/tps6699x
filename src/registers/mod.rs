@@ -7,6 +7,7 @@ use crate::Mode;
 pub mod autonegotiate_sink;
 pub mod boot_flags;
 pub mod dp_status;
+pub mod port_config;
 
 device_driver::create_device!(
     device_name: Registers,
