@@ -484,6 +484,33 @@ impl<B: I2c> Tps6699x<B> {
             )
             .await
     }
+
+    /// Get Rx attention Vdm
+    pub async fn get_rx_attn_vdm(&mut self, port: PortId) -> Result<registers::field_sets::RxAttnVdm, Error<B::Error>> {
+        self.borrow_port(port)?
+            .into_registers()
+            .rx_attn_vdm()
+            .read_async()
+            .await
+    }
+
+    /// Get Rx other Vdm
+    pub async fn get_rx_other_vdm(
+        &mut self,
+        port: PortId,
+    ) -> Result<registers::rx_other_vdm::RxOtherVdm, Error<B::Error>> {
+        let mut buf = [0u8; registers::rx_other_vdm::LEN];
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .read_register(
+                registers::rx_other_vdm::ADDR,
+                (registers::rx_other_vdm::LEN * 8) as u32,
+                &mut buf,
+            )
+            .await?;
+        Ok(buf.into())
+    }
 }
 
 #[cfg(test)]

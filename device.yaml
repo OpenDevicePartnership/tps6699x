@@ -1261,3 +1261,33 @@ IntelVidStatus:
       start: 72
       end: 88
       description: Data for Discover Modes (SOP')
+
+RxAttnVdm:
+  type: register
+  address: 0x60
+  access: RO
+  size_bits: 72
+  reset_value: 0x0
+  description: Received User SVID Attention VDM
+  fields:
+    NumOfValidVdos:
+      base: uint
+      start: 0
+      end: 2
+      description: Number of valid Vdos received
+    SeqNum:
+      base: uint
+      start: 5
+      end: 7
+      description: Increments by one every time this register is updated
+    VdmHeader:
+      base: uint
+      start: 8
+      end: 39
+      description: VDM header, Rx Vdm data object 1
+    Vdo:
+      base: uint
+      start: 40
+      end: 71
+      description: VDM data object, Rx Vdm data object 2
+

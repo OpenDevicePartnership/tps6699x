@@ -8,6 +8,7 @@ pub mod autonegotiate_sink;
 pub mod boot_flags;
 pub mod dp_status;
 pub mod port_config;
+pub mod rx_other_vdm;
 
 device_driver::create_device!(
     device_name: Registers,
