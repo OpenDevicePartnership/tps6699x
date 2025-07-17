@@ -7,9 +7,7 @@ use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::{Error, PdError, PortId};
 
 use super::Tps6699x;
-use crate::command::{
-    Command, ResetArgs, ReturnValue, CMD_4CC_TASK_RETURN_CODE_MASK, RESET_ARGS_LEN, RESET_DELAY_MS, TFUS_DELAY_MS,
-};
+use crate::command::*;
 use crate::{debug, error, registers as regs, Mode, PORT0};
 
 impl<B: I2c> Tps6699x<B> {
