@@ -121,18 +121,27 @@ impl PartialEq<u32> for Command {
     }
 }
 
+/// A status code, often in the first byte of the `DATAX` register after a command is executed.
+///
+/// [`ReturnValue::Task0`] through [`ReturnValue::Task10`] are reserved for standard tasks and may be used by certain
+/// tasks for task-specific error codes. These should be treated as an error when encountered.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub enum ReturnValue {
-    /// Success
+    /// Task completed successfully.
     Success = 0x00,
-    /// Timed-out or aborted with ABRT command
+
+    /// Task timed-out or aborted with `ABRT` command.
     Abort = 0x01,
+
     /// Rejected
     Rejected = 0x03,
-    /// RX buffer locked
+
+    /// Task rejected because the Rx Buffer was locked. This is for tasks that can require the PD controller to use the
+    /// Rx Buffer.
     RxLocked = 0x04,
+
     /// Task specific result
     Task0 = 0x05,
     /// Task specific result
