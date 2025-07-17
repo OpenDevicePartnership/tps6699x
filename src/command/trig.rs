@@ -4,10 +4,6 @@ use bincode::enc::Encoder;
 use bincode::error::EncodeError;
 use bincode::Encode;
 
-/// Timeout for completion of `Trig` command, determined by experimentation
-#[allow(dead_code)]
-pub(crate) const TIMEOUT_MS: u32 = 500;
-
 /// The length of the arguments for the `Trig` command.
 #[allow(dead_code)]
 pub(crate) const ARGS_LEN: usize = 2;

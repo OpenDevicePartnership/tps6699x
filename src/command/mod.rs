@@ -123,6 +123,24 @@ impl Command {
             _ => 1000,
         }
     }
+
+    /// Returns the timeout in milliseconds for the command to complete.
+    pub const fn timeout_ms(self) -> u32 {
+        match self {
+            Command::Tfus => TFUS_DELAY_MS + 100,
+            Command::Tfui | Command::Tfue | Command::Tfud | Command::Tfuq => 200, // docs say 100ms, but 200ms is more reliable
+            Command::Gaid => RESET_DELAY_MS + 100,
+            Command::Srdy | Command::Sryr => 250, // determined by experimentation
+            Command::Trig => 500,                 // determined by experimentation
+            _ => 1000,
+        }
+    }
+
+    /// The timeout for a command. This is [`Self::timeout_ms`] converted to an [`embassy_time::Duration`].
+    #[cfg(feature = "embassy")]
+    pub const fn timeout(self) -> embassy_time::Duration {
+        embassy_time::Duration::from_millis(self.timeout_ms() as u64)
+    }
 }
 
 impl PartialEq<u32> for Command {
@@ -248,24 +266,6 @@ impl Encode for ResetArgs {
 
 /// Delay for completion of TFUs command
 pub(crate) const TFUS_DELAY_MS: u32 = 500;
-/// Timeout for completion of TFUs command
-#[allow(dead_code)]
-pub(crate) const TFUS_TIMEOUT_MS: u32 = TFUS_DELAY_MS + 100;
-/// Timeout for completion of TFUi command, docs say 100ms, but 200ms is more reliable
-#[allow(dead_code)]
-pub(crate) const TFUI_TIMEOUT_MS: u32 = 200;
-/// Timeout for completion of TFUe command, docs say 100ms, but 200ms is more reliable
-#[allow(dead_code)]
-pub(crate) const TFUE_TIMEOUT_MS: u32 = 200;
-/// Timeout for completion of TFUd command, docs say 100ms, but 200ms is more reliable
-#[allow(dead_code)]
-pub(crate) const TFUD_TIMEOUT_MS: u32 = 200;
-/// Timeout for completion of TFUq command, docs say 100ms, but 200ms is more reliable
-#[allow(dead_code)]
-pub(crate) const TFUQ_TIMEOUT_MS: u32 = 200;
-/// Timeout for completion of reset
-#[allow(dead_code)]
-pub(crate) const RESET_TIMEOUT_MS: u32 = RESET_DELAY_MS + 100;
 /// Length of TFUi arguments
 #[allow(dead_code)]
 pub(crate) const TFUI_ARGS_LEN: usize = 8;
@@ -454,12 +454,6 @@ impl<Context> Decode<Context> for TfuqReturnValue {
     }
 }
 
-/// Timeout for completion of SRDY command, determined by experimentation
-#[allow(dead_code)]
-pub(crate) const SRDY_TIMEOUT_MS: u32 = 250;
-/// Timeout for completion of SRYR command, determined by experimentation
-#[allow(dead_code)]
-pub(crate) const SRYR_TIMEOUT_MS: u32 = 250;
 /// Srdy switch to enable
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]

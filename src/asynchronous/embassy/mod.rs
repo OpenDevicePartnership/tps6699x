@@ -16,7 +16,7 @@ use embedded_usb_pd::{Error, PdError, PortId};
 
 use super::interrupt::{self, InterruptController};
 use crate::asynchronous::internal;
-use crate::command::{muxr, trig, Command, ReturnValue, SrdySwitch, SRDY_TIMEOUT_MS, SRYR_TIMEOUT_MS};
+use crate::command::{muxr, trig, Command, ReturnValue, SrdySwitch};
 use crate::registers::field_sets::IntEventBus1;
 use crate::{error, registers, trace, Mode, MAX_SUPPORTED_PORTS};
 
@@ -262,20 +262,16 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         }
     }
 
-    /// Execute the given command with a timeout
+    /// Execute the given command with a timeout determined by [`Command::timeout`].
     async fn execute_command(
         &mut self,
         port: PortId,
         cmd: Command,
-        timeout_ms: u32,
         indata: Option<&[u8]>,
         outdata: Option<&mut [u8]>,
     ) -> Result<ReturnValue, Error<B::Error>> {
-        let result = with_timeout(
-            Duration::from_millis(timeout_ms.into()),
-            self.execute_command_no_timeout(port, cmd, indata, outdata),
-        )
-        .await;
+        let timeout = cmd.timeout();
+        let result = with_timeout(timeout, self.execute_command_no_timeout(port, cmd, indata, outdata)).await;
         if result.is_err() {
             error!("Command {:#?} timed out", cmd);
             // See if there's a definite error we can read
@@ -292,13 +288,11 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
 
     async fn execute_srdy(&mut self, port: PortId, switch: SrdySwitch) -> Result<ReturnValue, Error<B::Error>> {
         let arg_bytes = [switch.into()];
-        self.execute_command(port, Command::Srdy, SRDY_TIMEOUT_MS, Some(&arg_bytes), None)
-            .await
+        self.execute_command(port, Command::Srdy, Some(&arg_bytes), None).await
     }
 
     async fn execute_sryr(&mut self, port: PortId) -> Result<ReturnValue, Error<B::Error>> {
-        self.execute_command(port, Command::Sryr, SRYR_TIMEOUT_MS, None, None)
-            .await
+        self.execute_command(port, Command::Sryr, None, None).await
     }
 
     /// Enable or disable the given power path
@@ -322,8 +316,7 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
 
     /// Trigger an `ANeg` command to autonegotiate the sink contract.
     pub async fn autonegotiate_sink(&mut self, port: PortId) -> Result<(), Error<B::Error>> {
-        const TIMEOUT_MS: u32 = 1000; // arbitrary timeout
-        self.execute_command(port, Command::Aneg, TIMEOUT_MS, None, None)
+        self.execute_command(port, Command::Aneg, None, None)
             .await?
             .success_or(PdError::Failed)?;
 
@@ -342,8 +335,7 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
 
         bincode::encode_into_slice(args, &mut args_buf, config::standard().with_fixed_int_encoding()).unwrap();
 
-        self.execute_command(port, Command::Trig, trig::TIMEOUT_MS, Some(&args_buf), None)
-            .await
+        self.execute_command(port, Command::Trig, Some(&args_buf), None).await
     }
 
     /// Force retimer power on or off
@@ -417,8 +409,7 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     /// Execute the [`Command::Muxr`] command.
     pub async fn execute_muxr(&mut self, port: PortId, input: muxr::Input) -> Result<ReturnValue, Error<B::Error>> {
         let indata = input.0.to_le_bytes();
-        self.execute_command(port, Command::Muxr, 1000, Some(&indata), None)
-            .await
+        self.execute_command(port, Command::Muxr, Some(&indata), None).await
     }
 
     /// Reset the device.

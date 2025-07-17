@@ -1,6 +1,6 @@
 use bincode::config;
 use embassy_sync::blocking_mutex::raw::RawMutex;
-use embassy_time::{with_timeout, Duration};
+use embassy_time::with_timeout;
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::{Error, PdError};
@@ -16,7 +16,7 @@ impl<M: RawMutex, B: I2c> UpdateTarget for Tps6699x<'_, M, B> {
     async fn fw_update_mode_enter(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<Self::BusError>> {
         let result = {
             let mut inner = self.lock_inner().await;
-            with_timeout(Duration::from_millis(TFUS_TIMEOUT_MS.into()), inner.execute_tfus(delay)).await
+            with_timeout(Command::Tfus.timeout(), inner.execute_tfus(delay)).await
         };
 
         if result.is_err() {
@@ -38,17 +38,13 @@ impl<M: RawMutex, B: I2c> UpdateTarget for Tps6699x<'_, M, B> {
         bincode::encode_into_slice(args, &mut args_buf, config::standard().with_fixed_int_encoding())
             .map_err(|_| PdError::Serialize)?;
 
-        self.execute_command(PORT0, Command::Tfui, TFUI_TIMEOUT_MS, Some(&args_buf), None)
-            .await
+        self.execute_command(PORT0, Command::Tfui, Some(&args_buf), None).await
     }
 
     /// Attempt to exit fw update mode
     async fn fw_update_mode_exit(&mut self, delay: &mut impl DelayNs) -> Result<(), Error<Self::BusError>> {
         // Reset the controller if we failed to exit fw update mode
-        if let Ok(ret) = self
-            .execute_command(PORT0, Command::Tfue, TFUE_TIMEOUT_MS, None, None)
-            .await
-        {
+        if let Ok(ret) = self.execute_command(PORT0, Command::Tfue, None, None).await {
             if ret != ReturnValue::Success {
                 warn!("FW update exit failed: {:?}", ret);
             }
@@ -85,13 +81,7 @@ impl<M: RawMutex, B: I2c> UpdateTarget for Tps6699x<'_, M, B> {
             .map_err(|_| PdError::Serialize)?;
 
         let result = self
-            .execute_command(
-                PORT0,
-                Command::Tfuq,
-                TFUQ_TIMEOUT_MS,
-                Some(&arg_bytes),
-                Some(&mut return_bytes),
-            )
+            .execute_command(PORT0, Command::Tfuq, Some(&arg_bytes), Some(&mut return_bytes))
             .await?;
 
         if result != ReturnValue::Success {
@@ -116,7 +106,7 @@ impl<M: RawMutex, B: I2c> UpdateTarget for Tps6699x<'_, M, B> {
         bincode::encode_into_slice(args, &mut arg_bytes, config::standard().with_fixed_int_encoding())
             .map_err(|_| PdError::Serialize)?;
         let result = self
-            .execute_command(PORT0, Command::Tfud, TFUD_TIMEOUT_MS, Some(&arg_bytes), None)
+            .execute_command(PORT0, Command::Tfud, Some(&arg_bytes), None)
             .await?;
 
         if result != ReturnValue::Success {
@@ -133,11 +123,7 @@ impl<M: RawMutex, B: I2c> UpdateTarget for Tps6699x<'_, M, B> {
     ) -> Result<(), Error<Self::BusError>> {
         let result = {
             let mut inner = self.lock_inner().await;
-            with_timeout(
-                Duration::from_millis(RESET_TIMEOUT_MS.into()),
-                inner.execute_tfuc(delay),
-            )
-            .await
+            with_timeout(Command::Tfuc.timeout(), inner.execute_tfuc(delay)).await
         };
 
         if result.is_err() {
