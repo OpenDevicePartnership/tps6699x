@@ -4,6 +4,7 @@ use bincode::error::{DecodeError, EncodeError};
 use bincode::{Decode, Encode};
 use embedded_usb_pd::PdError;
 
+pub mod muxr;
 pub mod trig;
 
 /// Length of a command
@@ -62,6 +63,15 @@ pub enum Command {
 
     /// Trigger an Input GPIO event
     Trig = u32_from_str("Trig"),
+
+    /// Repeat transactions on I2C3m under certain conditions.
+    ///
+    /// # Input
+    /// [`muxr::Input`]
+    ///
+    /// # Output
+    /// [`ReturnValue`]
+    Muxr = u32_from_str("MuxR"),
 }
 
 impl TryFrom<u32> for Command {
