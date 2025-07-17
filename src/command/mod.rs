@@ -104,6 +104,8 @@ impl TryFrom<u32> for Command {
             Ok(Command::Aneg)
         } else if Command::Trig == value {
             Ok(Command::Trig)
+        } else if Command::Muxr == value {
+            Ok(Command::Muxr)
         } else {
             Err(PdError::InvalidParams)
         }
