@@ -16,7 +16,7 @@ use embedded_usb_pd::{Error, PdError, PortId};
 
 use super::interrupt::{self, InterruptController};
 use crate::asynchronous::internal;
-use crate::command::{trig, Command, ReturnValue, SrdySwitch, SRDY_TIMEOUT_MS, SRYR_TIMEOUT_MS};
+use crate::command::{muxr, trig, Command, ReturnValue, SrdySwitch, SRDY_TIMEOUT_MS, SRYR_TIMEOUT_MS};
 use crate::registers::field_sets::IntEventBus1;
 use crate::{error, registers, trace, Mode, MAX_SUPPORTED_PORTS};
 
@@ -412,6 +412,13 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         }
 
         Ok(())
+    }
+
+    /// Execute the [`Command::Muxr`] command.
+    pub async fn execute_muxr(&mut self, port: PortId, input: muxr::Input) -> Result<ReturnValue, Error<B::Error>> {
+        let indata = input.0.to_le_bytes();
+        self.execute_command(port, Command::Muxr, 1000, Some(&indata), None)
+            .await
     }
 
     /// Reset the device.
