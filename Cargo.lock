@@ -742,6 +742,7 @@ dependencies = [
  "embedded-hal-mock",
  "embedded-io-async",
  "embedded-usb-pd",
+ "heapless",
  "log",
  "tokio",
 ]

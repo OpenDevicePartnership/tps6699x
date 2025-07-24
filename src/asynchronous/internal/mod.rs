@@ -2,9 +2,12 @@
 use device_driver::AsyncRegisterInterface;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::pdinfo::AltMode;
+use embedded_usb_pd::pdo::source::Pdo;
+use embedded_usb_pd::pdo::ExpectedPdo;
 use embedded_usb_pd::{Error, PdError, PortId};
 
-use crate::{registers, Mode, MAX_SUPPORTED_PORTS, PORT0, PORT1, TPS66993_NUM_PORTS, TPS66994_NUM_PORTS};
+use crate::registers::rx_src_caps::EPR_PDO_START_INDEX;
+use crate::{registers, DeviceError, Mode, MAX_SUPPORTED_PORTS, PORT0, PORT1, TPS66993_NUM_PORTS, TPS66994_NUM_PORTS};
 
 mod command;
 
@@ -530,6 +533,49 @@ impl<B: I2c> Tps6699x<B> {
             .await?;
         Ok(buf.into())
     }
+
+    /// Get RX source capabilities
+    ///
+    /// Returns (num pdos placed in out_spr_pdos , num pdos placed in out_epr_pdos)
+    pub async fn get_rx_src_caps(
+        &mut self,
+        port: PortId,
+        out_spr_pdos: &mut [Pdo],
+        out_epr_pdos: &mut [Pdo],
+    ) -> Result<(usize, usize), DeviceError<B::Error, ExpectedPdo>> {
+        // Clamp to the maximum number of PDOs
+        let num_pdos = if !out_epr_pdos.is_empty() {
+            EPR_PDO_START_INDEX + out_epr_pdos.len()
+        } else {
+            // SPR PDOs start at index 0
+            out_spr_pdos.len()
+        }
+        .min(registers::rx_src_caps::TOTAL_PDOS);
+
+        // 4 bytes for each PDO
+        let read_size = registers::rx_src_caps::HEADER_LEN + 4 * num_pdos;
+        let mut buf = [0u8; registers::rx_src_caps::LEN];
+        self.borrow_port(port)
+            .map_err(DeviceError::from)?
+            .into_registers()
+            .interface()
+            .read_register(registers::rx_src_caps::ADDR, (read_size * 8) as u32, &mut buf)
+            .await?;
+
+        let rx_source_caps = registers::rx_src_caps::RxSrcCaps::try_from(buf).map_err(DeviceError::Other)?;
+        let num_sprs = out_spr_pdos.len().min(rx_source_caps.num_valid_pdos() as usize);
+        for (i, pdo) in out_spr_pdos.iter_mut().enumerate().take(num_sprs) {
+            // SPR PDOs start at index 0
+            *pdo = rx_source_caps[i];
+        }
+
+        let num_eprs = out_epr_pdos.len().min(rx_source_caps.num_valid_epr_pdos() as usize);
+        for (i, pdo) in out_epr_pdos.iter_mut().enumerate().take(num_eprs) {
+            *pdo = rx_source_caps[EPR_PDO_START_INDEX + i];
+        }
+
+        Ok((num_sprs, num_eprs))
+    }
 }
 
 #[cfg(test)]
@@ -540,8 +586,11 @@ mod test {
     use device_driver::AsyncRegisterInterface;
     use embedded_hal_async::i2c::ErrorType;
     use embedded_hal_mock::eh1::i2c::{Mock, Transaction};
+    use embedded_usb_pd::pdo::source::Pdo;
+    use registers::rx_src_caps::ADDR;
 
     use super::*;
+    use crate::registers::rx_src_caps::{self};
     use crate::test::*;
     use crate::{ADDR0, ADDR1, PORT0, PORT1};
 
@@ -913,5 +962,56 @@ mod test {
         let mock = Mock::new(&[]);
         let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR1);
         test_get_customer_use(&mut tps6699x, PORT0_ADDR1, TEST_CUSTOMER_USE).await;
+    }
+
+    /// Test reading SPR PDOs
+    #[tokio::test]
+    async fn test_get_rx_src_caps_spr() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        let mut buf = [0u8; rx_src_caps::LEN + 1];
+        // Register length
+        buf[0] = rx_src_caps::LEN as u8;
+        // Set header: low 3 bits are SPR PDO count
+        buf[1] = 0xa; // 2 SPR PDOs, 1 EPR PDOs
+                      // Fill PDOs with test data
+                      // SPR PDO 0 - Fixed PDO at 5V, 3A, 100% peak current
+        buf[2..6].copy_from_slice(&TEST_SRC_PDO_FIXED_5V3A_RAW.to_le_bytes());
+        // SPR PDO 1 - Fixed PDO at 5V, 1.5A, 100% peak current
+        buf[6..10].copy_from_slice(&TEST_SRC_PDO_FIXED_5V1A5_RAW.to_le_bytes());
+        // Fake SPR, used to test overread
+        buf[10..14].copy_from_slice(&TEST_SRC_PDO_FIXED_5V900MA_RAW.to_le_bytes());
+        // EPR PDO 0 - Fixed PDO at 28V, 5A, 100% peak current
+        buf[30..34].copy_from_slice(&TEST_SRC_EPR_PDO_FIXED_28V5A_RAW.to_le_bytes());
+        // Fake EPR, used to test overread
+        buf[34..38].copy_from_slice(&TEST_SRC_EPR_PDO_FIXED_28V3A_RAW.to_le_bytes());
+        // Fake EPR, used to test overread
+        buf[38..42].copy_from_slice(&TEST_SRC_EPR_PDO_FIXED_28V1A5_RAW.to_le_bytes());
+
+        // Expect a read of 14 bytes (header + 3 PDOs)
+        tps6699x
+            .bus
+            .update_expectations(&[Transaction::write_read(PORT0_ADDR0, std::vec![ADDR], {
+                Vec::from(buf)
+            })]);
+
+        // Read PDOs, with attempted overread
+        let mut out_spr_pdos = [Pdo::default(); 3];
+        let mut out_epr_pdos = [Pdo::default(); 2];
+        let (num_pdos, num_epr_pdos) = tps6699x
+            .get_rx_src_caps(PORT0, &mut out_spr_pdos, &mut out_epr_pdos)
+            .await
+            .unwrap();
+        tps6699x.bus.done();
+
+        assert_eq!(num_pdos, 2);
+        assert_eq!(num_epr_pdos, 1);
+        assert_eq!(out_spr_pdos[0], TEST_SRC_PDO_FIXED_5V3A);
+        assert_eq!(out_spr_pdos[1], TEST_SRC_PDO_FIXED_5V1A5);
+        assert_eq!(out_spr_pdos[2], Pdo::default());
+
+        assert_eq!(out_epr_pdos[0], TEST_SRC_EPR_PDO_FIXED_28V5A);
+        assert_eq!(out_epr_pdos[1], Pdo::default());
     }
 }

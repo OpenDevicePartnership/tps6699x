@@ -1195,6 +1195,7 @@ dependencies = [
  "embedded-hal-async",
  "embedded-io-async",
  "embedded-usb-pd",
+ "heapless 0.8.0",
 ]
 
 [[package]]
