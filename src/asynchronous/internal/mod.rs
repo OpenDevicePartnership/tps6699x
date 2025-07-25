@@ -2,6 +2,7 @@
 use device_driver::AsyncRegisterInterface;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::pdinfo::AltMode;
+use embedded_usb_pd::pdo::source::Pdo;
 use embedded_usb_pd::{Error, PdError, PortId};
 
 use crate::{registers, Mode, MAX_SUPPORTED_PORTS, PORT0, PORT1, TPS66993_NUM_PORTS, TPS66994_NUM_PORTS};
@@ -515,6 +516,41 @@ impl<B: I2c> Tps6699x<B> {
             )
             .await?;
         Ok(buf.into())
+    }
+
+    /// Get RX source capabilities
+    ///
+    /// Returns (num_standard_pdos, num_standard_epr_pdos)
+    pub async fn get_rx_src_caps(
+        &mut self,
+        port: PortId,
+        start: usize,
+        out_pdos: &mut [Pdo],
+    ) -> Result<(usize, usize), Error<B::Error>> {
+        // Clamp to the maximum number of PDOs
+        let num_pdos = if start + out_pdos.len() > registers::rx_src_caps::TOTAL_PDOS {
+            registers::rx_src_caps::TOTAL_PDOS - start
+        } else {
+            out_pdos.len()
+        };
+        // 4 bytes for each PDO
+        let read_size = registers::rx_src_caps::HEADER_LEN + 4 * num_pdos;
+        let mut buf = [0u8; registers::rx_src_caps::LEN];
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .read_register(registers::rx_src_caps::ADDR, (read_size * 8) as u32, &mut buf)
+            .await?;
+
+        let rx_source_caps = registers::rx_src_caps::RxSrcCaps::try_from(buf).map_err(Into::<Error<B::Error>>::into)?;
+        for (i, pdo) in out_pdos.iter_mut().enumerate() {
+            *pdo = rx_source_caps[start + i];
+        }
+
+        Ok((
+            rx_source_caps.num_valid_pdos() as usize,
+            rx_source_caps.num_valid_epr_pdos() as usize,
+        ))
     }
 }
 

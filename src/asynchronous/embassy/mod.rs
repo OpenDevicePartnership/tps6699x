@@ -495,7 +495,7 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
             // No ADO available
             Ok(None)
         } else {
-            Ok(Some(ado_raw.ado().try_into().map_err(Error::Pd)?))
+            Ok(Some(ado_raw.ado().try_into().map_err(Into::<Error<B::Error>>::into)?))
         }
     }
 
@@ -512,6 +512,19 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     ) -> Result<registers::rx_other_vdm::RxOtherVdm, Error<B::Error>> {
         let mut inner = self.lock_inner().await;
         inner.get_rx_other_vdm(port).await
+    }
+
+    /// Get Rx Source Caps
+    ///
+    /// Returns (num_standard_pdos, num_epr_pdos).
+    pub async fn get_rx_src_caps(
+        &mut self,
+        port: PortId,
+        start: usize,
+        out_pdos: &mut [embedded_usb_pd::pdo::source::Pdo],
+    ) -> Result<(usize, usize), Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.get_rx_src_caps(port, start, out_pdos).await
     }
 }
 
