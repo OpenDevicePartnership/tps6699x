@@ -418,6 +418,11 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         Ok(())
     }
 
+    /// Execute the [`Command::Dbfg`] command.
+    pub async fn execute_dbfg(&mut self, port: PortId) -> Result<ReturnValue, Error<B::Error>> {
+        self.execute_command(port, Command::Dbfg, None, None).await
+    }
+
     /// Execute the [`Command::Muxr`] command.
     pub async fn execute_muxr(&mut self, port: PortId, input: muxr::Input) -> Result<ReturnValue, Error<B::Error>> {
         let indata = input.0.to_le_bytes();
