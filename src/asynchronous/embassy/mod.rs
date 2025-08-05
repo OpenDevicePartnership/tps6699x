@@ -619,7 +619,7 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     pub async fn get_tx_identity(
         &mut self,
         port: PortId,
-    ) -> Result<registers::field_sets::TxIdentity, Error<B::Error>> {
+    ) -> Result<registers::tx_identity::TxIdentity, Error<B::Error>> {
         self.lock_inner().await.get_tx_identity(port).await
     }
 }
