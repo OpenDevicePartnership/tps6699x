@@ -614,6 +614,14 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
             epr: heapless::Vec::from_slice(&out_epr_pdos[..num_valid_epr]).unwrap(),
         })
     }
+
+    /// Get Tx Identity
+    pub async fn get_tx_identity(
+        &mut self,
+        port: PortId,
+    ) -> Result<registers::field_sets::TxIdentity, Error<B::Error>> {
+        self.lock_inner().await.get_tx_identity(port).await
+    }
 }
 
 impl<'a, M: RawMutex, B: I2c> interrupt::InterruptController for Tps6699x<'a, M, B> {
