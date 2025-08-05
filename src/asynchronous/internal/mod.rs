@@ -576,6 +576,24 @@ impl<B: I2c> Tps6699x<B> {
 
         Ok((num_sprs, num_eprs))
     }
+
+    /// Get Tx Identity
+    pub async fn get_tx_identity(
+        &mut self,
+        port: PortId,
+    ) -> Result<crate::registers::tx_identity::TxIdentity, Error<B::Error>> {
+        let mut buf = [0u8; crate::registers::tx_identity::LEN];
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .read_register(
+                crate::registers::tx_identity::ADDR,
+                (crate::registers::tx_identity::LEN * 8) as u32,
+                &mut buf,
+            )
+            .await?;
+        Ok(buf.into())
+    }
 }
 
 #[cfg(test)]
