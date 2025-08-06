@@ -640,6 +640,32 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     ) -> Result<registers::tx_identity::TxIdentity, Error<B::Error>> {
         self.lock_inner().await.modify_tx_identity(port, f).await
     }
+
+    /// Get DP config
+    pub async fn get_dp_config(&mut self, port: PortId) -> Result<registers::field_sets::DpConfig, Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.get_dp_config(port).await
+    }
+
+    /// Set DP config
+    pub async fn set_dp_config(
+        &mut self,
+        port: PortId,
+        config: registers::field_sets::DpConfig,
+    ) -> Result<(), Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.set_dp_config(port, config).await
+    }
+
+    /// Modify DP config settings
+    pub async fn modify_dp_config(
+        &mut self,
+        port: PortId,
+        f: impl FnOnce(&mut registers::field_sets::DpConfig) -> registers::field_sets::DpConfig,
+    ) -> Result<registers::field_sets::DpConfig, Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.modify_dp_config(port, f).await
+    }
 }
 
 impl<'a, M: RawMutex, B: I2c> interrupt::InterruptController for Tps6699x<'a, M, B> {
