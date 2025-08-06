@@ -1118,6 +1118,142 @@ PdStatus:
         ExitUsb4FollowingDrSwap: 0x4
         Reserved: catch_all
 
+DpConfig:
+  type: register
+  address: 0x51
+  access: RW
+  size_bits: 80
+  reset_value: 0x0000800000011C03
+  description: Display Port Configuration
+  fields:
+    EnableDpSvid:
+      base: bool
+      start: 0
+      description: Assert this bit to enable DisplayPort SVID.
+    DpMode:
+      base: bool
+      start: 1
+      description: Assert this bit to enable DisplayPort Alternate mode.
+    DpTransportSignalling:
+      base: uint
+      start: 10
+      end: 14
+      description: Signaling for transport of DisplayPort protocol.
+      conversion:
+        name: DpTransportSignalling
+        UsbSignaling: 0x0
+        DpSignaling: 0x1
+        Reserved: catch_all
+    DpPortCapability:
+      base: uint
+      start: 8
+      end: 10
+      description: Display port capabilities
+      conversion:
+        name: DpPortCapability
+        Reserved: 0x0
+        UfpDCapable: 0x1
+        DfpDCapable: 0x2
+        Reserved2: 0x3
+    DfpdPinAssignment:
+      base: uint
+      start: 16
+      end: 24
+      description: DFP_D Pin Assignments Supported. Each bit corresponds to an allowed pin assignment. Multiple pin assignments may be allowed.
+    UfpdPinAssignment:
+      base: uint
+      start: 24
+      end: 32
+      description: UFP_D Pin Assignments Supported. Each bit corresponds to an allowed pin assignment. Multiple pin assignments may be allowed.
+    MultiFunctionPreferred:
+      base: bool
+      start: 32
+      description: Assert this bit if multi-function is preferred.
+    DfpdUfpdConnected:
+      base: uint
+      start: 35
+      end: 37
+      description: This field indicates the status of the connection.
+      conversion:
+        name: DfpdUfpdConnected
+        NeitherConnected: 0x0
+        DfpDConnected: 0x1
+        UfpDConnected: 0x2
+        BothConnected: 0x3
+    DpVdoVersion:
+      base: uint
+      start: 37
+      end: 39
+      description: DP VDO Version
+      conversion:
+        name: DpVdoVersion
+        DpV20: 0x0
+        DpV21: 0x1
+        Reserved: catch_all
+    DpModeAutoEntryAllowed:
+      base: bool
+      start: 40
+      description: Assert this bit to enable auto-entry.
+    PortCapability:
+      base: uint
+      start: 48
+      end: 50
+      description: Port Capability
+      conversion:
+        name: PortCapability
+        Reserved: 0x0
+        DpSinkDeviceCapable: 0x1
+        DpSourceDeviceCapable: 0x2
+        BothDpSourceAndSinkDeviceCapable: 0x3
+    TransportSignalling:
+      base: uint
+      start: 50
+      end: 54
+      description: Transport Signalling
+    ReceptacleIndication:
+      base: bool
+      start: 54
+      description: Receptacle Indication. 0h = Dp interface presented on USB-C plug, 1h = Dp interface presented on USB-C receptacle
+    Usb2SignallingNotUsed:
+      base: bool
+      start: 55
+      description: USB2 signaling requirement on A6 - A7 or B6 - B7 (D+/D-) while in DP configuration. 0h = May be required, 1h = USB2 is not needed on A6-A7
+    DpSourceDevicePinAssignmentsSupported:
+      base: uint
+      start: 56
+      end: 64
+      description: DP Source DevicePinAssignments Supported
+    DpSinkDevicePinAssignmentsSupported:
+      base: uint
+      start: 64
+      end: 72
+      description: DP Sink DevicePinAssignments Supported
+    Uhbr13:
+      base: bool
+      start: 74
+      description: UHBR13
+    ActiveComponent:
+      base: uint
+      start: 76
+      end: 78
+      description: ActiveComponent
+      conversion:
+        name: ActiveComponent
+        Passive: 0x0
+        Retimer: 0x1
+        Redriver: 0x2
+        Optical: 0x3
+    DpamVersion:
+      base: uint
+      start: 78
+      end: 80
+      description: DPAM version
+      conversion:
+        name: DpamVersion
+        Version2OrEarlier: 0x0
+        Version21OrHigher: 0x1
+        Reserved: catch_all
+
 TbtConfig:
   type: register
   address: 0x52

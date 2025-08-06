@@ -442,6 +442,35 @@ impl<B: I2c> Tps6699x<B> {
         ))
     }
 
+    /// Get DP config
+    pub async fn get_dp_config(&mut self, port: PortId) -> Result<registers::field_sets::DpConfig, Error<B::Error>> {
+        self.borrow_port(port)?.into_registers().dp_config().read_async().await
+    }
+
+    /// Set DP config
+    pub async fn set_dp_config(
+        &mut self,
+        port: PortId,
+        config: registers::field_sets::DpConfig,
+    ) -> Result<(), Error<B::Error>> {
+        self.borrow_port(port)?
+            .into_registers()
+            .dp_config()
+            .write_async(|r| *r = config)
+            .await
+    }
+
+    /// Modify DP config settings
+    pub async fn modify_dp_config(
+        &mut self,
+        port: PortId,
+        f: impl FnOnce(&mut registers::field_sets::DpConfig) -> registers::field_sets::DpConfig,
+    ) -> Result<registers::field_sets::DpConfig, Error<B::Error>> {
+        let port = self.borrow_port(port)?;
+        let mut registers = port.into_registers();
+        registers.dp_config().modify_async(|r| f(r)).await
+    }
+
     /// Get Tbt config
     pub async fn get_tbt_config(&mut self, port: PortId) -> Result<registers::field_sets::TbtConfig, Error<B::Error>> {
         self.borrow_port(port)?.into_registers().tbt_config().read_async().await
