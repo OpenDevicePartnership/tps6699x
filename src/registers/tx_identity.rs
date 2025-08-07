@@ -10,7 +10,7 @@ pub const ADDR: u8 = 0x47;
 /// The length of the `Tx Identity` register, in bytes.
 ///
 /// This exceeds the maximum supported length by the [`device_driver`] crate.
-pub const LEN: usize = 49;
+pub const LEN: usize = 25;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -130,7 +130,7 @@ impl From<TxIdentityProductTypeUfp> for u8 {
 }
 
 bitfield! {
-    /// Tx Identity register, bits 0-391
+    /// Tx Identity register, bits 0-199
     #[derive(Clone, Copy)]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     pub struct TxIdentityRaw([u8]);
