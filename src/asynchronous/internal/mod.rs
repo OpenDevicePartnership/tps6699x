@@ -610,14 +610,14 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn get_tx_identity(
         &mut self,
         port: PortId,
-    ) -> Result<crate::registers::tx_identity::TxIdentity, Error<B::Error>> {
-        let mut buf = [0u8; crate::registers::tx_identity::LEN];
+    ) -> Result<registers::tx_identity::TxIdentity, Error<B::Error>> {
+        let mut buf = [0u8; registers::tx_identity::LEN];
         self.borrow_port(port)?
             .into_registers()
             .interface()
             .read_register(
-                crate::registers::tx_identity::ADDR,
-                (crate::registers::tx_identity::LEN * 8) as u32,
+                registers::tx_identity::ADDR,
+                (registers::tx_identity::LEN * 8) as u32,
                 &mut buf,
             )
             .await?;
@@ -628,14 +628,14 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn set_tx_identity(
         &mut self,
         port: PortId,
-        value: crate::registers::tx_identity::TxIdentity,
+        value: registers::tx_identity::TxIdentity,
     ) -> Result<(), Error<B::Error>> {
         self.borrow_port(port)?
             .into_registers()
             .interface()
             .write_register(
-                crate::registers::tx_identity::ADDR,
-                (crate::registers::tx_identity::LEN * 8) as u32,
+                registers::tx_identity::ADDR,
+                (registers::tx_identity::LEN * 8) as u32,
                 value.as_bytes(),
             )
             .await
@@ -645,8 +645,8 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn modify_tx_identity(
         &mut self,
         port: PortId,
-        f: impl FnOnce(&mut crate::registers::tx_identity::TxIdentity) -> crate::registers::tx_identity::TxIdentity,
-    ) -> Result<crate::registers::tx_identity::TxIdentity, Error<B::Error>> {
+        f: impl FnOnce(&mut registers::tx_identity::TxIdentity) -> registers::tx_identity::TxIdentity,
+    ) -> Result<registers::tx_identity::TxIdentity, Error<B::Error>> {
         let mut reg = self.get_tx_identity(port).await?;
         reg = f(&mut reg);
         self.set_tx_identity(port, reg.clone()).await?;
