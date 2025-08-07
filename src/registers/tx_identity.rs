@@ -15,7 +15,7 @@ pub const LEN: usize = 25;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
-pub enum TxIdentityVdoCount {
+pub enum VdoCount {
     Nak = 0x0,
     Busy = 0x1,
     NotSupported = 0x2,
@@ -26,32 +26,32 @@ pub enum TxIdentityVdoCount {
     Reserved(u8),
 }
 
-impl From<u8> for TxIdentityVdoCount {
+impl From<u8> for VdoCount {
     fn from(value: u8) -> Self {
         match value & 0x7 {
-            0x0 => TxIdentityVdoCount::Nak,
-            0x1 => TxIdentityVdoCount::Busy,
-            0x2 => TxIdentityVdoCount::NotSupported,
-            0x3 => TxIdentityVdoCount::Ack3Vdos,
-            0x4 => TxIdentityVdoCount::Ack4Vdos,
-            0x5 => TxIdentityVdoCount::Ack5Vdos,
-            0x6 => TxIdentityVdoCount::Ack6Vdos,
-            x => TxIdentityVdoCount::Reserved(x),
+            0x0 => VdoCount::Nak,
+            0x1 => VdoCount::Busy,
+            0x2 => VdoCount::NotSupported,
+            0x3 => VdoCount::Ack3Vdos,
+            0x4 => VdoCount::Ack4Vdos,
+            0x5 => VdoCount::Ack5Vdos,
+            0x6 => VdoCount::Ack6Vdos,
+            x => VdoCount::Reserved(x),
         }
     }
 }
 
-impl From<TxIdentityVdoCount> for u8 {
-    fn from(value: TxIdentityVdoCount) -> Self {
+impl From<VdoCount> for u8 {
+    fn from(value: VdoCount) -> Self {
         match value {
-            TxIdentityVdoCount::Nak => 0x0,
-            TxIdentityVdoCount::Busy => 0x1,
-            TxIdentityVdoCount::NotSupported => 0x2,
-            TxIdentityVdoCount::Ack3Vdos => 0x3,
-            TxIdentityVdoCount::Ack4Vdos => 0x4,
-            TxIdentityVdoCount::Ack5Vdos => 0x5,
-            TxIdentityVdoCount::Ack6Vdos => 0x6,
-            TxIdentityVdoCount::Reserved(x) => x,
+            VdoCount::Nak => 0x0,
+            VdoCount::Busy => 0x1,
+            VdoCount::NotSupported => 0x2,
+            VdoCount::Ack3Vdos => 0x3,
+            VdoCount::Ack4Vdos => 0x4,
+            VdoCount::Ack5Vdos => 0x5,
+            VdoCount::Ack6Vdos => 0x6,
+            VdoCount::Reserved(x) => x,
         }
     }
 }
@@ -59,7 +59,7 @@ impl From<TxIdentityVdoCount> for u8 {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
-pub enum TxIdentityProductTypeDfp {
+pub enum ProductTypeDfp {
     UndefinedDfp = 0x0,
     PdUsbHub = 0x1,
     PdUsbHost = 0x2,
@@ -68,28 +68,28 @@ pub enum TxIdentityProductTypeDfp {
     Reserved(u8),
 }
 
-impl From<u8> for TxIdentityProductTypeDfp {
+impl From<u8> for ProductTypeDfp {
     fn from(value: u8) -> Self {
         match value & 0x7 {
-            0x0 => TxIdentityProductTypeDfp::UndefinedDfp,
-            0x1 => TxIdentityProductTypeDfp::PdUsbHub,
-            0x2 => TxIdentityProductTypeDfp::PdUsbHost,
-            0x3 => TxIdentityProductTypeDfp::PowerBrick,
-            0x4 => TxIdentityProductTypeDfp::Amc,
-            x => TxIdentityProductTypeDfp::Reserved(x),
+            0x0 => ProductTypeDfp::UndefinedDfp,
+            0x1 => ProductTypeDfp::PdUsbHub,
+            0x2 => ProductTypeDfp::PdUsbHost,
+            0x3 => ProductTypeDfp::PowerBrick,
+            0x4 => ProductTypeDfp::Amc,
+            x => ProductTypeDfp::Reserved(x),
         }
     }
 }
 
-impl From<TxIdentityProductTypeDfp> for u8 {
-    fn from(value: TxIdentityProductTypeDfp) -> Self {
+impl From<ProductTypeDfp> for u8 {
+    fn from(value: ProductTypeDfp) -> Self {
         match value {
-            TxIdentityProductTypeDfp::UndefinedDfp => 0x0,
-            TxIdentityProductTypeDfp::PdUsbHub => 0x1,
-            TxIdentityProductTypeDfp::PdUsbHost => 0x2,
-            TxIdentityProductTypeDfp::PowerBrick => 0x3,
-            TxIdentityProductTypeDfp::Amc => 0x4,
-            TxIdentityProductTypeDfp::Reserved(x) => x,
+            ProductTypeDfp::UndefinedDfp => 0x0,
+            ProductTypeDfp::PdUsbHub => 0x1,
+            ProductTypeDfp::PdUsbHost => 0x2,
+            ProductTypeDfp::PowerBrick => 0x3,
+            ProductTypeDfp::Amc => 0x4,
+            ProductTypeDfp::Reserved(x) => x,
         }
     }
 }
@@ -97,7 +97,7 @@ impl From<TxIdentityProductTypeDfp> for u8 {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
-pub enum TxIdentityProductTypeUfp {
+pub enum ProductTypeUfp {
     UndefinedUfp = 0x0,
     PdUsbHub = 0x1,
     PdUsbPeripheral = 0x2,
@@ -105,26 +105,26 @@ pub enum TxIdentityProductTypeUfp {
     Reserved(u8),
 }
 
-impl From<u8> for TxIdentityProductTypeUfp {
+impl From<u8> for ProductTypeUfp {
     fn from(value: u8) -> Self {
         match value & 0x7 {
-            0x0 => TxIdentityProductTypeUfp::UndefinedUfp,
-            0x1 => TxIdentityProductTypeUfp::PdUsbHub,
-            0x2 => TxIdentityProductTypeUfp::PdUsbPeripheral,
-            0x3 => TxIdentityProductTypeUfp::Psd,
-            x => TxIdentityProductTypeUfp::Reserved(x),
+            0x0 => ProductTypeUfp::UndefinedUfp,
+            0x1 => ProductTypeUfp::PdUsbHub,
+            0x2 => ProductTypeUfp::PdUsbPeripheral,
+            0x3 => ProductTypeUfp::Psd,
+            x => ProductTypeUfp::Reserved(x),
         }
     }
 }
 
-impl From<TxIdentityProductTypeUfp> for u8 {
-    fn from(value: TxIdentityProductTypeUfp) -> Self {
+impl From<ProductTypeUfp> for u8 {
+    fn from(value: ProductTypeUfp) -> Self {
         match value {
-            TxIdentityProductTypeUfp::UndefinedUfp => 0x0,
-            TxIdentityProductTypeUfp::PdUsbHub => 0x1,
-            TxIdentityProductTypeUfp::PdUsbPeripheral => 0x2,
-            TxIdentityProductTypeUfp::Psd => 0x3,
-            TxIdentityProductTypeUfp::Reserved(x) => x,
+            ProductTypeUfp::UndefinedUfp => 0x0,
+            ProductTypeUfp::PdUsbHub => 0x1,
+            ProductTypeUfp::PdUsbPeripheral => 0x2,
+            ProductTypeUfp::Psd => 0x3,
+            ProductTypeUfp::Reserved(x) => x,
         }
     }
 }
@@ -177,12 +177,12 @@ impl TxIdentity {
     }
 
     /// Get number of valid VDOs
-    pub fn number_valid_vdos(&self) -> TxIdentityVdoCount {
+    pub fn number_valid_vdos(&self) -> VdoCount {
         self.0.number_valid_vdos().into()
     }
 
     /// Set number of valid VDOs and return `self` to chain.
-    pub fn set_number_valid_vdos(&mut self, value: TxIdentityVdoCount) -> &mut Self {
+    pub fn set_number_valid_vdos(&mut self, value: VdoCount) -> &mut Self {
         self.0.set_number_valid_vdos(value.into());
         self
     }
@@ -199,12 +199,12 @@ impl TxIdentity {
     }
 
     /// Get product type DFP
-    pub fn product_type_dfp(&self) -> TxIdentityProductTypeDfp {
+    pub fn product_type_dfp(&self) -> ProductTypeDfp {
         self.0.product_type_dfp().into()
     }
 
     /// Set product type DFP and return `self` to chain.
-    pub fn set_product_type_dfp(&mut self, value: TxIdentityProductTypeDfp) -> &mut Self {
+    pub fn set_product_type_dfp(&mut self, value: ProductTypeDfp) -> &mut Self {
         self.0.set_product_type_dfp(value.into());
         self
     }
@@ -221,12 +221,12 @@ impl TxIdentity {
     }
 
     /// Get product type UFP
-    pub fn product_type_ufp(&self) -> TxIdentityProductTypeUfp {
+    pub fn product_type_ufp(&self) -> ProductTypeUfp {
         self.0.product_type_ufp().into()
     }
 
     /// Set product type UFP and return `self` to chain.
-    pub fn set_product_type_ufp(&mut self, value: TxIdentityProductTypeUfp) -> &mut Self {
+    pub fn set_product_type_ufp(&mut self, value: ProductTypeUfp) -> &mut Self {
         self.0.set_product_type_ufp(value.into());
         self
     }
