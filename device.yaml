@@ -1211,9 +1211,14 @@ DpConfig:
       end: 54
       description: Transport Signalling
     ReceptacleIndication:
-      base: bool
+      base: uint
       start: 54
-      description: Receptacle Indication. 0h = Dp interface presented on USB-C plug, 1h = Dp interface presented on USB-C receptacle
+      end: 55
+      description: Receptacle Indication.
+      conversion:
+        name: ReceptacleIndication
+        Plug: 0x0
+        Receptacle: 0x1
     Usb2SignallingNotUsed:
       base: bool
       start: 55
