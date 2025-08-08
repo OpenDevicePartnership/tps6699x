@@ -1220,9 +1220,14 @@ DpConfig:
         Plug: 0x0
         Receptacle: 0x1
     Usb2SignallingNotUsed:
-      base: bool
+      base: uint
       start: 55
-      description: USB2 signaling requirement on A6 - A7 or B6 - B7 (D+/D-) while in DP configuration. 0h = May be required, 1h = USB2 is not needed on A6-A7
+      end: 56
+      description: USB2 signaling requirement on A6 - A7 or B6 - B7 (D+/D-) while in DP configuration.
+      conversion:
+        name: Usb2SignalingNotUsed
+        MayBeRequired: 0x0
+        NotNeededOnA6A7: 0x1
     DpSourceDevicePinAssignmentsSupported:
       base: uint
       start: 56
