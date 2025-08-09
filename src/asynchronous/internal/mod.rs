@@ -442,6 +442,35 @@ impl<B: I2c> Tps6699x<B> {
         ))
     }
 
+    /// Get DP config
+    pub async fn get_dp_config(&mut self, port: PortId) -> Result<registers::field_sets::DpConfig, Error<B::Error>> {
+        self.borrow_port(port)?.into_registers().dp_config().read_async().await
+    }
+
+    /// Set DP config
+    pub async fn set_dp_config(
+        &mut self,
+        port: PortId,
+        config: registers::field_sets::DpConfig,
+    ) -> Result<(), Error<B::Error>> {
+        self.borrow_port(port)?
+            .into_registers()
+            .dp_config()
+            .write_async(|r| *r = config)
+            .await
+    }
+
+    /// Modify DP config settings
+    pub async fn modify_dp_config(
+        &mut self,
+        port: PortId,
+        f: impl FnOnce(&mut registers::field_sets::DpConfig) -> registers::field_sets::DpConfig,
+    ) -> Result<registers::field_sets::DpConfig, Error<B::Error>> {
+        let port = self.borrow_port(port)?;
+        let mut registers = port.into_registers();
+        registers.dp_config().modify_async(|r| f(r)).await
+    }
+
     /// Get Tbt config
     pub async fn get_tbt_config(&mut self, port: PortId) -> Result<registers::field_sets::TbtConfig, Error<B::Error>> {
         self.borrow_port(port)?.into_registers().tbt_config().read_async().await
@@ -575,6 +604,53 @@ impl<B: I2c> Tps6699x<B> {
         }
 
         Ok((num_sprs, num_eprs))
+    }
+
+    /// Get Tx Identity
+    pub async fn get_tx_identity(
+        &mut self,
+        port: PortId,
+    ) -> Result<registers::tx_identity::TxIdentity, Error<B::Error>> {
+        let mut buf = [0u8; registers::tx_identity::LEN];
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .read_register(
+                registers::tx_identity::ADDR,
+                (registers::tx_identity::LEN * 8) as u32,
+                &mut buf,
+            )
+            .await?;
+        Ok(buf.into())
+    }
+
+    /// Set Tx Identity
+    pub async fn set_tx_identity(
+        &mut self,
+        port: PortId,
+        value: registers::tx_identity::TxIdentity,
+    ) -> Result<(), Error<B::Error>> {
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .write_register(
+                registers::tx_identity::ADDR,
+                (registers::tx_identity::LEN * 8) as u32,
+                value.as_bytes(),
+            )
+            .await
+    }
+
+    /// Modify Tx Identity settings
+    pub async fn modify_tx_identity(
+        &mut self,
+        port: PortId,
+        f: impl FnOnce(&mut registers::tx_identity::TxIdentity) -> registers::tx_identity::TxIdentity,
+    ) -> Result<registers::tx_identity::TxIdentity, Error<B::Error>> {
+        let mut reg = self.get_tx_identity(port).await?;
+        reg = f(&mut reg);
+        self.set_tx_identity(port, reg.clone()).await?;
+        Ok(reg)
     }
 }
 

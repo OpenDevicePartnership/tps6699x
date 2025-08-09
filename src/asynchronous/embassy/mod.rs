@@ -614,6 +614,58 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
             epr: heapless::Vec::from_slice(&out_epr_pdos[..num_valid_epr]).unwrap(),
         })
     }
+
+    /// Get Tx Identity
+    pub async fn get_tx_identity(
+        &mut self,
+        port: PortId,
+    ) -> Result<registers::tx_identity::TxIdentity, Error<B::Error>> {
+        self.lock_inner().await.get_tx_identity(port).await
+    }
+
+    /// Set Tx Identity
+    pub async fn set_tx_identity(
+        &mut self,
+        port: PortId,
+        value: registers::tx_identity::TxIdentity,
+    ) -> Result<(), Error<B::Error>> {
+        self.lock_inner().await.set_tx_identity(port, value).await
+    }
+
+    /// Modify the Tx Identity register (`0x47`).
+    pub async fn modify_tx_identity(
+        &mut self,
+        port: PortId,
+        f: impl FnOnce(&mut registers::tx_identity::TxIdentity) -> registers::tx_identity::TxIdentity,
+    ) -> Result<registers::tx_identity::TxIdentity, Error<B::Error>> {
+        self.lock_inner().await.modify_tx_identity(port, f).await
+    }
+
+    /// Get DP config
+    pub async fn get_dp_config(&mut self, port: PortId) -> Result<registers::field_sets::DpConfig, Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.get_dp_config(port).await
+    }
+
+    /// Set DP config
+    pub async fn set_dp_config(
+        &mut self,
+        port: PortId,
+        config: registers::field_sets::DpConfig,
+    ) -> Result<(), Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.set_dp_config(port, config).await
+    }
+
+    /// Modify DP config settings
+    pub async fn modify_dp_config(
+        &mut self,
+        port: PortId,
+        f: impl FnOnce(&mut registers::field_sets::DpConfig) -> registers::field_sets::DpConfig,
+    ) -> Result<registers::field_sets::DpConfig, Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.modify_dp_config(port, f).await
+    }
 }
 
 impl<'a, M: RawMutex, B: I2c> interrupt::InterruptController for Tps6699x<'a, M, B> {
