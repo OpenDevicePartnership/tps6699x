@@ -137,29 +137,29 @@ bitfield! {
     impl Debug;
 
     /// Number of valid VDOs in this register
-    pub u8, number_valid_vdos, set_number_valid_vdos: 3, 0;
+    pub u8, number_valid_vdos, set_number_valid_vdos: 2, 0;
     /// Vendor ID as defined in USB PD specification
-    pub u16, vendor_id, set_vendor_id: 24, 8;
+    pub u16, vendor_id, set_vendor_id: 23, 8;
     /// Product Type DFP as defined in USB PD specification
-    pub u8, product_type_dfp, set_product_type_dfp: 34, 31;
+    pub u8, product_type_dfp, set_product_type_dfp: 33, 31;
     /// Assert this bit if Alternate Modes are supported
     pub bool, modal_operation_supported, set_modal_operation_supported: 34;
     /// Product Type UFP as defined in USB PD specification
-    pub u8, product_type_ufp, set_product_type_ufp: 38, 35;
+    pub u8, product_type_ufp, set_product_type_ufp: 37, 35;
     /// Assert if USB communications capable as a device
     pub bool, usb_communication_capable_as_device, set_usb_communication_capable_as_device: 38;
     /// Assert if USB communications capable as a host
     pub bool, usb_communication_capable_as_host, set_usb_communication_capable_as_host: 39;
     /// 32-bit XID assigned by USB-IF
-    pub u32, certification_test_id, set_certification_test_id: 72, 40;
+    pub u32, certification_test_id, set_certification_test_id: 71, 40;
     /// FW version for the PD controller (read-only)
-    pub u16, bcd_device, set_bcd_device: 88, 72;
+    pub u16, bcd_device, set_bcd_device: 87, 72;
     /// Product ID used to populate PID in other registers
-    pub u16, usb_product_id, set_usb_product_id: 104, 88;
+    pub u16, usb_product_id, set_usb_product_id: 103, 88;
     /// UFP1 VDO
-    pub u32, ufp1_vdo, set_ufp1_vdo: 136, 104;
+    pub u32, ufp1_vdo, set_ufp1_vdo: 135, 104;
     /// DFP1 VDO
-    pub u32, dfp1_vdo, set_dfp1_vdo: 200, 168;
+    pub u32, dfp1_vdo, set_dfp1_vdo: 199, 168;
 }
 
 /// High-level wrapper around [`TxIdentityRaw`].
@@ -169,7 +169,33 @@ pub struct TxIdentity(TxIdentityRaw<[u8; LEN]>);
 
 impl TxIdentity {
     /// The default bytes for the Tx Identity register.
-    const DEFAULT: [u8; LEN] = [0u8; LEN];
+    const DEFAULT: [u8; LEN] = [
+        0x06, // Byte 0: Number Valid VDOs = 6
+        0x51, // Byte 1: Vendor ID lower byte (0x451 & 0xFF)
+        0x04, // Byte 2: Vendor ID upper byte (0x451 >> 8)
+        0x00, // Byte 3: Reserved
+        0xD5, // Byte 4: USB comm host(1) + USB comm device(1) + UFP type(010) + Modal op(1) + DFP type(010)
+        0x51, // Byte 5: Certification Test ID byte 0 (0x451 & 0xFF)
+        0x04, // Byte 6: Certification Test ID byte 1 (0x451 >> 8)
+        0x00, // Byte 7: Certification Test ID byte 2
+        0x00, // Byte 8: Certification Test ID byte 3
+        0x00, // Byte 9: BCD Device lower byte
+        0x00, // Byte 10: BCD Device upper byte
+        0x00, // Byte 11: USB Product ID lower byte
+        0x00, // Byte 12: USB Product ID upper byte
+        0x00, // Byte 13: UFP1 VDO byte 0
+        0x00, // Byte 14: UFP1 VDO byte 1
+        0x00, // Byte 15: UFP1 VDO byte 2
+        0x00, // Byte 16: UFP1 VDO byte 3
+        0x00, // Byte 17: Reserved byte 0
+        0x00, // Byte 18: Reserved byte 1
+        0x00, // Byte 19: Reserved byte 2
+        0x00, // Byte 20: Reserved byte 3
+        0x00, // Byte 21: DFP1 VDO byte 0
+        0x00, // Byte 22: DFP1 VDO byte 1
+        0x00, // Byte 23: DFP1 VDO byte 2
+        0x00, // Byte 24: DFP1 VDO byte 3
+    ];
 
     /// Get the raw byte representation of the Tx Identity register.
     pub fn as_bytes(&self) -> &[u8; LEN] {
@@ -324,5 +350,81 @@ impl From<TxIdentity> for [u8; LEN] {
 impl Default for TxIdentity {
     fn default() -> Self {
         Self::DEFAULT.into()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_default_values() {
+        let default_register = TxIdentity::default();
+
+        // Test Number Valid VDOs (bits 2-0) = 6h
+        assert_eq!(default_register.number_valid_vdos(), VdoCount::Ack6Vdos);
+
+        // Test Vendor ID (bits 23-8) = 451h
+        assert_eq!(default_register.vendor_id(), 0x451);
+
+        // Test Product Type DFP (bits 33-31) = 2h
+        assert_eq!(default_register.product_type_dfp(), ProductTypeDfp::PdUsbHost);
+
+        // Test Modal Operation Supported (bit 34) = 1h
+        assert_eq!(default_register.modal_operation_supported(), true);
+
+        // Test Product Type UFP (bits 37-35) = 2h
+        assert_eq!(default_register.product_type_ufp(), ProductTypeUfp::PdUsbPeripheral);
+
+        // Test USB Communication Capable as Device (bit 38) = 1h
+        assert_eq!(default_register.usb_communication_capable_as_device(), true);
+
+        // Test USB Communication Capable as Host (bit 39) = 1h
+        assert_eq!(default_register.usb_communication_capable_as_host(), true);
+
+        // Test Certification Test ID (bits 71-40) = 451h
+        assert_eq!(default_register.certification_test_id(), 0x451);
+
+        // Test BCD Device (bits 87-72) = 0h
+        assert_eq!(default_register.bcd_device(), 0x0);
+
+        // Test USB Product ID (bits 103-88) = 0h
+        assert_eq!(default_register.usb_product_id(), 0x0);
+
+        // Test UFP1 VDO (bits 135-104) = 0h
+        assert_eq!(default_register.ufp1_vdo(), 0x0);
+
+        // Test DFP1 VDO (bits 199-168) = 0h
+        assert_eq!(default_register.dfp1_vdo(), 0x0);
+    }
+
+    #[test]
+    fn test_raw_construction_matches_default() {
+        // Create a raw register with all zeros
+        let mut raw = TxIdentityRaw([0u8; LEN]);
+
+        // Set all fields to their default values individually
+        raw.set_number_valid_vdos(6); // VdoCount::Ack6Vdos = 6
+        raw.set_vendor_id(0x451); // TI vendor ID
+        raw.set_product_type_dfp(2); // ProductTypeDfp::PdUsbHost = 2
+        raw.set_modal_operation_supported(true); // Modal operation supported
+        raw.set_product_type_ufp(2); // ProductTypeUfp::PdUsbPeripheral = 2
+        raw.set_usb_communication_capable_as_device(true); // USB comm capable as device
+        raw.set_usb_communication_capable_as_host(true); // USB comm capable as host
+        raw.set_certification_test_id(0x451); // Certification test ID
+        raw.set_bcd_device(0x0); // BCD device version
+        raw.set_usb_product_id(0x0); // USB product ID
+        raw.set_ufp1_vdo(0x0); // UFP1 VDO
+        raw.set_dfp1_vdo(0x0); // DFP1 VDO
+
+        // Convert to TxIdentity
+        let tx_identity = TxIdentity(raw);
+
+        // Verify the raw bytes match the DEFAULT constant
+        assert_eq!(tx_identity.as_bytes(), &TxIdentity::DEFAULT);
+
+        // Also verify it matches a default-constructed TxIdentity
+        let default_tx_identity = TxIdentity::default();
+        assert_eq!(tx_identity.as_bytes(), default_tx_identity.as_bytes());
     }
 }
