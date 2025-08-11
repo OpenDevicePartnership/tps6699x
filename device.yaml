@@ -1123,7 +1123,7 @@ DpConfig:
   address: 0x51
   access: RW
   size_bits: 80
-  reset_value: 0x0000800000011C03
+  reset_value: 0x000000010100001C0603
   description: Display Port Configuration
   fields:
     EnableDpSvid:
