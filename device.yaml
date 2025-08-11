@@ -1134,16 +1134,6 @@ DpConfig:
       base: bool
       start: 1
       description: Assert this bit to enable DisplayPort Alternate mode.
-    DpTransportSignalling:
-      base: uint
-      start: 10
-      end: 14
-      description: Signaling for transport of DisplayPort protocol.
-      conversion:
-        name: DpTransportSignalling
-        Usb: 0x0
-        Dp: 0x1
-        Reserved: catch_all
     DpPortCapability:
       base: uint
       start: 8
@@ -1155,6 +1145,16 @@ DpConfig:
         UfpD: 0x1
         DfpD: 0x2
         Reserved2: 0x3
+    DpTransportSignalling:
+      base: uint
+      start: 10
+      end: 14
+      description: Signaling for transport of DisplayPort protocol.
+      conversion:
+        name: DpTransportSignalling
+        Usb: 0x0
+        Dp: 0x1
+        Reserved: catch_all
     DfpdPinAssignment:
       base: uint
       start: 16
