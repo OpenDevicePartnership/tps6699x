@@ -1,6 +1,15 @@
 //! Tx Identity register (`0x47`).
 //!
 //! This register's size exceeds the maximum supported length by the [`device_driver`] crate.
+//!
+//! Data to use for Discover Identity ACK. This data is sent in the response to Discover Identity
+//! REQ message. Initialized by Application Customization. The PD controller is not designed to
+//! transmit Product Type VDO as part of this ACK message, that is only required for Alternate
+//! Mode Adaptors (AMA), VCONN Powered Devices (VPD), and cables.
+//!
+//! Writes to this register have no immediate effect. PD Controller will update and use the
+//! contents of this register each time a Discover Identity SVDM is received before generating
+//! the Discover Identity SVDM ACK message.
 
 use bitfield::bitfield;
 
@@ -12,17 +21,29 @@ pub const ADDR: u8 = 0x47;
 /// This exceeds the maximum supported length by the [`device_driver`] crate.
 pub const LEN: usize = 25;
 
+/// Number of valid VDOs in the Tx Identity register (bits 2-0).
+///
+/// This field causes special behavior in the PD Controller's response to USB PD Discover Identity messages.
+/// Maximum of 6 VDOs supported, value 7 is reserved.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub enum VdoCount {
+    /// PD Controller will NAK USB PD Discover Identity message
     Nak = 0x0,
+    /// PD Controller will respond with BUSY message
     Busy = 0x1,
+    /// PD Controller will respond with Not_Supported (PD3) or no response (PD2)
     NotSupported = 0x2,
+    /// PD Controller will respond with an ACK message containing 3 VDOs
     Ack3Vdos = 0x3,
+    /// PD Controller will respond with an ACK message containing 4 VDOs
     Ack4Vdos = 0x4,
+    /// PD Controller will respond with an ACK message containing 5 VDOs
     Ack5Vdos = 0x5,
+    /// PD Controller will respond with an ACK message containing 6 VDOs
     Ack6Vdos = 0x6,
+    /// Reserved value (should not be used)
     Reserved(u8),
 }
 
@@ -56,15 +77,22 @@ impl From<VdoCount> for u8 {
     }
 }
 
+/// Product Type for Downstream Facing Port (DFP) as defined in USB PD specification (bits 33-31).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub enum ProductTypeDfp {
+    /// Undefined DFP product type
     UndefinedDfp = 0x0,
+    /// PD USB Hub
     PdUsbHub = 0x1,
+    /// PD USB Host
     PdUsbHost = 0x2,
+    /// Power Brick
     PowerBrick = 0x3,
+    /// Alternate Mode Controller (AMC)
     Amc = 0x4,
+    /// Reserved value
     Reserved(u8),
 }
 
@@ -94,14 +122,20 @@ impl From<ProductTypeDfp> for u8 {
     }
 }
 
+/// Product Type for Upstream Facing Port (UFP) as defined in USB PD specification (bits 37-35).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub enum ProductTypeUfp {
+    /// Undefined UFP product type
     UndefinedUfp = 0x0,
+    /// PD USB Hub
     PdUsbHub = 0x1,
+    /// PD USB Peripheral
     PdUsbPeripheral = 0x2,
+    /// Passive Cable (PSD - Passive SuperSpeed Device)
     Psd = 0x3,
+    /// Reserved value
     Reserved(u8),
 }
 
@@ -136,29 +170,32 @@ bitfield! {
     pub struct TxIdentityRaw([u8]);
     impl Debug;
 
-    /// Number of valid VDOs in this register
+    /// Number of valid VDOs in this register (bits 2-0)
     pub u8, number_valid_vdos, set_number_valid_vdos: 2, 0;
-    /// Vendor ID as defined in USB PD specification
+    /// Vendor ID as defined in USB PD specification (bits 23-8).
+    /// This value is also used to populate VID in TX_MIDB_SOP, TX_SCEDB, and TX_SKEDB registers.
     pub u16, vendor_id, set_vendor_id: 23, 8;
-    /// Product Type DFP as defined in USB PD specification
+    /// Product Type DFP as defined in USB PD specification (bits 33-31)
     pub u8, product_type_dfp, set_product_type_dfp: 33, 31;
-    /// Assert this bit if Alternate Modes are supported
+    /// Assert this bit if Alternate Modes are supported (bit 34)
     pub bool, modal_operation_supported, set_modal_operation_supported: 34;
-    /// Product Type UFP as defined in USB PD specification
+    /// Product Type UFP as defined in USB PD specification (bits 37-35)
     pub u8, product_type_ufp, set_product_type_ufp: 37, 35;
-    /// Assert if USB communications capable as a device
+    /// Assert if USB communications capable as a device (bit 38)
     pub bool, usb_communication_capable_as_device, set_usb_communication_capable_as_device: 38;
-    /// Assert if USB communications capable as a host
+    /// Assert if USB communications capable as a host (bit 39)
     pub bool, usb_communication_capable_as_host, set_usb_communication_capable_as_host: 39;
-    /// 32-bit XID assigned by USB-IF
+    /// 32-bit XID assigned by USB-IF (bits 71-40).
+    /// This value is also used to populate XID in TX_SCEDB and TX_SKEDB registers.
     pub u32, certification_test_id, set_certification_test_id: 71, 40;
-    /// FW version for the PD controller (read-only)
+    /// FW version for the PD controller (read-only) (bits 87-72)
     pub u16, bcd_device, set_bcd_device: 87, 72;
-    /// Product ID used to populate PID in other registers
+    /// Product ID used to populate PID in other registers (bits 103-88).
+    /// This value is also used to populate PID in TX_MIDB_SOP, TX_SCEDB, and TX_SKEDB registers.
     pub u16, usb_product_id, set_usb_product_id: 103, 88;
-    /// UFP1 VDO
+    /// UFP1 VDO (bits 135-104)
     pub u32, ufp1_vdo, set_ufp1_vdo: 135, 104;
-    /// DFP1 VDO
+    /// DFP1 VDO (bits 199-168)
     pub u32, dfp1_vdo, set_dfp1_vdo: 199, 168;
 }
 
