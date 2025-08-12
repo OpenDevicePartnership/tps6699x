@@ -1,4 +1,5 @@
 //! This module contains a high-level API uses embassy synchronization types
+use core::array::from_fn;
 use core::iter::zip;
 use core::sync::atomic::AtomicBool;
 
@@ -10,17 +11,20 @@ use embassy_time::{with_timeout, Duration};
 use embedded_hal::digital::InputPin;
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::i2c::I2c;
-use embedded_usb_pd::ado::Ado;
+use embedded_usb_pd::ado::{self, Ado};
 use embedded_usb_pd::pdinfo::AltMode;
-use embedded_usb_pd::{Error, PdError, PortId};
+use embedded_usb_pd::{pdo, Error, PdError, PortId};
+use itertools::izip;
 
 use super::interrupt::{self, InterruptController};
 use crate::asynchronous::internal;
 use crate::command::{muxr, trig, Command, ReturnValue, SrdySwitch};
+use crate::registers::autonegotiate_sink::AutoComputeSinkMaxVoltage;
 use crate::registers::field_sets::IntEventBus1;
-use crate::{error, registers, trace, Mode, MAX_SUPPORTED_PORTS};
+use crate::{error, registers, trace, warn, DeviceError, Mode, MAX_SUPPORTED_PORTS};
 
 pub mod fw_update;
+pub mod rx_src_caps;
 pub mod task;
 
 pub mod controller {
@@ -93,7 +97,7 @@ pub struct Tps6699x<'a, M: RawMutex, B: I2c> {
 
 impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     /// Locks the inner device
-    async fn lock_inner(&mut self) -> MutexGuard<'_, M, internal::Tps6699x<B>> {
+    pub async fn lock_inner(&mut self) -> MutexGuard<'_, M, internal::Tps6699x<B>> {
         self.controller.inner.lock().await
     }
 
@@ -150,6 +154,17 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         value: registers::autonegotiate_sink::AutonegotiateSink,
     ) -> Result<(), Error<B::Error>> {
         self.lock_inner().await.set_autonegotiate_sink(port, value).await
+    }
+
+    /// Modify the Autonegotiate Sink register (`0x37`).
+    pub async fn modify_autonegotiate_sink(
+        &mut self,
+        port: PortId,
+        f: impl FnOnce(
+            &mut registers::autonegotiate_sink::AutonegotiateSink,
+        ) -> registers::autonegotiate_sink::AutonegotiateSink,
+    ) -> Result<registers::autonegotiate_sink::AutonegotiateSink, Error<B::Error>> {
+        self.lock_inner().await.modify_autonegotiate_sink(port, f).await
     }
 
     /// Wrapper for `get_mode`
@@ -220,22 +235,44 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         self.controller.num_ports
     }
 
-    /// Wait for an interrupt to occur that satisfies the given predicate
-    pub async fn wait_interrupt(
+    /// Wait for an interrupt to occur that matches any bits in the given mask.
+    pub async fn wait_interrupt_any(
         &mut self,
         clear_current: bool,
-        f: impl Fn(PortId, IntEventBus1) -> bool,
+        mask: [IntEventBus1; MAX_SUPPORTED_PORTS],
     ) -> [IntEventBus1; MAX_SUPPORTED_PORTS] {
+        // No interrupts set, return immediately because there is nothing to wait for
+        // Also log a warning because this likely isn't what the user intended
+        if mask == [IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS] {
+            warn!("Interrupt masks are empty, returning immediately");
+            return [IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS];
+        }
+
         if clear_current {
             self.controller.interrupt_waker.reset();
         }
 
+        let mut accumulated_flags = [IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS];
         loop {
+            let mut done = false;
             let flags = self.controller.interrupt_waker.wait().await;
-            for (port, flag) in flags.iter().enumerate() {
-                if f(PortId(port as u8), *flag) {
-                    return flags;
+            for (&flags, &mask, accumulated) in izip!(flags.iter(), mask.iter(), accumulated_flags.iter_mut(),) {
+                *accumulated |= flags;
+                let consumed_flags = flags & mask;
+                if consumed_flags != IntEventBus1::new_zero() {
+                    done = true;
                 }
+            }
+
+            if done {
+                // Put back any unhandled interrupt flags for future processing
+                let unhandled = from_fn(|i| accumulated_flags[i] & !mask[i]);
+                if unhandled.iter().any(|&f| f != IntEventBus1::new_zero()) {
+                    // If there are unhandled flags, signal them for future processing
+                    trace!("Signaling unhandled interrupt flags: {:?}", unhandled);
+                    self.controller.interrupt_waker.signal(unhandled);
+                }
+                return from_fn(|i| accumulated_flags[i] & mask[i]);
             }
         }
     }
@@ -253,7 +290,20 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
             inner.send_command(port, cmd, indata).await?;
         }
 
-        self.wait_interrupt(false, |p, flags| p == port && flags.cmd_1_completed())
+        let mut cmd_complete = IntEventBus1::new_zero();
+        cmd_complete.set_cmd_1_completed(true);
+
+        let _flags = self
+            .wait_interrupt_any(
+                false,
+                from_fn(|i| {
+                    if i == port.0 as usize {
+                        cmd_complete
+                    } else {
+                        IntEventBus1::new_zero()
+                    }
+                }),
+            )
             .await;
         {
             let mut inner = self.lock_inner().await;
@@ -316,11 +366,11 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
 
     /// Trigger an `ANeg` command to autonegotiate the sink contract.
     pub async fn autonegotiate_sink(&mut self, port: PortId) -> Result<(), Error<B::Error>> {
-        self.execute_command(port, Command::Aneg, None, None)
-            .await?
-            .success_or(PdError::Failed)?;
-
-        Ok(())
+        match self.execute_command(port, Command::Aneg, None, None).await? {
+            ReturnValue::Success => Ok(()),
+            ReturnValue::Rejected => PdError::Rejected.into(),
+            _ => PdError::Failed.into(),
+        }
     }
 
     /// Trigger virtual gpios
@@ -406,6 +456,11 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         Ok(())
     }
 
+    /// Execute the [`Command::Dbfg`] command.
+    pub async fn execute_dbfg(&mut self, port: PortId) -> Result<ReturnValue, Error<B::Error>> {
+        self.execute_command(port, Command::Dbfg, None, None).await
+    }
+
     /// Execute the [`Command::Muxr`] command.
     pub async fn execute_muxr(&mut self, port: PortId, input: muxr::Input) -> Result<ReturnValue, Error<B::Error>> {
         let indata = input.0.to_le_bytes();
@@ -487,15 +542,15 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     }
 
     /// Get Rx ADO
-    pub async fn get_rx_ado(&mut self, port: PortId) -> Result<Option<Ado>, Error<B::Error>> {
+    pub async fn get_rx_ado(&mut self, port: PortId) -> Result<Option<Ado>, DeviceError<B::Error, ado::InvalidType>> {
         let mut inner = self.lock_inner().await;
-        let ado_raw = inner.get_rx_ado(port).await?;
+        let ado_raw = inner.get_rx_ado(port).await.map_err(DeviceError::from)?;
 
         if ado_raw == registers::field_sets::RxAdo::new_zero() {
             // No ADO available
             Ok(None)
         } else {
-            Ok(Some(ado_raw.ado().try_into().map_err(Error::Pd)?))
+            Ok(Some(ado_raw.ado().try_into().map_err(DeviceError::Other)?))
         }
     }
 
@@ -512,6 +567,104 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     ) -> Result<registers::rx_other_vdm::RxOtherVdm, Error<B::Error>> {
         let mut inner = self.lock_inner().await;
         inner.get_rx_other_vdm(port).await
+    }
+
+    /// Set autonegotiate sink max voltage. This may trigger a renegotiation
+    pub async fn set_autonegotiate_sink_max_voltage(
+        &mut self,
+        port: PortId,
+        voltage_mv: Option<u16>,
+    ) -> Result<(), Error<B::Error>> {
+        self.modify_autonegotiate_sink(port, |settings| {
+            if let Some(voltage) = voltage_mv {
+                settings.set_auto_compute_sink_max_voltage(AutoComputeSinkMaxVoltage::ProvidedByHost);
+                settings.set_auto_neg_max_voltage(voltage);
+            } else {
+                // Auto neg max voltage is ignored if this value is set
+                settings.set_auto_compute_sink_max_voltage(AutoComputeSinkMaxVoltage::ComputedByPdController);
+            }
+
+            settings.clone()
+        })
+        .await?;
+
+        // Trigger autonegotiate sink to apply the new max voltage
+        // This will result in a rejection if the port is not a sink, but this is expected
+        match self.autonegotiate_sink(port).await {
+            Err(Error::Pd(PdError::Rejected)) => Ok(()),
+            rest => rest,
+        }
+    }
+
+    /// Get Rx Source Caps
+    ///
+    /// Returns (num_standard_pdos, num_epr_pdos).
+    pub async fn get_rx_src_caps(&mut self, port: PortId) -> Result<rx_src_caps::RxSrcCaps, Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        let mut out_spr_pdos = [pdo::source::Pdo::default(); crate::registers::rx_src_caps::NUM_SPR_PDOS];
+        let mut out_epr_pdos = [pdo::source::Pdo::default(); crate::registers::rx_src_caps::NUM_EPR_PDOS];
+
+        let (num_valid_spr, num_valid_epr) = inner
+            .get_rx_src_caps(port, &mut out_spr_pdos, &mut out_epr_pdos)
+            .await?;
+
+        // These unwraps are safe because we know the sizes of the arrays
+        Ok(rx_src_caps::RxSrcCaps {
+            spr: heapless::Vec::from_slice(&out_spr_pdos[..num_valid_spr]).unwrap(),
+            epr: heapless::Vec::from_slice(&out_epr_pdos[..num_valid_epr]).unwrap(),
+        })
+    }
+
+    /// Get Tx Identity
+    pub async fn get_tx_identity(
+        &mut self,
+        port: PortId,
+    ) -> Result<registers::tx_identity::TxIdentity, Error<B::Error>> {
+        self.lock_inner().await.get_tx_identity(port).await
+    }
+
+    /// Set Tx Identity
+    pub async fn set_tx_identity(
+        &mut self,
+        port: PortId,
+        value: registers::tx_identity::TxIdentity,
+    ) -> Result<(), Error<B::Error>> {
+        self.lock_inner().await.set_tx_identity(port, value).await
+    }
+
+    /// Modify the Tx Identity register (`0x47`).
+    pub async fn modify_tx_identity(
+        &mut self,
+        port: PortId,
+        f: impl FnOnce(&mut registers::tx_identity::TxIdentity) -> registers::tx_identity::TxIdentity,
+    ) -> Result<registers::tx_identity::TxIdentity, Error<B::Error>> {
+        self.lock_inner().await.modify_tx_identity(port, f).await
+    }
+
+    /// Get DP config
+    pub async fn get_dp_config(&mut self, port: PortId) -> Result<registers::field_sets::DpConfig, Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.get_dp_config(port).await
+    }
+
+    /// Set DP config
+    pub async fn set_dp_config(
+        &mut self,
+        port: PortId,
+        config: registers::field_sets::DpConfig,
+    ) -> Result<(), Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.set_dp_config(port, config).await
+    }
+
+    /// Modify DP config settings
+    pub async fn modify_dp_config(
+        &mut self,
+        port: PortId,
+        f: impl FnOnce(&mut registers::field_sets::DpConfig) -> registers::field_sets::DpConfig,
+    ) -> Result<registers::field_sets::DpConfig, Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.modify_dp_config(port, f).await
     }
 }
 
@@ -608,3 +761,120 @@ impl<M: RawMutex, B: I2c> Drop for InterruptGuard<'_, M, B> {
 }
 
 impl<M: RawMutex, B: I2c> interrupt::InterruptGuard for InterruptGuard<'_, M, B> {}
+
+#[cfg(test)]
+mod test {
+    use embassy_sync::blocking_mutex::raw::NoopRawMutex;
+    use embedded_hal_mock::eh1::i2c::Mock;
+    use static_cell::StaticCell;
+
+    use super::*;
+    use crate::ADDR0;
+
+    /// Tests `wait_interrupt_any` with a mask for both ports.
+    #[tokio::test]
+    async fn test_wait_interrupt_any_both() {
+        static CONTROLLER: StaticCell<controller::Controller<NoopRawMutex, Mock>> = StaticCell::new();
+        let controller = CONTROLLER.init(controller::Controller::new_tps66994(Mock::new(&[]), ADDR0).unwrap());
+        let (mut pd, _interrupt) = controller.make_parts();
+
+        let mut port0 = IntEventBus1::new_zero();
+        port0.set_new_consumer_contract(true);
+        port0.set_sink_ready(true);
+        port0.set_cmd_1_completed(true);
+
+        let mut port1 = IntEventBus1::new_zero();
+        port1.set_plug_event(true);
+        port1.set_alert_message_received(true);
+
+        pd.controller.interrupt_waker.signal([port0, port1]);
+
+        let mut mask0 = IntEventBus1::new_zero();
+        mask0.set_cmd_1_completed(true);
+
+        let mut mask1 = IntEventBus1::new_zero();
+        mask1.set_plug_event(true);
+        mask1.set_alert_message_received(true);
+
+        let flags = pd.wait_interrupt_any(false, [mask0, mask1]).await;
+        assert_eq!(flags, [mask0, mask1]);
+
+        let mut unhandled0 = IntEventBus1::new_zero();
+        unhandled0.set_new_consumer_contract(true);
+        unhandled0.set_sink_ready(true);
+
+        let unhandled1 = IntEventBus1::new_zero();
+
+        // Should already be signaled
+        assert_eq!(
+            pd.controller.interrupt_waker.try_take().unwrap(),
+            [unhandled0, unhandled1]
+        );
+    }
+
+    /// Tests `wait_interrupt` with a mask for a single port.
+    #[tokio::test]
+    async fn test_wait_interrupt_any_single() {
+        static CONTROLLER: StaticCell<controller::Controller<NoopRawMutex, Mock>> = StaticCell::new();
+        let controller = CONTROLLER.init(controller::Controller::new_tps66994(Mock::new(&[]), ADDR0).unwrap());
+        let (mut pd, _interrupt) = controller.make_parts();
+
+        let mut port0 = IntEventBus1::new_zero();
+        port0.set_new_consumer_contract(true);
+        port0.set_sink_ready(true);
+        port0.set_cmd_1_completed(true);
+
+        let mut port1 = IntEventBus1::new_zero();
+        port1.set_plug_event(true);
+        port1.set_alert_message_received(true);
+
+        pd.controller.interrupt_waker.signal([port0, port1]);
+
+        let mut mask0 = IntEventBus1::new_zero();
+        mask0.set_cmd_1_completed(true);
+
+        let mask1 = IntEventBus1::new_zero();
+
+        let flags = pd.wait_interrupt_any(false, [mask0, mask1]).await;
+        assert_eq!(flags, [mask0, mask1]);
+
+        let mut unhandled0 = IntEventBus1::new_zero();
+        unhandled0.set_new_consumer_contract(true);
+        unhandled0.set_sink_ready(true);
+
+        let unhandled1 = port1;
+
+        // Should already be signaled
+        assert_eq!(
+            pd.controller.interrupt_waker.try_take().unwrap(),
+            [unhandled0, unhandled1]
+        );
+    }
+
+    /// Tests `wait_interrupt` with both masks set to zero.
+    #[tokio::test]
+    async fn test_wait_interrupt_any_zero_masks() {
+        static CONTROLLER: StaticCell<controller::Controller<NoopRawMutex, Mock>> = StaticCell::new();
+        let controller = CONTROLLER.init(controller::Controller::new_tps66994(Mock::new(&[]), ADDR0).unwrap());
+        let (mut pd, _interrupt) = controller.make_parts();
+
+        let mut port0 = IntEventBus1::new_zero();
+        port0.set_new_consumer_contract(true);
+        port0.set_sink_ready(true);
+        port0.set_cmd_1_completed(true);
+
+        let mut port1 = IntEventBus1::new_zero();
+        port1.set_plug_event(true);
+        port1.set_alert_message_received(true);
+
+        pd.controller.interrupt_waker.signal([port0, port1]);
+
+        let mask0 = IntEventBus1::new_zero();
+        let mask1 = IntEventBus1::new_zero();
+        let flags = pd.wait_interrupt_any(false, [mask0, mask1]).await;
+        assert_eq!(flags, [mask0, mask1]);
+
+        // Should already be signaled with nothing changed
+        assert_eq!(pd.controller.interrupt_waker.try_take().unwrap(), [port0, port1]);
+    }
+}

@@ -17,7 +17,7 @@ use mimxrt600_fcb::FlexSPIFlashConfigurationBlock;
 use static_cell::StaticCell;
 use tps6699x::asynchronous::embassy as pd_controller;
 use tps6699x::registers::field_sets::IntEventBus1;
-use tps6699x::ADDR0;
+use tps6699x::{ADDR0, MAX_SUPPORTED_PORTS};
 use {defmt_rtt as _, panic_probe as _};
 
 bind_interrupts!(struct Irqs {
@@ -54,7 +54,11 @@ async fn main(spawner: Spawner) {
     spawner.must_spawn(interrupt_task(int_in, interrupt));
 
     loop {
-        let flags = pd.wait_interrupt(false, |_, flags| flags.plug_event()).await;
+        let mut plug_event_mask = IntEventBus1::new_zero();
+        plug_event_mask.set_plug_event(true);
+        let flags = pd
+            .wait_interrupt_any(false, [plug_event_mask; MAX_SUPPORTED_PORTS])
+            .await;
 
         for (i, flag) in flags.iter().enumerate().take(pd.num_ports()) {
             if *flag == IntEventBus1::new_zero() {

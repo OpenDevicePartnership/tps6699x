@@ -1,4 +1,12 @@
 
 # cargo-vet audits file
 
-[audits]
+[[audits.portable-atomic]]
+who = "Robert Zieba <robertzieba@microsoft.com>"
+criteria = "safe-to-run"
+version = "1.11.1"
+
+[[audits.static_cell]]
+who = "Robert Zieba <robertzieba@microsoft.com>"
+criteria = "safe-to-run"
+version = "2.1.1"

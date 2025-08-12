@@ -58,11 +58,20 @@ pub enum Command {
     /// None.
     ///
     /// # Output
-    /// Standard task return code.
+    /// [`ReturnValue`]
     Aneg = u32_from_str("ANeg"),
 
     /// Trigger an Input GPIO event
     Trig = u32_from_str("Trig"),
+
+    /// Clear the dead battery flag.
+    ///
+    /// # Input
+    /// None.
+    ///
+    /// # Output
+    /// [`ReturnValue`]
+    Dbfg = u32_from_str("DBfg"),
 
     /// Repeat transactions on I2C3m under certain conditions.
     ///
@@ -104,6 +113,8 @@ impl TryFrom<u32> for Command {
             Ok(Command::Aneg)
         } else if Command::Trig == value {
             Ok(Command::Trig)
+        } else if Command::Dbfg == value {
+            Ok(Command::Dbfg)
         } else if Command::Muxr == value {
             Ok(Command::Muxr)
         } else {
@@ -131,7 +142,7 @@ impl Command {
         match self {
             Command::Tfus => TFUS_DELAY_MS + 100,
             Command::Tfui | Command::Tfue | Command::Tfud | Command::Tfuq => 200, // docs say 100ms, but 200ms is more reliable
-            Command::Gaid => RESET_DELAY_MS + 100,
+            Command::Gaid | Command::Tfuc => RESET_DELAY_MS + 100,
             Command::Srdy | Command::Sryr => 250, // determined by experimentation
             Command::Trig => 500,                 // determined by experimentation
             _ => 1000,

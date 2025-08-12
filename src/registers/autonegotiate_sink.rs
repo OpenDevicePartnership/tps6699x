@@ -6,6 +6,7 @@
 //! - Use a units crate for safely expressing values like 20 mV per LSB, etc.
 
 use bitfield::bitfield;
+use embedded_usb_pd::pdo::{MA10_UNIT, MA50_UNIT, MV20_UNIT, MV50_UNIT, MW250_UNIT};
 
 /// The address of the `Autonegotiate Sink` register.
 pub const ADDR: u8 = 0x37;
@@ -404,9 +405,9 @@ impl AutonegotiateSink {
         self
     }
 
-    /// Maximum current to request. 10 mA per LSB.
+    /// Maximum current to request in mA.
     pub fn auto_neg_max_current(&self) -> u16 {
-        self.0.auto_neg_max_current()
+        self.0.auto_neg_max_current() * MA10_UNIT
     }
 
     /// Set [`Self::auto_neg_max_current`] and return `self` to chain.
@@ -415,47 +416,49 @@ impl AutonegotiateSink {
         self
     }
 
-    /// Minimum operating power required by the sink. 250 mW per LSB.
-    pub fn auto_neg_sink_min_required_power(&self) -> u16 {
-        self.0.auto_neg_sink_min_required_power()
+    /// Minimum operating power required by the sink in mW.
+    pub fn auto_neg_sink_min_required_power(&self) -> u32 {
+        self.0.auto_neg_sink_min_required_power() as u32 * MW250_UNIT
     }
 
     /// Set [`Self::auto_neg_sink_min_required_power`] and return `self` to chain.
-    pub fn set_auto_neg_sink_min_required_power(&mut self, value: u16) -> &mut Self {
-        self.0.set_auto_neg_sink_min_required_power(value);
+    pub fn set_auto_neg_sink_min_required_power(&mut self, value_mw: u32) -> &mut Self {
+        self.0
+            .set_auto_neg_sink_min_required_power((value_mw / MW250_UNIT) as u16);
         self
     }
 
-    /// Maximum voltage to request. 50 mV per LSB.
+    /// Maximum voltage to request in mV.
     pub fn auto_neg_max_voltage(&self) -> u16 {
-        self.0.auto_neg_max_voltage()
+        self.0.auto_neg_max_voltage() * MV50_UNIT
     }
 
     /// Set [`Self::auto_neg_max_voltage`] and return `self` to chain.
-    pub fn set_auto_neg_max_voltage(&mut self, value: u16) -> &mut Self {
-        self.0.set_auto_neg_max_voltage(value);
+    pub fn set_auto_neg_max_voltage(&mut self, value_mv: u16) -> &mut Self {
+        self.0.set_auto_neg_max_voltage(value_mv / MV50_UNIT);
         self
     }
 
-    /// Minimum voltage to request. 50 mV per LSB.
+    /// Minimum voltage to request in mV.
     pub fn auto_neg_min_voltage(&self) -> u16 {
-        self.0.auto_neg_min_voltage()
+        self.0.auto_neg_min_voltage() * MV50_UNIT
     }
 
     /// Set [`Self::auto_neg_min_voltage`] and return `self` to chain.
-    pub fn set_auto_neg_min_voltage(&mut self, value: u16) -> &mut Self {
-        self.0.set_auto_neg_min_voltage(value);
+    pub fn set_auto_neg_min_voltage(&mut self, value_mv: u16) -> &mut Self {
+        self.0.set_auto_neg_min_voltage(value_mv / MV50_UNIT);
         self
     }
 
-    /// Capabilities mismatch power threshold. 250 mW per LSB.
-    pub fn auto_neg_capabilities_mismatch_power(&self) -> u16 {
-        self.0.auto_neg_capabilities_mismatch_power()
+    /// Capabilities mismatch power threshold.
+    pub fn auto_neg_capabilities_mismatch_power(&self) -> u32 {
+        self.0.auto_neg_capabilities_mismatch_power() as u32 * MW250_UNIT
     }
 
     /// Set [`Self::auto_neg_capabilities_mismatch_power`] and return `self` to chain.
-    pub fn set_auto_neg_capabilities_mismatch_power(&mut self, value: u16) -> &mut Self {
-        self.0.set_auto_neg_capabilities_mismatch_power(value);
+    pub fn set_auto_neg_capabilities_mismatch_power(&mut self, value_mw: u32) -> &mut Self {
+        self.0
+            .set_auto_neg_capabilities_mismatch_power((value_mw / MW250_UNIT) as u16);
         self
     }
 
@@ -547,25 +550,25 @@ impl AutonegotiateSink {
         self
     }
 
-    /// Operation current in Sink PPS mode. 50 mA per LSB.
-    pub fn pps_operating_current(&self) -> u8 {
-        self.0.pps_operating_current()
+    /// Operation current in Sink PPS mode in mA.
+    pub fn pps_operating_current(&self) -> u16 {
+        self.0.pps_operating_current() as u16 * MA50_UNIT
     }
 
     /// Set [`Self::pps_operating_current`] and return `self` to chain.
-    pub fn set_pps_operating_current(&mut self, value: u8) -> &mut Self {
-        self.0.set_pps_operating_current(value);
+    pub fn set_pps_operating_current(&mut self, value: u16) -> &mut Self {
+        self.0.set_pps_operating_current((value / MA50_UNIT) as u8);
         self
     }
 
-    /// Desired output voltage. 20 mV per LSB.
+    /// Desired output voltage in mV.
     pub fn pps_output_voltage(&self) -> u16 {
-        self.0.pps_output_voltage()
+        self.0.pps_output_voltage() * MV20_UNIT
     }
 
     /// Set [`Self::pps_output_voltage`] and return `self` to chain.
-    pub fn set_pps_output_voltage(&mut self, value: u16) -> &mut Self {
-        self.0.set_pps_output_voltage(value);
+    pub fn set_pps_output_voltage(&mut self, value_mv: u16) -> &mut Self {
+        self.0.set_pps_output_voltage(value_mv / MV20_UNIT);
         self
     }
 
@@ -653,10 +656,10 @@ mod tests {
         assert!(!actual.auto_disable_input_for_sink_standby_in_dbm());
         assert!(!actual.auto_enable_standby_srdy());
         assert!(!actual.auto_enable_input_after_snk_ready_in_dbm());
-        assert_eq!(actual.auto_neg_max_current(), 0x1F4);
-        assert_eq!(actual.auto_neg_sink_min_required_power(), 0x3C);
-        assert_eq!(actual.auto_neg_max_voltage(), 0x190);
-        assert_eq!(actual.auto_neg_min_voltage(), 0x64);
+        assert_eq!(actual.auto_neg_max_current(), 0x1F4 * MA10_UNIT);
+        assert_eq!(actual.auto_neg_sink_min_required_power(), 0x3C * MW250_UNIT);
+        assert_eq!(actual.auto_neg_max_voltage(), 0x190 * MV50_UNIT);
+        assert_eq!(actual.auto_neg_min_voltage(), 0x64 * MV50_UNIT);
         assert_eq!(actual.auto_neg_capabilities_mismatch_power(), 0);
         assert!(!actual.pps_enable_sink_mode());
         assert_eq!(actual.pps_request_interval(), PpsRequestInterval::EightSeconds);
