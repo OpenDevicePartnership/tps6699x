@@ -200,7 +200,7 @@ bitfield! {
 }
 
 /// High-level wrapper around [`TxIdentityRaw`].
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct TxIdentity(TxIdentityRaw<[u8; LEN]>);
 
