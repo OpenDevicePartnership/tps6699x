@@ -21,62 +21,6 @@ pub const ADDR: u8 = 0x47;
 /// This exceeds the maximum supported length by the [`device_driver`] crate.
 pub const LEN: usize = 25;
 
-/// Number of valid VDOs in the Tx Identity register (bits 2-0).
-///
-/// This field causes special behavior in the PD Controller's response to USB PD Discover Identity messages.
-/// Maximum of 6 VDOs supported, value 7 is reserved.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "defmt", derive(defmt::Format))]
-#[repr(u8)]
-pub enum VdoCount {
-    /// PD Controller will NAK USB PD Discover Identity message
-    Nak = 0x0,
-    /// PD Controller will respond with BUSY message
-    Busy = 0x1,
-    /// PD Controller will respond with Not_Supported (PD3) or no response (PD2)
-    NotSupported = 0x2,
-    /// PD Controller will respond with an ACK message containing 3 VDOs
-    Ack3Vdos = 0x3,
-    /// PD Controller will respond with an ACK message containing 4 VDOs
-    Ack4Vdos = 0x4,
-    /// PD Controller will respond with an ACK message containing 5 VDOs
-    Ack5Vdos = 0x5,
-    /// PD Controller will respond with an ACK message containing 6 VDOs
-    Ack6Vdos = 0x6,
-    /// Reserved value (should not be used)
-    Reserved(u8),
-}
-
-impl From<u8> for VdoCount {
-    fn from(value: u8) -> Self {
-        match value & 0x7 {
-            0x0 => VdoCount::Nak,
-            0x1 => VdoCount::Busy,
-            0x2 => VdoCount::NotSupported,
-            0x3 => VdoCount::Ack3Vdos,
-            0x4 => VdoCount::Ack4Vdos,
-            0x5 => VdoCount::Ack5Vdos,
-            0x6 => VdoCount::Ack6Vdos,
-            x => VdoCount::Reserved(x),
-        }
-    }
-}
-
-impl From<VdoCount> for u8 {
-    fn from(value: VdoCount) -> Self {
-        match value {
-            VdoCount::Nak => 0x0,
-            VdoCount::Busy => 0x1,
-            VdoCount::NotSupported => 0x2,
-            VdoCount::Ack3Vdos => 0x3,
-            VdoCount::Ack4Vdos => 0x4,
-            VdoCount::Ack5Vdos => 0x5,
-            VdoCount::Ack6Vdos => 0x6,
-            VdoCount::Reserved(x) => x,
-        }
-    }
-}
-
 /// Product Type for Downstream Facing Port (DFP) as defined in USB PD specification (bits 33-31).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -240,13 +184,13 @@ impl TxIdentity {
     }
 
     /// Get number of valid VDOs
-    pub fn number_valid_vdos(&self) -> VdoCount {
-        self.0.number_valid_vdos().into()
+    pub fn number_valid_vdos(&self) -> u8 {
+        self.0.number_valid_vdos()
     }
 
     /// Set number of valid VDOs and return `self` to chain.
-    pub fn set_number_valid_vdos(&mut self, value: VdoCount) -> &mut Self {
-        self.0.set_number_valid_vdos(value.into());
+    pub fn set_number_valid_vdos(&mut self, value: u8) -> &mut Self {
+        self.0.set_number_valid_vdos(value);
         self
     }
 
@@ -399,7 +343,7 @@ mod tests {
         let default_register = TxIdentity::default();
 
         // Test Number Valid VDOs (bits 2-0) = 6h
-        assert_eq!(default_register.number_valid_vdos(), VdoCount::Ack6Vdos);
+        assert_eq!(default_register.number_valid_vdos(), 6);
 
         // Test Vendor ID (bits 23-8) = 451h
         assert_eq!(default_register.vendor_id(), 0x451);
