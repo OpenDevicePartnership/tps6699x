@@ -18,4 +18,4 @@ rustflags = [
 target = "thumbv8m.main-none-eabihf" # Cortex-M33
 
 [env]
-DEFMT_LOG = "debug"
+DEFMT_LOG = "trace"

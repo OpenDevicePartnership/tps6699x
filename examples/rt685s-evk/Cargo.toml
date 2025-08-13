@@ -55,3 +55,6 @@ name = "fw_update"
 
 [[bin]]
 name = "plug_status"
+
+[patch."https://github.com/OpenDevicePartnership/embedded-usb-pd"]
+embedded-usb-pd = { path = "../../../embedded-usb-pd" }

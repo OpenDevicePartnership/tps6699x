@@ -24,6 +24,7 @@ use crate::{error, registers, trace, DeviceError, Mode, MAX_SUPPORTED_PORTS};
 pub mod fw_update;
 pub mod rx_src_caps;
 pub mod task;
+pub mod ucsi;
 
 pub mod controller {
     use super::*;

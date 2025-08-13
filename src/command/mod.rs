@@ -81,6 +81,15 @@ pub enum Command {
     /// # Output
     /// [`ReturnValue`]
     Muxr = u32_from_str("MuxR"),
+
+    /// Execute a UCSI command
+    ///
+    /// # Input
+    /// [`embedded_usb_pd::ucsi::lpm::Command`]
+    ///
+    /// # Output
+    /// [`embedded_usb_pd::ucsi::lpm::ResponseData`]
+    Ucsi = u32_from_str("UCSI"),
 }
 
 impl TryFrom<u32> for Command {
