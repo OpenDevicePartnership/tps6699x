@@ -156,6 +156,7 @@ impl Command {
             Command::Gaid | Command::Tfuc => RESET_DELAY_MS + 100,
             Command::Srdy | Command::Sryr => 250, // determined by experimentation
             Command::Trig => 500,                 // determined by experimentation
+            Command::Drst => 100,                 // PD spec says 24/27/30 ms, round up
             _ => 1000,
         }
     }
