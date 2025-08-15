@@ -666,6 +666,11 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         let mut inner = self.lock_inner().await;
         inner.modify_dp_config(port, f).await
     }
+
+    /// Execute the [`Command::Drst`] command.
+    pub async fn execute_drst(&mut self, port: PortId) -> Result<ReturnValue, Error<B::Error>> {
+        self.execute_command(port, Command::Drst, None, None).await
+    }
 }
 
 impl<'a, M: RawMutex, B: I2c> interrupt::InterruptController for Tps6699x<'a, M, B> {
