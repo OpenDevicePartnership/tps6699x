@@ -81,6 +81,15 @@ pub enum Command {
     /// # Output
     /// [`ReturnValue`]
     Muxr = u32_from_str("MuxR"),
+
+    /// PD Data Reset
+    ///
+    /// # Input
+    /// None.
+    ///
+    /// # Output
+    /// [`ReturnValue`]
+    Drst = u32_from_str("DRST"),
 }
 
 impl TryFrom<u32> for Command {
@@ -117,6 +126,8 @@ impl TryFrom<u32> for Command {
             Ok(Command::Dbfg)
         } else if Command::Muxr == value {
             Ok(Command::Muxr)
+        } else if Command::Drst == value {
+            Ok(Command::Drst)
         } else {
             Err(PdError::InvalidParams)
         }
