@@ -13,15 +13,6 @@ url = "https://raw.githubusercontent.com/google/rust-crate-audits/main/audits.to
 [imports.mozilla]
 url = "https://raw.githubusercontent.com/mozilla/supply-chain/main/audits.toml"
 
-[policy.embassy-sync]
-audit-as-crates-io = false
-
-[policy.embassy-time]
-audit-as-crates-io = false
-
-[policy.embassy-time-driver]
-audit-as-crates-io = false
-
 [[exemptions.addr2line]]
 version = "0.24.2"
 criteria = "safe-to-run"
@@ -32,10 +23,6 @@ criteria = "safe-to-deploy"
 
 [[exemptions.anyhow]]
 version = "1.0.98"
-criteria = "safe-to-deploy"
-
-[[exemptions.arraydeque]]
-version = "0.5.1"
 criteria = "safe-to-deploy"
 
 [[exemptions.backtrace]]
@@ -100,6 +87,18 @@ criteria = "safe-to-deploy"
 
 [[exemptions.device-driver-macros]]
 version = "1.0.4"
+criteria = "safe-to-deploy"
+
+[[exemptions.embassy-sync]]
+version = "0.7.2"
+criteria = "safe-to-deploy"
+
+[[exemptions.embassy-time]]
+version = "0.4.0"
+criteria = "safe-to-deploy"
+
+[[exemptions.embassy-time-driver]]
+version = "0.2.1"
 criteria = "safe-to-deploy"
 
 [[exemptions.embedded-hal]]
@@ -216,10 +215,6 @@ criteria = "safe-to-run"
 
 [[exemptions.once_cell]]
 version = "1.21.3"
-criteria = "safe-to-deploy"
-
-[[exemptions.pin-project-lite]]
-version = "0.2.16"
 criteria = "safe-to-deploy"
 
 [[exemptions.pin-utils]]
