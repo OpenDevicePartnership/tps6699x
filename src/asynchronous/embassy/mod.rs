@@ -769,7 +769,7 @@ impl<'a, M: RawMutex, B: I2c> Interrupt<'a, M, B> {
                 match with_timeout(Duration::from_millis(100), inner.clear_interrupt(port_id)).await {
                     Ok(res) => match res {
                         Ok(event) => flags[port] |= event,
-                        Err(e) => {
+                        Err(_e) => {
                             continue;
                         }
                     },
