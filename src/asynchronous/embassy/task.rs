@@ -97,7 +97,7 @@ mod retry_strategy {
                 let next_backoff = self
                     .next_backoff
                     .checked_mul(2)
-                    .unwrap_or(self.max_backoff)
+                    .unwrap_or(Duration::MAX)
                     .min(self.max_backoff);
 
                 Some(core::mem::replace(&mut self.next_backoff, next_backoff))
@@ -171,6 +171,24 @@ mod retry_strategy {
                 strategy.next(),
                 Some(strategy.max_backoff),
                 "Backoff should still cap at max_backoff"
+            );
+        }
+
+        /// No panic should occur on overflow, and backoff should cap at `Duration::MAX.min(max_backoff)`.
+        #[test]
+        fn overflow() {
+            let first = Duration::MAX / 2 + Duration::from_millis(1);
+            let mut strategy = State {
+                instant: false,
+                next_backoff: first,
+                max_backoff: first + Duration::from_millis(2),
+            };
+
+            assert_eq!(strategy.next(), Some(first));
+            assert_eq!(
+                strategy.next(),
+                Some(strategy.max_backoff),
+                "Backoff should cap at max_backoff on overflow"
             );
         }
     }
