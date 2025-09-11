@@ -195,7 +195,7 @@ jobs:
       - name: cargo install cargo-hack
         uses: taiki-e/install-action@cargo-hack
       - name: cargo test
-        run: cargo hack --feature-powerset --exclude-features defmt test
+        run: cargo hack --feature-powerset --exclude-features defmt test --all-targets
 
   test-doc:
     runs-on: ubuntu-latest
