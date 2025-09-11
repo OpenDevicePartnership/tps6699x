@@ -11,7 +11,7 @@ pub async fn interrupt_task<M: RawMutex, B: I2c, INT: Wait + InputPin>(
     int: &mut INT,
     interrupts: &mut [&mut Interrupt<'_, M, B>],
 ) {
-    let mut retry_strategy = retry_strategy::State::default();
+    let mut retry_strategy = retry_strategy::ExponentialBackoff::default();
     loop {
         if int.wait_for_low().await.is_err() {
             error!("Error waiting for interrupt");
@@ -66,7 +66,7 @@ mod retry_strategy {
     ///
     /// This implements an exponential backoff strategy so transient errors are retried quickly.
     /// However, the first retry is immediate in case there was a new interrupt that came in very recently.
-    pub struct State {
+    pub struct ExponentialBackoff {
         /// Whether [`Self::next`] should return immediately with [`None`].
         ///
         /// This is `true` initially, and set to `false` after the first call to [`Self::next`].
@@ -79,7 +79,7 @@ mod retry_strategy {
         max_backoff: Duration,
     }
 
-    impl Default for State {
+    impl Default for ExponentialBackoff {
         fn default() -> Self {
             Self {
                 instant: true,
@@ -89,7 +89,7 @@ mod retry_strategy {
         }
     }
 
-    impl State {
+    impl ExponentialBackoff {
         /// Get the next backoff duration.
         pub fn next(&mut self) -> Option<Duration> {
             if core::mem::take(&mut self.instant) {
@@ -113,7 +113,7 @@ mod retry_strategy {
         /// The default state should use an instant first try and a positive non-zero backoff.
         #[test]
         fn default_is_instant_positive() {
-            let strategy = State::default();
+            let strategy = ExponentialBackoff::default();
             assert!(strategy.instant, "First try should be true");
             assert!(
                 strategy.next_backoff > Duration::MIN,
@@ -124,7 +124,7 @@ mod retry_strategy {
 
         #[test]
         fn instant_first_try() {
-            let mut strategy = State {
+            let mut strategy = ExponentialBackoff {
                 instant: true,
                 next_backoff: Duration::from_millis(1),
                 max_backoff: Duration::from_millis(100),
@@ -137,7 +137,7 @@ mod retry_strategy {
         #[test]
         fn exponential_backoff() {
             let first = Duration::from_millis(1);
-            let mut strategy = State {
+            let mut strategy = ExponentialBackoff {
                 instant: false,
                 next_backoff: first,
                 max_backoff: Duration::from_millis(100),
@@ -156,7 +156,7 @@ mod retry_strategy {
         #[test]
         fn max_backoff() {
             let first = Duration::from_millis(99);
-            let mut strategy = State {
+            let mut strategy = ExponentialBackoff {
                 instant: false,
                 next_backoff: first,
                 max_backoff: first + Duration::from_millis(1),
@@ -179,7 +179,7 @@ mod retry_strategy {
         #[test]
         fn overflow() {
             let first = Duration::MAX / 2 + Duration::from_millis(1);
-            let mut strategy = State {
+            let mut strategy = ExponentialBackoff {
                 instant: false,
                 next_backoff: first,
                 max_backoff: first + Duration::from_millis(2),
