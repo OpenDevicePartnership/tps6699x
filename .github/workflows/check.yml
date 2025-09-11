@@ -33,8 +33,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt
-      - name: cargo fmt --check
-        run: cargo fmt --check
+      - run: cargo fmt --check
 
   clippy:
     runs-on: ubuntu-latest
@@ -95,11 +94,11 @@ jobs:
         env:
           RUSTDOCFLAGS: --cfg docsrs
 
-  hack:
+  check:
     # cargo-hack checks combinations of feature flags to ensure that features are all additive
     # which is required for feature unification
     runs-on: ubuntu-latest
-    name: ubuntu / stable / features
+    name: ubuntu / stable / check
     steps:
       - uses: actions/checkout@v4
         with:
@@ -110,7 +109,7 @@ jobs:
         uses: taiki-e/install-action@cargo-hack
       # intentionally no target specifier; see https://github.com/jonhoo/rust-ci-conf/pull/4
       # --feature-powerset runs for every combination of features
-      - name: cargo hack
+      - name: cargo check
         run: cargo hack --feature-powerset check
 
   deny:
@@ -195,7 +194,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
       - name: cargo install cargo-hack
         uses: taiki-e/install-action@cargo-hack
-      - name: test
+      - name: cargo test
         run: cargo hack --feature-powerset --exclude-features defmt test
 
   test-doc:
