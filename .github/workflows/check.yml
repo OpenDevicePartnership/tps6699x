@@ -200,12 +200,11 @@ jobs:
 
   test-doc:
     runs-on: ubuntu-latest
-    name: ubuntu / stable / test
+    name: ubuntu / stable / test-doc
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Install stable
         uses: dtolnay/rust-toolchain@stable
-      - name: cargo test
-        run: cargo test --doc
+      - run: cargo test --doc
