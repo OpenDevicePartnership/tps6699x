@@ -5,10 +5,9 @@ use embedded_usb_pd::{LocalPortId, PdError};
 pub mod asynchronous;
 pub mod command;
 pub mod fmt;
+pub mod fw_update;
 pub mod registers;
 pub mod stream;
-
-pub mod fw_update;
 
 /// I2C address set 0
 pub const ADDR0: [u8; 2] = [0x20, 0x24];

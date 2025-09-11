@@ -4,16 +4,14 @@ use embedded_hal_async::digital::Wait;
 use embedded_hal_async::i2c::I2c;
 
 use super::Interrupt;
-use crate::{error, warn};
-
-/// Period to wait if we might be checking interrupts exessively
-const INTERRUPT_BACKOFF_MS: u64 = 100;
+use crate::{error, trace, warn};
 
 /// Task to process all given interrupts
 pub async fn interrupt_task<M: RawMutex, B: I2c, INT: Wait + InputPin>(
     int: &mut INT,
     interrupts: &mut [&mut Interrupt<'_, M, B>],
 ) {
+    let mut retry_strategy = retry_strategy::State::default();
     loop {
         if int.wait_for_low().await.is_err() {
             error!("Error waiting for interrupt");
@@ -31,15 +29,149 @@ pub async fn interrupt_task<M: RawMutex, B: I2c, INT: Wait + InputPin>(
             }
         }
 
-        // If the interrupt line is still asserted then we either had an error or interrupts are currently disabled
-        // Back off for a bit to allow other tasks to run, otherwise this task can end up continously scheduled
-        // and starve other tasks
+        // If interrupt line is still asserted, retry following backoff strategy
         match int.is_low() {
-            Ok(true) => embassy_time::Timer::after_millis(INTERRUPT_BACKOFF_MS).await,
+            Ok(true) => {
+                match retry_strategy.next() {
+                    None => {
+                        trace!("Interrupt line still asserted, retrying immediately");
+                    }
+                    Some(backoff) => {
+                        // If this was not the first try, back off
+                        trace!("Interrupt line still asserted, backing off for {:?}", backoff);
+                        embassy_time::Timer::after(backoff).await;
+                    }
+                }
+            }
+            Ok(false) => {
+                // Interrupt line is no longer asserted, reset backoff
+                retry_strategy = Default::default();
+            }
             Err(_) => {
                 error!("Error post-checking interrupt line");
             }
-            _ => {}
+        }
+    }
+}
+
+mod retry_strategy {
+    use embassy_time::Duration;
+
+    /// How to back off when the interrupt line remains asserted after processing all interrupts.
+    ///
+    /// The interrupt line may remain asserted after processing all interrupts due to an error (possibly transient),
+    /// interrupts being disabled, or a new interrupt that came in very recently.
+    /// When this happens, back off for a bit to allow other tasks to run, otherwise [`super::interrupt_task`] may
+    /// starve other tasks.
+    ///
+    /// This implements an exponential backoff strategy so transient errors are retried quickly.
+    /// However, the first retry is immediate in case there was a new interrupt that came in very recently.
+    pub struct State {
+        /// Whether this is the first try and [`Self::next`] should return immediately.
+        first_try: bool,
+
+        /// The next backoff duration to use.
+        next_backoff: Duration,
+
+        /// The maximum backoff duration to use.
+        max_backoff: Duration,
+    }
+
+    impl Default for State {
+        fn default() -> Self {
+            Self {
+                first_try: true,
+                next_backoff: Duration::from_millis(1),
+                max_backoff: Duration::from_millis(100),
+            }
+        }
+    }
+
+    impl State {
+        /// Get the next backoff duration.
+        pub fn next(&mut self) -> Option<Duration> {
+            if self.first_try {
+                self.first_try = false;
+                None
+            } else {
+                let next_backoff = self
+                    .next_backoff
+                    .checked_mul(2)
+                    .unwrap_or(self.max_backoff)
+                    .min(self.max_backoff);
+
+                Some(core::mem::replace(&mut self.next_backoff, next_backoff))
+            }
+        }
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        /// The default state should use an instant first try and a positive non-zero backoff.
+        #[test]
+        fn default_is_instant_positive() {
+            let strategy = State::default();
+            assert!(strategy.first_try, "First try should be true");
+            assert!(
+                strategy.next_backoff > Duration::MIN,
+                "Next backoff should be positive non-zero (got {:?})",
+                strategy.next_backoff
+            );
+        }
+
+        #[test]
+        fn instant_first_try() {
+            let mut strategy = State {
+                first_try: true,
+                next_backoff: Duration::from_millis(1),
+                max_backoff: Duration::from_millis(100),
+            };
+
+            assert_eq!(strategy.next(), None, "First try should be instant");
+            assert_ne!(strategy.next(), None, "Second try should not be instant");
+        }
+
+        #[test]
+        fn exponential_backoff() {
+            let first = Duration::from_millis(1);
+            let mut strategy = State {
+                first_try: false,
+                next_backoff: first,
+                max_backoff: Duration::from_millis(100),
+            };
+
+            assert_eq!(strategy.next(), Some(first * 1));
+            assert_eq!(strategy.next(), Some(first * 2));
+            assert_eq!(strategy.next(), Some(first * 4));
+            assert_eq!(strategy.next(), Some(first * 8));
+            assert_eq!(strategy.next(), Some(first * 16));
+            assert_eq!(strategy.next(), Some(first * 32));
+            assert_eq!(strategy.next(), Some(first * 64));
+            // Next would be 128ms, but capped at 100ms, and that's another test case.
+        }
+
+        #[test]
+        fn max_backoff() {
+            let first = Duration::from_millis(99);
+            let mut strategy = State {
+                first_try: false,
+                next_backoff: first,
+                max_backoff: first + Duration::from_millis(1),
+            };
+
+            assert_eq!(strategy.next(), Some(first));
+            assert_eq!(
+                strategy.next(),
+                Some(strategy.max_backoff),
+                "Backoff should cap at max_backoff"
+            );
+            assert_eq!(
+                strategy.next(),
+                Some(strategy.max_backoff),
+                "Backoff should still cap at max_backoff"
+            );
         }
     }
 }
