@@ -193,8 +193,10 @@ jobs:
           submodules: true
       - name: Install stable
         uses: dtolnay/rust-toolchain@stable
-      - name: cargo test
-        run: cargo test --all-targets
+      - name: cargo install cargo-hack
+        uses: taiki-e/install-action@cargo-hack
+      - name: test
+        run: cargo hack --feature-powerset --exclude-features defmt test
 
   test-doc:
     runs-on: ubuntu-latest
