@@ -9,8 +9,8 @@ pub mod autonegotiate_sink;
 pub mod boot_flags;
 pub mod dp_status;
 pub mod port_config;
+pub mod rx_caps;
 pub mod rx_other_vdm;
-pub mod rx_src_caps;
 pub mod tx_identity;
 
 device_driver::create_device!(

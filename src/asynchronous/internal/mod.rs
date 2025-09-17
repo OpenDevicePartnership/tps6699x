@@ -2,11 +2,10 @@
 use device_driver::AsyncRegisterInterface;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::pdinfo::AltMode;
-use embedded_usb_pd::pdo::source::Pdo;
-use embedded_usb_pd::pdo::ExpectedPdo;
+use embedded_usb_pd::pdo::{self, sink, source, ExpectedPdo};
 use embedded_usb_pd::{Error, LocalPortId, PdError};
 
-use crate::registers::rx_src_caps::EPR_PDO_START_INDEX;
+use crate::registers::rx_caps::EPR_PDO_START_INDEX;
 use crate::{registers, DeviceError, Mode, MAX_SUPPORTED_PORTS, PORT0, PORT1, TPS66993_NUM_PORTS, TPS66994_NUM_PORTS};
 
 mod command;
@@ -584,14 +583,15 @@ impl<B: I2c> Tps6699x<B> {
         Ok(buf.into())
     }
 
-    /// Get RX source capabilities
+    /// Get RX source/sink capabilities
     ///
     /// Returns (num pdos placed in out_spr_pdos , num pdos placed in out_epr_pdos)
-    pub async fn get_rx_src_caps(
+    pub async fn get_rx_caps<T: pdo::RoleCommon>(
         &mut self,
         port: LocalPortId,
-        out_spr_pdos: &mut [Pdo],
-        out_epr_pdos: &mut [Pdo],
+        register: u8,
+        out_spr_pdos: &mut [T],
+        out_epr_pdos: &mut [T],
     ) -> Result<(usize, usize), DeviceError<B::Error, ExpectedPdo>> {
         // Clamp to the maximum number of PDOs
         let num_pdos = if !out_epr_pdos.is_empty() {
@@ -600,31 +600,57 @@ impl<B: I2c> Tps6699x<B> {
             // SPR PDOs start at index 0
             out_spr_pdos.len()
         }
-        .min(registers::rx_src_caps::TOTAL_PDOS);
+        .min(registers::rx_caps::TOTAL_PDOS);
 
         // 4 bytes for each PDO
-        let read_size = registers::rx_src_caps::HEADER_LEN + 4 * num_pdos;
-        let mut buf = [0u8; registers::rx_src_caps::LEN];
+        let read_size = registers::rx_caps::HEADER_LEN + 4 * num_pdos;
+        let mut buf = [0u8; registers::rx_caps::LEN];
         self.borrow_port(port)
             .map_err(DeviceError::from)?
             .into_registers()
             .interface()
-            .read_register(registers::rx_src_caps::ADDR, (read_size * 8) as u32, &mut buf)
+            .read_register(register, (read_size * 8) as u32, &mut buf)
             .await?;
 
-        let rx_source_caps = registers::rx_src_caps::RxSrcCaps::try_from(buf).map_err(DeviceError::Other)?;
-        let num_sprs = out_spr_pdos.len().min(rx_source_caps.num_valid_pdos() as usize);
+        let rx_caps = registers::rx_caps::RxCaps::<T>::try_from(buf).map_err(DeviceError::Other)?;
+        let num_sprs = out_spr_pdos.len().min(rx_caps.num_valid_pdos() as usize);
         for (i, pdo) in out_spr_pdos.iter_mut().enumerate().take(num_sprs) {
             // SPR PDOs start at index 0
-            *pdo = rx_source_caps[i];
+            *pdo = rx_caps[i];
         }
 
-        let num_eprs = out_epr_pdos.len().min(rx_source_caps.num_valid_epr_pdos() as usize);
+        let num_eprs = out_epr_pdos.len().min(rx_caps.num_valid_epr_pdos() as usize);
         for (i, pdo) in out_epr_pdos.iter_mut().enumerate().take(num_eprs) {
-            *pdo = rx_source_caps[EPR_PDO_START_INDEX + i];
+            *pdo = rx_caps[EPR_PDO_START_INDEX + i];
         }
 
         Ok((num_sprs, num_eprs))
+    }
+
+    /// Get RX src capabilities
+    ///
+    /// Returns (num pdos placed in out_spr_pdos , num pdos placed in out_epr_pdos)
+    pub async fn get_rx_src_caps(
+        &mut self,
+        port: LocalPortId,
+        out_spr_pdos: &mut [source::Pdo],
+        out_epr_pdos: &mut [source::Pdo],
+    ) -> Result<(usize, usize), DeviceError<B::Error, ExpectedPdo>> {
+        self.get_rx_caps(port, registers::rx_caps::RX_SRC_ADDR, out_spr_pdos, out_epr_pdos)
+            .await
+    }
+
+    /// Get RX sink capabilities
+    ///
+    /// Returns (num pdos placed in out_spr_pdos , num pdos placed in out_epr_pdos)
+    pub async fn get_rx_snk_caps(
+        &mut self,
+        port: LocalPortId,
+        out_spr_pdos: &mut [sink::Pdo],
+        out_epr_pdos: &mut [sink::Pdo],
+    ) -> Result<(usize, usize), DeviceError<B::Error, ExpectedPdo>> {
+        self.get_rx_caps(port, registers::rx_caps::RX_SNK_ADDR, out_spr_pdos, out_epr_pdos)
+            .await
     }
 
     /// Get Tx Identity
@@ -684,10 +710,9 @@ mod test {
     use embedded_hal_async::i2c::ErrorType;
     use embedded_hal_mock::eh1::i2c::{Mock, Transaction};
     use embedded_usb_pd::pdo::source::Pdo;
-    use registers::rx_src_caps::ADDR;
 
     use super::*;
-    use crate::registers::rx_src_caps::{self};
+    use crate::registers::rx_caps::{self};
     use crate::test::*;
     use crate::{ADDR0, ADDR1, PORT0, PORT1};
 
@@ -1067,9 +1092,9 @@ mod test {
         let mock = Mock::new(&[]);
         let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
 
-        let mut buf = [0u8; rx_src_caps::LEN + 1];
+        let mut buf = [0u8; rx_caps::LEN + 1];
         // Register length
-        buf[0] = rx_src_caps::LEN as u8;
+        buf[0] = rx_caps::LEN as u8;
         // Set header: low 3 bits are SPR PDO count
         buf[1] = 0xa; // 2 SPR PDOs, 1 EPR PDOs
                       // Fill PDOs with test data
@@ -1087,11 +1112,11 @@ mod test {
         buf[38..42].copy_from_slice(&TEST_SRC_EPR_PDO_FIXED_28V1A5_RAW.to_le_bytes());
 
         // Expect a read of 14 bytes (header + 3 PDOs)
-        tps6699x
-            .bus
-            .update_expectations(&[Transaction::write_read(PORT0_ADDR0, std::vec![ADDR], {
+        tps6699x.bus.update_expectations(
+            &[Transaction::write_read(PORT0_ADDR0, std::vec![rx_caps::RX_SRC_ADDR], {
                 Vec::from(buf)
-            })]);
+            })],
+        );
 
         // Read PDOs, with attempted overread
         let mut out_spr_pdos = [Pdo::default(); 3];

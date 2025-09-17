@@ -1,11 +1,13 @@
 use core::ops::{Index, IndexMut};
 
 use bitfield::bitfield;
-use embedded_usb_pd::pdo::source::Pdo;
-use embedded_usb_pd::pdo::ExpectedPdo;
+use embedded_usb_pd::pdo::{sink, source, Common, ExpectedPdo, RoleCommon};
 
-/// Register address
-pub const ADDR: u8 = 0x30;
+/// Rx source caps register address
+pub const RX_SRC_ADDR: u8 = 0x30;
+
+/// Rx sink caps register address
+pub const RX_SNK_ADDR: u8 = 0x31;
 
 /// Length of the register in bytes
 pub const LEN: usize = 45;
@@ -28,10 +30,10 @@ pub const EPR_PDO_START_INDEX: usize = SPR_PDO_START_INDEX + NUM_SPR_PDOS;
 pub const NUM_EPR_PDOS: usize = 4;
 
 bitfield! {
-    /// Received source capabilities register
+    /// Received source/sink capabilities register
     #[derive(Clone, Copy)]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-    struct RxSrcCapsRaw([u8]);
+    struct RxCapsRaw([u8]);
     impl Debug;
 
     /// Number of Valid PDOs
@@ -68,7 +70,7 @@ bitfield! {
 
 /// High-level wrapper around [`RxSrcCapsRaw`].
 #[derive(Clone, Copy, Debug)]
-pub struct RxSrcCaps {
+pub struct RxCaps<T: Common> {
     /// Number of valid standard PDOs
     num_valid_pdos: u8,
     /// Number of valid EPR PDOs
@@ -76,10 +78,10 @@ pub struct RxSrcCaps {
     /// Last source capabilities received is EPR
     last_src_cap_is_epr: bool,
     /// PDOs
-    pdos: [Pdo; TOTAL_PDOS],
+    pdos: [T; TOTAL_PDOS],
 }
 
-impl RxSrcCaps {
+impl<T: Common> RxCaps<T> {
     /// Get number of valid standard PDOs
     pub fn num_valid_pdos(&self) -> u8 {
         self.num_valid_pdos
@@ -114,8 +116,8 @@ impl RxSrcCaps {
     }
 }
 
-impl Index<usize> for RxSrcCaps {
-    type Output = Pdo;
+impl<T: Common> Index<usize> for RxCaps<T> {
+    type Output = T;
 
     fn index(&self, index: usize) -> &Self::Output {
         if index < TOTAL_PDOS {
@@ -126,7 +128,7 @@ impl Index<usize> for RxSrcCaps {
     }
 }
 
-impl IndexMut<usize> for RxSrcCaps {
+impl<T: Common> IndexMut<usize> for RxCaps<T> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         if index < TOTAL_PDOS {
             &mut self.pdos[index]
@@ -136,19 +138,19 @@ impl IndexMut<usize> for RxSrcCaps {
     }
 }
 
-impl TryFrom<[u8; LEN]> for RxSrcCaps {
+impl<T: RoleCommon> TryFrom<[u8; LEN]> for RxCaps<T> {
     type Error = ExpectedPdo;
 
     fn try_from(raw: [u8; LEN]) -> Result<Self, Self::Error> {
-        let raw = RxSrcCapsRaw(raw);
+        let raw = RxCapsRaw(raw);
         let num_valid_pdos = raw.num_valid_pdos() as usize;
         let num_valid_epr_pdos = raw.num_valid_epr_pdos() as usize;
 
-        let mut pdos = [Pdo::default(); TOTAL_PDOS];
+        let mut pdos = [T::default(); TOTAL_PDOS];
 
         // Decode only valid SPR PDOs
         for (i, pdo) in pdos.iter_mut().enumerate().take(num_valid_pdos) {
-            *pdo = Pdo::try_from(match i {
+            *pdo = T::try_from(match i {
                 0 => raw.pdo0(),
                 1 => raw.pdo1(),
                 2 => raw.pdo2(),
@@ -167,7 +169,7 @@ impl TryFrom<[u8; LEN]> for RxSrcCaps {
             .enumerate()
             .take(num_valid_epr_pdos)
         {
-            *pdo = Pdo::try_from(match i {
+            *pdo = T::try_from(match i {
                 0 => raw.epr_pdo0(),
                 1 => raw.epr_pdo1(),
                 2 => raw.epr_pdo2(),
@@ -176,7 +178,7 @@ impl TryFrom<[u8; LEN]> for RxSrcCaps {
             })?;
         }
 
-        Ok(RxSrcCaps {
+        Ok(RxCaps {
             num_valid_pdos: raw.num_valid_pdos(),
             num_valid_epr_pdos: raw.num_valid_epr_pdos(),
             last_src_cap_is_epr: raw.last_src_cap_is_epr(),
@@ -184,6 +186,9 @@ impl TryFrom<[u8; LEN]> for RxSrcCaps {
         })
     }
 }
+
+pub type RxSrcCaps = RxCaps<source::Pdo>;
+pub type RxSnkCaps = RxCaps<sink::Pdo>;
 
 #[cfg(test)]
 mod test {

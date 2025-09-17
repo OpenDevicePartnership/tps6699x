@@ -25,7 +25,7 @@ use crate::registers::field_sets::IntEventBus1;
 use crate::{error, registers, trace, warn, DeviceError, Mode, MAX_SUPPORTED_PORTS};
 
 pub mod fw_update;
-pub mod rx_src_caps;
+pub mod rx_caps;
 pub mod task;
 pub mod ucsi;
 
@@ -626,23 +626,41 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         }
     }
 
-    /// Get Rx Source Caps
+    /// Get Rx source/sink Caps
     ///
     /// Returns (num_standard_pdos, num_epr_pdos).
-    pub async fn get_rx_src_caps(&mut self, port: LocalPortId) -> Result<rx_src_caps::RxSrcCaps, Error<B::Error>> {
+    pub async fn get_rx_caps<T: pdo::RoleCommon>(
+        &mut self,
+        port: LocalPortId,
+        register: u8,
+    ) -> Result<rx_caps::RxCaps<T>, Error<B::Error>> {
         let mut inner = self.lock_inner().await;
-        let mut out_spr_pdos = [pdo::source::Pdo::default(); crate::registers::rx_src_caps::NUM_SPR_PDOS];
-        let mut out_epr_pdos = [pdo::source::Pdo::default(); crate::registers::rx_src_caps::NUM_EPR_PDOS];
+        let mut out_spr_pdos = [T::default(); crate::registers::rx_caps::NUM_SPR_PDOS];
+        let mut out_epr_pdos = [T::default(); crate::registers::rx_caps::NUM_EPR_PDOS];
 
         let (num_valid_spr, num_valid_epr) = inner
-            .get_rx_src_caps(port, &mut out_spr_pdos, &mut out_epr_pdos)
+            .get_rx_caps(port, register, &mut out_spr_pdos, &mut out_epr_pdos)
             .await?;
 
         // These unwraps are safe because we know the sizes of the arrays
-        Ok(rx_src_caps::RxSrcCaps {
+        Ok(rx_caps::RxCaps {
             spr: heapless::Vec::from_slice(&out_spr_pdos[..num_valid_spr]).unwrap(),
             epr: heapless::Vec::from_slice(&out_epr_pdos[..num_valid_epr]).unwrap(),
         })
+    }
+
+    /// Get Rx Sink Caps
+    ///
+    /// Returns (num_standard_pdos, num_epr_pdos).
+    pub async fn get_rx_snk_caps(&mut self, port: LocalPortId) -> Result<rx_caps::RxSnkCaps, Error<B::Error>> {
+        self.get_rx_caps(port, registers::rx_caps::RX_SNK_ADDR).await
+    }
+
+    /// Get Rx source Caps
+    ///
+    /// Returns (num_standard_pdos, num_epr_pdos).
+    pub async fn get_rx_src_caps(&mut self, port: LocalPortId) -> Result<rx_caps::RxSrcCaps, Error<B::Error>> {
+        self.get_rx_caps(port, registers::rx_caps::RX_SRC_ADDR).await
     }
 
     /// Get Tx Identity
