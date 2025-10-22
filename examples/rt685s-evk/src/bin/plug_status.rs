@@ -65,25 +65,25 @@ async fn main(spawner: Spawner) {
             }
 
             let port = LocalPortId(i as u8);
-            info!("P{}: plug event", i);
+            info!("{}: plug event", port);
             let result = pd.get_port_status(port).await;
             if let Err(e) = result {
-                info!("P{}: error getting port status: {:?}", i, e);
+                info!("{}: error getting port status: {:?}", port, e);
                 continue;
             }
 
             let status = result.unwrap();
             if status.plug_present() {
-                info!("P{}: plug present", i);
+                info!("{}: plug present", port);
                 if status.plug_orientation() {
-                    info!("P{}: flipped ", i);
+                    info!("{}: flipped ", port);
                 } else {
-                    info!("P{}: not flipped", i);
+                    info!("{}: not flipped", port);
                 }
 
-                info!("P{}: connection state {:?}", i, status.connection_state());
+                info!("{}: connection state {:?}", port, status.connection_state());
             } else {
-                info!("P{}: plug removed", i);
+                info!("{}: plug removed", port);
             }
         }
     }
