@@ -54,6 +54,7 @@ impl<B: I2c> Tps6699x<B> {
         &mut self,
         port: LocalPortId,
         data: Option<&mut [u8]>,
+        has_return_value: bool,
     ) -> Result<ReturnValue, Error<B::Error>> {
         match self.check_command_complete(port).await {
             Ok(true) => {
@@ -67,8 +68,15 @@ impl<B: I2c> Tps6699x<B> {
             }
         }
 
+        let max_len = if has_return_value {
+            // -1 because one byte is used for the return value
+            regs::REG_DATA1_LEN - 1
+        } else {
+            regs::REG_DATA1_LEN
+        };
+
         if let Some(ref data) = data {
-            if data.len() > regs::REG_DATA1_LEN - 1 {
+            if data.len() > max_len {
                 // Data length too long
                 return PdError::InvalidParams.into();
             }
@@ -82,15 +90,23 @@ impl<B: I2c> Tps6699x<B> {
             .read_register(regs::REG_DATA1, (regs::REG_DATA1_LEN * 8) as u32, &mut buf)
             .await?;
 
-        let return_code = buf[0] & CMD_4CC_TASK_RETURN_CODE_MASK;
-        let ret = ReturnValue::try_from(return_code).map_err(Error::Pd)?;
-        debug!("read_command_result: ret: {:?}", ret);
-        // Overwrite return value
-        if let Some(data) = data {
-            data.copy_from_slice(&buf[1..=data.len()]);
+        if has_return_value {
+            let return_code = buf[0] & CMD_4CC_TASK_RETURN_CODE_MASK;
+            let ret = ReturnValue::try_from(return_code).map_err(Error::Pd)?;
+            debug!("read_command_result: ret: {:?}", ret);
+            // Overwrite return value
+            if let Some(data) = data {
+                data.copy_from_slice(&buf[1..=data.len()]);
+            }
+            Ok(ret)
+        } else {
+            // No return value to check
+            debug!("read_command_result: Done");
+            if let Some(data) = data {
+                data.copy_from_slice(&buf[..data.len()]);
+            }
+            Ok(ReturnValue::Success)
         }
-
-        Ok(ret)
     }
 
     /// Reset the controller

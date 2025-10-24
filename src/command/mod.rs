@@ -4,6 +4,7 @@ use bincode::error::{DecodeError, EncodeError};
 use bincode::{Decode, Encode};
 use embedded_usb_pd::PdError;
 
+pub mod gcdm;
 pub mod muxr;
 pub mod trig;
 pub mod vdms;
@@ -109,6 +110,15 @@ pub enum Command {
     /// # Output
     /// [`embedded_usb_pd::ucsi::lpm::ResponseData`]
     Ucsi = u32_from_str("UCSI"),
+
+    /// Get custom discovered modes
+    ///
+    /// # Input
+    /// [`gcdm::Input`]
+    ///
+    /// # Output
+    /// [`gcdm::DiscoveredMode`]
+    GCdm = u32_from_str("GCdm"),
 }
 
 impl TryFrom<u32> for Command {
@@ -182,6 +192,12 @@ impl Command {
             Command::Drst => 100,                 // PD spec says 24/27/30 ms, round up
             _ => 1000,
         }
+    }
+
+    /// If the command returns a standard return value in the first output byte
+    pub const fn has_return_value(self) -> bool {
+        // Use match because `!=` is not const
+        !matches!(self, Command::GCdm)
     }
 
     /// The timeout for a command. This is [`Self::timeout_ms`] converted to an [`embassy_time::Duration`].

@@ -8,18 +8,19 @@ use bincode::config;
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use embassy_sync::mutex::{Mutex, MutexGuard};
 use embassy_sync::signal::Signal;
-use embassy_time::{with_timeout, Duration};
+use embassy_time::{with_timeout, Duration, Timer};
 use embedded_hal::digital::InputPin;
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::ado::{self, Ado};
 use embedded_usb_pd::pdinfo::AltMode;
+use embedded_usb_pd::vdm::Svid;
 use embedded_usb_pd::{pdo, Error, LocalPortId, PdError};
 use itertools::izip;
 
 use super::interrupt::{self, InterruptController};
 use crate::asynchronous::internal;
-use crate::command::{muxr, trig, vdms, Command, ReturnValue, SrdySwitch};
+use crate::command::{gcdm, muxr, trig, vdms, Command, ReturnValue, SrdySwitch};
 use crate::registers::autonegotiate_sink::AutoComputeSinkMaxVoltage;
 use crate::registers::field_sets::IntEventBus1;
 use crate::{error, registers, trace, warn, DeviceError, Mode, MAX_SUPPORTED_PORTS};
@@ -315,8 +316,7 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
             .await;
         {
             let mut inner = self.lock_inner().await;
-            inner.read_command_result(port, outdata).await
-            // todo: map command result here
+            inner.read_command_result(port, outdata, cmd.has_return_value()).await
         }
     }
 
@@ -334,7 +334,7 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
             error!("Command {:#?} timed out", cmd);
             // See if there's a definite error we can read
             let mut inner = self.lock_inner().await;
-            return match inner.read_command_result(port, None).await? {
+            return match inner.read_command_result(port, None, cmd.has_return_value()).await? {
                 ReturnValue::Rejected => PdError::Rejected,
                 _ => PdError::Timeout,
             }
@@ -721,6 +721,53 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     /// Execute the [`Command::Drst`] command.
     pub async fn execute_drst(&mut self, port: LocalPortId) -> Result<ReturnValue, Error<B::Error>> {
         self.execute_command(port, Command::Drst, None, None).await
+    }
+
+    /// Get Rx discovered custom modes
+    pub async fn get_rx_discovered_custom_modes(
+        &mut self,
+        port: LocalPortId,
+        svid: Svid,
+    ) -> Result<gcdm::DiscoveredModes, Error<B::Error>> {
+        let mut input_data = [0u8; gcdm::INPUT_LEN];
+        let mut output_data = [0u8; gcdm::OUTPUT_LEN];
+
+        // Executing `GCdm` too soon after the discover modes interrupt can fail
+        // Brief delay to work around this, value determined by trial and error
+        Timer::after_millis(5).await;
+
+        let _size = bincode::encode_into_slice(
+            gcdm::Input { svid },
+            input_data.as_mut_slice(),
+            bincode::config::standard().with_fixed_int_encoding(),
+        )
+        .map_err(|_| Error::Pd(PdError::Serialize))?;
+
+        let ret: Result<(), PdError> = self
+            .execute_command(
+                port,
+                Command::GCdm,
+                Some(input_data.as_slice()),
+                Some(output_data.as_mut_slice()),
+            )
+            .await?
+            .into();
+        ret?;
+
+        let (modes, _): (gcdm::DiscoveredModes, _) =
+            bincode::decode_from_slice(&output_data, bincode::config::standard().with_fixed_int_encoding())
+                .map_err(|_| Error::Pd(PdError::Serialize))?;
+
+        // Documentation says that this command doesn't have a standard return value.
+        // But it actually can fail with a rejection error, however the output data is not shifted to accommodate this.
+        // We have to handle this ourselves instead of relying on the standard command execution code.
+        // Object positions for the discover modes command start at 1 so we can clearly distinguish between a rejection
+        // and a VDO with a value that matches a return value
+        if modes.alt_modes[0].position == 0 && modes.alt_modes[0].vdo != 0 {
+            Err(Error::Pd(PdError::Rejected))
+        } else {
+            Ok(modes)
+        }
     }
 }
 
