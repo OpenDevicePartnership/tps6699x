@@ -19,6 +19,12 @@ impl bincode::Encode for Input {
     }
 }
 
+impl From<Svid> for Input {
+    fn from(svid: Svid) -> Self {
+        Self { svid }
+    }
+}
+
 /// Representation of a custom discovered mode
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, bincode::Decode)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]

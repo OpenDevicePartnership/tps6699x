@@ -14,7 +14,6 @@ use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::ado::{self, Ado};
 use embedded_usb_pd::pdinfo::AltMode;
-use embedded_usb_pd::vdm::Svid;
 use embedded_usb_pd::{pdo, Error, LocalPortId, PdError};
 use itertools::izip;
 
@@ -724,10 +723,10 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     }
 
     /// Get Rx discovered custom modes
-    pub async fn get_rx_discovered_custom_modes(
+    pub async fn execute_gcdm(
         &mut self,
         port: LocalPortId,
-        svid: Svid,
+        input: gcdm::Input,
     ) -> Result<gcdm::DiscoveredModes, Error<B::Error>> {
         let mut input_data = [0u8; gcdm::INPUT_LEN];
         let mut output_data = [0u8; gcdm::OUTPUT_LEN];
@@ -737,7 +736,7 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         Timer::after_millis(5).await;
 
         let _size = bincode::encode_into_slice(
-            gcdm::Input { svid },
+            input,
             input_data.as_mut_slice(),
             bincode::config::standard().with_fixed_int_encoding(),
         )
