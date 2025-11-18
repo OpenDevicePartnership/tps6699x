@@ -408,8 +408,6 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         self.virtual_gpio_trigger(port, edge, trig::Cmd::RetimerForcePwr)
             .await?;
 
-        embassy_time::Timer::after(Duration::from_millis(50)).await;
-
         Ok(())
     }
 
