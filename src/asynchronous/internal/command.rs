@@ -96,14 +96,14 @@ impl<B: I2c> Tps6699x<B> {
             debug!("read_command_result: ret: {:?}", ret);
             // Overwrite return value
             if let Some(data) = data {
-                data.copy_from_slice(&buf[1..=data.len()]);
+                data.copy_from_slice(buf.get(1..=data.len()).ok_or(PdError::InvalidParams)?);
             }
             Ok(ret)
         } else {
             // No return value to check
             debug!("read_command_result: Done");
             if let Some(data) = data {
-                data.copy_from_slice(&buf[..data.len()]);
+                data.copy_from_slice(buf.get(..data.len()).ok_or(PdError::InvalidParams)?);
             }
             Ok(ReturnValue::Success)
         }

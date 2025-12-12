@@ -162,7 +162,8 @@ impl From<u8> for PpsRequestInterval {
             0x1 => PpsRequestInterval::FourSeconds,
             0x2 => PpsRequestInterval::TwoSeconds,
             0x3 => PpsRequestInterval::OneSecond,
-            _ => unreachable!("Masked value should always be in range 0-3"),
+            // Panic safety: All possible u8 values are unit tested
+            _ => unreachable!(),
         }
     }
 }
@@ -677,5 +678,19 @@ mod tests {
 
         let bytes = actual.as_bytes();
         assert_eq!(bytes, &AutonegotiateSink::DEFAULT);
+    }
+
+    #[test]
+    fn test_from_pps_request_interval() {
+        // Test simple values
+        assert_eq!(PpsRequestInterval::EightSeconds, 0x0.into());
+        assert_eq!(PpsRequestInterval::FourSeconds, 0x1.into());
+        assert_eq!(PpsRequestInterval::TwoSeconds, 0x2.into());
+        assert_eq!(PpsRequestInterval::OneSecond, 0x3.into());
+
+        // Verify no panics
+        for v in u8::MIN..=u8::MAX {
+            let _ = PpsRequestInterval::from(v);
+        }
     }
 }
