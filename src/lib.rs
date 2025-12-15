@@ -56,15 +56,15 @@ impl<BE, T> From<DeviceError<BE, T>> for embedded_usb_pd::Error<BE> {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Mode {
     /// Boot mode
-    Boot = u32_from_str("BOOT"),
+    Boot = u32_from_str(*b"BOOT"),
     /// Firmware corrupt on both banks
-    F211 = u32_from_str("F211"),
+    F211 = u32_from_str(*b"F211"),
     /// Before app config
-    App0 = u32_from_str("APP0"),
+    App0 = u32_from_str(*b"APP0"),
     /// After app config
-    App1 = u32_from_str("APP1"),
+    App1 = u32_from_str(*b"APP1"),
     /// App FW waiting for power
-    Wtpr = u32_from_str("WTPR"),
+    Wtpr = u32_from_str(*b"WTPR"),
 }
 
 impl PartialEq<u32> for Mode {
@@ -102,12 +102,8 @@ impl Into<[u8; 4]> for Mode {
 
 const U32_STR_LEN: usize = 4;
 /// Converts a 4-byte string into a u32
-pub(crate) const fn u32_from_str(value: &str) -> u32 {
-    if value.len() != U32_STR_LEN {
-        panic!("Invalid command string")
-    }
-    let bytes = value.as_bytes();
-    u32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]).to_le()
+pub(crate) const fn u32_from_str(bytes: [u8; U32_STR_LEN]) -> u32 {
+    u32::from_le_bytes(bytes).to_le()
 }
 
 /// Common unit test functions

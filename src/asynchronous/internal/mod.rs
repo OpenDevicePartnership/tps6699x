@@ -2,10 +2,10 @@
 use device_driver::AsyncRegisterInterface;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::pdinfo::AltMode;
-use embedded_usb_pd::pdo::{self, sink, source, ExpectedPdo};
+use embedded_usb_pd::pdo::{self, sink, source};
 use embedded_usb_pd::{Error, LocalPortId, PdError};
 
-use crate::registers::rx_caps::EPR_PDO_START_INDEX;
+use crate::registers::rx_caps::{RxCapsError, EPR_PDO_START_INDEX};
 use crate::{
     registers, warn, DeviceError, Mode, MAX_SUPPORTED_PORTS, PORT0, PORT1, TPS66993_NUM_PORTS, TPS66994_NUM_PORTS,
 };
@@ -45,10 +45,13 @@ impl<B: I2c> device_driver::AsyncRegisterInterface for Port<'_, B> {
 
         buf[0] = address;
         buf[1] = data.len() as u8;
-        let _ = &buf[2..data.len() + 2].copy_from_slice(data);
+        let _ = &buf
+            .get_mut(2..data.len() + 2)
+            .ok_or(PdError::InvalidParams)?
+            .copy_from_slice(data);
 
         self.bus
-            .write(self.addr, &buf[..data.len() + 2])
+            .write(self.addr, buf.get(..data.len() + 2).ok_or(PdError::InvalidParams)?)
             .await
             .map_err(Error::Bus)
     }
@@ -69,7 +72,7 @@ impl<B: I2c> device_driver::AsyncRegisterInterface for Port<'_, B> {
         }
 
         self.bus
-            .write_read(self.addr, &reg, &mut buf[..full_len])
+            .write_read(self.addr, &reg, buf.get_mut(..full_len).ok_or(PdError::InvalidParams)?)
             .await
             .map_err(Error::Bus)?;
 
@@ -88,7 +91,7 @@ impl<B: I2c> device_driver::AsyncRegisterInterface for Port<'_, B> {
             // Controller is busy and can't respond
             PdError::Busy.into()
         } else {
-            data.copy_from_slice(&buf[1..data.len() + 1]);
+            data.copy_from_slice(buf.get(1..data.len() + 1).ok_or(PdError::InvalidParams)?);
             Ok(())
         }
     }
@@ -117,11 +120,7 @@ impl<B: I2c> Tps6699x<B> {
 
     /// Get the I2C address for a port
     fn port_addr(&self, port: LocalPortId) -> Result<u8, Error<B::Error>> {
-        if port.0 as usize >= self.num_ports {
-            PdError::InvalidPort.into()
-        } else {
-            Ok(self.addr[port.0 as usize])
-        }
+        Ok(*self.addr.get(port.0 as usize).ok_or(PdError::InvalidPort)?)
     }
 
     /// Returns number of ports
@@ -602,7 +601,7 @@ impl<B: I2c> Tps6699x<B> {
         register: u8,
         out_spr_pdos: &mut [T],
         out_epr_pdos: &mut [T],
-    ) -> Result<(usize, usize), DeviceError<B::Error, ExpectedPdo>> {
+    ) -> Result<(usize, usize), DeviceError<B::Error, RxCapsError>> {
         // Clamp to the maximum number of PDOs
         let num_pdos = if !out_epr_pdos.is_empty() {
             EPR_PDO_START_INDEX + out_epr_pdos.len()
@@ -626,12 +625,16 @@ impl<B: I2c> Tps6699x<B> {
         let num_sprs = out_spr_pdos.len().min(rx_caps.num_valid_pdos() as usize);
         for (i, pdo) in out_spr_pdos.iter_mut().enumerate().take(num_sprs) {
             // SPR PDOs start at index 0
-            *pdo = rx_caps[i];
+            *pdo = *rx_caps
+                .get(i)
+                .ok_or(DeviceError::Error(Error::Pd(PdError::InvalidParams)))?;
         }
 
         let num_eprs = out_epr_pdos.len().min(rx_caps.num_valid_epr_pdos() as usize);
         for (i, pdo) in out_epr_pdos.iter_mut().enumerate().take(num_eprs) {
-            *pdo = rx_caps[EPR_PDO_START_INDEX + i];
+            *pdo = *rx_caps
+                .get(EPR_PDO_START_INDEX + i)
+                .ok_or(DeviceError::Error(Error::Pd(PdError::InvalidParams)))?;
         }
 
         Ok((num_sprs, num_eprs))
@@ -645,7 +648,7 @@ impl<B: I2c> Tps6699x<B> {
         port: LocalPortId,
         out_spr_pdos: &mut [source::Pdo],
         out_epr_pdos: &mut [source::Pdo],
-    ) -> Result<(usize, usize), DeviceError<B::Error, ExpectedPdo>> {
+    ) -> Result<(usize, usize), DeviceError<B::Error, RxCapsError>> {
         self.get_rx_caps(port, registers::rx_caps::RX_SRC_ADDR, out_spr_pdos, out_epr_pdos)
             .await
     }
@@ -658,7 +661,7 @@ impl<B: I2c> Tps6699x<B> {
         port: LocalPortId,
         out_spr_pdos: &mut [sink::Pdo],
         out_epr_pdos: &mut [sink::Pdo],
-    ) -> Result<(usize, usize), DeviceError<B::Error, ExpectedPdo>> {
+    ) -> Result<(usize, usize), DeviceError<B::Error, RxCapsError>> {
         self.get_rx_caps(port, registers::rx_caps::RX_SNK_ADDR, out_spr_pdos, out_epr_pdos)
             .await
     }

@@ -233,13 +233,11 @@ impl<T: UpdateTarget> BorrowedUpdaterInProgress<T> {
         controllers: &mut [&mut T],
         data: &[u8],
     ) -> Result<(), Error<T::BusError>> {
-        if controllers.is_empty() {
-            return Err(PdError::InvalidParams.into());
-        }
-
         trace!("Controllers: Sending burst write");
         let update_args = self.update_args.ok_or(Error::Pd(PdError::InvalidParams))?;
-        if let Err(e) = controllers[0]
+        if let Err(e) = controllers
+            .get_mut(0)
+            .ok_or(PdError::InvalidParams)?
             .fw_update_burst_write(update_args.broadcast_u16_address as u8, data)
             .await
         {
@@ -434,7 +432,10 @@ impl<T: UpdateTarget> BorrowedUpdaterInProgress<T> {
             read_result.read_data,
         );
 
-        self.args_buffer[current..current + read_len].copy_from_slice(read_result.read_data);
+        self.args_buffer
+            .get_mut(current..current + read_len)
+            .ok_or(PdError::InvalidParams)?
+            .copy_from_slice(read_result.read_data);
 
         if read_result.is_complete() {
             // We have the full header metadata
@@ -498,7 +499,10 @@ impl<T: UpdateTarget> BorrowedUpdaterInProgress<T> {
         self.block_args = None;
         let current = read_result.read_state.current;
         let read_len = read_result.read_data.len();
-        self.args_buffer[current..current + read_len].copy_from_slice(read_result.read_data);
+        self.args_buffer
+            .get_mut(current..current + read_len)
+            .ok_or(PdError::InvalidParams)?
+            .copy_from_slice(read_result.read_data);
 
         if read_result.is_complete() {
             // We have the full header metadata
@@ -573,7 +577,10 @@ impl<T: UpdateTarget> BorrowedUpdaterInProgress<T> {
     ) -> Result<Option<SeekOperation>, Error<T::BusError>> {
         let current = read_result.read_state.current;
         let read_len = read_result.read_data.len();
-        self.args_buffer[current..current + read_len].copy_from_slice(read_result.read_data);
+        self.args_buffer
+            .get_mut(current..current + read_len)
+            .ok_or(PdError::InvalidParams)?
+            .copy_from_slice(read_result.read_data);
         self.fw_update_burst_write(controllers, read_result.read_data).await?;
         if read_result.is_complete() {
             // We have the full image size
@@ -702,14 +709,22 @@ pub async fn perform_fw_update_borrowed<T: UpdateTarget>(
 
     // Disable all interrupts while we're entering FW update mode
     // These go in the second half of the interrupt_guards array so they get dropped last
-    disable_all_interrupts(controllers, &mut interrupt_guards[half..]).await?;
+    disable_all_interrupts(
+        controllers,
+        interrupt_guards.get_mut(half..).ok_or(PdError::InvalidParams)?,
+    )
+    .await?;
     info!("Starting update");
     let result = updater.start_fw_update(controllers, delay).await;
     info!("Update started");
 
     // Re-enable interrupts on port 0 only
     // These go in the first half of the interrupt_guards array so they get dropped first
-    enable_port0_interrupts(controllers, &mut interrupt_guards[0..half]).await?;
+    enable_port0_interrupts(
+        controllers,
+        interrupt_guards.get_mut(0..half).ok_or(PdError::InvalidParams)?,
+    )
+    .await?;
 
     match result {
         Err(e) => {

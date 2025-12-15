@@ -83,6 +83,8 @@ impl SeekingStream {
             );
             // Still waiting for a particular byte
             self.position += data.len();
+            // Panic safety: this will never panic because we can always take a slice with a length of zero
+            #[allow(clippy::indexing_slicing)]
             &data[0..0]
         }
     }

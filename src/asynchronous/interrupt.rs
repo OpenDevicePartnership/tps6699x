@@ -27,12 +27,8 @@ pub trait InterruptController {
         port: LocalPortId,
         enabled: bool,
     ) -> Result<Self::Guard, Error<Self::BusError>> {
-        if port.0 as usize >= MAX_SUPPORTED_PORTS {
-            return PdError::InvalidPort.into();
-        }
-
         let mut state = self.interrupts_enabled().await?;
-        state[port.0 as usize] = enabled;
+        *state.get_mut(port.0 as usize).ok_or(PdError::InvalidPort)? = enabled;
         self.enable_interrupts_guarded(state).await
     }
 

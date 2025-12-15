@@ -1,5 +1,3 @@
-use core::ops::{Index, IndexMut};
-
 use bitfield::bitfield;
 use embedded_usb_pd::pdo::{sink, source, Common, ExpectedPdo, RoleCommon};
 
@@ -114,32 +112,38 @@ impl<T: Common> RxCaps<T> {
         self.last_src_cap_is_epr = is_epr;
         self
     }
-}
 
-impl<T: Common> Index<usize> for RxCaps<T> {
-    type Output = T;
+    /// Checked indexing into the PDOs
+    pub fn get(&self, index: usize) -> Option<&T> {
+        self.pdos.get(index)
+    }
 
-    fn index(&self, index: usize) -> &Self::Output {
-        if index < TOTAL_PDOS {
-            &self.pdos[index]
-        } else {
-            panic!("Index out of bounds: {}", index);
-        }
+    /// Checked mutable indexing into the PDOs
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        self.pdos.get_mut(index)
     }
 }
 
-impl<T: Common> IndexMut<usize> for RxCaps<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index < TOTAL_PDOS {
-            &mut self.pdos[index]
-        } else {
-            panic!("Index out of bounds: {}", index);
-        }
-    }
+/// Struct for [`RxCapsError::ExpectedPdo`]
+#[derive(Copy, Clone, Debug)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct InvalidPdoIndex {
+    pub requested: usize,
+    pub max: usize,
+}
+
+/// Error type for functions that deal with received capabilities
+#[derive(Copy, Clone, Debug)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub enum RxCapsError {
+    /// PDO conversion error
+    ExpectedPdo(ExpectedPdo),
+    /// Invalid PDO index accessed, contains (requested, max)
+    InvalidPdoIndex(InvalidPdoIndex),
 }
 
 impl<T: RoleCommon> TryFrom<[u8; LEN]> for RxCaps<T> {
-    type Error = ExpectedPdo;
+    type Error = RxCapsError;
 
     fn try_from(raw: [u8; LEN]) -> Result<Self, Self::Error> {
         let raw = RxCapsRaw(raw);
@@ -158,8 +162,14 @@ impl<T: RoleCommon> TryFrom<[u8; LEN]> for RxCaps<T> {
                 4 => raw.pdo4(),
                 5 => raw.pdo5(),
                 6 => raw.pdo6(),
-                _ => unreachable!(),
-            })?;
+                _ => {
+                    return Err(RxCapsError::InvalidPdoIndex(InvalidPdoIndex {
+                        requested: i,
+                        max: NUM_SPR_PDOS,
+                    }))
+                }
+            })
+            .map_err(RxCapsError::ExpectedPdo)?;
         }
 
         // Decode only valid EPR PDOs
@@ -174,8 +184,14 @@ impl<T: RoleCommon> TryFrom<[u8; LEN]> for RxCaps<T> {
                 1 => raw.epr_pdo1(),
                 2 => raw.epr_pdo2(),
                 3 => raw.epr_pdo3(),
-                _ => unreachable!(),
-            })?;
+                _ => {
+                    return Err(RxCapsError::InvalidPdoIndex(InvalidPdoIndex {
+                        requested: i,
+                        max: NUM_EPR_PDOS,
+                    }))
+                }
+            })
+            .map_err(RxCapsError::ExpectedPdo)?;
         }
 
         Ok(RxCaps {
@@ -220,8 +236,11 @@ mod test {
         let rx_src_caps = RxSrcCaps::try_from(buf).unwrap();
         assert_eq!(rx_src_caps.num_valid_pdos(), 2);
         assert_eq!(rx_src_caps.num_valid_epr_pdos(), 1);
-        assert_eq!(rx_src_caps[0], TEST_SRC_PDO_FIXED_5V3A);
-        assert_eq!(rx_src_caps[1], TEST_SRC_PDO_FIXED_5V1A5);
-        assert_eq!(rx_src_caps[EPR_PDO_START_INDEX], TEST_SRC_EPR_PDO_FIXED_28V5A);
+        assert_eq!(*rx_src_caps.get(0).unwrap(), TEST_SRC_PDO_FIXED_5V3A);
+        assert_eq!(*rx_src_caps.get(1).unwrap(), TEST_SRC_PDO_FIXED_5V1A5);
+        assert_eq!(
+            *rx_src_caps.get(EPR_PDO_START_INDEX).unwrap(),
+            TEST_SRC_EPR_PDO_FIXED_28V5A
+        );
     }
 }

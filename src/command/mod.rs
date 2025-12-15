@@ -4,26 +4,15 @@ use bincode::error::{DecodeError, EncodeError};
 use bincode::{Decode, Encode};
 use embedded_usb_pd::PdError;
 
+use crate::u32_from_str;
+
 pub mod gcdm;
 pub mod muxr;
 pub mod trig;
 pub mod vdms;
 
-/// Length of a command
-const CMD_LEN: usize = 4;
-
 /// TaskResult is only defined for lower 4 bits
 pub const CMD_4CC_TASK_RETURN_CODE_MASK: u8 = 0x0F;
-
-/// Converts a 4-byte string into a u32
-const fn u32_from_str(value: &str) -> u32 {
-    if value.len() != CMD_LEN {
-        panic!("Invalid command string")
-    }
-
-    let bytes = value.as_bytes();
-    u32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]).to_le()
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -32,27 +21,27 @@ pub enum Command {
     /// Previous command succeeded
     Success = 0,
     /// Invalid Command
-    Invalid = u32_from_str("!CMD"),
+    Invalid = u32_from_str(*b"!CMD"),
     /// Reset command
-    Gaid = u32_from_str("GAID"),
+    Gaid = u32_from_str(*b"GAID"),
 
     /// Tomcat firmware update mode enter
-    Tfus = u32_from_str("TFUs"),
+    Tfus = u32_from_str(*b"TFUs"),
     /// Tomcat firmware update mode init
-    Tfui = u32_from_str("TFUi"),
+    Tfui = u32_from_str(*b"TFUi"),
     /// Tomcat firmware update mode query
-    Tfuq = u32_from_str("TFUq"),
+    Tfuq = u32_from_str(*b"TFUq"),
     /// Tomcat firmware update mode exit
-    Tfue = u32_from_str("TFUe"),
+    Tfue = u32_from_str(*b"TFUe"),
     /// Tomcat firmware update data
-    Tfud = u32_from_str("TFUd"),
+    Tfud = u32_from_str(*b"TFUd"),
     /// Tomcat firmware update complete
-    Tfuc = u32_from_str("TFUc"),
+    Tfuc = u32_from_str(*b"TFUc"),
 
     /// System ready to sink
-    Srdy = u32_from_str("SRDY"),
+    Srdy = u32_from_str(*b"SRDY"),
     /// SRDY reset
-    Sryr = u32_from_str("SRYR"),
+    Sryr = u32_from_str(*b"SRYR"),
 
     /// Re-evaluate the Autonegotiate Sink register.
     ///
@@ -61,10 +50,10 @@ pub enum Command {
     ///
     /// # Output
     /// [`ReturnValue`]
-    Aneg = u32_from_str("ANeg"),
+    Aneg = u32_from_str(*b"ANeg"),
 
     /// Trigger an Input GPIO event
-    Trig = u32_from_str("Trig"),
+    Trig = u32_from_str(*b"Trig"),
 
     /// Clear the dead battery flag.
     ///
@@ -73,7 +62,7 @@ pub enum Command {
     ///
     /// # Output
     /// [`ReturnValue`]
-    Dbfg = u32_from_str("DBfg"),
+    Dbfg = u32_from_str(*b"DBfg"),
 
     /// Repeat transactions on I2C3m under certain conditions.
     ///
@@ -82,7 +71,7 @@ pub enum Command {
     ///
     /// # Output
     /// [`ReturnValue`]
-    Muxr = u32_from_str("MuxR"),
+    Muxr = u32_from_str(*b"MuxR"),
 
     /// PD Data Reset
     ///
@@ -91,7 +80,7 @@ pub enum Command {
     ///
     /// # Output
     /// [`ReturnValue`]
-    Drst = u32_from_str("DRST"),
+    Drst = u32_from_str(*b"DRST"),
 
     /// Send VDM.
     ///
@@ -100,7 +89,7 @@ pub enum Command {
     ///
     /// # Output
     /// None
-    VDMs = u32_from_str("VDMs"),
+    VDMs = u32_from_str(*b"VDMs"),
 
     /// Execute a UCSI command
     ///
@@ -109,7 +98,7 @@ pub enum Command {
     ///
     /// # Output
     /// [`embedded_usb_pd::ucsi::lpm::ResponseData`]
-    Ucsi = u32_from_str("UCSI"),
+    Ucsi = u32_from_str(*b"UCSI"),
 
     /// Get custom discovered modes
     ///
@@ -118,7 +107,7 @@ pub enum Command {
     ///
     /// # Output
     /// [`gcdm::DiscoveredMode`]
-    GCdm = u32_from_str("GCdm"),
+    GCdm = u32_from_str(*b"GCdm"),
 }
 
 impl TryFrom<u32> for Command {
