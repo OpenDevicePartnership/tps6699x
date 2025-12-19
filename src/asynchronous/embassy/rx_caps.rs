@@ -71,8 +71,8 @@ impl<T: Common> RxCaps<T> {
 impl From<RxCaps<source::Pdo>> for RxCaps<pdo::Pdo> {
     fn from(value: RxCaps<source::Pdo>) -> Self {
         RxCaps {
-            spr: value.spr_as_slice().iter().map(|pdo| pdo.clone().into()).collect(),
-            epr: value.epr_as_slice().iter().map(|pdo| pdo.clone().into()).collect(),
+            spr: value.spr_as_slice().iter().map(|&pdo| pdo.into()).collect(),
+            epr: value.epr_as_slice().iter().map(|&pdo| pdo.into()).collect(),
         }
     }
 }
@@ -80,8 +80,8 @@ impl From<RxCaps<source::Pdo>> for RxCaps<pdo::Pdo> {
 impl From<RxCaps<sink::Pdo>> for RxCaps<pdo::Pdo> {
     fn from(value: RxCaps<sink::Pdo>) -> Self {
         RxCaps {
-            spr: value.spr_as_slice().iter().map(|pdo| pdo.clone().into()).collect(),
-            epr: value.epr_as_slice().iter().map(|pdo| pdo.clone().into()).collect(),
+            spr: value.spr_as_slice().iter().map(|&pdo| pdo.into()).collect(),
+            epr: value.epr_as_slice().iter().map(|&pdo| pdo.into()).collect(),
         }
     }
 }

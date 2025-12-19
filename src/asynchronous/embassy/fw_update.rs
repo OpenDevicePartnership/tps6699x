@@ -19,12 +19,12 @@ impl<M: RawMutex, B: I2c> UpdateTarget for Tps6699x<'_, M, B> {
             with_timeout(Command::Tfus.timeout(), inner.execute_tfus(delay)).await
         };
 
-        if result.is_err() {
+        if let Ok(result) = result {
+            result
+        } else {
             error!("Enter FW mode timeout");
-            return PdError::Timeout.into();
+            PdError::Timeout.into()
         }
-
-        result.unwrap()
     }
 
     /// Initialize the firmware update with the TFUi command
@@ -93,7 +93,10 @@ impl<M: RawMutex, B: I2c> UpdateTarget for Tps6699x<'_, M, B> {
             bincode::decode_from_slice(&return_bytes, config::standard().with_fixed_int_encoding())
                 .map_err(|_| PdError::Serialize)?;
 
-        Ok(ret.block_status[block_index])
+        ret.block_status
+            .get(block_index)
+            .cloned()
+            .ok_or(Error::Pd(PdError::InvalidParams))
     }
 
     async fn fw_update_stream_data(
@@ -126,12 +129,12 @@ impl<M: RawMutex, B: I2c> UpdateTarget for Tps6699x<'_, M, B> {
             with_timeout(Command::Tfuc.timeout(), inner.execute_tfuc(delay)).await
         };
 
-        if result.is_err() {
+        if let Ok(result) = result {
+            result
+        } else {
             error!("Complete timeout");
-            return PdError::Timeout.into();
+            PdError::Timeout.into()
         }
-
-        result.unwrap()
     }
 
     async fn fw_update_burst_write(&mut self, address: u8, data: &[u8]) -> Result<(), Error<Self::BusError>> {
