@@ -273,13 +273,21 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
             }
 
             if done {
-                // Put back any unhandled interrupt flags for future processing
+                // Panic safety: `unhandled`, `accumulated_flags`, and `mask` are all of size MAX_SUPPORTED_PORTS
+                // so this will never index out of bounds
+                #[allow(clippy::indexing_slicing)]
                 let unhandled = from_fn(|i| accumulated_flags[i] & !mask[i]);
+
+                // Put back any unhandled interrupt flags for future processing
                 if unhandled.iter().any(|&f| f != IntEventBus1::new_zero()) {
                     // If there are unhandled flags, signal them for future processing
                     trace!("Signaling unhandled interrupt flags: {:?}", unhandled);
                     self.controller.interrupt_waker.signal(unhandled);
                 }
+
+                // Panic safety: the return type, `accumulated_flags`, and `mask` are all of size MAX_SUPPORTED_PORTS
+                // so this will never index out of bounds
+                #[allow(clippy::indexing_slicing)]
                 return from_fn(|i| accumulated_flags[i] & mask[i]);
             }
         }
@@ -329,18 +337,18 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     ) -> Result<ReturnValue, Error<B::Error>> {
         let timeout = cmd.timeout();
         let result = with_timeout(timeout, self.execute_command_no_timeout(port, cmd, indata, outdata)).await;
-        if result.is_err() {
+        if let Ok(result) = result {
+            result
+        } else {
             error!("Command {:#?} timed out", cmd);
             // See if there's a definite error we can read
             let mut inner = self.lock_inner().await;
-            return match inner.read_command_result(port, None, cmd.has_return_value()).await? {
+            match inner.read_command_result(port, None, cmd.has_return_value()).await? {
                 ReturnValue::Rejected => PdError::Rejected,
                 _ => PdError::Timeout,
             }
-            .into();
+            .into()
         }
-
-        result.unwrap()
     }
 
     async fn execute_srdy(&mut self, port: LocalPortId, switch: SrdySwitch) -> Result<ReturnValue, Error<B::Error>> {
@@ -390,7 +398,8 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         let args = trig::Args { edge, cmd };
         let mut args_buf = [0; trig::ARGS_LEN];
 
-        bincode::encode_into_slice(args, &mut args_buf, config::standard().with_fixed_int_encoding()).unwrap();
+        bincode::encode_into_slice(args, &mut args_buf, config::standard().with_fixed_int_encoding())
+            .map_err(|_| Error::Pd(PdError::InvalidParams))?;
 
         self.execute_command(port, Command::Trig, Some(&args_buf), None).await
     }
@@ -639,10 +648,9 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
             .get_rx_caps(port, register, &mut out_spr_pdos, &mut out_epr_pdos)
             .await?;
 
-        // These unwraps are safe because we know the sizes of the arrays
         Ok(rx_caps::RxCaps {
-            spr: heapless::Vec::from_slice(&out_spr_pdos[..num_valid_spr]).unwrap(),
-            epr: heapless::Vec::from_slice(&out_epr_pdos[..num_valid_epr]).unwrap(),
+            spr: heapless::Vec::from_iter(out_spr_pdos.into_iter().take(num_valid_spr)),
+            epr: heapless::Vec::from_iter(out_epr_pdos.into_iter().take(num_valid_epr)),
         })
     }
 
@@ -807,10 +815,19 @@ impl<'a, M: RawMutex, B: I2c> Interrupt<'a, M, B> {
         {
             let interrupts_enabled = self.controller.interrupts_enabled();
             let mut inner = self.lock_inner().await;
-            for port in 0..inner.num_ports() {
+
+            // Note: `interrupts_enabled` and `flags` are both of size MAX_SUPPORTED_PORTS and so
+            // will always have a 1:1 mapping. If `num_ports` ever returns a value larger than
+            // MAX_SUPPORTED_PORTS, `port` will simply be capped at MAX_SUPPORTED_PORTS.
+            for (port, (interrupt_enabled, flag)) in interrupts_enabled
+                .iter()
+                .zip(flags.iter_mut())
+                .take(inner.num_ports())
+                .enumerate()
+            {
                 let port_id = LocalPortId(port as u8);
 
-                if !interrupts_enabled[port] {
+                if !interrupt_enabled {
                     trace!("{:?}: Interrupt for disabled", port_id);
                     continue;
                 }
@@ -830,7 +847,7 @@ impl<'a, M: RawMutex, B: I2c> Interrupt<'a, M, B> {
 
                 match with_timeout(Duration::from_millis(100), inner.clear_interrupt(port_id)).await {
                     Ok(res) => match res {
-                        Ok(event) => flags[port] |= event,
+                        Ok(event) => *flag |= event,
                         Err(_e) => {
                             continue;
                         }

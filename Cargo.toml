@@ -3,7 +3,7 @@ name = "tps6699x"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-rust-version = "1.83"
+rust-version = "1.88"
 
 [dependencies]
 bitfield = "0.19.0"
@@ -40,3 +40,17 @@ critical-section = { version = "1.1", features = ["std"] }
 embedded-hal-mock = { version = "0.11.1", features = ["embedded-hal-async"] }
 tokio = { version = "1.42.0", features = ["rt", "macros", "time"] }
 static_cell = "2.1.0"
+
+[lints.clippy]
+correctness = "deny"
+expect_used = "deny"
+indexing_slicing = "deny"
+panic = "deny"
+panic_in_result_fn = "deny"
+perf = "deny"
+suspicious = "deny"
+style = "deny"
+todo = "deny"
+unimplemented = "deny"
+unreachable = "deny"
+unwrap_used = "deny"

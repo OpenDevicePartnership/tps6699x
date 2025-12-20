@@ -58,7 +58,9 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
 
             // First byte returned is number of bytes written, we don't use it so erase it
             outdata.rotate_left(1);
-            outdata.last_mut().map(|b| *b = 0);
+            if let Some(b) = outdata.last_mut() {
+                *b = 0;
+            }
         }
 
         Ok(ReturnValue::Success)
@@ -74,7 +76,7 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         let port = command.port();
 
         // Internally the controller uses 1-based port numbering
-        let mut command = command.clone();
+        let mut command = *command;
         command.set_port(LocalPortId(command.port().0 + 1));
 
         encode_into_slice(

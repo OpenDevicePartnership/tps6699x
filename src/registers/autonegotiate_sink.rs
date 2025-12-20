@@ -163,6 +163,7 @@ impl From<u8> for PpsRequestInterval {
             0x2 => PpsRequestInterval::TwoSeconds,
             0x3 => PpsRequestInterval::OneSecond,
             // Panic safety: All possible u8 values are unit tested
+            #[allow(clippy::unreachable)]
             _ => unreachable!(),
         }
     }
