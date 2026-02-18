@@ -1155,6 +1155,15 @@ DpConfig:
         Usb: 0x0
         Dp: 0x1
         Reserved: catch_all
+    UsbDataPath:
+      base: uint
+      start: 15
+      end: 16
+      description: USB data path support.
+      conversion:
+        name: UsbDataPath
+        MayBeRequired: 0x0
+        NotRequired: 0x1
     DfpdPinAssignment:
       base: uint
       start: 16
