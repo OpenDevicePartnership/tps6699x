@@ -515,6 +515,17 @@ impl<B: I2c> Tps6699x<B> {
             .await
     }
 
+    /// Modify Tbt config settings
+    pub async fn modify_tbt_config(
+        &mut self,
+        port: LocalPortId,
+        f: impl FnOnce(&mut registers::field_sets::TbtConfig) -> registers::field_sets::TbtConfig,
+    ) -> Result<registers::field_sets::TbtConfig, Error<B::Error>> {
+        let port = self.borrow_port(port)?;
+        let mut registers = port.into_registers();
+        registers.tbt_config().modify_async(|r| f(r)).await
+    }
+
     /// Set unconstrained power on a port
     pub async fn set_unconstrained_power(&mut self, port: LocalPortId, enable: bool) -> Result<(), Error<B::Error>> {
         let mut control = self.get_port_control(port).await?;
