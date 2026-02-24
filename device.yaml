@@ -1155,6 +1155,15 @@ DpConfig:
         Usb: 0x0
         Dp: 0x1
         Reserved: catch_all
+    UsbDataPath:
+      base: uint
+      start: 15
+      end: 16
+      description: USB data path support.
+      conversion:
+        name: DpUsbDataPath
+        MayBeRequired: 0x0
+        NotRequired: 0x1
     DfpdPinAssignment:
       base: uint
       start: 16
@@ -1324,6 +1333,15 @@ TbtConfig:
       base: bool
       start: 49
       description: Assert this bit to enable TBT auto-entry.
+    UsbDataPath:
+      base: uint
+      start: 54
+      end: 55
+      description: USB data path support.
+      conversion:
+        name: TbtUsbDataPath
+        MayBeRequired: 0x0
+        NotRequired: 0x1
     SourceVCONNDelay:
       base: uint
       start: 56
