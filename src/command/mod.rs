@@ -25,6 +25,28 @@ pub enum Command {
     /// Reset command
     Gaid = u32_from_str(*b"GAID"),
 
+    /// Simulate a port disconnect.
+    ///
+    /// The `DISC` Modal Task causes the PD Controller to act as if the USB-C port
+    /// is disconnected, with an optional Host-specified delay to restoring normal
+    /// port operation. If currently there is no USB-C connection on the port, then
+    /// this task will be rejected. The port that will be disconnected when writing
+    /// the `DISC` Task will correspond to the I2C target address used when writing
+    /// the `DISC` Task.
+    ///
+    /// # Input
+    /// `DISCDelay`: 8-bit value in seconds for disconnect time. If 0, there is
+    /// no automatic reconnect.
+    ///
+    /// # Output
+    /// [`ReturnValue`]
+    ///
+    /// This Task always completes successfully, it has no reason to be rejected
+    /// or timed-out. If another Modal Task was already active the `DISC` Modal
+    /// Task will cancel that Modal Task and take its place. The `DISC` Modal Task
+    /// completes immediately, it does not wait for the re-connect delay
+    DISC = u32_from_str(*b"DISC"),
+
     /// Tomcat firmware update mode enter
     Tfus = u32_from_str(*b"TFUs"),
     /// Tomcat firmware update mode init
@@ -120,6 +142,8 @@ impl TryFrom<u32> for Command {
             Ok(Command::Invalid)
         } else if Command::Gaid == value {
             Ok(Command::Gaid)
+        } else if Command::DISC == value {
+            Ok(Command::DISC)
         } else if Command::Tfus == value {
             Ok(Command::Tfus)
         } else if Command::Tfui == value {
