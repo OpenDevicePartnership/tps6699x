@@ -44,7 +44,7 @@ pub enum Command {
     /// This Task always completes successfully, it has no reason to be rejected
     /// or timed-out. If another Modal Task was already active the `DISC` Modal
     /// Task will cancel that Modal Task and take its place. The `DISC` Modal Task
-    /// completes immediately, it does not wait for the re-connect delay
+    /// completes immediately, it does not wait for the reconnect delay.
     DISC = u32_from_str(*b"DISC"),
 
     /// Tomcat firmware update mode enter
