@@ -559,6 +559,30 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         inner.set_port_config(port, config).await
     }
 
+    /// Get Sx App Config register (`0x20`).
+    ///
+    /// This register contains the current system power state.
+    pub async fn get_sx_app_config(
+        &mut self,
+        port: LocalPortId,
+    ) -> Result<registers::sx_app_config::SxAppConfig, Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.get_sx_app_config(port).await
+    }
+
+    /// Set Sx App Config register (`0x20`).
+    ///
+    /// Write the current system power state to the PD controller. A change in power state
+    /// triggers a new Application Configuration to be applied.
+    pub async fn set_sx_app_config(
+        &mut self,
+        port: LocalPortId,
+        config: registers::sx_app_config::SxAppConfig,
+    ) -> Result<(), Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.set_sx_app_config(port, config).await
+    }
+
     /// Get Rx ADO
     pub async fn get_rx_ado(
         &mut self,

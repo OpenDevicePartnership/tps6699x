@@ -568,6 +568,46 @@ impl<B: I2c> Tps6699x<B> {
             .await
     }
 
+    /// Get Sx App Config register (`0x20`).
+    ///
+    /// This register contains the current system power state.
+    pub async fn get_sx_app_config(
+        &mut self,
+        port: LocalPortId,
+    ) -> Result<registers::sx_app_config::SxAppConfig, Error<B::Error>> {
+        let mut buf = [0u8; registers::sx_app_config::LEN];
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .read_register(
+                registers::sx_app_config::ADDR,
+                (registers::sx_app_config::LEN * 8) as u32,
+                &mut buf,
+            )
+            .await?;
+        Ok(buf.into())
+    }
+
+    /// Set Sx App Config register (`0x20`).
+    ///
+    /// Write the current system power state to the PD controller. A change in power state
+    /// triggers a new Application Configuration to be applied.
+    pub async fn set_sx_app_config(
+        &mut self,
+        port: LocalPortId,
+        config: registers::sx_app_config::SxAppConfig,
+    ) -> Result<(), Error<B::Error>> {
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .write_register(
+                registers::sx_app_config::ADDR,
+                (registers::sx_app_config::LEN * 8) as u32,
+                config.as_bytes(),
+            )
+            .await
+    }
+
     /// Get Rx ADO
     pub async fn get_rx_ado(&mut self, port: LocalPortId) -> Result<registers::field_sets::RxAdo, Error<B::Error>> {
         self.borrow_port(port)?.into_registers().rx_ado().read_async().await
