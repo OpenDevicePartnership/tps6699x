@@ -1108,4 +1108,624 @@ mod test {
         assert_eq!(out_epr_pdos[0], TEST_SRC_EPR_PDO_FIXED_28V5A);
         assert_eq!(out_epr_pdos[1], Pdo::default());
     }
+
+    async fn run_modify_interrupt_mask(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::IntEventBus1;
+
+        let initial = IntEventBus1::new_zero();
+        let mut expected = initial;
+        expected.set_plug_event(true);
+
+        tps6699x.bus.update_expectations(&[
+            create_register_read(expected_addr, 0x16, initial),
+            create_register_write(expected_addr, 0x16, expected),
+        ]);
+
+        let result = tps6699x
+            .modify_interrupt_mask(port, |r| {
+                r.set_plug_event(true);
+                *r
+            })
+            .await
+            .unwrap();
+
+        assert_eq!(result, expected);
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_modify_interrupt_mask() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_modify_interrupt_mask(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_modify_interrupt_mask(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    #[tokio::test]
+    async fn test_modify_interrupt_mask_all() {
+        use registers::field_sets::IntEventBus1;
+
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        let initial = IntEventBus1::new_zero();
+        let mut expected = initial;
+        expected.set_plug_event(true);
+
+        tps6699x.bus.update_expectations(&[
+            create_register_read(PORT0_ADDR0, 0x16, initial),
+            create_register_write(PORT0_ADDR0, 0x16, expected),
+            create_register_read(PORT1_ADDR0, 0x16, initial),
+            create_register_write(PORT1_ADDR0, 0x16, expected),
+        ]);
+
+        tps6699x
+            .modify_interrupt_mask_all(|r| {
+                r.set_plug_event(true);
+                *r
+            })
+            .await
+            .unwrap();
+
+        tps6699x.bus.done();
+    }
+
+    async fn run_get_autonegotiate_sink(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::autonegotiate_sink;
+
+        let data = [0u8; autonegotiate_sink::LEN];
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x37, data)]);
+
+        let result = tps6699x.get_autonegotiate_sink(port).await.unwrap();
+        assert_eq!(<[u8; autonegotiate_sink::LEN]>::from(result), data);
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_autonegotiate_sink() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_autonegotiate_sink(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_autonegotiate_sink(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    async fn run_set_autonegotiate_sink(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::autonegotiate_sink::{self, AutonegotiateSink};
+
+        let data = [0u8; autonegotiate_sink::LEN];
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_write(expected_addr, 0x37, data)]);
+
+        tps6699x
+            .set_autonegotiate_sink(port, AutonegotiateSink::from(data))
+            .await
+            .unwrap();
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_set_autonegotiate_sink() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_set_autonegotiate_sink(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_set_autonegotiate_sink(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    async fn run_get_power_path_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::PowerPathStatus;
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x26, PowerPathStatus::new_zero())]);
+
+        let result = tps6699x.get_power_path_status(port).await.unwrap();
+        assert_eq!(result, PowerPathStatus::new_zero());
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_power_path_status() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_power_path_status(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_power_path_status(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    async fn run_get_pd_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::PdStatus;
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x40, PdStatus::new_zero())]);
+
+        let result = tps6699x.get_pd_status(port).await.unwrap();
+        assert_eq!(result, PdStatus::new_zero());
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_pd_status() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_pd_status(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_pd_status(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    async fn run_get_port_control(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::PortControl;
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x29, PortControl::new_zero())]);
+
+        let result = tps6699x.get_port_control(port).await.unwrap();
+        assert_eq!(result, PortControl::new_zero());
+        tps6699x.bus.done();
+    }
+
+    async fn run_set_port_control(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::PortControl;
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_write(expected_addr, 0x29, PortControl::new_zero())]);
+
+        tps6699x.set_port_control(port, PortControl::new_zero()).await.unwrap();
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_port_control() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_port_control(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_port_control(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    #[tokio::test]
+    async fn test_set_port_control() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_set_port_control(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_set_port_control(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    #[tokio::test]
+    async fn test_get_system_config() {
+        use registers::field_sets::SystemConfig;
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(PORT0_ADDR0, 0x27, SystemConfig::new_zero())]);
+
+        let result = tps6699x.get_system_config().await.unwrap();
+        assert_eq!(result, SystemConfig::new_zero());
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_set_system_config() {
+        use registers::field_sets::SystemConfig;
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_write(PORT0_ADDR0, 0x27, SystemConfig::new_zero())]);
+
+        tps6699x.set_system_config(SystemConfig::new_zero()).await.unwrap();
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_boot_flags() {
+        use registers::boot_flags;
+
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        let data = [0u8; boot_flags::LEN];
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(PORT0_ADDR0, 0x2D, data)]);
+
+        let result = tps6699x.get_boot_flags().await.unwrap();
+        assert_eq!(result.0, data);
+        tps6699x.bus.done();
+    }
+
+    async fn run_get_dp_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::dp_status;
+
+        let data = [0u8; dp_status::LEN];
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x58, data)]);
+
+        let result = tps6699x.get_dp_status(port).await.unwrap();
+        assert_eq!(result.0, data);
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_dp_status() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_dp_status(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_dp_status(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    async fn run_get_intel_vid_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::IntelVidStatus;
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x59, IntelVidStatus::new_zero())]);
+
+        let result = tps6699x.get_intel_vid_status(port).await.unwrap();
+        assert_eq!(result, IntelVidStatus::new_zero());
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_intel_vid_status() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_intel_vid_status(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_intel_vid_status(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    async fn run_get_usb_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::UsbStatus;
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x24, UsbStatus::new_zero())]);
+
+        let result = tps6699x.get_usb_status(port).await.unwrap();
+        assert_eq!(result, UsbStatus::new_zero());
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_usb_status() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_usb_status(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_usb_status(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    async fn run_get_user_vid_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::UserVidStatus;
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x57, UserVidStatus::new_zero())]);
+
+        let result = tps6699x.get_user_vid_status(port).await.unwrap();
+        assert_eq!(result, UserVidStatus::new_zero());
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_user_vid_status() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_user_vid_status(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_user_vid_status(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    async fn run_get_dp_config(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::DpConfig;
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x51, DpConfig::new_zero())]);
+
+        let result = tps6699x.get_dp_config(port).await.unwrap();
+        assert_eq!(result, DpConfig::new_zero());
+        tps6699x.bus.done();
+    }
+
+    async fn run_set_dp_config(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::DpConfig;
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_write(expected_addr, 0x51, DpConfig::new_zero())]);
+
+        tps6699x.set_dp_config(port, DpConfig::new_zero()).await.unwrap();
+        tps6699x.bus.done();
+    }
+
+    async fn run_modify_dp_config(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::DpConfig;
+
+        let initial = DpConfig::new_zero();
+        let mut expected = initial;
+        expected.set_enable_dp_svid(true);
+
+        tps6699x.bus.update_expectations(&[
+            create_register_read(expected_addr, 0x51, initial),
+            create_register_write(expected_addr, 0x51, expected),
+        ]);
+
+        let result = tps6699x
+            .modify_dp_config(port, |r| {
+                r.set_enable_dp_svid(true);
+                *r
+            })
+            .await
+            .unwrap();
+
+        assert_eq!(result, expected);
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_dp_config() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_dp_config(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_dp_config(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    #[tokio::test]
+    async fn test_set_dp_config() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_set_dp_config(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_set_dp_config(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    #[tokio::test]
+    async fn test_modify_dp_config() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_modify_dp_config(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_modify_dp_config(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    async fn run_get_tbt_config(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::TbtConfig;
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x52, TbtConfig::new_zero())]);
+
+        let result = tps6699x.get_tbt_config(port).await.unwrap();
+        assert_eq!(result, TbtConfig::new_zero());
+        tps6699x.bus.done();
+    }
+
+    async fn run_set_tbt_config(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::TbtConfig;
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_write(expected_addr, 0x52, TbtConfig::new_zero())]);
+
+        tps6699x.set_tbt_config(port, TbtConfig::new_zero()).await.unwrap();
+        tps6699x.bus.done();
+    }
+
+    async fn run_modify_tbt_config(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::TbtConfig;
+
+        let initial = TbtConfig::new_zero();
+        let mut expected = initial;
+        expected.set_tbt_vid_en(true);
+
+        tps6699x.bus.update_expectations(&[
+            create_register_read(expected_addr, 0x52, initial),
+            create_register_write(expected_addr, 0x52, expected),
+        ]);
+
+        let result = tps6699x
+            .modify_tbt_config(port, |r| {
+                r.set_tbt_vid_en(true);
+                *r
+            })
+            .await
+            .unwrap();
+
+        assert_eq!(result, expected);
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_tbt_config() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_tbt_config(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_tbt_config(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    #[tokio::test]
+    async fn test_set_tbt_config() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_set_tbt_config(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_set_tbt_config(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    #[tokio::test]
+    async fn test_modify_tbt_config() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_modify_tbt_config(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_modify_tbt_config(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    async fn run_get_port_config(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::port_config;
+
+        let data = [0u8; port_config::LEN];
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x28, data)]);
+
+        let result = tps6699x.get_port_config(port).await.unwrap();
+        assert_eq!(<[u8; port_config::LEN]>::from(result), data);
+        tps6699x.bus.done();
+    }
+
+    async fn run_set_port_config(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::port_config::{self, PortConfig};
+
+        let data = [0u8; port_config::LEN];
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_write(expected_addr, 0x28, data)]);
+
+        tps6699x.set_port_config(port, PortConfig::from(data)).await.unwrap();
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_port_config() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_port_config(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_port_config(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    #[tokio::test]
+    async fn test_set_port_config() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_set_port_config(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_set_port_config(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    async fn run_get_rx_ado(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::RxAdo;
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x74, RxAdo::new_zero())]);
+
+        let result = tps6699x.get_rx_ado(port).await.unwrap();
+        assert_eq!(result, RxAdo::new_zero());
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_rx_ado() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_rx_ado(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_rx_ado(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    async fn run_get_rx_attn_vdm(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::field_sets::RxAttnVdm;
+
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x60, RxAttnVdm::new_zero())]);
+
+        let result = tps6699x.get_rx_attn_vdm(port).await.unwrap();
+        assert_eq!(result, RxAttnVdm::new_zero());
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_rx_attn_vdm() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_rx_attn_vdm(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_rx_attn_vdm(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    async fn run_get_rx_other_vdm(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::rx_other_vdm;
+
+        let data = [0u8; rx_other_vdm::LEN];
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x61, data)]);
+
+        let result = tps6699x.get_rx_other_vdm(port).await.unwrap();
+        assert_eq!(<[u8; rx_other_vdm::LEN]>::from(result), data);
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_rx_other_vdm() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_rx_other_vdm(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_rx_other_vdm(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    async fn run_get_tx_identity(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::tx_identity;
+
+        let data = [0u8; tx_identity::LEN];
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x47, data)]);
+
+        let result = tps6699x.get_tx_identity(port).await.unwrap();
+        assert_eq!(<[u8; tx_identity::LEN]>::from(result), data);
+        tps6699x.bus.done();
+    }
+
+    async fn run_set_tx_identity(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        use registers::tx_identity::{self, TxIdentity};
+
+        let data = [0u8; tx_identity::LEN];
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_write(expected_addr, 0x47, data)]);
+
+        tps6699x.set_tx_identity(port, TxIdentity::from(data)).await.unwrap();
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_get_tx_identity() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_get_tx_identity(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_tx_identity(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
+
+    #[tokio::test]
+    async fn test_set_tx_identity() {
+        let mock = Mock::new(&[]);
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
+
+        run_set_tx_identity(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_set_tx_identity(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
 }
