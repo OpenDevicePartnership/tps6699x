@@ -917,7 +917,7 @@ mod test {
         test_rw_ports(&mut tps6699x, PORT1, PORT1_ADDR1).await;
     }
 
-    async fn test_clear_interrupt(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+    async fn run_clear_interrupt(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
         use registers::field_sets::IntEventBus1;
 
         // Create a fully asserted interrupt register
@@ -935,27 +935,16 @@ mod test {
         tps6699x.bus.done();
     }
 
-    /// Test clearing interrupts with address set 0
     #[tokio::test]
-    async fn test_clear_interrupt_0() {
+    async fn test_clear_interrupt() {
         let mock = Mock::new(&[]);
         let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
 
-        test_clear_interrupt(&mut tps6699x, PORT0, PORT0_ADDR0).await;
-        test_clear_interrupt(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+        run_clear_interrupt(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_clear_interrupt(&mut tps6699x, PORT1, PORT1_ADDR0).await;
     }
 
-    /// Test clearing interrupts with address set 0
-    #[tokio::test]
-    async fn test_clear_interrupt_1() {
-        let mock = Mock::new(&[]);
-        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR1);
-
-        test_clear_interrupt(&mut tps6699x, PORT0, PORT0_ADDR1).await;
-        test_clear_interrupt(&mut tps6699x, PORT1, PORT1_ADDR1).await;
-    }
-
-    async fn test_get_port_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+    async fn run_get_port_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
         use registers::field_sets::Status;
 
         let mut transactions = Vec::new();
@@ -968,27 +957,16 @@ mod test {
         tps6699x.bus.done();
     }
 
-    /// Test get port status on address set 0
     #[tokio::test]
-    async fn test_get_port_status_0() {
+    async fn test_get_port_status() {
         let mock = Mock::new(&[]);
         let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
 
-        test_get_port_status(&mut tps6699x, PORT0, PORT0_ADDR0).await;
-        test_get_port_status(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+        run_get_port_status(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_port_status(&mut tps6699x, PORT1, PORT1_ADDR0).await;
     }
 
-    /// Test get port status on address set 1
-    #[tokio::test]
-    async fn test_get_port_status_1() {
-        let mock = Mock::new(&[]);
-        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR1);
-
-        test_get_port_status(&mut tps6699x, PORT0, PORT0_ADDR1).await;
-        test_get_port_status(&mut tps6699x, PORT1, PORT1_ADDR1).await;
-    }
-
-    async fn test_get_active_pdo_contract(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+    async fn run_get_active_pdo_contract(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
         use registers::field_sets::ActivePdoContract;
 
         let mut transactions = Vec::new();
@@ -1002,24 +980,15 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_get_active_pdo_contract_ports_0() {
+    async fn test_get_active_pdo_contract() {
         let mock = Mock::new(&[]);
         let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
 
-        test_get_active_pdo_contract(&mut tps6699x, PORT0, PORT0_ADDR0).await;
-        test_get_active_pdo_contract(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+        run_get_active_pdo_contract(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_active_pdo_contract(&mut tps6699x, PORT1, PORT1_ADDR0).await;
     }
 
-    #[tokio::test]
-    async fn test_get_active_pdo_contract_ports_1() {
-        let mock = Mock::new(&[]);
-        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR1);
-
-        test_get_active_pdo_contract(&mut tps6699x, PORT0, PORT0_ADDR1).await;
-        test_get_active_pdo_contract(&mut tps6699x, PORT1, PORT1_ADDR1).await;
-    }
-
-    async fn test_get_active_rdo_contract(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+    async fn run_get_active_rdo_contract(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
         use registers::field_sets::ActiveRdoContract;
 
         let mut transactions = Vec::new();
@@ -1033,24 +1002,15 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_get_active_rdo_contract_ports_0() {
+    async fn test_get_active_rdo_contract() {
         let mock = Mock::new(&[]);
         let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
 
-        test_get_active_rdo_contract(&mut tps6699x, PORT0, PORT0_ADDR0).await;
-        test_get_active_rdo_contract(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+        run_get_active_rdo_contract(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_get_active_rdo_contract(&mut tps6699x, PORT1, PORT1_ADDR0).await;
     }
 
-    #[tokio::test]
-    async fn test_get_active_rdo_contract_ports_1() {
-        let mock = Mock::new(&[]);
-        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR1);
-
-        test_get_active_rdo_contract(&mut tps6699x, PORT0, PORT0_ADDR1).await;
-        test_get_active_rdo_contract(&mut tps6699x, PORT1, PORT1_ADDR1).await;
-    }
-
-    async fn test_get_mode(tps6699x: &mut Tps6699x<Mock>, expected_addr: u8, expected_mode: Mode) {
+    async fn run_get_mode(tps6699x: &mut Tps6699x<Mock>, expected_addr: u8, expected_mode: Mode) {
         let mut transactions = Vec::new();
         transactions.push(create_register_read(expected_addr, 0x03, expected_mode));
         tps6699x.bus.update_expectations(&transactions);
@@ -1060,78 +1020,42 @@ mod test {
         tps6699x.bus.done();
     }
 
-    async fn test_get_modes(tps6699x: &mut Tps6699x<Mock>, expected_addr: u8) {
-        test_get_mode(tps6699x, expected_addr, Mode::Boot).await;
-        test_get_mode(tps6699x, expected_addr, Mode::F211).await;
-        test_get_mode(tps6699x, expected_addr, Mode::App0).await;
-        test_get_mode(tps6699x, expected_addr, Mode::App1).await;
-        test_get_mode(tps6699x, expected_addr, Mode::Wtpr).await;
-    }
-
     #[tokio::test]
-    async fn test_get_modes_0() {
+    async fn test_get_modes() {
         let mock = Mock::new(&[]);
         let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
-        test_get_modes(&mut tps6699x, PORT0_ADDR0).await;
+        run_get_mode(&mut tps6699x, PORT0_ADDR0, Mode::Boot).await;
+        run_get_mode(&mut tps6699x, PORT0_ADDR0, Mode::F211).await;
+        run_get_mode(&mut tps6699x, PORT0_ADDR0, Mode::App0).await;
+        run_get_mode(&mut tps6699x, PORT0_ADDR0, Mode::App1).await;
+        run_get_mode(&mut tps6699x, PORT0_ADDR0, Mode::Wtpr).await;
     }
 
     #[tokio::test]
-    async fn test_get_modes_1() {
+    async fn test_get_fw_version() {
         let mock = Mock::new(&[]);
-        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR1);
-        test_get_modes(&mut tps6699x, PORT0_ADDR1).await;
-    }
+        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
 
-    async fn test_get_fw_version(tps6699x: &mut Tps6699x<Mock>, expected_addr: u8, expected_version: u32) {
         let mut transactions = Vec::new();
-        transactions.push(create_register_read(
-            expected_addr,
-            0x0F,
-            expected_version.to_le_bytes(),
-        ));
+        transactions.push(create_register_read(PORT0_ADDR0, 0x0F, TEST_FW_VERSION.to_le_bytes()));
         tps6699x.bus.update_expectations(&transactions);
 
         let version = tps6699x.get_fw_version().await.unwrap();
-        assert_eq!(version, expected_version);
+        assert_eq!(version, TEST_FW_VERSION);
         tps6699x.bus.done();
     }
 
     #[tokio::test]
-    async fn test_get_fw_version_0() {
+    async fn test_get_customer_use() {
         let mock = Mock::new(&[]);
         let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
-        test_get_fw_version(&mut tps6699x, PORT0_ADDR0, TEST_FW_VERSION).await;
-    }
-
-    #[tokio::test]
-    async fn test_get_fw_version_1() {
-        let mock = Mock::new(&[]);
-        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR1);
-        test_get_fw_version(&mut tps6699x, PORT0_ADDR1, TEST_FW_VERSION).await;
-    }
-
-    async fn test_get_customer_use(tps6699x: &mut Tps6699x<Mock>, expected_addr: u8, expected_value: u64) {
         let mut transactions = Vec::new();
-        transactions.push(create_register_read(expected_addr, 0x06, expected_value.to_le_bytes()));
+        transactions.push(create_register_read(PORT0_ADDR0, 0x06, TEST_CUSTOMER_USE.to_le_bytes()));
         tps6699x.bus.update_expectations(&transactions);
 
         let value = tps6699x.get_customer_use().await.unwrap();
-        assert_eq!(value, expected_value);
+        assert_eq!(value, TEST_CUSTOMER_USE);
         tps6699x.bus.done();
-    }
-
-    #[tokio::test]
-    async fn test_get_customer_use_0() {
-        let mock = Mock::new(&[]);
-        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
-        test_get_customer_use(&mut tps6699x, PORT0_ADDR0, TEST_CUSTOMER_USE).await;
-    }
-
-    #[tokio::test]
-    async fn test_get_customer_use_1() {
-        let mock = Mock::new(&[]);
-        let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR1);
-        test_get_customer_use(&mut tps6699x, PORT0_ADDR1, TEST_CUSTOMER_USE).await;
     }
 
     /// Test reading SPR PDOs

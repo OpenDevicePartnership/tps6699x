@@ -93,7 +93,7 @@ pub type RxSnkCaps = RxCaps<sink::Pdo>;
 mod tests {
     use embedded_usb_pd::pdo;
     use embedded_usb_pd::pdo::sink::FixedData as SnkFixedData;
-    use embedded_usb_pd::pdo::source::{FixedData as SrcFixedData, FixedFlags};
+    use embedded_usb_pd::pdo::source::FixedData as SrcFixedData;
 
     use super::*;
 
