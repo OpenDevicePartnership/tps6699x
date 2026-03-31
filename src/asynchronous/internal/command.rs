@@ -313,4 +313,34 @@ mod test {
         tps6699x.execute_tfuc(&mut delay).await.unwrap();
         tps6699x.bus.done();
     }
+
+    async fn run_check_command_complete(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        let mut transactions = Vec::new();
+
+        // Successful command
+        transactions.push(create_register_read(expected_addr, 0x08, [0x00, 0x00, 0x00, 0x00]));
+        // Invalid command
+        transactions.push(create_register_read(expected_addr, 0x08, [0x21, 0x43, 0x4D, 0x44]));
+        // Command still in progress
+        transactions.push(create_register_read(expected_addr, 0x08, [0x47, 0x41, 0x49, 0x44]));
+
+        tps6699x.bus.update_expectations(&transactions);
+
+        assert_eq!(tps6699x.check_command_complete(port).await, Ok(true));
+        assert_eq!(
+            tps6699x.check_command_complete(port).await,
+            Err(Error::Pd(PdError::UnrecognizedCommand))
+        );
+        assert_eq!(tps6699x.check_command_complete(port).await, Ok(false));
+
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_check_command_complete() {
+        let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR0);
+
+        run_check_command_complete(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_check_command_complete(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+    }
 }
