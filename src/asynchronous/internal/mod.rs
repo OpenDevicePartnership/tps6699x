@@ -575,7 +575,11 @@ impl<B: I2c> Tps6699x<B> {
         &mut self,
         port: LocalPortId,
     ) -> Result<registers::field_sets::SxAppConfig, Error<B::Error>> {
-        self.borrow_port(port)?.into_registers().sx_app_config().read_async().await
+        self.borrow_port(port)?
+            .into_registers()
+            .sx_app_config()
+            .read_async()
+            .await
     }
 
     /// Set Sx App Config register (`0x20`).
