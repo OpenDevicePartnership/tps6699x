@@ -565,7 +565,7 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     pub async fn get_sx_app_config(
         &mut self,
         port: LocalPortId,
-    ) -> Result<registers::sx_app_config::SxAppConfig, Error<B::Error>> {
+    ) -> Result<registers::field_sets::SxAppConfig, Error<B::Error>> {
         let mut inner = self.lock_inner().await;
         inner.get_sx_app_config(port).await
     }
@@ -577,7 +577,7 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     pub async fn set_sx_app_config(
         &mut self,
         port: LocalPortId,
-        config: registers::sx_app_config::SxAppConfig,
+        config: registers::field_sets::SxAppConfig,
     ) -> Result<(), Error<B::Error>> {
         let mut inner = self.lock_inner().await;
         inner.set_sx_app_config(port, config).await

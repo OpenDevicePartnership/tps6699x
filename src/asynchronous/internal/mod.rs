@@ -574,18 +574,8 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn get_sx_app_config(
         &mut self,
         port: LocalPortId,
-    ) -> Result<registers::sx_app_config::SxAppConfig, Error<B::Error>> {
-        let mut buf = [0u8; registers::sx_app_config::LEN];
-        self.borrow_port(port)?
-            .into_registers()
-            .interface()
-            .read_register(
-                registers::sx_app_config::ADDR,
-                (registers::sx_app_config::LEN * 8) as u32,
-                &mut buf,
-            )
-            .await?;
-        Ok(buf.into())
+    ) -> Result<registers::field_sets::SxAppConfig, Error<B::Error>> {
+        self.borrow_port(port)?.into_registers().sx_app_config().read_async().await
     }
 
     /// Set Sx App Config register (`0x20`).
@@ -595,17 +585,9 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn set_sx_app_config(
         &mut self,
         port: LocalPortId,
-        config: registers::sx_app_config::SxAppConfig,
+        config: registers::field_sets::SxAppConfig,
     ) -> Result<(), Error<B::Error>> {
-        self.borrow_port(port)?
-            .into_registers()
-            .interface()
-            .write_register(
-                registers::sx_app_config::ADDR,
-                (registers::sx_app_config::LEN * 8) as u32,
-                config.as_bytes(),
-            )
-            .await
+        self.borrow_port(port)?.into_registers().sx_app_config().write_async(config).await
     }
 
     /// Get Rx ADO

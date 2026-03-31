@@ -342,6 +342,28 @@ IntMaskBus1:
     reset_value: 0x0000000F000000CD30380A
     access: RW
 
+SxAppConfig:
+  type: register
+  address: 0x20
+  size_bits: 16
+  reset_value: 0x0000
+  access: RW
+  description: Set Sx App Config - system power state for application configuration
+  fields:
+    SleepState:
+      base: uint
+      start: 0
+      end: 3
+      description: Current system power state
+      conversion:
+        name: SystemPowerState
+        S0: 0x0
+        S3: 0x1
+        S4: 0x2
+        S5: 0x3
+        S0ix: 0x4
+        Reserved: catch_all
+
 IntClearBus1:
   type: ref
   target: IntEventBus1
