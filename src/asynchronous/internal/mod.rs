@@ -585,9 +585,13 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn set_sx_app_config(
         &mut self,
         port: LocalPortId,
-        config: registers::field_sets::SxAppConfig,
+        state: registers::SystemPowerState,
     ) -> Result<(), Error<B::Error>> {
-        self.borrow_port(port)?.into_registers().sx_app_config().write_async(config).await
+        self.borrow_port(port)?
+            .into_registers()
+            .sx_app_config()
+            .write_async(|config| config.set_sleep_state(state))
+            .await
     }
 
     /// Get Rx ADO

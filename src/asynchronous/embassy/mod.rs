@@ -577,10 +577,10 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     pub async fn set_sx_app_config(
         &mut self,
         port: LocalPortId,
-        config: registers::field_sets::SxAppConfig,
+        state: registers::SystemPowerState,
     ) -> Result<(), Error<B::Error>> {
         let mut inner = self.lock_inner().await;
-        inner.set_sx_app_config(port, config).await
+        inner.set_sx_app_config(port, state).await
     }
 
     /// Get Rx ADO
