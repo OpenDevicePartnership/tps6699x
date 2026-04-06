@@ -598,6 +598,25 @@ impl<B: I2c> Tps6699x<B> {
             .await
     }
 
+    /// Get the discovered SVIDs on a port returned from `Discover SVIDs REQ` messages.
+    pub async fn get_discovered_svids(
+        &mut self,
+        port: LocalPortId,
+    ) -> Result<registers::discovered_svids::DiscoveredSvids, Error<B::Error>> {
+        let mut buf = [0u8; registers::discovered_svids::LEN];
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .read_register(
+                registers::discovered_svids::ADDR,
+                (registers::discovered_svids::LEN * 8) as u32,
+                &mut buf,
+            )
+            .await?;
+
+        Ok(buf.into())
+    }
+
     /// Get Rx ADO
     pub async fn get_rx_ado(&mut self, port: LocalPortId) -> Result<registers::field_sets::RxAdo, Error<B::Error>> {
         self.borrow_port(port)?.into_registers().rx_ado().read_async().await

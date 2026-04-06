@@ -583,6 +583,14 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         inner.set_sx_app_config(port, state).await
     }
 
+    /// Get the discovered SVIDs on a port returned from `Discover SVIDs REQ` messages.
+    pub async fn get_discovered_svids(
+        &mut self,
+        port: LocalPortId,
+    ) -> Result<registers::discovered_svids::DiscoveredSvids, Error<B::Error>> {
+        self.lock_inner().await.get_discovered_svids(port).await
+    }
+
     /// Get Rx ADO
     pub async fn get_rx_ado(
         &mut self,

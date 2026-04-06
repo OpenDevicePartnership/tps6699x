@@ -5,6 +5,7 @@ use crate::Mode;
 
 pub mod autonegotiate_sink;
 pub mod boot_flags;
+pub mod discovered_svids;
 pub mod dp_status;
 pub mod port_config;
 pub mod rx_caps;
