@@ -748,6 +748,11 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         self.execute_command(port, Command::Drst, None, None).await
     }
 
+    /// Execute the [`Command::HRST`] command.
+    pub async fn execute_hrst(&mut self, port: LocalPortId) -> Result<ReturnValue, Error<B::Error>> {
+        self.execute_command(port, Command::HRST, None, None).await
+    }
+
     /// Get Rx discovered custom modes
     pub async fn execute_gcdm(
         &mut self,
