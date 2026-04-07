@@ -370,3 +370,20 @@ pub(crate) mod test {
     /// Test invalid source APDO raw, invalid due to APDO type being 11b
     pub const TEST_SRC_APDO_INVALID_RAW: u32 = 0xF0000000;
 }
+
+#[cfg(test)]
+mod tests {
+    use embedded_usb_pd::PdError;
+
+    use super::*;
+
+    #[test]
+    fn test_mode_try_from_u32() {
+        assert_eq!(Mode::try_from(0x544F4F42).unwrap(), Mode::Boot);
+        assert_eq!(Mode::try_from(0x31313246).unwrap(), Mode::F211);
+        assert_eq!(Mode::try_from(0x30505041).unwrap(), Mode::App0);
+        assert_eq!(Mode::try_from(0x31505041).unwrap(), Mode::App1);
+        assert_eq!(Mode::try_from(0x52505457).unwrap(), Mode::Wtpr);
+        assert_eq!(Mode::try_from(0u32), Err(PdError::InvalidParams));
+    }
+}

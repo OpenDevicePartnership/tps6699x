@@ -189,10 +189,28 @@ jobs:
           submodules: true
       - name: Install stable
         uses: dtolnay/rust-toolchain@stable
+        with:
+          # For grcov
+          components: llvm-tools
       - name: cargo install cargo-hack
         uses: taiki-e/install-action@cargo-hack
       - name: cargo test
         run: cargo hack --feature-powerset --exclude-features defmt test --all-targets
+        env:
+          RUSTFLAGS: '-C instrument-coverage'
+          CARGO_INCREMENTAL: '0'
+      # Generate and upload test coverage report
+      - name: Install grcov
+        uses: taiki-e/install-action@grcov
+      - name: Generate test coverage report
+        run: |
+          grcov . --binary-path ./target/debug/deps -s . --branch --ignore-not-existing --ignore "/home/runner/*" -t html -o ./target/debug/coverage
+          grcov . --binary-path ./target/debug/deps -s . --branch --ignore-not-existing --ignore "/home/runner/*" -t markdown >> $GITHUB_STEP_SUMMARY
+      - name: Upload test coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-coverage-report
+          path: ./target/debug/coverage
 
   test-doc:
     runs-on: ubuntu-latest

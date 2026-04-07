@@ -25,6 +25,28 @@ pub enum Command {
     /// Reset command
     Gaid = u32_from_str(*b"GAID"),
 
+    /// Simulate a port disconnect.
+    ///
+    /// The `DISC` Modal Task causes the PD Controller to act as if the USB-C port
+    /// is disconnected, with an optional Host-specified delay to restoring normal
+    /// port operation. If currently there is no USB-C connection on the port, then
+    /// this task will be rejected. The port that will be disconnected when writing
+    /// the `DISC` Task will correspond to the I2C target address used when writing
+    /// the `DISC` Task.
+    ///
+    /// # Input
+    /// `DISCDelay`: 8-bit value in seconds for disconnect time. If 0, there is
+    /// no automatic reconnect.
+    ///
+    /// # Output
+    /// [`ReturnValue`]
+    ///
+    /// This Task always completes successfully, it has no reason to be rejected
+    /// or timed-out. If another Modal Task was already active the `DISC` Modal
+    /// Task will cancel that Modal Task and take its place. The `DISC` Modal Task
+    /// completes immediately, it does not wait for the reconnect delay.
+    DISC = u32_from_str(*b"DISC"),
+
     /// Tomcat firmware update mode enter
     Tfus = u32_from_str(*b"TFUs"),
     /// Tomcat firmware update mode init
@@ -120,6 +142,8 @@ impl TryFrom<u32> for Command {
             Ok(Command::Invalid)
         } else if Command::Gaid == value {
             Ok(Command::Gaid)
+        } else if Command::DISC == value {
+            Ok(Command::DISC)
         } else if Command::Tfus == value {
             Ok(Command::Tfus)
         } else if Command::Tfui == value {
@@ -673,5 +697,158 @@ mod test {
         let (decoded, _): (TfudArgs, _) =
             bincode::decode_from_slice(&buf, config::standard().with_fixed_int_encoding()).unwrap();
         assert_eq!(decoded, args);
+    }
+
+    #[test]
+    fn test_try_from_u32_command() {
+        assert_eq!(Command::try_from(Command::Success as u32).unwrap(), Command::Success);
+        assert_eq!(Command::try_from(Command::Invalid as u32).unwrap(), Command::Invalid);
+        assert_eq!(Command::try_from(Command::Gaid as u32).unwrap(), Command::Gaid);
+        assert_eq!(Command::try_from(Command::DISC as u32).unwrap(), Command::DISC);
+        assert_eq!(Command::try_from(Command::Tfus as u32).unwrap(), Command::Tfus);
+        assert_eq!(Command::try_from(Command::Tfui as u32).unwrap(), Command::Tfui);
+        assert_eq!(Command::try_from(Command::Tfuq as u32).unwrap(), Command::Tfuq);
+        assert_eq!(Command::try_from(Command::Tfue as u32).unwrap(), Command::Tfue);
+        assert_eq!(Command::try_from(Command::Tfud as u32).unwrap(), Command::Tfud);
+        assert_eq!(Command::try_from(Command::Tfuc as u32).unwrap(), Command::Tfuc);
+        assert_eq!(Command::try_from(Command::Srdy as u32).unwrap(), Command::Srdy);
+        assert_eq!(Command::try_from(Command::Sryr as u32).unwrap(), Command::Sryr);
+        assert_eq!(Command::try_from(Command::Aneg as u32).unwrap(), Command::Aneg);
+        assert_eq!(Command::try_from(Command::Trig as u32).unwrap(), Command::Trig);
+        assert_eq!(Command::try_from(Command::Dbfg as u32).unwrap(), Command::Dbfg);
+        assert_eq!(Command::try_from(Command::Muxr as u32).unwrap(), Command::Muxr);
+        assert_eq!(Command::try_from(Command::Drst as u32).unwrap(), Command::Drst);
+        assert_eq!(Command::try_from(Command::VDMs as u32).unwrap(), Command::VDMs);
+        assert_eq!(Command::try_from(Command::Ucsi as u32).unwrap(), Command::Ucsi);
+        assert_eq!(Command::try_from(0xFFFFFFFFu32), Err(PdError::InvalidParams));
+    }
+
+    #[test]
+    fn test_try_from_u8_return_value() {
+        assert_eq!(ReturnValue::try_from(0x00).unwrap(), ReturnValue::Success);
+        assert_eq!(ReturnValue::try_from(0x01).unwrap(), ReturnValue::Abort);
+        assert_eq!(ReturnValue::try_from(0x03).unwrap(), ReturnValue::Rejected);
+        assert_eq!(ReturnValue::try_from(0x04).unwrap(), ReturnValue::RxLocked);
+        assert_eq!(ReturnValue::try_from(0x05).unwrap(), ReturnValue::Task0);
+        assert_eq!(ReturnValue::try_from(0x06).unwrap(), ReturnValue::Task1);
+        assert_eq!(ReturnValue::try_from(0x07).unwrap(), ReturnValue::Task2);
+        assert_eq!(ReturnValue::try_from(0x08).unwrap(), ReturnValue::Task3);
+        assert_eq!(ReturnValue::try_from(0x09).unwrap(), ReturnValue::Task4);
+        assert_eq!(ReturnValue::try_from(0x0A).unwrap(), ReturnValue::Task5);
+        assert_eq!(ReturnValue::try_from(0x0B).unwrap(), ReturnValue::Task6);
+        assert_eq!(ReturnValue::try_from(0x0C).unwrap(), ReturnValue::Task7);
+        assert_eq!(ReturnValue::try_from(0x0D).unwrap(), ReturnValue::Task8);
+        assert_eq!(ReturnValue::try_from(0x0E).unwrap(), ReturnValue::Task9);
+        assert_eq!(ReturnValue::try_from(0x0F).unwrap(), ReturnValue::Task10);
+        assert_eq!(ReturnValue::try_from(0x02u8), Err(PdError::InvalidParams));
+        for invalid in 0x10u8..=0xFF {
+            assert_eq!(ReturnValue::try_from(invalid), Err(PdError::InvalidParams));
+        }
+    }
+
+    #[test]
+    fn test_try_from_u8_tfuq_block_status() {
+        assert_eq!(TfuqBlockStatus::try_from(0x00).unwrap(), TfuqBlockStatus::Success);
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x01).unwrap(),
+            TfuqBlockStatus::InvalidTfuState
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x02).unwrap(),
+            TfuqBlockStatus::InvalidHeaderSize
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x03).unwrap(),
+            TfuqBlockStatus::InvalidDataBlock
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x04).unwrap(),
+            TfuqBlockStatus::InvalidDataSize
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x05).unwrap(),
+            TfuqBlockStatus::InvalidSlaveAddress
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x06).unwrap(),
+            TfuqBlockStatus::InvalidTimeout
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x07).unwrap(),
+            TfuqBlockStatus::MaxAppConfigUpdate
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x08).unwrap(),
+            TfuqBlockStatus::HeaderRxInProgress
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x09).unwrap(),
+            TfuqBlockStatus::HeaderValidAndAuthentic
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x0A).unwrap(),
+            TfuqBlockStatus::HeaderNotValid
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x0B).unwrap(),
+            TfuqBlockStatus::HeaderKeyNotValid
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x0C).unwrap(),
+            TfuqBlockStatus::HeaderRootAuthFailure
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x0D).unwrap(),
+            TfuqBlockStatus::HeaderFwheaderAuthFailure
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x0E).unwrap(),
+            TfuqBlockStatus::DataRxInProgress
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x0F).unwrap(),
+            TfuqBlockStatus::DataValidAndAuthentic
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x10).unwrap(),
+            TfuqBlockStatus::DataValidButRepeated
+        );
+        assert_eq!(TfuqBlockStatus::try_from(0x11).unwrap(), TfuqBlockStatus::DataNotValid);
+        assert_eq!(TfuqBlockStatus::try_from(0x12).unwrap(), TfuqBlockStatus::DataInvalidId);
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x13).unwrap(),
+            TfuqBlockStatus::DataAuthFailure
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x14).unwrap(),
+            TfuqBlockStatus::F911IdNotValid
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x15).unwrap(),
+            TfuqBlockStatus::F911DataNotValid
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x16).unwrap(),
+            TfuqBlockStatus::F911AuthFailure
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x17).unwrap(),
+            TfuqBlockStatus::ImageDownloadTimeout
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x18).unwrap(),
+            TfuqBlockStatus::BlockDownloadTimeout
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x19).unwrap(),
+            TfuqBlockStatus::BlockWriteFailed
+        );
+        assert_eq!(
+            TfuqBlockStatus::try_from(0x1A).unwrap(),
+            TfuqBlockStatus::SpecialCmdFailed
+        );
+        for invalid in 0x1B..=0xFF {
+            assert_eq!(TfuqBlockStatus::try_from(invalid), Err(PdError::InvalidParams));
+        }
     }
 }

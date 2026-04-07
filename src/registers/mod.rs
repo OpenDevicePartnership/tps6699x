@@ -101,3 +101,95 @@ impl IntEventBus1 {
         IntEventBus1::from([0xFF; 11])
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_convert_type_c_current() {
+        let current: type_c::Current = TypecCurrent::UsbDefault.try_into().unwrap();
+        assert_eq!(current, type_c::Current::UsbDefault);
+
+        let current: type_c::Current = TypecCurrent::Current1A5.try_into().unwrap();
+        assert_eq!(current, type_c::Current::Current1A5);
+
+        let current: type_c::Current = TypecCurrent::Current3A0.try_into().unwrap();
+        assert_eq!(current, type_c::Current::Current3A0);
+
+        let current: TypecCurrent = type_c::Current::UsbDefault.into();
+        assert_eq!(current, TypecCurrent::UsbDefault);
+
+        let current: TypecCurrent = type_c::Current::Current1A5.into();
+        assert_eq!(current, TypecCurrent::Current1A5);
+
+        let current: TypecCurrent = type_c::Current::Current3A0.into();
+        assert_eq!(current, TypecCurrent::Current3A0);
+    }
+
+    #[test]
+    fn test_convert_pd_cc_pull_up() {
+        let current: type_c::Current = PdCcPullUp::UsbDefault.try_into().unwrap();
+        assert_eq!(current, type_c::Current::UsbDefault);
+
+        let current: type_c::Current = PdCcPullUp::Current1A5.try_into().unwrap();
+        assert_eq!(current, type_c::Current::Current1A5);
+
+        let current: type_c::Current = PdCcPullUp::Current3A0.try_into().unwrap();
+        assert_eq!(current, type_c::Current::Current3A0);
+
+        let result: Result<type_c::Current, _> = PdCcPullUp::NoPull.try_into();
+        assert_eq!(result, Err(PdError::InvalidParams));
+
+        let pull_up: PdCcPullUp = type_c::Current::UsbDefault.into();
+        assert_eq!(pull_up, PdCcPullUp::UsbDefault);
+
+        let pull_up: PdCcPullUp = type_c::Current::Current1A5.into();
+        assert_eq!(pull_up, PdCcPullUp::Current1A5);
+
+        let pull_up: PdCcPullUp = type_c::Current::Current3A0.into();
+        assert_eq!(pull_up, PdCcPullUp::Current3A0);
+    }
+
+    #[test]
+    fn test_convert_plug_mode_to_connection_state() {
+        let state: ConnectionState = PlugMode::Debug.try_into().unwrap();
+        assert!(matches!(state, ConnectionState::DebugAccessory));
+
+        let state: ConnectionState = PlugMode::Audio.try_into().unwrap();
+        assert!(matches!(state, ConnectionState::AudioAccessory));
+
+        let state: ConnectionState = PlugMode::Connected.try_into().unwrap();
+        assert!(matches!(state, ConnectionState::Attached));
+
+        let state: ConnectionState = PlugMode::ConnectedNoRa.try_into().unwrap();
+        assert!(matches!(state, ConnectionState::Attached));
+
+        let result: Result<ConnectionState, _> = PlugMode::NotConnected.try_into();
+        assert_eq!(result.unwrap_err(), PdError::InvalidParams);
+
+        let result: Result<ConnectionState, _> = PlugMode::Disabled.try_into();
+        assert_eq!(result.unwrap_err(), PdError::InvalidParams);
+
+        let result: Result<ConnectionState, _> = PlugMode::RaDetected.try_into();
+        assert_eq!(result.unwrap_err(), PdError::InvalidParams);
+    }
+
+    #[test]
+    fn test_convert_mode_to_str() {
+        let s: &str = crate::Mode::Boot.into();
+        assert_eq!(s, "BOOT");
+
+        let s: &str = crate::Mode::F211.into();
+        assert_eq!(s, "F211");
+
+        let s: &str = crate::Mode::App0.into();
+        assert_eq!(s, "APP0");
+
+        let s: &str = crate::Mode::App1.into();
+        assert_eq!(s, "APP1");
+
+        let s: &str = crate::Mode::Wtpr.into();
+        assert_eq!(s, "WTPR");
+    }
+}

@@ -174,7 +174,7 @@ mod test {
     use regs::REG_DATA1;
 
     use crate::asynchronous::internal::Tps6699x;
-    use crate::{ADDR0, ADDR1, PORT0};
+    use crate::{ADDR0, PORT0, PORT1};
 
     extern crate std;
     use std::vec::Vec;
@@ -185,8 +185,9 @@ mod test {
     /// Value used for generic command testing, no particular significance
     const TEST_CMD_DATA: u64 = 0x12345678abcdef;
 
-    async fn test_send_command<const N: usize>(
+    async fn run_send_command<const N: usize>(
         tps6699x: &mut Tps6699x<Mock>,
+        port: LocalPortId,
         expected_addr: u8,
         expected_cmd: Command,
         expected_data: Option<[u8; N]>,
@@ -206,43 +207,47 @@ mod test {
         tps6699x.bus.update_expectations(&transactions);
 
         if let Some(data) = expected_data {
-            tps6699x.send_command(PORT0, expected_cmd, Some(&data)).await.unwrap();
+            tps6699x.send_command(port, expected_cmd, Some(&data)).await.unwrap();
         } else {
-            tps6699x.send_command(PORT0, expected_cmd, None).await.unwrap();
+            tps6699x.send_command(port, expected_cmd, None).await.unwrap();
         }
 
         tps6699x.bus.done();
     }
 
+    /// Test send_command on both ports with ADDR0
     #[tokio::test]
-    async fn test_send_command_0() {
+    async fn test_send_command() {
         let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR0);
-        test_send_command::<0>(&mut tps6699x, PORT0_ADDR0, Command::Invalid, None).await;
-        test_send_command(
+        run_send_command::<0>(&mut tps6699x, PORT0, PORT0_ADDR0, Command::Invalid, None).await;
+        run_send_command(
             &mut tps6699x,
+            PORT0,
             PORT0_ADDR0,
             Command::Invalid,
             Some(TEST_CMD_DATA.to_le_bytes()),
         )
         .await;
-    }
-
-    #[tokio::test]
-    async fn test_send_command_1() {
-        let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR1);
-        test_send_command::<0>(&mut tps6699x, PORT0_ADDR1, Command::Invalid, None).await;
-        test_send_command(
+        run_send_command::<0>(&mut tps6699x, PORT1, PORT1_ADDR0, Command::Invalid, None).await;
+        run_send_command(
             &mut tps6699x,
-            PORT0_ADDR1,
+            PORT1,
+            PORT1_ADDR0,
             Command::Invalid,
             Some(TEST_CMD_DATA.to_le_bytes()),
         )
         .await;
     }
 
-    async fn test_reset(tps6699x: &mut Tps6699x<Mock>, expected_addr: u8, expected_args: ResetArgs) {
+    #[tokio::test]
+    async fn test_reset() {
+        let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR0);
         let mut delay = Delay {};
         let mut transactions = Vec::new();
+        let expected_args = ResetArgs {
+            switch_banks: true,
+            copy_bank: false,
+        };
 
         let mut arg_bytes = [0u8; RESET_ARGS_LEN];
         bincode::encode_into_slice(
@@ -252,9 +257,9 @@ mod test {
         )
         .unwrap();
 
-        transactions.push(create_register_write(expected_addr, REG_DATA1, arg_bytes));
+        transactions.push(create_register_write(PORT0_ADDR0, REG_DATA1, arg_bytes));
         transactions.push(create_register_write(
-            expected_addr,
+            PORT0_ADDR0,
             0x08,
             (Command::Gaid as u32).to_le_bytes(),
         ));
@@ -265,44 +270,18 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_reset_0() {
+    async fn test_execute_tfus() {
         let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR0);
-        test_reset(
-            &mut tps6699x,
-            PORT0_ADDR0,
-            ResetArgs {
-                switch_banks: true,
-                copy_bank: false,
-            },
-        )
-        .await;
-    }
-
-    #[tokio::test]
-    async fn test_reset_1() {
-        let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR1);
-        test_reset(
-            &mut tps6699x,
-            PORT0_ADDR1,
-            ResetArgs {
-                switch_banks: true,
-                copy_bank: false,
-            },
-        )
-        .await;
-    }
-
-    async fn test_execute_tfus(tps6699x: &mut Tps6699x<Mock>, expected_addr: u8) {
         let mut delay = Delay {};
         let mut transactions = Vec::new();
 
         transactions.push(create_register_write(
-            expected_addr,
+            PORT0_ADDR0,
             0x08,
             (Command::Tfus as u32).to_le_bytes(),
         ));
         transactions.push(create_register_read(
-            expected_addr,
+            PORT0_ADDR0,
             0x03,
             (Mode::F211 as u32).to_le_bytes(),
         ));
@@ -313,33 +292,19 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_execute_tfus_0() {
+    async fn test_execute_tfuc() {
         let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR0);
-        test_execute_tfus(&mut tps6699x, PORT0_ADDR0).await;
-    }
-
-    #[tokio::test]
-    async fn test_execute_tfus_1() {
-        let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR1);
-        test_execute_tfus(&mut tps6699x, PORT0_ADDR1).await;
-    }
-
-    async fn test_execute_tfuc(tps6699x: &mut Tps6699x<Mock>, expected_addr: u8) {
         let mut delay = Delay {};
         let mut transactions = Vec::new();
 
+        transactions.push(create_register_write(PORT0_ADDR0, REG_DATA1, [0, RESET_FEATURE_ENABLE]));
         transactions.push(create_register_write(
-            expected_addr,
-            REG_DATA1,
-            [0, RESET_FEATURE_ENABLE],
-        ));
-        transactions.push(create_register_write(
-            expected_addr,
+            PORT0_ADDR0,
             0x08,
             (Command::Tfuc as u32).to_le_bytes(),
         ));
         transactions.push(create_register_read(
-            expected_addr,
+            PORT0_ADDR0,
             0x03,
             (Mode::App0 as u32).to_le_bytes(),
         ));
@@ -349,15 +314,33 @@ mod test {
         tps6699x.bus.done();
     }
 
-    #[tokio::test]
-    async fn test_execute_tfuc_0() {
-        let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR0);
-        test_execute_tfuc(&mut tps6699x, PORT0_ADDR0).await;
+    async fn run_check_command_complete(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+        let mut transactions = Vec::new();
+
+        // Successful command
+        transactions.push(create_register_read(expected_addr, 0x08, [0x00, 0x00, 0x00, 0x00]));
+        // Invalid command
+        transactions.push(create_register_read(expected_addr, 0x08, [0x21, 0x43, 0x4D, 0x44]));
+        // Command still in progress
+        transactions.push(create_register_read(expected_addr, 0x08, [0x47, 0x41, 0x49, 0x44]));
+
+        tps6699x.bus.update_expectations(&transactions);
+
+        assert_eq!(tps6699x.check_command_complete(port).await, Ok(true));
+        assert_eq!(
+            tps6699x.check_command_complete(port).await,
+            Err(Error::Pd(PdError::UnrecognizedCommand))
+        );
+        assert_eq!(tps6699x.check_command_complete(port).await, Ok(false));
+
+        tps6699x.bus.done();
     }
 
     #[tokio::test]
-    async fn test_execute_tfuc_1() {
-        let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR1);
-        test_execute_tfuc(&mut tps6699x, PORT0_ADDR1).await;
+    async fn test_check_command_complete() {
+        let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR0);
+
+        run_check_command_complete(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_check_command_complete(&mut tps6699x, PORT1, PORT1_ADDR0).await;
     }
 }

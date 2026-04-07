@@ -408,4 +408,66 @@ mod tests {
         let default_tx_identity = TxIdentity::default();
         assert_eq!(tx_identity.as_bytes(), default_tx_identity.as_bytes());
     }
+
+    #[test]
+    fn test_product_type_dfp_from_u8() {
+        assert_eq!(ProductTypeDfp::from(0x0), ProductTypeDfp::UndefinedDfp);
+        assert_eq!(ProductTypeDfp::from(0x1), ProductTypeDfp::PdUsbHub);
+        assert_eq!(ProductTypeDfp::from(0x2), ProductTypeDfp::PdUsbHost);
+        assert_eq!(ProductTypeDfp::from(0x3), ProductTypeDfp::PowerBrick);
+        assert_eq!(ProductTypeDfp::from(0x4), ProductTypeDfp::Amc);
+        assert_eq!(ProductTypeDfp::from(0x5), ProductTypeDfp::Reserved(0x5));
+        assert_eq!(ProductTypeDfp::from(0x6), ProductTypeDfp::Reserved(0x6));
+        assert_eq!(ProductTypeDfp::from(0x7), ProductTypeDfp::Reserved(0x7));
+    }
+
+    #[test]
+    fn test_product_type_dfp_into_u8() {
+        assert_eq!(u8::from(ProductTypeDfp::UndefinedDfp), 0x0);
+        assert_eq!(u8::from(ProductTypeDfp::PdUsbHub), 0x1);
+        assert_eq!(u8::from(ProductTypeDfp::PdUsbHost), 0x2);
+        assert_eq!(u8::from(ProductTypeDfp::PowerBrick), 0x3);
+        assert_eq!(u8::from(ProductTypeDfp::Amc), 0x4);
+        assert_eq!(u8::from(ProductTypeDfp::Reserved(0x5)), 0x5);
+    }
+
+    #[test]
+    fn test_product_type_dfp_roundtrip() {
+        let values = [0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7];
+        for val in values {
+            let dfp_type = ProductTypeDfp::from(val);
+            let back_to_u8 = u8::from(dfp_type);
+            assert_eq!(back_to_u8, val & 0x7);
+        }
+    }
+
+    #[test]
+    fn test_product_type_ufp_from_u8() {
+        assert_eq!(ProductTypeUfp::from(0x0), ProductTypeUfp::UndefinedUfp);
+        assert_eq!(ProductTypeUfp::from(0x1), ProductTypeUfp::PdUsbHub);
+        assert_eq!(ProductTypeUfp::from(0x2), ProductTypeUfp::PdUsbPeripheral);
+        assert_eq!(ProductTypeUfp::from(0x3), ProductTypeUfp::Psd);
+        assert_eq!(ProductTypeUfp::from(0x4), ProductTypeUfp::Reserved(0x4));
+        assert_eq!(ProductTypeUfp::from(0x5), ProductTypeUfp::Reserved(0x5));
+        assert_eq!(ProductTypeUfp::from(0x6), ProductTypeUfp::Reserved(0x6));
+        assert_eq!(ProductTypeUfp::from(0x7), ProductTypeUfp::Reserved(0x7));
+    }
+
+    #[test]
+    fn test_product_type_ufp_into_u8() {
+        assert_eq!(u8::from(ProductTypeUfp::UndefinedUfp), 0x0);
+        assert_eq!(u8::from(ProductTypeUfp::PdUsbHub), 0x1);
+        assert_eq!(u8::from(ProductTypeUfp::PdUsbPeripheral), 0x2);
+        assert_eq!(u8::from(ProductTypeUfp::Psd), 0x3);
+        assert_eq!(u8::from(ProductTypeUfp::Reserved(0x4)), 0x4);
+    }
+
+    #[test]
+    fn test_tx_identity_roundtrip() {
+        let original_bytes = TxIdentity::DEFAULT;
+        let tx_identity = TxIdentity::from(original_bytes);
+        let final_bytes: [u8; LEN] = tx_identity.into();
+
+        assert_eq!(final_bytes, original_bytes);
+    }
 }

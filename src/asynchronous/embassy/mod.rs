@@ -244,6 +244,8 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     }
 
     /// Wait for an interrupt to occur that matches any bits in the given mask.
+    ///
+    /// Drop safety: Safe, unhandled interrupts will be re-signaled.
     pub async fn wait_interrupt_any(
         &mut self,
         clear_current: bool,
@@ -260,35 +262,11 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
             self.controller.interrupt_waker.reset();
         }
 
-        let mut accumulated_flags = [IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS];
+        let mut accumulated_flags = AccumulatedFlagsAny::new(self.controller, mask);
         loop {
-            let mut done = false;
             let flags = self.controller.interrupt_waker.wait().await;
-            for (&flags, &mask, accumulated) in izip!(flags.iter(), mask.iter(), accumulated_flags.iter_mut(),) {
-                *accumulated |= flags;
-                let consumed_flags = flags & mask;
-                if consumed_flags != IntEventBus1::new_zero() {
-                    done = true;
-                }
-            }
-
-            if done {
-                // Panic safety: `unhandled`, `accumulated_flags`, and `mask` are all of size MAX_SUPPORTED_PORTS
-                // so this will never index out of bounds
-                #[allow(clippy::indexing_slicing)]
-                let unhandled = from_fn(|i| accumulated_flags[i] & !mask[i]);
-
-                // Put back any unhandled interrupt flags for future processing
-                if unhandled.iter().any(|&f| f != IntEventBus1::new_zero()) {
-                    // If there are unhandled flags, signal them for future processing
-                    trace!("Signaling unhandled interrupt flags: {:?}", unhandled);
-                    self.controller.interrupt_waker.signal(unhandled);
-                }
-
-                // Panic safety: the return type, `accumulated_flags`, and `mask` are all of size MAX_SUPPORTED_PORTS
-                // so this will never index out of bounds
-                #[allow(clippy::indexing_slicing)]
-                return from_fn(|i| accumulated_flags[i] & mask[i]);
+            if let Some(flags) = accumulated_flags.accumulate(flags) {
+                return flags;
             }
         }
     }
@@ -498,6 +476,16 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         inner.reset(delay, &Default::default()).await
     }
 
+    /// Execute the [`Command::DISC`] command to disconnect a port for a specified amount of time (in seconds).
+    pub async fn execute_disc(
+        &mut self,
+        port: LocalPortId,
+        disconnect_time_s: Option<u8>,
+    ) -> Result<ReturnValue, Error<B::Error>> {
+        let buf = [disconnect_time_s.unwrap_or(0)];
+        self.execute_command(port, Command::DISC, Some(&buf), None).await
+    }
+
     /// Get boot flags
     pub async fn get_boot_flags(&mut self) -> Result<registers::boot_flags::BootFlags, Error<B::Error>> {
         let mut inner = self.lock_inner().await;
@@ -569,6 +557,30 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     ) -> Result<(), Error<B::Error>> {
         let mut inner = self.lock_inner().await;
         inner.set_port_config(port, config).await
+    }
+
+    /// Get Sx App Config register (`0x20`).
+    ///
+    /// This register contains the current system power state.
+    pub async fn get_sx_app_config(
+        &mut self,
+        port: LocalPortId,
+    ) -> Result<registers::field_sets::SxAppConfig, Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.get_sx_app_config(port).await
+    }
+
+    /// Set Sx App Config register (`0x20`).
+    ///
+    /// Write the current system power state to the PD controller. A change in power state
+    /// triggers a new Application Configuration to be applied.
+    pub async fn set_sx_app_config(
+        &mut self,
+        port: LocalPortId,
+        state: registers::SystemPowerState,
+    ) -> Result<(), Error<B::Error>> {
+        let mut inner = self.lock_inner().await;
+        inner.set_sx_app_config(port, state).await
     }
 
     /// Get Rx ADO
@@ -890,13 +902,82 @@ impl<M: RawMutex, B: I2c> Drop for InterruptGuard<'_, M, B> {
 
 impl<M: RawMutex, B: I2c> interrupt::InterruptGuard for InterruptGuard<'_, M, B> {}
 
+/// Struct to ensure drop-safety of [`Tps6699x::wait_interrupt_any`]
+///
+/// This struct re-signals any unhandled interrupts on drop.
+struct AccumulatedFlagsAny<'a, M: RawMutex, B: I2c> {
+    controller: &'a controller::Controller<M, B>,
+    accumulated_flags: [IntEventBus1; MAX_SUPPORTED_PORTS],
+    masks: [IntEventBus1; MAX_SUPPORTED_PORTS],
+}
+
+impl<'a, M: RawMutex, B: I2c> AccumulatedFlagsAny<'a, M, B> {
+    fn new(controller: &'a controller::Controller<M, B>, masks: [IntEventBus1; MAX_SUPPORTED_PORTS]) -> Self {
+        AccumulatedFlagsAny {
+            controller,
+            accumulated_flags: [IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS],
+            masks,
+        }
+    }
+
+    fn accumulate(
+        &mut self,
+        flags: [IntEventBus1; MAX_SUPPORTED_PORTS],
+    ) -> Option<[IntEventBus1; MAX_SUPPORTED_PORTS]> {
+        let mut done = false;
+        for (&flags, &mask, accumulated) in izip!(flags.iter(), self.masks.iter(), self.accumulated_flags.iter_mut(),) {
+            *accumulated |= flags;
+            let consumed_flags = flags & mask;
+            if consumed_flags != IntEventBus1::new_zero() {
+                done = true;
+            }
+        }
+
+        if done {
+            // Panic safety: the return type, `accumulated_flags`, and `mask` are all of size MAX_SUPPORTED_PORTS
+            // so this will never index out of bounds
+            #[allow(clippy::indexing_slicing)]
+            let handled = from_fn(|i| self.accumulated_flags[i] & self.masks[i]);
+            // Put unhandled flags back for signaling in `drop()`
+            self.accumulated_flags = from_fn(|i| self.accumulated_flags[i] & !self.masks[i]);
+            Some(handled)
+        } else {
+            None
+        }
+    }
+}
+
+impl<M: RawMutex, B: I2c> Drop for AccumulatedFlagsAny<'_, M, B> {
+    fn drop(&mut self) {
+        // Catch any flags that may have happened since the last accumulate.
+        let new = self
+            .controller
+            .interrupt_waker
+            .try_take()
+            .unwrap_or([IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS]);
+        // Panic safety: `unhandled`, `accumulated_flags`, and `mask` are all of size MAX_SUPPORTED_PORTS
+        // so this will never index out of bounds
+        #[allow(clippy::indexing_slicing)]
+        let unhandled = from_fn(|i| self.accumulated_flags[i] | new[i]);
+
+        // Put back any unhandled interrupt flags for future processing
+        if unhandled.iter().any(|&f| f != IntEventBus1::new_zero()) {
+            // If there are unhandled flags, signal them for future processing
+            trace!("Signaling unhandled interrupt flags: {:?}", unhandled);
+            self.controller.interrupt_waker.signal(unhandled);
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use embassy_sync::blocking_mutex::raw::NoopRawMutex;
+    use embassy_time::{with_timeout, Duration, TimeoutError};
     use embedded_hal_mock::eh1::i2c::Mock;
     use static_cell::StaticCell;
 
     use super::*;
+    use crate::asynchronous::embassy::controller::Controller;
     use crate::ADDR0;
 
     /// Tests `wait_interrupt_any` with a mask for both ports.
@@ -1004,5 +1085,50 @@ mod test {
 
         // Should already be signaled with nothing changed
         assert_eq!(pd.controller.interrupt_waker.try_take().unwrap(), [port0, port1]);
+    }
+
+    #[tokio::test]
+    async fn test_wait_interrupt_any_timeout() {
+        // Port0 mocked pending interrupts
+        let mut port0 = IntEventBus1::new_zero();
+        port0.set_new_consumer_contract(true);
+
+        // Port1 mocked pending interrupts
+        let mut port1 = IntEventBus1::new_zero();
+        port1.set_plug_event(true);
+
+        static CONTROLLER: StaticCell<Controller<NoopRawMutex, Mock>> = StaticCell::new();
+        let controller = CONTROLLER.init(Controller::new_tps66994(Mock::new(&[]), ADDR0).unwrap());
+        let (mut pd, _interrupt) = controller.make_parts();
+
+        pd.controller.interrupt_waker.signal([port0, port1]);
+
+        // The mask doesn't match the pending interrupts, so we should get a timeout
+        let mut mask0 = IntEventBus1::new_zero();
+        mask0.set_cmd_1_completed(true);
+
+        let mut mask1 = IntEventBus1::new_zero();
+        mask1.set_new_provider_contract(true);
+
+        assert_eq!(
+            with_timeout(Duration::from_millis(10), pd.wait_interrupt_any(false, [mask0, mask1])).await,
+            Err(TimeoutError)
+        );
+
+        // Use all mask to get leftover interrupts
+        let mut leftover0 = IntEventBus1::new_zero();
+        leftover0.set_new_consumer_contract(true);
+
+        let mut leftover1 = IntEventBus1::new_zero();
+        leftover1.set_plug_event(true);
+
+        let leftover_flags = with_timeout(
+            Duration::from_millis(10),
+            pd.wait_interrupt_any(false, [IntEventBus1::all(), IntEventBus1::all()]),
+        )
+        .await
+        .unwrap();
+        assert_eq!(leftover_flags[0], leftover0);
+        assert_eq!(leftover_flags[1], leftover1);
     }
 }

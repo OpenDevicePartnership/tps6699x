@@ -694,4 +694,98 @@ mod tests {
             let _ = PpsRequestInterval::from(v);
         }
     }
+
+    #[test]
+    fn test_auto_neg_rdo_priority_from_bool() {
+        assert_eq!(AutoNegRdoPriority::from(false), AutoNegRdoPriority::HigherVoltage);
+        assert_eq!(AutoNegRdoPriority::from(true), AutoNegRdoPriority::LowerVoltage);
+    }
+
+    #[test]
+    fn test_auto_neg_rdo_priority_to_bool() {
+        assert_eq!(bool::from(AutoNegRdoPriority::HigherVoltage), false);
+        assert_eq!(bool::from(AutoNegRdoPriority::LowerVoltage), true);
+    }
+
+    #[test]
+    fn test_auto_compute_sink_min_power_from_bool() {
+        assert_eq!(
+            AutoComputeSinkMinPower::from(false),
+            AutoComputeSinkMinPower::ProvidedByHost
+        );
+        assert_eq!(
+            AutoComputeSinkMinPower::from(true),
+            AutoComputeSinkMinPower::ComputedByPdController
+        );
+    }
+
+    #[test]
+    fn test_auto_compute_sink_min_power_to_bool() {
+        assert_eq!(bool::from(AutoComputeSinkMinPower::ProvidedByHost), false);
+        assert_eq!(bool::from(AutoComputeSinkMinPower::ComputedByPdController), true);
+    }
+
+    #[test]
+    fn test_no_capability_mismatch_from_bool() {
+        assert_eq!(NoCapabilityMismatch::from(false), NoCapabilityMismatch::Enabled);
+        assert_eq!(NoCapabilityMismatch::from(true), NoCapabilityMismatch::Disabled);
+    }
+
+    #[test]
+    fn test_no_capability_mismatch_to_bool() {
+        assert_eq!(bool::from(NoCapabilityMismatch::Enabled), false);
+        assert_eq!(bool::from(NoCapabilityMismatch::Disabled), true);
+    }
+
+    #[test]
+    fn test_auto_compute_sink_min_voltage_from_bool() {
+        assert_eq!(
+            AutoComputeSinkMinVoltage::from(false),
+            AutoComputeSinkMinVoltage::ProvidedByHost
+        );
+        assert_eq!(
+            AutoComputeSinkMinVoltage::from(true),
+            AutoComputeSinkMinVoltage::ComputedByPdController
+        );
+    }
+
+    #[test]
+    fn test_auto_compute_sink_min_voltage_to_bool() {
+        assert_eq!(bool::from(AutoComputeSinkMinVoltage::ProvidedByHost), false);
+        assert_eq!(bool::from(AutoComputeSinkMinVoltage::ComputedByPdController), true);
+    }
+
+    #[test]
+    fn test_auto_compute_sink_max_voltage_from_bool() {
+        assert_eq!(
+            AutoComputeSinkMaxVoltage::from(false),
+            AutoComputeSinkMaxVoltage::ProvidedByHost
+        );
+        assert_eq!(
+            AutoComputeSinkMaxVoltage::from(true),
+            AutoComputeSinkMaxVoltage::ComputedByPdController
+        );
+    }
+
+    #[test]
+    fn test_auto_compute_sink_max_voltage_to_bool() {
+        assert_eq!(bool::from(AutoComputeSinkMaxVoltage::ProvidedByHost), false);
+        assert_eq!(bool::from(AutoComputeSinkMaxVoltage::ComputedByPdController), true);
+    }
+
+    #[test]
+    fn test_pps_request_interval_to_u8() {
+        assert_eq!(u8::from(PpsRequestInterval::EightSeconds), 0x0);
+        assert_eq!(u8::from(PpsRequestInterval::FourSeconds), 0x1);
+        assert_eq!(u8::from(PpsRequestInterval::TwoSeconds), 0x2);
+        assert_eq!(u8::from(PpsRequestInterval::OneSecond), 0x3);
+    }
+
+    #[test]
+    fn test_autonegotiate_sink_roundtrip() {
+        let original_bytes = AutonegotiateSink::DEFAULT;
+        let sink = AutonegotiateSink::from(original_bytes);
+        let roundtrip_bytes: [u8; LEN] = sink.into();
+        assert_eq!(roundtrip_bytes, original_bytes);
+    }
 }

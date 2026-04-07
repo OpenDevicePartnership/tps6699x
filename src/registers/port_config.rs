@@ -888,3 +888,257 @@ impl Default for PortConfig {
         Self::DEFAULT.into()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // SbuMuxUsage tests
+    #[test]
+    fn test_sbu_mux_usage_from_u8() {
+        assert_eq!(SbuMuxUsage::from(0x0), SbuMuxUsage::DisplayPortAux);
+        assert_eq!(SbuMuxUsage::from(0x1), SbuMuxUsage::AllAux);
+        assert_eq!(SbuMuxUsage::from(0x2), SbuMuxUsage::Reserved(0x2));
+        assert_eq!(SbuMuxUsage::from(0x3), SbuMuxUsage::Reserved(0x3));
+        assert_eq!(SbuMuxUsage::from(0xFF), SbuMuxUsage::Reserved(0x3));
+    }
+
+    #[test]
+    fn test_sbu_mux_usage_to_u8() {
+        assert_eq!(u8::from(SbuMuxUsage::DisplayPortAux), 0x0);
+        assert_eq!(u8::from(SbuMuxUsage::AllAux), 0x1);
+        assert_eq!(u8::from(SbuMuxUsage::Reserved(0x2)), 0x2);
+        assert_eq!(u8::from(SbuMuxUsage::Reserved(0x3)), 0x3);
+    }
+
+    // SbuMuxDefaultSetting tests
+    #[test]
+    fn test_sbu_mux_default_setting_from_u8() {
+        assert_eq!(SbuMuxDefaultSetting::from(0x0), SbuMuxDefaultSetting::DontChange);
+        assert_eq!(SbuMuxDefaultSetting::from(0x1), SbuMuxDefaultSetting::DisableSbuMux);
+        assert_eq!(SbuMuxDefaultSetting::from(0x2), SbuMuxDefaultSetting::EnableDbg);
+        assert_eq!(SbuMuxDefaultSetting::from(0x3), SbuMuxDefaultSetting::Reserved(0x3));
+        assert_eq!(SbuMuxDefaultSetting::from(0x7), SbuMuxDefaultSetting::Reserved(0x7));
+        assert_eq!(SbuMuxDefaultSetting::from(0xFF), SbuMuxDefaultSetting::Reserved(0x7));
+    }
+
+    #[test]
+    fn test_sbu_mux_default_setting_to_u8() {
+        assert_eq!(u8::from(SbuMuxDefaultSetting::DontChange), 0x0);
+        assert_eq!(u8::from(SbuMuxDefaultSetting::DisableSbuMux), 0x1);
+        assert_eq!(u8::from(SbuMuxDefaultSetting::EnableDbg), 0x2);
+        assert_eq!(u8::from(SbuMuxDefaultSetting::Reserved(0x5)), 0x5);
+    }
+
+    // SbuMuxDebugSetting tests
+    #[test]
+    fn test_sbu_mux_debug_setting_from_u8() {
+        assert_eq!(SbuMuxDebugSetting::from(0x0), SbuMuxDebugSetting::DebugSnk);
+        assert_eq!(SbuMuxDebugSetting::from(0x1), SbuMuxDebugSetting::UnorientedDebugSrc);
+        assert_eq!(SbuMuxDebugSetting::from(0x2), SbuMuxDebugSetting::OrientedDebugSrc);
+        assert_eq!(SbuMuxDebugSetting::from(0x3), SbuMuxDebugSetting::AnyDebug);
+        assert_eq!(SbuMuxDebugSetting::from(0x4), SbuMuxDebugSetting::NeverEnable);
+        assert_eq!(SbuMuxDebugSetting::from(0x5), SbuMuxDebugSetting::Reserved(0x5));
+        assert_eq!(SbuMuxDebugSetting::from(0xFF), SbuMuxDebugSetting::Reserved(0x7));
+    }
+
+    #[test]
+    fn test_sbu_mux_debug_setting_to_u8() {
+        assert_eq!(u8::from(SbuMuxDebugSetting::DebugSnk), 0x0);
+        assert_eq!(u8::from(SbuMuxDebugSetting::UnorientedDebugSrc), 0x1);
+        assert_eq!(u8::from(SbuMuxDebugSetting::OrientedDebugSrc), 0x2);
+        assert_eq!(u8::from(SbuMuxDebugSetting::AnyDebug), 0x3);
+        assert_eq!(u8::from(SbuMuxDebugSetting::NeverEnable), 0x4);
+        assert_eq!(u8::from(SbuMuxDebugSetting::Reserved(0x6)), 0x6);
+    }
+
+    // LevelShifterDirectionCfg tests
+    #[test]
+    fn test_level_shifter_direction_cfg_from_u8() {
+        assert_eq!(LevelShifterDirectionCfg::from(0x0), LevelShifterDirectionCfg::Automatic);
+        assert_eq!(
+            LevelShifterDirectionCfg::from(0x1),
+            LevelShifterDirectionCfg::GpioControlled
+        );
+        assert_eq!(
+            LevelShifterDirectionCfg::from(0x2),
+            LevelShifterDirectionCfg::I2cControlled
+        );
+        assert_eq!(
+            LevelShifterDirectionCfg::from(0x3),
+            LevelShifterDirectionCfg::Reserved(0x3)
+        );
+        assert_eq!(
+            LevelShifterDirectionCfg::from(0xFF),
+            LevelShifterDirectionCfg::Reserved(0x3)
+        );
+    }
+
+    #[test]
+    fn test_level_shifter_direction_cfg_to_u8() {
+        assert_eq!(u8::from(LevelShifterDirectionCfg::Automatic), 0x0);
+        assert_eq!(u8::from(LevelShifterDirectionCfg::GpioControlled), 0x1);
+        assert_eq!(u8::from(LevelShifterDirectionCfg::I2cControlled), 0x2);
+        assert_eq!(u8::from(LevelShifterDirectionCfg::Reserved(0x3)), 0x3);
+    }
+
+    // ExternalDcdcType tests
+    #[test]
+    fn test_external_dcdc_type_from_u8() {
+        assert_eq!(ExternalDcdcType::from(0x0), ExternalDcdcType::MarinaBay);
+        assert_eq!(ExternalDcdcType::from(0x1), ExternalDcdcType::Bq25758);
+        assert_eq!(ExternalDcdcType::from(0x2), ExternalDcdcType::Reserved(0x2));
+        assert_eq!(ExternalDcdcType::from(0xFF), ExternalDcdcType::Reserved(0xFF));
+    }
+
+    #[test]
+    fn test_external_dcdc_type_to_u8() {
+        assert_eq!(u8::from(ExternalDcdcType::MarinaBay), 0x0);
+        assert_eq!(u8::from(ExternalDcdcType::Bq25758), 0x1);
+        assert_eq!(u8::from(ExternalDcdcType::Reserved(0xAB)), 0xAB);
+    }
+
+    // TypeCStateMachine tests
+    #[test]
+    fn test_typec_state_machine_from_u8() {
+        assert_eq!(TypeCStateMachine::from(0x0), TypeCStateMachine::Sink);
+        assert_eq!(TypeCStateMachine::from(0x1), TypeCStateMachine::Source);
+        assert_eq!(TypeCStateMachine::from(0x2), TypeCStateMachine::Drp);
+        assert_eq!(TypeCStateMachine::from(0x3), TypeCStateMachine::Disabled);
+        assert_eq!(TypeCStateMachine::from(0xFF), TypeCStateMachine::Disabled);
+    }
+
+    #[test]
+    fn test_typec_state_machine_to_u8() {
+        assert_eq!(u8::from(TypeCStateMachine::Sink), 0x0);
+        assert_eq!(u8::from(TypeCStateMachine::Source), 0x1);
+        assert_eq!(u8::from(TypeCStateMachine::Drp), 0x2);
+        assert_eq!(u8::from(TypeCStateMachine::Disabled), 0x3);
+    }
+
+    // VbusSinkUvpTripHv tests
+    #[test]
+    fn test_vbus_sink_uvp_trip_hv_from_u8() {
+        assert_eq!(VbusSinkUvpTripHv::from(0x0), VbusSinkUvpTripHv::Pct5);
+        assert_eq!(VbusSinkUvpTripHv::from(0x1), VbusSinkUvpTripHv::Pct10);
+        assert_eq!(VbusSinkUvpTripHv::from(0x2), VbusSinkUvpTripHv::Pct15);
+        assert_eq!(VbusSinkUvpTripHv::from(0x3), VbusSinkUvpTripHv::Pct20);
+        assert_eq!(VbusSinkUvpTripHv::from(0x4), VbusSinkUvpTripHv::Pct25);
+        assert_eq!(VbusSinkUvpTripHv::from(0x5), VbusSinkUvpTripHv::Pct30);
+        assert_eq!(VbusSinkUvpTripHv::from(0x6), VbusSinkUvpTripHv::Pct40);
+        assert_eq!(VbusSinkUvpTripHv::from(0x7), VbusSinkUvpTripHv::Reserved(0x7));
+        assert_eq!(VbusSinkUvpTripHv::from(0xFF), VbusSinkUvpTripHv::Reserved(0x7));
+    }
+
+    #[test]
+    fn test_vbus_sink_uvp_trip_hv_to_u8() {
+        assert_eq!(u8::from(VbusSinkUvpTripHv::Pct5), 0x0);
+        assert_eq!(u8::from(VbusSinkUvpTripHv::Pct10), 0x1);
+        assert_eq!(u8::from(VbusSinkUvpTripHv::Pct15), 0x2);
+        assert_eq!(u8::from(VbusSinkUvpTripHv::Pct20), 0x3);
+        assert_eq!(u8::from(VbusSinkUvpTripHv::Pct25), 0x4);
+        assert_eq!(u8::from(VbusSinkUvpTripHv::Pct30), 0x5);
+        assert_eq!(u8::from(VbusSinkUvpTripHv::Pct40), 0x6);
+        assert_eq!(u8::from(VbusSinkUvpTripHv::Reserved(0x7)), 0x7);
+    }
+
+    // OvpForPp5v tests
+    #[test]
+    fn test_ovp_for_pp5v_from_u8() {
+        assert_eq!(OvpForPp5v::from(0x0), OvpForPp5v::V5_25);
+        assert_eq!(OvpForPp5v::from(0x1), OvpForPp5v::V5_5);
+        assert_eq!(OvpForPp5v::from(0x2), OvpForPp5v::V5_8);
+        assert_eq!(OvpForPp5v::from(0x3), OvpForPp5v::V6_1);
+        assert_eq!(OvpForPp5v::from(0xFF), OvpForPp5v::V6_1);
+    }
+
+    #[test]
+    fn test_ovp_for_pp5v_to_u8() {
+        assert_eq!(u8::from(OvpForPp5v::V5_25), 0x0);
+        assert_eq!(u8::from(OvpForPp5v::V5_5), 0x1);
+        assert_eq!(u8::from(OvpForPp5v::V5_8), 0x2);
+        assert_eq!(u8::from(OvpForPp5v::V6_1), 0x3);
+    }
+
+    // VbusOvpUsage tests
+    #[test]
+    fn test_vbus_ovp_usage_from_u8() {
+        assert_eq!(VbusOvpUsage::from(0x0), VbusOvpUsage::Pct100);
+        assert_eq!(VbusOvpUsage::from(0x1), VbusOvpUsage::Pct105);
+        assert_eq!(VbusOvpUsage::from(0x2), VbusOvpUsage::Pct111);
+        assert_eq!(VbusOvpUsage::from(0x3), VbusOvpUsage::Pct114);
+        assert_eq!(VbusOvpUsage::from(0xFF), VbusOvpUsage::Pct114);
+    }
+
+    #[test]
+    fn test_vbus_ovp_usage_to_u8() {
+        assert_eq!(u8::from(VbusOvpUsage::Pct100), 0x0);
+        assert_eq!(u8::from(VbusOvpUsage::Pct105), 0x1);
+        assert_eq!(u8::from(VbusOvpUsage::Pct111), 0x2);
+        assert_eq!(u8::from(VbusOvpUsage::Pct114), 0x3);
+    }
+
+    // Usb3Rate tests
+    #[test]
+    fn test_usb3_rate_from_u8() {
+        assert_eq!(Usb3Rate::from(0x0), Usb3Rate::NotSupported);
+        assert_eq!(Usb3Rate::from(0x1), Usb3Rate::Gen1);
+        assert_eq!(Usb3Rate::from(0x2), Usb3Rate::Gen2);
+        assert_eq!(Usb3Rate::from(0x3), Usb3Rate::Reserved(0x3));
+        assert_eq!(Usb3Rate::from(0xFF), Usb3Rate::Reserved(0x3));
+    }
+
+    #[test]
+    fn test_usb3_rate_to_u8() {
+        assert_eq!(u8::from(Usb3Rate::NotSupported), 0x0);
+        assert_eq!(u8::from(Usb3Rate::Gen1), 0x1);
+        assert_eq!(u8::from(Usb3Rate::Gen2), 0x2);
+        assert_eq!(u8::from(Usb3Rate::Reserved(0x3)), 0x3);
+    }
+
+    // TypeCSupportOptions tests
+    #[test]
+    fn test_typec_support_options_from_u8() {
+        assert_eq!(TypeCSupportOptions::from(0x0), TypeCSupportOptions::None);
+        assert_eq!(TypeCSupportOptions::from(0x1), TypeCSupportOptions::TrySrcDrp);
+        assert_eq!(TypeCSupportOptions::from(0x2), TypeCSupportOptions::Reserved(0x2));
+        assert_eq!(TypeCSupportOptions::from(0x3), TypeCSupportOptions::Reserved(0x3));
+        assert_eq!(TypeCSupportOptions::from(0xFF), TypeCSupportOptions::Reserved(0x3));
+    }
+
+    #[test]
+    fn test_typec_support_options_to_u8() {
+        assert_eq!(u8::from(TypeCSupportOptions::None), 0x0);
+        assert_eq!(u8::from(TypeCSupportOptions::TrySrcDrp), 0x1);
+        assert_eq!(u8::from(TypeCSupportOptions::Reserved(0x2)), 0x2);
+    }
+
+    // CrossbarType tests
+    #[test]
+    fn test_crossbar_type_from_bool() {
+        assert_eq!(CrossbarType::from(false), CrossbarType::Type1);
+        assert_eq!(CrossbarType::from(true), CrossbarType::Type2);
+    }
+
+    #[test]
+    fn test_crossbar_type_to_bool() {
+        assert_eq!(bool::from(CrossbarType::Type1), false);
+        assert_eq!(bool::from(CrossbarType::Type2), true);
+    }
+
+    #[test]
+    fn test_port_config_default() {
+        let config = PortConfig::default();
+        assert_eq!(config.as_bytes(), &[0u8; LEN]);
+    }
+
+    #[test]
+    fn test_port_config_round_trip() {
+        let mut bytes = [0u8; LEN];
+        bytes[0] = 0x42;
+        bytes[17] = 0xFF;
+        let config = PortConfig::from(bytes);
+        let result: [u8; LEN] = config.into();
+        assert_eq!(result, bytes);
+    }
+}

@@ -13,10 +13,6 @@ url = "https://raw.githubusercontent.com/google/rust-crate-audits/main/audits.to
 [imports.mozilla]
 url = "https://raw.githubusercontent.com/mozilla/supply-chain/main/audits.toml"
 
-[[exemptions.addr2line]]
-version = "0.24.2"
-criteria = "safe-to-run"
-
 [[exemptions.ahash]]
 version = "0.8.12"
 criteria = "safe-to-deploy"
@@ -24,10 +20,6 @@ criteria = "safe-to-deploy"
 [[exemptions.anyhow]]
 version = "1.0.98"
 criteria = "safe-to-deploy"
-
-[[exemptions.backtrace]]
-version = "0.3.75"
-criteria = "safe-to-run"
 
 [[exemptions.bincode]]
 version = "2.0.1"
@@ -53,28 +45,12 @@ criteria = "safe-to-deploy"
 version = "0.6.0"
 criteria = "safe-to-deploy"
 
-[[exemptions.critical-section]]
-version = "1.2.0"
-criteria = "safe-to-deploy"
-
 [[exemptions.dd-manifest-tree]]
 version = "1.0.0"
 criteria = "safe-to-deploy"
 
 [[exemptions.defmt]]
 version = "0.3.100"
-criteria = "safe-to-deploy"
-
-[[exemptions.defmt]]
-version = "1.0.1"
-criteria = "safe-to-deploy"
-
-[[exemptions.defmt-macros]]
-version = "1.0.1"
-criteria = "safe-to-deploy"
-
-[[exemptions.defmt-parser]]
-version = "1.0.0"
 criteria = "safe-to-deploy"
 
 [[exemptions.device-driver]]
@@ -95,10 +71,6 @@ criteria = "safe-to-deploy"
 
 [[exemptions.embassy-time-driver]]
 version = "0.2.1"
-criteria = "safe-to-deploy"
-
-[[exemptions.embedded-hal]]
-version = "0.2.7"
 criteria = "safe-to-deploy"
 
 [[exemptions.embedded-hal]]
@@ -149,18 +121,6 @@ criteria = "safe-to-deploy"
 version = "0.3.31"
 criteria = "safe-to-deploy"
 
-[[exemptions.futures-task]]
-version = "0.3.31"
-criteria = "safe-to-deploy"
-
-[[exemptions.futures-util]]
-version = "0.3.31"
-criteria = "safe-to-deploy"
-
-[[exemptions.gimli]]
-version = "0.31.1"
-criteria = "safe-to-run"
-
 [[exemptions.hash32]]
 version = "0.3.1"
 criteria = "safe-to-deploy"
@@ -185,21 +145,9 @@ criteria = "safe-to-deploy"
 version = "0.14.0"
 criteria = "safe-to-deploy"
 
-[[exemptions.libc]]
-version = "0.2.172"
-criteria = "safe-to-run"
-
 [[exemptions.log]]
 version = "0.4.27"
 criteria = "safe-to-deploy"
-
-[[exemptions.memchr]]
-version = "2.7.4"
-criteria = "safe-to-run"
-
-[[exemptions.miniz_oxide]]
-version = "0.8.8"
-criteria = "safe-to-run"
 
 [[exemptions.num]]
 version = "0.3.1"
@@ -217,24 +165,8 @@ criteria = "safe-to-run"
 version = "0.3.2"
 criteria = "safe-to-run"
 
-[[exemptions.object]]
-version = "0.36.7"
-criteria = "safe-to-run"
-
 [[exemptions.once_cell]]
 version = "1.21.3"
-criteria = "safe-to-deploy"
-
-[[exemptions.pin-utils]]
-version = "0.1.0"
-criteria = "safe-to-deploy"
-
-[[exemptions.proc-macro-error-attr2]]
-version = "2.0.0"
-criteria = "safe-to-deploy"
-
-[[exemptions.proc-macro-error2]]
-version = "2.0.1"
 criteria = "safe-to-deploy"
 
 [[exemptions.proc-macro2]]
@@ -261,14 +193,6 @@ criteria = "safe-to-deploy"
 version = "2.0.12"
 criteria = "safe-to-deploy"
 
-[[exemptions.tokio]]
-version = "1.45.0"
-criteria = "safe-to-run"
-
-[[exemptions.tokio-macros]]
-version = "2.5.0"
-criteria = "safe-to-run"
-
 [[exemptions.unty]]
 version = "0.0.4"
 criteria = "safe-to-deploy"
@@ -280,42 +204,6 @@ criteria = "safe-to-deploy"
 [[exemptions.virtue]]
 version = "0.0.18"
 criteria = "safe-to-deploy"
-
-[[exemptions.windows-targets]]
-version = "0.52.6"
-criteria = "safe-to-run"
-
-[[exemptions.windows_aarch64_gnullvm]]
-version = "0.52.6"
-criteria = "safe-to-run"
-
-[[exemptions.windows_aarch64_msvc]]
-version = "0.52.6"
-criteria = "safe-to-run"
-
-[[exemptions.windows_i686_gnu]]
-version = "0.52.6"
-criteria = "safe-to-run"
-
-[[exemptions.windows_i686_gnullvm]]
-version = "0.52.6"
-criteria = "safe-to-run"
-
-[[exemptions.windows_i686_msvc]]
-version = "0.52.6"
-criteria = "safe-to-run"
-
-[[exemptions.windows_x86_64_gnu]]
-version = "0.52.6"
-criteria = "safe-to-run"
-
-[[exemptions.windows_x86_64_gnullvm]]
-version = "0.52.6"
-criteria = "safe-to-run"
-
-[[exemptions.windows_x86_64_msvc]]
-version = "0.52.6"
-criteria = "safe-to-run"
 
 [[exemptions.wyz]]
 version = "0.5.1"
