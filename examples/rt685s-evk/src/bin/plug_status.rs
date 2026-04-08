@@ -50,7 +50,7 @@ async fn main(spawner: Spawner) {
     let (mut pd, interrupt) = controller.make_parts();
 
     info!("Spawing PD interrupt task");
-    spawner.must_spawn(interrupt_task(int_in, interrupt));
+    spawner.spawn(interrupt_task(int_in, interrupt).unwrap());
 
     loop {
         let mut plug_event_mask = IntEventBus1::new_zero();

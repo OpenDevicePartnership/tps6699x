@@ -55,7 +55,7 @@ async fn main(spawner: Spawner) {
     pd.reset(&mut delay).await.unwrap();
 
     info!("Spawing PD interrupt task");
-    spawner.must_spawn(interrupt_task(int_in, interrupt));
+    spawner.spawn(interrupt_task(int_in, interrupt).unwrap());
 
     let pd_fw_bytes = [0u8].as_slice(); //include_bytes!("../../fw.bin").as_slice();
 
