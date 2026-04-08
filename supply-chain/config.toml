@@ -186,11 +186,11 @@ version = "1.0.1"
 criteria = "safe-to-deploy"
 
 [[exemptions.thiserror]]
-version = "2.0.18"
+version = "2.0.12"
 criteria = "safe-to-deploy"
 
 [[exemptions.thiserror-impl]]
-version = "2.0.18"
+version = "2.0.12"
 criteria = "safe-to-deploy"
 
 [[exemptions.unty]]

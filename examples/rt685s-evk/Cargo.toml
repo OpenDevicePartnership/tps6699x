@@ -34,7 +34,7 @@ embassy-time = { version = "0.5.0", features = [
     "defmt",
     "defmt-timestamp-uptime",
 ] }
-embassy-embedded-hal = { version = "0.5.0", features = ["defmt"] }
+embassy-embedded-hal = { version = "0.6.0", features = ["defmt"] }
 futures = { version = "0.3.30", default-features = false, features = [
     "async-await",
 ] }
