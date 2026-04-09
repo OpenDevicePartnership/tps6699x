@@ -714,6 +714,22 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         self.lock_inner().await.modify_tx_identity(port, f).await
     }
 
+    /// Get the latest received SOP identity data
+    pub async fn get_received_sop_identity_data(
+        &mut self,
+        port: LocalPortId,
+    ) -> Result<registers::received_sop_identity_data::ReceivedSopIdentityData, Error<B::Error>> {
+        self.lock_inner().await.get_received_sop_identity_data(port).await
+    }
+
+    /// Get the latest received SOP Prime identity data
+    pub async fn get_received_sop_prime_identity_data(
+        &mut self,
+        port: LocalPortId,
+    ) -> Result<registers::received_sop_prime_identity_data::ReceivedSopPrimeIdentityData, Error<B::Error>> {
+        self.lock_inner().await.get_received_sop_prime_identity_data(port).await
+    }
+
     /// Get DP config
     pub async fn get_dp_config(
         &mut self,

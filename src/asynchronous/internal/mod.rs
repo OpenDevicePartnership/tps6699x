@@ -772,6 +772,42 @@ impl<B: I2c> Tps6699x<B> {
         self.set_tx_identity(port, reg.clone()).await?;
         Ok(reg)
     }
+
+    /// Get the latest received SOP identity data
+    pub async fn get_received_sop_identity_data(
+        &mut self,
+        port: LocalPortId,
+    ) -> Result<registers::received_sop_identity_data::ReceivedSopIdentityData, Error<B::Error>> {
+        let mut buf = [0u8; registers::received_sop_identity_data::LEN];
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .read_register(
+                registers::received_sop_identity_data::ADDR,
+                (registers::received_sop_identity_data::LEN * 8) as u32,
+                &mut buf,
+            )
+            .await?;
+        Ok(buf.into())
+    }
+
+    /// Get the latest received SOP Prime identity data
+    pub async fn get_received_sop_prime_identity_data(
+        &mut self,
+        port: LocalPortId,
+    ) -> Result<registers::received_sop_prime_identity_data::ReceivedSopPrimeIdentityData, Error<B::Error>> {
+        let mut buf = [0u8; registers::received_sop_prime_identity_data::LEN];
+        self.borrow_port(port)?
+            .into_registers()
+            .interface()
+            .read_register(
+                registers::received_sop_prime_identity_data::ADDR,
+                (registers::received_sop_prime_identity_data::LEN * 8) as u32,
+                &mut buf,
+            )
+            .await?;
+        Ok(buf.into())
+    }
 }
 
 #[cfg(test)]
