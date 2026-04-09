@@ -139,3 +139,37 @@ impl From<[u8; LEN]> for ReceivedSopPrimeIdentityData {
         Self(Raw(raw))
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub enum ConvertToResponseVdosError {
+    MissingIdHeader,
+    InvalidIdHeader,
+    MissingCertStat,
+    MissingProductVdo,
+}
+
+impl TryFrom<ReceivedSopPrimeIdentityData>
+    for embedded_usb_pd::vdm::structured::command::discover_identity::sop_prime::ResponseVdos
+{
+    type Error = ConvertToResponseVdosError;
+
+    fn try_from(value: ReceivedSopPrimeIdentityData) -> Result<Self, Self::Error> {
+        Ok(Self {
+            id: value
+                .id_header()
+                .ok_or(ConvertToResponseVdosError::MissingIdHeader)?
+                .map_err(|_| ConvertToResponseVdosError::InvalidIdHeader)?,
+            cert_stat: Some(value.cert_stat().ok_or(ConvertToResponseVdosError::MissingCertStat)?),
+            product: Some(
+                value
+                    .product_vdo()
+                    .ok_or(ConvertToResponseVdosError::MissingProductVdo)?,
+            ),
+            product_type_vdos: {
+                let mut iter = value.product_type_vdos();
+                core::array::from_fn(|_| iter.next().unwrap_or(ProductTypeVdo(0)))
+            },
+        })
+    }
+}
