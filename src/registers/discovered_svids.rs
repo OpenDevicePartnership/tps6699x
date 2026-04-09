@@ -5,7 +5,7 @@
 //! This register contains the SVID information returned from `Discover SVIDs REQ` messages.
 
 use bitfield::bitfield;
-use embedded_usb_pd::vdm::Svid;
+use embedded_usb_pd::vdm::structured::Svid;
 
 /// The address of the `Discovered SVIDs` register.
 pub const ADDR: u8 = 0x21;
