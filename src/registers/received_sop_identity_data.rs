@@ -150,7 +150,13 @@ pub enum ConvertToResponseVdosError {
     InvalidIdHeader(id_header_vdo::Raw),
     MissingCertStat,
     MissingProductVdo,
-    MissingProductTypeVdo,
+    MissingProductTypeVdo {
+        /// The number of Product Type VDOs needed based on the ID Header.
+        needed: usize,
+
+        /// The number of Product Type VDOs actually available.
+        available: usize,
+    },
     InvalidProductTypeUfpVdo(ParseUfpVdoError),
 }
 
@@ -197,7 +203,10 @@ impl TryFrom<ReceivedSopIdentityData>
                 let dfp_vdo = value
                     .product_type_vdos()
                     .nth(index)
-                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo)?
+                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo {
+                        needed: index + 1,
+                        available: value.product_type_vdos().count(),
+                    })?
                     .into();
 
                 match product_type_dfp {
@@ -219,8 +228,11 @@ impl TryFrom<ReceivedSopIdentityData>
             product_type_ufp @ (id_header_vdo::ProductTypeUfp::Hub | id_header_vdo::ProductTypeUfp::Peripheral) => {
                 let ufp_vdo = value
                     .product_type_vdos()
-                    .nth(1) // the second Product Type VDO is the UFP one if both are present
-                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo)?
+                    .next()
+                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo {
+                        needed: 1,
+                        available: value.product_type_vdos().count(),
+                    })?
                     .try_into()?;
 
                 match product_type_ufp {
