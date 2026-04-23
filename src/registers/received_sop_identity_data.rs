@@ -7,7 +7,8 @@
 use bitfield::bitfield;
 use embedded_usb_pd::vdm::structured::{
     command::discover_identity::{
-        sop::{id_header_vdo, IdHeaderVdo},
+        sop::{id_header_vdo, DfpProductTypeVdos, IdHeaderVdo, UfpProductTypeVdos},
+        ufp_vdo::ParseUfpVdoError,
         CertStatVdo, ProductTypeVdo, ProductVdo,
     },
     header::CommandType,
@@ -146,9 +147,17 @@ impl From<[u8; LEN]> for ReceivedSopIdentityData {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ConvertToResponseVdosError {
     MissingIdHeader,
-    InvalidIdHeader,
+    InvalidIdHeader(id_header_vdo::Raw),
     MissingCertStat,
     MissingProductVdo,
+    MissingProductTypeVdo,
+    InvalidProductTypeUfpVdo(ParseUfpVdoError),
+}
+
+impl From<ParseUfpVdoError> for ConvertToResponseVdosError {
+    fn from(value: ParseUfpVdoError) -> Self {
+        Self::InvalidProductTypeUfpVdo(value)
+    }
 }
 
 impl TryFrom<ReceivedSopIdentityData>
@@ -157,21 +166,80 @@ impl TryFrom<ReceivedSopIdentityData>
     type Error = ConvertToResponseVdosError;
 
     fn try_from(value: ReceivedSopIdentityData) -> Result<Self, Self::Error> {
+        let id = value
+            .id_header()
+            .ok_or(ConvertToResponseVdosError::MissingIdHeader)?
+            .map_err(ConvertToResponseVdosError::InvalidIdHeader)?;
+
+        let cert_stat = value.cert_stat().ok_or(ConvertToResponseVdosError::MissingCertStat)?;
+        let product = value
+            .product_vdo()
+            .ok_or(ConvertToResponseVdosError::MissingProductVdo)?;
+
+        let dfp_product_type_vdos = match id.product_type_dfp {
+            id_header_vdo::ProductTypeDfp::NotADfp => DfpProductTypeVdos::NotADfp,
+
+            // these all parse the same way, so combine to reduce code duplication
+            product_type_dfp @ (id_header_vdo::ProductTypeDfp::Hub
+            | id_header_vdo::ProductTypeDfp::Host
+            | id_header_vdo::ProductTypeDfp::Charger) => {
+                /* PD 6.4.4.3.1 Discover Identity
+
+                If the product is a DRD both a Product Type (UFP) and a Product Type (DFP) are declared in the ID Header. These
+                products Shall return Product Type VDOs for both UFP and DFP beginning with the UFP VDO, then by a 32-bit Pad
+                Object (defined as all '0's), followed by the DFP VDO as shown in Figure 6.17, "Discover Identity Command response
+                for a DRD".
+                */
+
+                // we're already a DFP at this scope, so we're DRD if we're also a UFP
+                let is_dual_role = !matches!(id.product_type_ufp, id_header_vdo::ProductTypeUfp::NotAUfp);
+                let index = if is_dual_role { 2 } else { 0 };
+                let dfp_vdo = value
+                    .product_type_vdos()
+                    .nth(index)
+                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo)?
+                    .into();
+
+                match product_type_dfp {
+                    id_header_vdo::ProductTypeDfp::Hub => DfpProductTypeVdos::Hub(dfp_vdo),
+                    id_header_vdo::ProductTypeDfp::Host => DfpProductTypeVdos::Host(dfp_vdo),
+                    id_header_vdo::ProductTypeDfp::Charger => DfpProductTypeVdos::Charger(dfp_vdo),
+
+                    // techincally unreachable since the case was handled above, but we include it for exhaustiveness
+                    id_header_vdo::ProductTypeDfp::NotADfp => DfpProductTypeVdos::NotADfp,
+                }
+            }
+        };
+
+        let ufp_product_type_vdos = match id.product_type_ufp {
+            id_header_vdo::ProductTypeUfp::NotAUfp => UfpProductTypeVdos::NotAUfp,
+            id_header_vdo::ProductTypeUfp::Psd => UfpProductTypeVdos::Psd,
+
+            // these all parse the same way, so combine to reduce code duplication
+            product_type_ufp @ (id_header_vdo::ProductTypeUfp::Hub | id_header_vdo::ProductTypeUfp::Peripheral) => {
+                let ufp_vdo = value
+                    .product_type_vdos()
+                    .nth(1) // the second Product Type VDO is the UFP one if both are present
+                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo)?
+                    .try_into()?;
+
+                match product_type_ufp {
+                    id_header_vdo::ProductTypeUfp::Hub => UfpProductTypeVdos::Hub(ufp_vdo),
+                    id_header_vdo::ProductTypeUfp::Peripheral => UfpProductTypeVdos::Peripheral(ufp_vdo),
+
+                    // techincally unreachable since the case was handled above, but we include it for exhaustiveness
+                    id_header_vdo::ProductTypeUfp::NotAUfp => UfpProductTypeVdos::NotAUfp,
+                    id_header_vdo::ProductTypeUfp::Psd => UfpProductTypeVdos::Psd,
+                }
+            }
+        };
+
         Ok(Self {
-            id: value
-                .id_header()
-                .ok_or(ConvertToResponseVdosError::MissingIdHeader)?
-                .map_err(|_| ConvertToResponseVdosError::InvalidIdHeader)?,
-            cert_stat: Some(value.cert_stat().ok_or(ConvertToResponseVdosError::MissingCertStat)?),
-            product: Some(
-                value
-                    .product_vdo()
-                    .ok_or(ConvertToResponseVdosError::MissingProductVdo)?,
-            ),
-            product_type_vdos: {
-                let mut iter = value.product_type_vdos();
-                core::array::from_fn(|_| iter.next().unwrap_or(ProductTypeVdo(0)))
-            },
+            id: id.into(),
+            cert_stat,
+            product,
+            dfp_product_type_vdos,
+            ufp_product_type_vdos,
         })
     }
 }

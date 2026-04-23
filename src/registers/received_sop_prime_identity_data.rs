@@ -7,7 +7,10 @@
 use bitfield::bitfield;
 use embedded_usb_pd::vdm::structured::{
     command::discover_identity::{
-        sop_prime::{id_header_vdo, IdHeaderVdo},
+        active_cable_vdo::{ParseActiveCableVdo1Error, ParseActiveCableVdo2Error},
+        passive_cable_vdo::ParsePassiveCableVdoError,
+        sop_prime::{id_header_vdo, IdHeaderVdo, ProductTypeVdos},
+        vpd_vdo::ParseVpdVdoError,
         CertStatVdo, ProductTypeVdo, ProductVdo,
     },
     header::CommandType,
@@ -144,9 +147,38 @@ impl From<[u8; LEN]> for ReceivedSopPrimeIdentityData {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ConvertToResponseVdosError {
     MissingIdHeader,
-    InvalidIdHeader,
+    InvalidIdHeader(id_header_vdo::Raw),
     MissingCertStat,
     MissingProductVdo,
+    MissingProductTypeVdo,
+    InvalidProductTypePassiveCableVdo(ParsePassiveCableVdoError),
+    InvalidProductTypeActiveCableVdo1(ParseActiveCableVdo1Error),
+    InvalidProductTypeActiveCableVdo2(ParseActiveCableVdo2Error),
+    InvalidProductTypeVpdVdo(ParseVpdVdoError),
+}
+
+impl From<ParsePassiveCableVdoError> for ConvertToResponseVdosError {
+    fn from(value: ParsePassiveCableVdoError) -> Self {
+        Self::InvalidProductTypePassiveCableVdo(value)
+    }
+}
+
+impl From<ParseActiveCableVdo1Error> for ConvertToResponseVdosError {
+    fn from(value: ParseActiveCableVdo1Error) -> Self {
+        Self::InvalidProductTypeActiveCableVdo1(value)
+    }
+}
+
+impl From<ParseActiveCableVdo2Error> for ConvertToResponseVdosError {
+    fn from(value: ParseActiveCableVdo2Error) -> Self {
+        Self::InvalidProductTypeActiveCableVdo2(value)
+    }
+}
+
+impl From<ParseVpdVdoError> for ConvertToResponseVdosError {
+    fn from(value: ParseVpdVdoError) -> Self {
+        Self::InvalidProductTypeVpdVdo(value)
+    }
 }
 
 impl TryFrom<ReceivedSopPrimeIdentityData>
@@ -155,21 +187,58 @@ impl TryFrom<ReceivedSopPrimeIdentityData>
     type Error = ConvertToResponseVdosError;
 
     fn try_from(value: ReceivedSopPrimeIdentityData) -> Result<Self, Self::Error> {
+        let id = value
+            .id_header()
+            .ok_or(ConvertToResponseVdosError::MissingIdHeader)?
+            .map_err(ConvertToResponseVdosError::InvalidIdHeader)?;
+
+        let cert_stat = value.cert_stat().ok_or(ConvertToResponseVdosError::MissingCertStat)?;
+        let product = value
+            .product_vdo()
+            .ok_or(ConvertToResponseVdosError::MissingProductVdo)?;
+
+        let product_type_vdos = match id.product_type {
+            id_header_vdo::ProductType::NotACablePlugVpd => ProductTypeVdos::NotACablePlugVpd,
+            id_header_vdo::ProductType::PassiveCable => {
+                let vdo = value
+                    .product_type_vdos()
+                    .next()
+                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo)?
+                    .try_into()?;
+
+                ProductTypeVdos::PassiveCable(vdo)
+            }
+            id_header_vdo::ProductType::ActiveCable => {
+                let vdo1 = value
+                    .product_type_vdos()
+                    .next()
+                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo)?
+                    .try_into()?;
+
+                let vdo2 = value
+                    .product_type_vdos()
+                    .nth(1)
+                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo)?
+                    .try_into()?;
+
+                ProductTypeVdos::ActiveCable(vdo1, vdo2)
+            }
+            id_header_vdo::ProductType::Vpd => {
+                let vdo = value
+                    .product_type_vdos()
+                    .next()
+                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo)?
+                    .try_into()?;
+
+                ProductTypeVdos::Vpd(vdo)
+            }
+        };
+
         Ok(Self {
-            id: value
-                .id_header()
-                .ok_or(ConvertToResponseVdosError::MissingIdHeader)?
-                .map_err(|_| ConvertToResponseVdosError::InvalidIdHeader)?,
-            cert_stat: Some(value.cert_stat().ok_or(ConvertToResponseVdosError::MissingCertStat)?),
-            product: Some(
-                value
-                    .product_vdo()
-                    .ok_or(ConvertToResponseVdosError::MissingProductVdo)?,
-            ),
-            product_type_vdos: {
-                let mut iter = value.product_type_vdos();
-                core::array::from_fn(|_| iter.next().unwrap_or(ProductTypeVdo(0)))
-            },
+            id: id.into(),
+            cert_stat,
+            product,
+            product_type_vdos,
         })
     }
 }
