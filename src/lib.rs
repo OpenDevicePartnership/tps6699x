@@ -117,7 +117,6 @@ pub(crate) mod test {
     use bincode::encode_into_slice;
     use embedded_hal_async::delay::DelayNs;
     use embedded_hal_mock::eh1::i2c::Transaction;
-    use embedded_usb_pd::pdo::source::FixedFlags;
     use embedded_usb_pd::pdo::{self, MA10_UNIT, MV50_UNIT};
     use tokio::time::sleep;
 
@@ -316,8 +315,8 @@ pub(crate) mod test {
         (((voltage_mv / MV50_UNIT) as u32) << 10) | (current_ma / MA10_UNIT) as u32
     }
 
-    pub const fn test_src_pdo_fixed_flags() -> FixedFlags {
-        FixedFlags {
+    pub const fn test_src_pdo_fixed_flags() -> pdo::source::FixedData {
+        pdo::source::FixedData {
             dual_role_power: false,
             usb_suspend_supported: false,
             unconstrained_power: false,
@@ -325,6 +324,10 @@ pub(crate) mod test {
             dual_role_data: false,
             unchunked_extended_messages_support: false,
             epr_capable: false,
+            // Other values don't matter because we're just using this for the flags.
+            peak_current: pdo::source::PeakCurrent::Pct100,
+            voltage_mv: 0,
+            current_ma: 0,
         }
     }
 
@@ -332,20 +335,20 @@ pub(crate) mod test {
     pub const TEST_SRC_PDO_FIXED_5V3A_RAW: u32 = test_src_pdo_fixed_raw(5000, 3000);
     /// Test source PDO fixed 5V 3A
     pub const TEST_SRC_PDO_FIXED_5V3A: pdo::source::Pdo = pdo::source::Pdo::Fixed(pdo::source::FixedData {
-        flags: test_src_pdo_fixed_flags(),
         voltage_mv: 5000,
         current_ma: 3000,
         peak_current: pdo::source::PeakCurrent::Pct100,
+        ..test_src_pdo_fixed_flags()
     });
 
     /// Test source PDO fixed 5V 1.5A raw
     pub const TEST_SRC_PDO_FIXED_5V1A5_RAW: u32 = test_src_pdo_fixed_raw(5000, 1500);
     /// Test source PDO fixed 5V 1.5A
     pub const TEST_SRC_PDO_FIXED_5V1A5: pdo::source::Pdo = pdo::source::Pdo::Fixed(pdo::source::FixedData {
-        flags: test_src_pdo_fixed_flags(),
         voltage_mv: 5000,
         current_ma: 1500,
         peak_current: pdo::source::PeakCurrent::Pct100,
+        ..test_src_pdo_fixed_flags()
     });
 
     /// Test source PDO fixed 5V 900mA raw
@@ -355,10 +358,10 @@ pub(crate) mod test {
     pub const TEST_SRC_EPR_PDO_FIXED_28V5A_RAW: u32 = test_src_pdo_fixed_raw(28000, 5000);
     /// Test source EPR PDO fixed 28V 5A
     pub const TEST_SRC_EPR_PDO_FIXED_28V5A: pdo::source::Pdo = pdo::source::Pdo::Fixed(pdo::source::FixedData {
-        flags: test_src_pdo_fixed_flags(),
         voltage_mv: 28000,
         current_ma: 5000,
         peak_current: pdo::source::PeakCurrent::Pct100,
+        ..test_src_pdo_fixed_flags()
     });
 
     /// Test source EPR PDO fixed 28V 3A raw
