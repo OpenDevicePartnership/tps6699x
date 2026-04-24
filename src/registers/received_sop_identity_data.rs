@@ -159,7 +159,7 @@ pub enum ConvertToResponseVdosError {
         /// The Cert Stat VDO, included for context in debugging.
         cert_stat: CertStatVdo,
     },
-    MissingProductTypeVdo {
+    MissingProductTypeUfpVdo {
         /// The ID Header VDO, included for context in debugging.
         id: IdHeaderVdo,
 
@@ -168,12 +168,6 @@ pub enum ConvertToResponseVdosError {
 
         /// The Product VDO, included for context in debugging.
         product: ProductVdo,
-
-        /// The number of Product Type VDOs needed based on the ID Header.
-        needed: usize,
-
-        /// The number of Product Type VDOs actually available.
-        available: usize,
     },
     InvalidProductTypeUfpVdo {
         /// The ID Header VDO, included for context in debugging.
@@ -185,12 +179,84 @@ pub enum ConvertToResponseVdosError {
         /// The Product VDO, included for context in debugging.
         product: ProductVdo,
 
-        /// The DFP Product Type VDOs, included for context in debugging.
-        dfp_product_type_vdos: DfpProductTypeVdos,
-
         /// The inner error encountered when parsing the Product Type (UFP) VDO.
         inner: ParseUfpVdoError,
     },
+    MissingProductTypeDfpVdo {
+        /// The ID Header VDO, included for context in debugging.
+        id: IdHeaderVdo,
+
+        /// The Cert Stat VDO, included for context in debugging.
+        cert_stat: CertStatVdo,
+
+        /// The Product VDO, included for context in debugging.
+        product: ProductVdo,
+
+        /// The UFP Product Type VDO, included for context in debugging.
+        ufp_product_type_vdos: UfpProductTypeVdos,
+
+        /// The number of Product Type VDOs needed based on the ID Header.
+        needed: usize,
+
+        /// The number of Product Type VDOs actually available.
+        available: usize,
+    },
+}
+
+impl ConvertToResponseVdosError {
+    /// Get the ID Header VDO if it was parsed successfully.
+    pub const fn id(&self) -> Option<IdHeaderVdo> {
+        match self {
+            Self::MissingIdHeader | Self::InvalidIdHeader(_) => None,
+            Self::MissingCertStat { id }
+            | Self::MissingProductVdo { id, .. }
+            | Self::MissingProductTypeUfpVdo { id, .. }
+            | Self::InvalidProductTypeUfpVdo { id, .. }
+            | Self::MissingProductTypeDfpVdo { id, .. } => Some(*id),
+        }
+    }
+
+    /// Get the Cert Stat VDO if it was parsed successfully.
+    pub const fn cert_stat(&self) -> Option<CertStatVdo> {
+        match self {
+            Self::MissingIdHeader | Self::InvalidIdHeader(_) | Self::MissingCertStat { .. } => None,
+            Self::MissingProductVdo { cert_stat, .. }
+            | Self::MissingProductTypeUfpVdo { cert_stat, .. }
+            | Self::InvalidProductTypeUfpVdo { cert_stat, .. }
+            | Self::MissingProductTypeDfpVdo { cert_stat, .. } => Some(*cert_stat),
+        }
+    }
+
+    /// Get the Product VDO if it was parsed successfully.
+    pub const fn product(&self) -> Option<ProductVdo> {
+        match self {
+            Self::MissingIdHeader
+            | Self::InvalidIdHeader(_)
+            | Self::MissingCertStat { .. }
+            | Self::MissingProductVdo { .. } => None,
+            Self::MissingProductTypeUfpVdo { product, .. }
+            | Self::InvalidProductTypeUfpVdo { product, .. }
+            | Self::MissingProductTypeDfpVdo { product, .. } => Some(*product),
+        }
+    }
+
+    /// Get the UFP Product Type VDOs if they were parsed successfully.
+    ///
+    /// If the DFP Product Type VDO was parsed successfully, it, and the UFP VDO,
+    /// are available in the [`Ok`] return value of the [`TryFrom`] implementation.
+    pub const fn ufp_product_type_vdos(&self) -> Option<UfpProductTypeVdos> {
+        match self {
+            Self::MissingIdHeader
+            | Self::InvalidIdHeader(_)
+            | Self::MissingCertStat { .. }
+            | Self::MissingProductVdo { .. }
+            | Self::MissingProductTypeUfpVdo { .. }
+            | Self::InvalidProductTypeUfpVdo { .. } => None,
+            Self::MissingProductTypeDfpVdo {
+                ufp_product_type_vdos, ..
+            } => Some(*ufp_product_type_vdos),
+        }
+    }
 }
 
 impl TryFrom<ReceivedSopIdentityData>
@@ -210,6 +276,37 @@ impl TryFrom<ReceivedSopIdentityData>
         let product = value
             .product_vdo()
             .ok_or(ConvertToResponseVdosError::MissingProductVdo { id, cert_stat })?;
+
+        // parse UFP first since it always comes first in the VDO list for DRDs (see DFP parsing below)
+        // this provides the UFP VDO to callers in the case that DFP parsing fails, whereas parsing DFP first would not
+        let ufp_product_type_vdos = match id.product_type_ufp {
+            id_header_vdo::ProductTypeUfp::NotAUfp => UfpProductTypeVdos::NotAUfp,
+            id_header_vdo::ProductTypeUfp::Psd => UfpProductTypeVdos::Psd,
+
+            // these all parse the same way, so combine to reduce code duplication
+            product_type_ufp @ (id_header_vdo::ProductTypeUfp::Hub | id_header_vdo::ProductTypeUfp::Peripheral) => {
+                let ufp_vdo = value
+                    .product_type_vdos()
+                    .next()
+                    .ok_or(ConvertToResponseVdosError::MissingProductTypeUfpVdo { id, cert_stat, product })?
+                    .try_into()
+                    .map_err(|inner| ConvertToResponseVdosError::InvalidProductTypeUfpVdo {
+                        id,
+                        cert_stat,
+                        product,
+                        inner,
+                    })?;
+
+                match product_type_ufp {
+                    id_header_vdo::ProductTypeUfp::Hub => UfpProductTypeVdos::Hub(ufp_vdo),
+                    id_header_vdo::ProductTypeUfp::Peripheral => UfpProductTypeVdos::Peripheral(ufp_vdo),
+
+                    // techincally unreachable since the case was handled above, but we include it for exhaustiveness
+                    id_header_vdo::ProductTypeUfp::NotAUfp => UfpProductTypeVdos::NotAUfp,
+                    id_header_vdo::ProductTypeUfp::Psd => UfpProductTypeVdos::Psd,
+                }
+            }
+        };
 
         let dfp_product_type_vdos = match id.product_type_dfp {
             id_header_vdo::ProductTypeDfp::NotADfp => DfpProductTypeVdos::NotADfp,
@@ -232,10 +329,11 @@ impl TryFrom<ReceivedSopIdentityData>
                 let dfp_vdo = value
                     .product_type_vdos()
                     .nth(index)
-                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo {
+                    .ok_or(ConvertToResponseVdosError::MissingProductTypeDfpVdo {
                         id,
                         cert_stat,
                         product,
+                        ufp_product_type_vdos,
                         needed: index + 1,
                         available: value.product_type_vdos().count(),
                     })?
@@ -248,42 +346,6 @@ impl TryFrom<ReceivedSopIdentityData>
 
                     // techincally unreachable since the case was handled above, but we include it for exhaustiveness
                     id_header_vdo::ProductTypeDfp::NotADfp => DfpProductTypeVdos::NotADfp,
-                }
-            }
-        };
-
-        let ufp_product_type_vdos = match id.product_type_ufp {
-            id_header_vdo::ProductTypeUfp::NotAUfp => UfpProductTypeVdos::NotAUfp,
-            id_header_vdo::ProductTypeUfp::Psd => UfpProductTypeVdos::Psd,
-
-            // these all parse the same way, so combine to reduce code duplication
-            product_type_ufp @ (id_header_vdo::ProductTypeUfp::Hub | id_header_vdo::ProductTypeUfp::Peripheral) => {
-                let ufp_vdo = value
-                    .product_type_vdos()
-                    .next()
-                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo {
-                        id,
-                        cert_stat,
-                        product,
-                        needed: 1,
-                        available: value.product_type_vdos().count(),
-                    })?
-                    .try_into()
-                    .map_err(|inner| ConvertToResponseVdosError::InvalidProductTypeUfpVdo {
-                        id,
-                        cert_stat,
-                        product,
-                        dfp_product_type_vdos,
-                        inner,
-                    })?;
-
-                match product_type_ufp {
-                    id_header_vdo::ProductTypeUfp::Hub => UfpProductTypeVdos::Hub(ufp_vdo),
-                    id_header_vdo::ProductTypeUfp::Peripheral => UfpProductTypeVdos::Peripheral(ufp_vdo),
-
-                    // techincally unreachable since the case was handled above, but we include it for exhaustiveness
-                    id_header_vdo::ProductTypeUfp::NotAUfp => UfpProductTypeVdos::NotAUfp,
-                    id_header_vdo::ProductTypeUfp::Psd => UfpProductTypeVdos::Psd,
                 }
             }
         };

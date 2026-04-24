@@ -239,6 +239,72 @@ pub enum ConvertToResponseVdosError {
     },
 }
 
+impl ConvertToResponseVdosError {
+    /// Get the ID Header VDO if it was parsed successfully.
+    pub const fn id(&self) -> Option<IdHeaderVdo> {
+        match self {
+            Self::MissingIdHeader | Self::InvalidIdHeader(_) => None,
+            Self::MissingCertStat { id }
+            | Self::MissingProductVdo { id, .. }
+            | Self::MissingProductTypeVdo { id, .. }
+            | Self::MissingProductTypeActiveCableVdo2 { id, .. }
+            | Self::InvalidProductTypePassiveCableVdo { id, .. }
+            | Self::InvalidProductTypeActiveCableVdo1 { id, .. }
+            | Self::InvalidProductTypeActiveCableVdo2 { id, .. }
+            | Self::InvalidProductTypeVpdVdo { id, .. } => Some(*id),
+        }
+    }
+
+    /// Get the Cert Stat VDO if it was parsed successfully.
+    pub const fn cert_stat(&self) -> Option<CertStatVdo> {
+        match self {
+            Self::MissingIdHeader | Self::InvalidIdHeader(_) | Self::MissingCertStat { .. } => None,
+            Self::MissingProductVdo { cert_stat, .. }
+            | Self::MissingProductTypeVdo { cert_stat, .. }
+            | Self::MissingProductTypeActiveCableVdo2 { cert_stat, .. }
+            | Self::InvalidProductTypePassiveCableVdo { cert_stat, .. }
+            | Self::InvalidProductTypeActiveCableVdo1 { cert_stat, .. }
+            | Self::InvalidProductTypeActiveCableVdo2 { cert_stat, .. }
+            | Self::InvalidProductTypeVpdVdo { cert_stat, .. } => Some(*cert_stat),
+        }
+    }
+
+    /// Get the Product VDO if it was parsed successfully.
+    pub const fn product(&self) -> Option<ProductVdo> {
+        match self {
+            Self::MissingIdHeader
+            | Self::InvalidIdHeader(_)
+            | Self::MissingCertStat { .. }
+            | Self::MissingProductVdo { .. } => None,
+            Self::MissingProductTypeVdo { product, .. }
+            | Self::MissingProductTypeActiveCableVdo2 { product, .. }
+            | Self::InvalidProductTypePassiveCableVdo { product, .. }
+            | Self::InvalidProductTypeActiveCableVdo1 { product, .. }
+            | Self::InvalidProductTypeActiveCableVdo2 { product, .. }
+            | Self::InvalidProductTypeVpdVdo { product, .. } => Some(*product),
+        }
+    }
+
+    /// Get the Active Cable VDO1 if it was parsed successfully.
+    ///
+    /// If the Active Cable VDO2 was parsed successfully, it, and the VDO1, are
+    /// available in the [`Ok`] return value of the [`TryFrom`] implementation.
+    pub const fn active_cable_vdo1(&self) -> Option<ActiveCableVdo1> {
+        match self {
+            Self::MissingIdHeader
+            | Self::InvalidIdHeader(_)
+            | Self::MissingCertStat { .. }
+            | Self::MissingProductVdo { .. }
+            | Self::MissingProductTypeVdo { .. }
+            | Self::InvalidProductTypePassiveCableVdo { .. }
+            | Self::InvalidProductTypeActiveCableVdo1 { .. }
+            | Self::InvalidProductTypeVpdVdo { .. } => None,
+            Self::MissingProductTypeActiveCableVdo2 { active_cable_vdo1, .. }
+            | Self::InvalidProductTypeActiveCableVdo2 { active_cable_vdo1, .. } => Some(*active_cable_vdo1),
+        }
+    }
+}
+
 impl TryFrom<ReceivedSopPrimeIdentityData>
     for embedded_usb_pd::vdm::structured::command::discover_identity::sop_prime::ResponseVdos
 {
