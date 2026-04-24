@@ -148,22 +148,49 @@ impl From<[u8; LEN]> for ReceivedSopIdentityData {
 pub enum ConvertToResponseVdosError {
     MissingIdHeader,
     InvalidIdHeader(id_header_vdo::Raw),
-    MissingCertStat,
-    MissingProductVdo,
+    MissingCertStat {
+        /// The ID Header VDO, included for context in debugging.
+        id: IdHeaderVdo,
+    },
+    MissingProductVdo {
+        /// The ID Header VDO, included for context in debugging.
+        id: IdHeaderVdo,
+
+        /// The Cert Stat VDO, included for context in debugging.
+        cert_stat: CertStatVdo,
+    },
     MissingProductTypeVdo {
+        /// The ID Header VDO, included for context in debugging.
+        id: IdHeaderVdo,
+
+        /// The Cert Stat VDO, included for context in debugging.
+        cert_stat: CertStatVdo,
+
+        /// The Product VDO, included for context in debugging.
+        product: ProductVdo,
+
         /// The number of Product Type VDOs needed based on the ID Header.
         needed: usize,
 
         /// The number of Product Type VDOs actually available.
         available: usize,
     },
-    InvalidProductTypeUfpVdo(ParseUfpVdoError),
-}
+    InvalidProductTypeUfpVdo {
+        /// The ID Header VDO, included for context in debugging.
+        id: IdHeaderVdo,
 
-impl From<ParseUfpVdoError> for ConvertToResponseVdosError {
-    fn from(value: ParseUfpVdoError) -> Self {
-        Self::InvalidProductTypeUfpVdo(value)
-    }
+        /// The Cert Stat VDO, included for context in debugging.
+        cert_stat: CertStatVdo,
+
+        /// The Product VDO, included for context in debugging.
+        product: ProductVdo,
+
+        /// The DFP Product Type VDOs, included for context in debugging.
+        dfp_product_type_vdos: DfpProductTypeVdos,
+
+        /// The inner error encountered when parsing the Product Type (UFP) VDO.
+        inner: ParseUfpVdoError,
+    },
 }
 
 impl TryFrom<ReceivedSopIdentityData>
@@ -177,10 +204,12 @@ impl TryFrom<ReceivedSopIdentityData>
             .ok_or(ConvertToResponseVdosError::MissingIdHeader)?
             .map_err(ConvertToResponseVdosError::InvalidIdHeader)?;
 
-        let cert_stat = value.cert_stat().ok_or(ConvertToResponseVdosError::MissingCertStat)?;
+        let cert_stat = value
+            .cert_stat()
+            .ok_or(ConvertToResponseVdosError::MissingCertStat { id })?;
         let product = value
             .product_vdo()
-            .ok_or(ConvertToResponseVdosError::MissingProductVdo)?;
+            .ok_or(ConvertToResponseVdosError::MissingProductVdo { id, cert_stat })?;
 
         let dfp_product_type_vdos = match id.product_type_dfp {
             id_header_vdo::ProductTypeDfp::NotADfp => DfpProductTypeVdos::NotADfp,
@@ -204,6 +233,9 @@ impl TryFrom<ReceivedSopIdentityData>
                     .product_type_vdos()
                     .nth(index)
                     .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo {
+                        id,
+                        cert_stat,
+                        product,
                         needed: index + 1,
                         available: value.product_type_vdos().count(),
                     })?
@@ -230,10 +262,20 @@ impl TryFrom<ReceivedSopIdentityData>
                     .product_type_vdos()
                     .next()
                     .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo {
+                        id,
+                        cert_stat,
+                        product,
                         needed: 1,
                         available: value.product_type_vdos().count(),
                     })?
-                    .try_into()?;
+                    .try_into()
+                    .map_err(|inner| ConvertToResponseVdosError::InvalidProductTypeUfpVdo {
+                        id,
+                        cert_stat,
+                        product,
+                        dfp_product_type_vdos,
+                        inner,
+                    })?;
 
                 match product_type_ufp {
                     id_header_vdo::ProductTypeUfp::Hub => UfpProductTypeVdos::Hub(ufp_vdo),

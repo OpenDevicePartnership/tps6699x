@@ -11,7 +11,7 @@ use embedded_usb_pd::vdm::structured::{
         passive_cable_vdo::ParsePassiveCableVdoError,
         sop_prime::{id_header_vdo, IdHeaderVdo, ProductTypeVdos},
         vpd_vdo::ParseVpdVdoError,
-        CertStatVdo, ProductTypeVdo, ProductVdo,
+        ActiveCableVdo1, CertStatVdo, ProductTypeVdo, ProductVdo,
     },
     header::CommandType,
 };
@@ -148,37 +148,95 @@ impl From<[u8; LEN]> for ReceivedSopPrimeIdentityData {
 pub enum ConvertToResponseVdosError {
     MissingIdHeader,
     InvalidIdHeader(id_header_vdo::Raw),
-    MissingCertStat,
-    MissingProductVdo,
-    MissingProductTypeVdo,
-    InvalidProductTypePassiveCableVdo(ParsePassiveCableVdoError),
-    InvalidProductTypeActiveCableVdo1(ParseActiveCableVdo1Error),
-    InvalidProductTypeActiveCableVdo2(ParseActiveCableVdo2Error),
-    InvalidProductTypeVpdVdo(ParseVpdVdoError),
-}
+    MissingCertStat {
+        /// The ID Header VDO, included for context in debugging.
+        id: IdHeaderVdo,
+    },
+    MissingProductVdo {
+        /// The ID Header VDO, included for context in debugging.
+        id: IdHeaderVdo,
 
-impl From<ParsePassiveCableVdoError> for ConvertToResponseVdosError {
-    fn from(value: ParsePassiveCableVdoError) -> Self {
-        Self::InvalidProductTypePassiveCableVdo(value)
-    }
-}
+        /// The Cert Stat VDO, included for context in debugging.
+        cert_stat: CertStatVdo,
+    },
+    MissingProductTypeVdo {
+        /// The ID Header VDO, included for context in debugging.
+        id: IdHeaderVdo,
 
-impl From<ParseActiveCableVdo1Error> for ConvertToResponseVdosError {
-    fn from(value: ParseActiveCableVdo1Error) -> Self {
-        Self::InvalidProductTypeActiveCableVdo1(value)
-    }
-}
+        /// The Cert Stat VDO, included for context in debugging.
+        cert_stat: CertStatVdo,
 
-impl From<ParseActiveCableVdo2Error> for ConvertToResponseVdosError {
-    fn from(value: ParseActiveCableVdo2Error) -> Self {
-        Self::InvalidProductTypeActiveCableVdo2(value)
-    }
-}
+        /// The Product VDO, included for context in debugging.
+        product: ProductVdo,
+    },
+    MissingProductTypeActiveCableVdo2 {
+        /// The ID Header VDO, included for context in debugging.
+        id: IdHeaderVdo,
 
-impl From<ParseVpdVdoError> for ConvertToResponseVdosError {
-    fn from(value: ParseVpdVdoError) -> Self {
-        Self::InvalidProductTypeVpdVdo(value)
-    }
+        /// The Cert Stat VDO, included for context in debugging.
+        cert_stat: CertStatVdo,
+
+        /// The Product VDO, included for context in debugging.
+        product: ProductVdo,
+
+        /// The first Product Type (Active Cable) VDO, included for context in debugging.
+        active_cable_vdo1: ActiveCableVdo1,
+    },
+    InvalidProductTypePassiveCableVdo {
+        /// The ID Header VDO, included for context in debugging.
+        id: IdHeaderVdo,
+
+        /// The Cert Stat VDO, included for context in debugging.
+        cert_stat: CertStatVdo,
+
+        /// The Product VDO, included for context in debugging.
+        product: ProductVdo,
+
+        /// The inner error encountered when parsing the Product Type (Passive Cable) VDO.
+        inner: ParsePassiveCableVdoError,
+    },
+    InvalidProductTypeActiveCableVdo1 {
+        /// The ID Header VDO, included for context in debugging.
+        id: IdHeaderVdo,
+
+        /// The Cert Stat VDO, included for context in debugging.
+        cert_stat: CertStatVdo,
+
+        /// The Product VDO, included for context in debugging.
+        product: ProductVdo,
+
+        /// The inner error encountered when parsing the first Product Type (Active Cable) VDO.
+        inner: ParseActiveCableVdo1Error,
+    },
+    InvalidProductTypeActiveCableVdo2 {
+        /// The ID Header VDO, included for context in debugging.
+        id: IdHeaderVdo,
+
+        /// The Cert Stat VDO, included for context in debugging.
+        cert_stat: CertStatVdo,
+
+        /// The Product VDO, included for context in debugging.
+        product: ProductVdo,
+
+        /// The first Product Type (Active Cable) VDO, included for context in debugging.
+        active_cable_vdo1: ActiveCableVdo1,
+
+        /// The inner error encountered when parsing the second Product Type (Active Cable) VDO.
+        inner: ParseActiveCableVdo2Error,
+    },
+    InvalidProductTypeVpdVdo {
+        /// The ID Header VDO, included for context in debugging.
+        id: IdHeaderVdo,
+
+        /// The Cert Stat VDO, included for context in debugging.
+        cert_stat: CertStatVdo,
+
+        /// The Product VDO, included for context in debugging.
+        product: ProductVdo,
+
+        /// The inner error encountered when parsing the Product Type (VPD) VDO.
+        inner: ParseVpdVdoError,
+    },
 }
 
 impl TryFrom<ReceivedSopPrimeIdentityData>
@@ -192,10 +250,13 @@ impl TryFrom<ReceivedSopPrimeIdentityData>
             .ok_or(ConvertToResponseVdosError::MissingIdHeader)?
             .map_err(ConvertToResponseVdosError::InvalidIdHeader)?;
 
-        let cert_stat = value.cert_stat().ok_or(ConvertToResponseVdosError::MissingCertStat)?;
+        let cert_stat = value
+            .cert_stat()
+            .ok_or(ConvertToResponseVdosError::MissingCertStat { id })?;
+
         let product = value
             .product_vdo()
-            .ok_or(ConvertToResponseVdosError::MissingProductVdo)?;
+            .ok_or(ConvertToResponseVdosError::MissingProductVdo { id, cert_stat })?;
 
         let product_type_vdos = match id.product_type {
             id_header_vdo::ProductType::NotACablePlugVpd => ProductTypeVdos::NotACablePlugVpd,
@@ -203,8 +264,14 @@ impl TryFrom<ReceivedSopPrimeIdentityData>
                 let vdo = value
                     .product_type_vdos()
                     .next()
-                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo)?
-                    .try_into()?;
+                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo { id, cert_stat, product })?
+                    .try_into()
+                    .map_err(|inner| ConvertToResponseVdosError::InvalidProductTypePassiveCableVdo {
+                        id,
+                        cert_stat,
+                        product,
+                        inner,
+                    })?;
 
                 ProductTypeVdos::PassiveCable(vdo)
             }
@@ -212,14 +279,32 @@ impl TryFrom<ReceivedSopPrimeIdentityData>
                 let vdo1 = value
                     .product_type_vdos()
                     .next()
-                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo)?
-                    .try_into()?;
+                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo { id, cert_stat, product })?
+                    .try_into()
+                    .map_err(|inner| ConvertToResponseVdosError::InvalidProductTypeActiveCableVdo1 {
+                        id,
+                        cert_stat,
+                        product,
+                        inner,
+                    })?;
 
                 let vdo2 = value
                     .product_type_vdos()
                     .nth(1)
-                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo)?
-                    .try_into()?;
+                    .ok_or(ConvertToResponseVdosError::MissingProductTypeActiveCableVdo2 {
+                        id,
+                        cert_stat,
+                        product,
+                        active_cable_vdo1: vdo1,
+                    })?
+                    .try_into()
+                    .map_err(|inner| ConvertToResponseVdosError::InvalidProductTypeActiveCableVdo2 {
+                        id,
+                        cert_stat,
+                        product,
+                        active_cable_vdo1: vdo1,
+                        inner,
+                    })?;
 
                 ProductTypeVdos::ActiveCable(vdo1, vdo2)
             }
@@ -227,8 +312,14 @@ impl TryFrom<ReceivedSopPrimeIdentityData>
                 let vdo = value
                     .product_type_vdos()
                     .next()
-                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo)?
-                    .try_into()?;
+                    .ok_or(ConvertToResponseVdosError::MissingProductTypeVdo { id, cert_stat, product })?
+                    .try_into()
+                    .map_err(|inner| ConvertToResponseVdosError::InvalidProductTypeVpdVdo {
+                        id,
+                        cert_stat,
+                        product,
+                        inner,
+                    })?;
 
                 ProductTypeVdos::Vpd(vdo)
             }
