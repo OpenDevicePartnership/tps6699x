@@ -361,11 +361,266 @@ impl TryFrom<ReceivedSopIdentityData>
 #[cfg(test)]
 mod tests {
     use super::*;
+    use embedded_usb_pd::vdm::structured::command::discover_identity::sop::{
+        DfpProductTypeVdos, ResponseVdos, UfpProductTypeVdos,
+    };
+    use embedded_usb_pd::vdm::structured::header::CommandType;
+
+    /// Build a raw register byte array for testing.
+    ///
+    /// Byte 0 encodes `num_vdos` in bits 2:0 and `response_type` in bits 7:6.
+    /// VDO values are stored little-endian starting at byte 1, 4 bytes each.
+    fn make_raw(num_vdos: u8, response_type: u8, vdos: &[u32]) -> [u8; LEN] {
+        let mut raw = [0u8; LEN];
+        raw[0] = (num_vdos & 0b111) | ((response_type & 0b11) << 6);
+        for (i, &vdo) in vdos.iter().enumerate().take(6) {
+            let offset = 1 + i * 4;
+            raw[offset..offset + 4].copy_from_slice(&vdo.to_le_bytes());
+        }
+        raw
+    }
 
     #[test]
     fn number_valid_vdos_is_capped_at_6() {
         let mut reg = ReceivedSopIdentityData::default();
         reg.0.set_number_valid_vdos(7);
         assert_eq!(reg.number_valid_vdos(), 6);
+    }
+
+    #[test]
+    fn vdos_returns_correct_count() {
+        for n in 0..=6u8 {
+            let raw = make_raw(n, 0, &[0; 6]);
+            let reg = ReceivedSopIdentityData::from(raw);
+            assert_eq!(reg.vdos().len(), n as usize, "n={n}");
+        }
+    }
+
+    #[test]
+    fn vdos_returns_correct_values() {
+        let expected = [0x11111111, 0x22222222, 0x33333333, 0x44444444, 0x55555555, 0x66666666];
+        let raw = make_raw(6, 0, &expected);
+        let reg = ReceivedSopIdentityData::from(raw);
+        let mut iter = reg.vdos();
+        for &e in &expected {
+            assert_eq!(iter.next(), Some(e));
+        }
+        assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn response_type_maps_all_variants() {
+        let cases = [
+            (0b00u8, CommandType::Request),
+            (0b01, CommandType::Ack),
+            (0b10, CommandType::Nak),
+            (0b11, CommandType::Busy),
+        ];
+        for (raw_bits, expected) in cases {
+            let raw = make_raw(0, raw_bits, &[]);
+            let reg = ReceivedSopIdentityData::from(raw);
+            assert_eq!(reg.response_type(), expected, "raw_bits={raw_bits:#04b}");
+        }
+    }
+
+    #[test]
+    fn id_header_returns_none_when_no_vdos() {
+        let reg = ReceivedSopIdentityData::default();
+        assert!(reg.id_header().is_none());
+    }
+
+    #[test]
+    fn cert_stat_returns_none_when_fewer_than_2_vdos() {
+        let raw = make_raw(1, 0, &[0]);
+        let reg = ReceivedSopIdentityData::from(raw);
+        assert!(reg.cert_stat().is_none());
+    }
+
+    #[test]
+    fn product_vdo_returns_none_when_fewer_than_3_vdos() {
+        let raw = make_raw(2, 0, &[0, 0]);
+        let reg = ReceivedSopIdentityData::from(raw);
+        assert!(reg.product_vdo().is_none());
+    }
+
+    #[test]
+    fn product_type_vdos_skips_first_three() {
+        let raw = make_raw(
+            6,
+            0,
+            &[0x11111111, 0x22222222, 0x33333333, 0xAAAAAAAA, 0xBBBBBBBB, 0xCCCCCCCC],
+        );
+        let reg = ReceivedSopIdentityData::from(raw);
+        let mut iter = reg.product_type_vdos();
+        assert_eq!(iter.next().map(|v| v.0), Some(0xAAAAAAAA));
+        assert_eq!(iter.next().map(|v| v.0), Some(0xBBBBBBBB));
+        assert_eq!(iter.next().map(|v| v.0), Some(0xCCCCCCCC));
+        assert_eq!(iter.next(), None);
+    }
+
+    mod try_from {
+        use super::*;
+
+        // connector_type=Receptacle (0b10) at bits 22:21, product_type_dfp=NotADfp (0b000) at bits 25:23,
+        // product_type_ufp=NotAUfp (0b000) at bits 29:27.
+        const SIMPLE_RECEPTACLE_ID_HEADER: u32 = 0b10 << 21; // 0x00400000
+
+        #[test]
+        fn missing_id_header() {
+            let reg = ReceivedSopIdentityData::default();
+            assert_eq!(
+                ResponseVdos::try_from(reg),
+                Err(ConvertToResponseVdosError::MissingIdHeader)
+            );
+        }
+
+        #[test]
+        fn invalid_id_header() {
+            // connector_type bits 22:21 = 0b00 is invalid (valid: 0b10=Receptacle, 0b11=Plug)
+            let raw = make_raw(1, 0b01, &[0x00000000]);
+            let reg = ReceivedSopIdentityData::from(raw);
+            assert_eq!(
+                ResponseVdos::try_from(reg),
+                Err(ConvertToResponseVdosError::InvalidIdHeader(id_header_vdo::Raw(
+                    0x00000000
+                )))
+            );
+        }
+
+        #[test]
+        fn missing_cert_stat() {
+            let raw = make_raw(1, 0b01, &[SIMPLE_RECEPTACLE_ID_HEADER]);
+            let reg = ReceivedSopIdentityData::from(raw);
+            assert_eq!(
+                ResponseVdos::try_from(reg),
+                Err(ConvertToResponseVdosError::MissingCertStat {
+                    id: SIMPLE_RECEPTACLE_ID_HEADER.try_into().unwrap(),
+                })
+            );
+        }
+
+        #[test]
+        fn missing_product_vdo() {
+            let raw = make_raw(2, 0b01, &[SIMPLE_RECEPTACLE_ID_HEADER, 0]);
+            let reg = ReceivedSopIdentityData::from(raw);
+            assert_eq!(
+                ResponseVdos::try_from(reg),
+                Err(ConvertToResponseVdosError::MissingProductVdo {
+                    id: SIMPLE_RECEPTACLE_ID_HEADER.try_into().unwrap(),
+                    cert_stat: CertStatVdo(0),
+                })
+            );
+        }
+
+        #[test]
+        fn success_not_ufp_not_dfp() {
+            // A device that is neither UFP nor DFP requires only the base 3 VDOs.
+            let raw = make_raw(3, 0b01, &[SIMPLE_RECEPTACLE_ID_HEADER, 0, 0]);
+            let reg = ReceivedSopIdentityData::from(raw);
+            let vdos = ResponseVdos::try_from(reg).unwrap();
+            assert_eq!(vdos.ufp_product_type_vdos, UfpProductTypeVdos::NotAUfp);
+            assert_eq!(vdos.dfp_product_type_vdos, DfpProductTypeVdos::NotADfp);
+        }
+
+        // connector_type=Receptacle (0b10), product_type_ufp=Hub (0b001) at bits 29:27,
+        // product_type_dfp=NotADfp (0b000) at bits 25:23.
+        const UFP_HUB_ID_HEADER: u32 = (0b10 << 21) | (0b001 << 27); // 0x08400000
+
+        #[test]
+        fn missing_ufp_product_type_vdo() {
+            // Hub UFP requires a product type VDO, but we only have the base 3.
+            let raw = make_raw(3, 0b01, &[UFP_HUB_ID_HEADER, 0, 0]);
+            let reg = ReceivedSopIdentityData::from(raw);
+            assert_eq!(
+                ResponseVdos::try_from(reg),
+                Err(ConvertToResponseVdosError::MissingProductTypeUfpVdo {
+                    id: UFP_HUB_ID_HEADER.try_into().unwrap(),
+                    cert_stat: CertStatVdo(0),
+                    product: 0.into(),
+                })
+            );
+        }
+
+        #[test]
+        fn success_ufp_hub() {
+            // 0x00000000 is a valid UfpVdo (usb_highest_speed=Usb2p0, vconn_power=OneW, etc.)
+            let raw = make_raw(4, 0b01, &[UFP_HUB_ID_HEADER, 0, 0, 0x00000000]);
+            let reg = ReceivedSopIdentityData::from(raw);
+            let vdos = ResponseVdos::try_from(reg).unwrap();
+            assert_eq!(
+                vdos.ufp_product_type_vdos,
+                UfpProductTypeVdos::Hub(0.try_into().unwrap())
+            );
+            assert_eq!(vdos.dfp_product_type_vdos, DfpProductTypeVdos::NotADfp);
+        }
+
+        // connector_type=Receptacle (0b10), product_type_dfp=Host (0b010) at bits 25:23,
+        // product_type_ufp=NotAUfp (0b000) at bits 29:27.
+        const DFP_HOST_ID_HEADER: u32 = (0b10 << 21) | (0b010 << 23); // 0x01400000
+
+        #[test]
+        fn missing_dfp_product_type_vdo() {
+            // Host DFP requires a product type VDO, but we only have the base 3.
+            let raw = make_raw(3, 0b01, &[DFP_HOST_ID_HEADER, 0, 0]);
+            let reg = ReceivedSopIdentityData::from(raw);
+            assert_eq!(
+                ResponseVdos::try_from(reg),
+                Err(ConvertToResponseVdosError::MissingProductTypeDfpVdo {
+                    id: DFP_HOST_ID_HEADER.try_into().unwrap(),
+                    cert_stat: CertStatVdo(0),
+                    product: 0.into(),
+                    ufp_product_type_vdos: UfpProductTypeVdos::NotAUfp,
+                    needed: 1,
+                    available: 0,
+                })
+            );
+        }
+
+        #[test]
+        fn success_dfp_host() {
+            // DfpVdo uses From<u32> (infallible), so 0x00000000 is valid.
+            let raw = make_raw(4, 0b01, &[DFP_HOST_ID_HEADER, 0, 0, 0x00000000]);
+            let reg = ReceivedSopIdentityData::from(raw);
+            let vdos = ResponseVdos::try_from(reg).unwrap();
+            assert_eq!(vdos.dfp_product_type_vdos, DfpProductTypeVdos::Host(0.into()));
+            assert_eq!(vdos.ufp_product_type_vdos, UfpProductTypeVdos::NotAUfp);
+        }
+
+        // DRD: connector_type=Receptacle (0b10), product_type_ufp=Hub (0b001) at bits 29:27,
+        // product_type_dfp=Host (0b010) at bits 25:23.
+        // PD spec: DRD response has [ufp_vdo, pad(0), dfp_vdo] in product type VDOs.
+        const DRD_HUB_HOST_ID_HEADER: u32 = (0b10 << 21) | (0b001 << 27) | (0b010 << 23); // 0x09400000
+
+        #[test]
+        fn drd_missing_dfp_product_type_vdo() {
+            // DRD DFP VDO is at product_type_vdos index 2, but with only 5 total VDOs
+            // product_type_vdos() yields 2 items (indices 0 and 1), so nth(2) returns None.
+            let raw = make_raw(5, 0b01, &[DRD_HUB_HOST_ID_HEADER, 0, 0, 0, 0]);
+            let reg = ReceivedSopIdentityData::from(raw);
+            assert_eq!(
+                ResponseVdos::try_from(reg),
+                Err(ConvertToResponseVdosError::MissingProductTypeDfpVdo {
+                    id: DRD_HUB_HOST_ID_HEADER.try_into().unwrap(),
+                    cert_stat: CertStatVdo(0),
+                    product: 0.into(),
+                    ufp_product_type_vdos: UfpProductTypeVdos::Hub(0.try_into().unwrap()),
+                    needed: 3,
+                    available: 2,
+                })
+            );
+        }
+
+        #[test]
+        fn success_drd() {
+            // 6 VDOs: id, cert_stat, product_vdo, ufp_vdo, pad(0), dfp_vdo.
+            let raw = make_raw(6, 0b01, &[DRD_HUB_HOST_ID_HEADER, 0, 0, 0, 0, 0]);
+            let reg = ReceivedSopIdentityData::from(raw);
+            let vdos = ResponseVdos::try_from(reg).unwrap();
+            assert_eq!(
+                vdos.ufp_product_type_vdos,
+                UfpProductTypeVdos::Hub(0.try_into().unwrap())
+            );
+            assert_eq!(vdos.dfp_product_type_vdos, DfpProductTypeVdos::Host(0.into()));
+        }
     }
 }

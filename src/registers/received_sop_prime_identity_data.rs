@@ -405,11 +405,217 @@ impl TryFrom<ReceivedSopPrimeIdentityData>
 #[cfg(test)]
 mod tests {
     use super::*;
+    use embedded_usb_pd::vdm::structured::command::discover_identity::sop_prime::{ProductTypeVdos, ResponseVdos};
+    use embedded_usb_pd::vdm::structured::command::discover_identity::PassiveCableVdo;
+
+    #[test]
+    fn default_has_no_vdos() {
+        let reg = ReceivedSopPrimeIdentityData::default();
+        assert_eq!(reg.number_valid_vdos(), 0);
+        assert_eq!(reg.vdos().count(), 0);
+        assert_eq!(reg.id_header(), None);
+        assert_eq!(reg.cert_stat(), None);
+        assert_eq!(reg.product_vdo(), None);
+        assert_eq!(reg.product_type_vdos().count(), 0);
+    }
 
     #[test]
     fn number_valid_vdos_is_capped_at_6() {
         let mut reg = ReceivedSopPrimeIdentityData::default();
         reg.0.set_number_valid_vdos(7);
         assert_eq!(reg.number_valid_vdos(), 6);
+    }
+
+    /// Build a raw register byte array for testing.
+    ///
+    /// Byte 0 encodes `num_vdos` in bits 2:0 and `response_type` in bits 7:6.
+    /// VDO values are stored little-endian starting at byte 1, 4 bytes each.
+    fn make_raw(num_vdos: u8, response_type: u8, vdos: &[u32]) -> [u8; LEN] {
+        let mut raw = [0u8; LEN];
+        raw[0] = (num_vdos & 0b111) | ((response_type & 0b11) << 6);
+        for (i, &vdo) in vdos.iter().enumerate().take(6) {
+            let offset = 1 + i * 4;
+            raw[offset..offset + 4].copy_from_slice(&vdo.to_le_bytes());
+        }
+        raw
+    }
+
+    #[test]
+    fn vdos_returns_correct_count() {
+        for n in 0..=6u8 {
+            let raw = make_raw(n, 0, &[0; 6]);
+            let reg = ReceivedSopPrimeIdentityData::from(raw);
+            assert_eq!(reg.vdos().len(), n as usize);
+        }
+    }
+
+    #[test]
+    fn vdos_returns_correct_values() {
+        let expected = [0x11111111, 0x22222222, 0x33333333, 0x44444444, 0x55555555, 0x66666666];
+        let raw = make_raw(6, 0, &expected);
+        let reg = ReceivedSopPrimeIdentityData::from(raw);
+        let mut iter = reg.vdos();
+        for &e in &expected {
+            assert_eq!(iter.next(), Some(e));
+        }
+        assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn product_type_vdos_skips_first_three() {
+        let raw = make_raw(
+            6,
+            0,
+            &[0x11111111, 0x22222222, 0x33333333, 0xAAAAAAAA, 0xBBBBBBBB, 0xCCCCCCCC],
+        );
+        let reg = ReceivedSopPrimeIdentityData::from(raw);
+        let mut iter = reg.product_type_vdos();
+        assert_eq!(iter.next().map(|v| v.0), Some(0xAAAAAAAA));
+        assert_eq!(iter.next().map(|v| v.0), Some(0xBBBBBBBB));
+        assert_eq!(iter.next().map(|v| v.0), Some(0xCCCCCCCC));
+        assert_eq!(iter.next(), None);
+    }
+
+    mod try_from {
+        use super::*;
+
+        // connector_type=Plug (0b11) at bits 22:21, product_type=NotACablePlugVpd (0b000) at bits 29:27.
+        const SIMPLE_PLUG_ID_HEADER: u32 = 0b11 << 21; // 0x00600000
+
+        #[test]
+        fn missing_id_header() {
+            let reg = ReceivedSopPrimeIdentityData::default();
+            assert_eq!(
+                ResponseVdos::try_from(reg),
+                Err(ConvertToResponseVdosError::MissingIdHeader)
+            );
+        }
+
+        #[test]
+        fn invalid_id_header() {
+            // connector_type bits 22:21 = 0b00 is invalid (valid: 0b10=Receptacle, 0b11=Plug)
+            let raw = make_raw(1, 0b01, &[0x00000000]);
+            let reg = ReceivedSopPrimeIdentityData::from(raw);
+            assert_eq!(
+                ResponseVdos::try_from(reg),
+                Err(ConvertToResponseVdosError::InvalidIdHeader(id_header_vdo::Raw(
+                    0x00000000
+                )))
+            );
+        }
+
+        #[test]
+        fn missing_cert_stat() {
+            let raw = make_raw(1, 0b01, &[SIMPLE_PLUG_ID_HEADER]);
+            let reg = ReceivedSopPrimeIdentityData::from(raw);
+            assert_eq!(
+                ResponseVdos::try_from(reg),
+                Err(ConvertToResponseVdosError::MissingCertStat {
+                    id: SIMPLE_PLUG_ID_HEADER.try_into().unwrap(),
+                })
+            );
+        }
+
+        #[test]
+        fn missing_product_vdo() {
+            let raw = make_raw(2, 0b01, &[SIMPLE_PLUG_ID_HEADER, 0]);
+            let reg = ReceivedSopPrimeIdentityData::from(raw);
+            assert_eq!(
+                ResponseVdos::try_from(reg),
+                Err(ConvertToResponseVdosError::MissingProductVdo {
+                    id: SIMPLE_PLUG_ID_HEADER.try_into().unwrap(),
+                    cert_stat: CertStatVdo(0),
+                })
+            );
+        }
+
+        #[test]
+        fn success_not_a_cable_plug_vpd() {
+            // NotACablePlugVpd requires no product type VDOs, only the base 3.
+            let raw = make_raw(3, 0b01, &[SIMPLE_PLUG_ID_HEADER, 0, 0]);
+            let reg = ReceivedSopPrimeIdentityData::from(raw);
+            let vdos = ResponseVdos::try_from(reg).unwrap();
+            assert_eq!(vdos.product_type_vdos, ProductTypeVdos::NotACablePlugVpd);
+        }
+
+        // connector_type=Plug (0b11), product_type=PassiveCable (0b011) at bits 29:27.
+        const PASSIVE_CABLE_ID_HEADER: u32 = (0b11 << 21) | (0b011 << 27); // 0x18600000
+
+        // A valid PassiveCableVdo raw value:
+        //   vbus_current_handling_capability=ThreeAmps (0b01) at bits 6:5
+        //   cable_latency=LessThan10ns (0b0001) at bits 16:13
+        //   usb_type_c_or_captive=UsbTypeC (0b10) at bits 19:18
+        //   all other fields at their zero-value (usb_highest_speed=Usb2p0, maximum_vbus_voltage=TwentyVolt, etc.)
+        const VALID_PASSIVE_CABLE_VDO: u32 = (0b01 << 5) | (0b0001 << 13) | (0b10 << 18); // 0x82020
+
+        #[test]
+        fn missing_product_type_vdo_for_passive_cable() {
+            // PassiveCable requires 1 product type VDO, but we only have the base 3.
+            let raw = make_raw(3, 0b01, &[PASSIVE_CABLE_ID_HEADER, 0, 0]);
+            let reg = ReceivedSopPrimeIdentityData::from(raw);
+            assert_eq!(
+                ResponseVdos::try_from(reg),
+                Err(ConvertToResponseVdosError::MissingProductTypeVdo {
+                    id: PASSIVE_CABLE_ID_HEADER.try_into().unwrap(),
+                    cert_stat: CertStatVdo(0),
+                    product: 0.into(),
+                })
+            );
+        }
+
+        #[test]
+        fn invalid_product_type_passive_cable_vdo() {
+            // 0x00000000 has vbus_current_handling_capability=0b00, which is invalid.
+            let raw = make_raw(4, 0b01, &[PASSIVE_CABLE_ID_HEADER, 0, 0, 0x00000000]);
+            let reg = ReceivedSopPrimeIdentityData::from(raw);
+            assert_eq!(
+                ResponseVdos::try_from(reg),
+                Err(ConvertToResponseVdosError::InvalidProductTypePassiveCableVdo {
+                    id: PASSIVE_CABLE_ID_HEADER.try_into().unwrap(),
+                    cert_stat: CertStatVdo(0),
+                    product: 0.into(),
+                    inner: ParsePassiveCableVdoError::InvalidVbusCurrentHandlingCapability,
+                })
+            );
+        }
+
+        #[test]
+        fn success_passive_cable() {
+            let raw = make_raw(4, 0b01, &[PASSIVE_CABLE_ID_HEADER, 0, 0, VALID_PASSIVE_CABLE_VDO]);
+            let reg = ReceivedSopPrimeIdentityData::from(raw);
+            let vdos = ResponseVdos::try_from(reg).unwrap();
+            assert_eq!(
+                vdos.product_type_vdos,
+                ProductTypeVdos::PassiveCable(VALID_PASSIVE_CABLE_VDO.try_into().unwrap())
+            );
+        }
+
+        // connector_type=Plug (0b11), product_type=ActiveCable (0b100) at bits 29:27.
+        const ACTIVE_CABLE_ID_HEADER: u32 = (0b11 << 21) | (0b100 << 27); // 0x20600000
+
+        // A valid ActiveCableVdo1 raw value:
+        //   vbus_current_handling_capability=ThreeAmps (0b01) at bits 6:5
+        //   cable_termination_type=OneEndActive (0b10) at bits 12:11
+        //     (unlike PassiveCableVdo, active cable's CableTerminationType only accepts 0b10/0b11)
+        //   cable_latency=LessThan10ns (0b0001) at bits 16:13
+        //   usb_type_c_or_captive=UsbTypeC (0b10) at bits 19:18
+        //   all other fields at their zero-value
+        const VALID_ACTIVE_CABLE_VDO1: u32 = (0b01 << 5) | (0b10 << 11) | (0b0001 << 13) | (0b10 << 18); // 0x83020
+
+        #[test]
+        fn missing_active_cable_vdo2() {
+            // ActiveCable needs 2 product type VDOs; we provide a valid VDO1 but no VDO2.
+            let raw = make_raw(4, 0b01, &[ACTIVE_CABLE_ID_HEADER, 0, 0, VALID_ACTIVE_CABLE_VDO1]);
+            let reg = ReceivedSopPrimeIdentityData::from(raw);
+            assert_eq!(
+                ResponseVdos::try_from(reg),
+                Err(ConvertToResponseVdosError::MissingProductTypeActiveCableVdo2 {
+                    id: ACTIVE_CABLE_ID_HEADER.try_into().unwrap(),
+                    cert_stat: CertStatVdo(0),
+                    product: 0.into(),
+                    active_cable_vdo1: ActiveCableVdo1::try_from(VALID_ACTIVE_CABLE_VDO1).unwrap(),
+                })
+            );
+        }
     }
 }
