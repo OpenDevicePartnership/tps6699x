@@ -53,9 +53,9 @@ pub struct ReceivedSopIdentityData(Raw<[u8; LEN]>);
 impl ReceivedSopIdentityData {
     pub const DEFAULT: Self = Self(Raw([0; LEN]));
 
-    /// Returns the number of valid VDOs in this register.
+    /// Returns the number of valid VDOs in this register (max of 6).
     pub fn number_valid_vdos(&self) -> usize {
-        self.0.number_valid_vdos() as usize
+        self.0.number_valid_vdos().min(6) as usize
     }
 
     /// Returns an iterator over the VDOs.
@@ -355,5 +355,17 @@ impl TryFrom<ReceivedSopIdentityData>
             dfp_product_type_vdos,
             ufp_product_type_vdos,
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn number_valid_vdos_is_capped_at_6() {
+        let mut reg = ReceivedSopIdentityData::default();
+        reg.0.set_number_valid_vdos(7);
+        assert_eq!(reg.number_valid_vdos(), 6);
     }
 }
