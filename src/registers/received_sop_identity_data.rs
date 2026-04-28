@@ -299,7 +299,7 @@ impl TryFrom<ReceivedSopIdentityData>
                     id_header_vdo::ProductTypeUfp::Hub => UfpProductTypeVdos::Hub(ufp_vdo),
                     id_header_vdo::ProductTypeUfp::Peripheral => UfpProductTypeVdos::Peripheral(ufp_vdo),
 
-                    // techincally unreachable since the case was handled above, but we include it for exhaustiveness
+                    // technically unreachable since the case was handled above, but we include it for exhaustiveness
                     id_header_vdo::ProductTypeUfp::NotAUfp => UfpProductTypeVdos::NotAUfp,
                     id_header_vdo::ProductTypeUfp::Psd => UfpProductTypeVdos::Psd,
                 }
