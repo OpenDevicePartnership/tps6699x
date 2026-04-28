@@ -34,7 +34,7 @@ bitfield! {
 
     /// Type of response received.
     ///
-    /// See [`ResponseType`].
+    /// See [`CommandType`] for more details.
     pub u8, response_type, set_response_type: 7, 6;
 
     pub u32, vdo1, set_vdo1: 39, 8;
