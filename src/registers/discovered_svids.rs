@@ -90,6 +90,11 @@ impl DiscoveredSvids {
     }
 
     /// Returns an iterator over the SVIDs discovered on the SOP port partner.
+    ///
+    /// This will return at most 8 SVIDs, even if [`Self::number_sop_svids`] returns
+    /// a larger number. Neither the data sheet nor the USB PD specification explicitly
+    /// state that there can be at most 8 SVIDs, but the register only has space
+    /// for 8.
     pub fn svid_sop(&self) -> impl ExactSizeIterator<Item = Svid> {
         [
             self.0.svid_sop0(),
@@ -112,6 +117,11 @@ impl DiscoveredSvids {
     }
 
     /// Returns an iterator over the SVIDs discovered on the SOP' cable plug.
+    ///
+    /// This will return at most 8 SVIDs, even if [`Self::number_sop_prime_svids`]
+    /// returns a larger number. Neither the data sheet nor the USB PD specification
+    /// explicitly state that there can be at most 8 SVIDs, but the register only
+    /// has space for 8.
     pub fn svid_sop_prime(&self) -> impl ExactSizeIterator<Item = Svid> {
         [
             self.0.svid_sop_prime0(),
@@ -182,5 +192,19 @@ mod tests {
 
         assert_eq!(reg.number_sop_prime_svids(), 0);
         assert_eq!(reg.svid_sop_prime().len(), 0);
+    }
+
+    /// There's only space fo r8 SVIDs in the register but the number of SVIDs could
+    /// be larger, so the iterators should clamp to 8.
+    #[test]
+    fn iterators_clamp_to_8() {
+        let mut reg = DiscoveredSvids::default();
+
+        reg.0.set_number_sop_svids(9);
+        reg.0.set_number_sop_prime_svids(10);
+        assert_eq!(reg.number_sop_svids(), 9);
+        assert_eq!(reg.number_sop_prime_svids(), 10);
+        assert_eq!(reg.svid_sop().len(), 8);
+        assert_eq!(reg.svid_sop_prime().len(), 8);
     }
 }
