@@ -5,16 +5,18 @@
 //! This register contains the response to Discover Identity command sent to the SOP' or SOP'' cable plug.
 
 use bitfield::bitfield;
-use embedded_usb_pd::vdm::structured::{
-    command::discover_identity::{
-        active_cable_vdo::{ParseActiveCableVdo1Error, ParseActiveCableVdo2Error},
-        passive_cable_vdo::ParsePassiveCableVdoError,
-        sop_prime::{id_header_vdo, IdHeaderVdo, ProductTypeVdos},
-        vpd_vdo::ParseVpdVdoError,
-        ActiveCableVdo1, CertStatVdo, ProductTypeVdo, ProductVdo,
-    },
-    header::CommandType,
+use embedded_usb_pd::vdm::structured::command::discover_identity::active_cable_vdo::{
+    ParseActiveCableVdo1Error, ParseActiveCableVdo2Error,
 };
+use embedded_usb_pd::vdm::structured::command::discover_identity::passive_cable_vdo::ParsePassiveCableVdoError;
+use embedded_usb_pd::vdm::structured::command::discover_identity::sop_prime::{
+    id_header_vdo, IdHeaderVdo, ProductTypeVdos,
+};
+use embedded_usb_pd::vdm::structured::command::discover_identity::vpd_vdo::ParseVpdVdoError;
+use embedded_usb_pd::vdm::structured::command::discover_identity::{
+    ActiveCableVdo1, CertStatVdo, ProductTypeVdo, ProductVdo,
+};
+use embedded_usb_pd::vdm::structured::header::CommandType;
 
 use crate::debug;
 

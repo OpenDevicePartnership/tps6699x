@@ -5,14 +5,12 @@
 //! This register contains the response to Discover Identity command sent to the SOP port partner.
 
 use bitfield::bitfield;
-use embedded_usb_pd::vdm::structured::{
-    command::discover_identity::{
-        sop::{id_header_vdo, DfpProductTypeVdos, IdHeaderVdo, UfpProductTypeVdos},
-        ufp_vdo::ParseUfpVdoError,
-        CertStatVdo, ProductTypeVdo, ProductVdo,
-    },
-    header::CommandType,
+use embedded_usb_pd::vdm::structured::command::discover_identity::sop::{
+    id_header_vdo, DfpProductTypeVdos, IdHeaderVdo, UfpProductTypeVdos,
 };
+use embedded_usb_pd::vdm::structured::command::discover_identity::ufp_vdo::ParseUfpVdoError;
+use embedded_usb_pd::vdm::structured::command::discover_identity::{CertStatVdo, ProductTypeVdo, ProductVdo};
+use embedded_usb_pd::vdm::structured::header::CommandType;
 
 use crate::debug;
 

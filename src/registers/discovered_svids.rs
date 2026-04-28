@@ -145,7 +145,8 @@ impl From<[u8; LEN]> for DiscoveredSvids {
 mod tests {
     use super::*;
     extern crate std;
-    use std::{vec, vec::Vec};
+    use std::vec;
+    use std::vec::Vec;
 
     #[test]
     fn impl_iterators() {
