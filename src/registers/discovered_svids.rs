@@ -16,7 +16,7 @@ pub const ADDR: u8 = 0x21;
 pub const LEN: usize = 264 / 8;
 
 bitfield! {
-    /// Received source/sink capabilities register
+    /// Discovered SVIDs register.
     #[derive(Clone, Copy, PartialEq, Eq)]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     struct Raw([u8]);

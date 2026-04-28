@@ -23,7 +23,7 @@ pub const ADDR: u8 = 0x48;
 pub const LEN: usize = 200 / 8;
 
 bitfield! {
-    /// Received source/sink capabilities register
+    /// Received SOP Identity Data Object register
     #[derive(Clone, Copy, PartialEq, Eq)]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     struct Raw([u8]);
