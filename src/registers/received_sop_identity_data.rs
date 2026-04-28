@@ -360,11 +360,12 @@ impl TryFrom<ReceivedSopIdentityData>
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use embedded_usb_pd::vdm::structured::command::discover_identity::sop::{
         DfpProductTypeVdos, ResponseVdos, UfpProductTypeVdos,
     };
     use embedded_usb_pd::vdm::structured::header::CommandType;
+
+    use super::*;
 
     /// Build a raw register byte array for testing.
     ///

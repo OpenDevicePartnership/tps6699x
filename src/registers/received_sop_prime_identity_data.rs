@@ -404,9 +404,9 @@ impl TryFrom<ReceivedSopPrimeIdentityData>
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use embedded_usb_pd::vdm::structured::command::discover_identity::sop_prime::{ProductTypeVdos, ResponseVdos};
-    use embedded_usb_pd::vdm::structured::command::discover_identity::PassiveCableVdo;
+
+    use super::*;
 
     #[test]
     fn default_has_no_vdos() {
