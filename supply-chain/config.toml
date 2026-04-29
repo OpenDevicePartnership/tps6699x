@@ -33,10 +33,6 @@ criteria = "safe-to-deploy"
 version = "0.3.100"
 criteria = "safe-to-deploy"
 
-[[exemptions.device-driver]]
-version = "1.0.4"
-criteria = "safe-to-deploy"
-
 [[exemptions.embassy-sync]]
 version = "0.8.0"
 criteria = "safe-to-deploy"

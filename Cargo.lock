@@ -158,9 +158,9 @@ dependencies = [
 
 [[package]]
 name = "device-driver"
-version = "1.0.4"
+version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c424cfcc4a418769975185d1d9066ad07fa05cb343fda8ea0adf98a9e9d195d2"
+checksum = "c2e4547bd66511372d2a38ac3c1b2892c7ebf83cf0d5411c3406e496c85a1d96"
 dependencies = [
  "defmt 0.3.100",
  "embedded-io 0.6.1",

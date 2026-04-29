@@ -1,4 +1,4 @@
-///Root block of the Registers driver
+/// Root block of the Registers driver
 #[derive(Debug)]
 pub struct Registers<I> {
     pub(crate) interface: I,
@@ -27,6 +27,8 @@ impl<I> Registers<I> {
     /// This is useful for e.g. debug printing all values.
     /// The given [field_sets::FieldSetValue] has a Debug and Format implementation that forwards to the concrete type
     /// the lies within so it can be printed without matching on it.
+    #[allow(unused_mut)]
+    #[allow(unused_variables)]
     pub fn read_all_registers(
         &mut self,
         mut callback: impl FnMut(u8, &'static str, field_sets::FieldSetValue),
@@ -93,6 +95,8 @@ impl<I> Registers<I> {
     /// This is useful for e.g. debug printing all values.
     /// The given [field_sets::FieldSetValue] has a Debug and Format implementation that forwards to the concrete type
     /// the lies within so it can be printed without matching on it.
+    #[allow(unused_mut)]
+    #[allow(unused_variables)]
     pub async fn read_all_registers_async(
         &mut self,
         mut callback: impl FnMut(u8, &'static str, field_sets::FieldSetValue),
@@ -146,7 +150,7 @@ impl<I> Registers<I> {
         callback(116 + 0 * 0, "rx_ado", reg.into());
         Ok(())
     }
-    ///Controller operation mode
+    /// Controller operation mode
     pub fn mode(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -165,7 +169,7 @@ impl<I> Registers<I> {
             ::device_driver::RO,
         >::new(self.interface(), address as u8, field_sets::Mode::new)
     }
-    ///Customer use
+    /// Customer use
     pub fn customer_use(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -184,7 +188,7 @@ impl<I> Registers<I> {
             ::device_driver::RW,
         >::new(self.interface(), address as u8, field_sets::CustomerUse::new)
     }
-    ///Command 1 register
+    /// Command 1 register
     pub fn cmd_1(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -203,7 +207,7 @@ impl<I> Registers<I> {
             ::device_driver::RW,
         >::new(self.interface(), address as u8, field_sets::Cmd1::new)
     }
-    ///Boot FW version
+    /// Boot FW version
     pub fn version(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -222,7 +226,7 @@ impl<I> Registers<I> {
             ::device_driver::RO,
         >::new(self.interface(), address as u8, field_sets::Version::new)
     }
-    ///Asserted interrupts for I2C1
+    /// Asserted interrupts for I2C1
     pub fn int_event_bus_1(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -241,7 +245,7 @@ impl<I> Registers<I> {
             ::device_driver::RO,
         >::new(self.interface(), address as u8, field_sets::IntEventBus1::new)
     }
-    ///Masked interrupts for I2C1
+    /// Masked interrupts for I2C1
     pub fn int_mask_bus_1(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -264,7 +268,7 @@ impl<I> Registers<I> {
             field_sets::IntEventBus1::new_as_int_mask_bus_1,
         )
     }
-    ///Set Sx App Config - system power state for application configuration
+    /// Set Sx App Config - system power state for application configuration
     pub fn sx_app_config(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -283,7 +287,7 @@ impl<I> Registers<I> {
             ::device_driver::RW,
         >::new(self.interface(), address as u8, field_sets::SxAppConfig::new)
     }
-    ///Interrupt clear for I2C1
+    /// Interrupt clear for I2C1
     pub fn int_clear_bus_1(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -306,7 +310,7 @@ impl<I> Registers<I> {
             field_sets::IntEventBus1::new_as_int_clear_bus_1,
         )
     }
-    ///Port status
+    /// Port status
     pub fn status(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -325,7 +329,7 @@ impl<I> Registers<I> {
             ::device_driver::RO,
         >::new(self.interface(), address as u8, field_sets::Status::new)
     }
-    ///Power path status
+    /// Power path status
     pub fn usb_status(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -344,7 +348,7 @@ impl<I> Registers<I> {
             ::device_driver::RO,
         >::new(self.interface(), address as u8, field_sets::UsbStatus::new)
     }
-    ///Power path status
+    /// Power path status
     pub fn power_path_status(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -363,7 +367,7 @@ impl<I> Registers<I> {
             ::device_driver::RO,
         >::new(self.interface(), address as u8, field_sets::PowerPathStatus::new)
     }
-    ///Global system configuration
+    /// Global system configuration
     pub fn system_config(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -382,7 +386,7 @@ impl<I> Registers<I> {
             ::device_driver::RW,
         >::new(self.interface(), address as u8, field_sets::SystemConfig::new)
     }
-    ///Port control
+    /// Port control
     pub fn port_control(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -401,7 +405,7 @@ impl<I> Registers<I> {
             ::device_driver::RW,
         >::new(self.interface(), address as u8, field_sets::PortControl::new)
     }
-    ///Active PDO contract
+    /// Active PDO contract
     pub fn active_pdo_contract(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -420,7 +424,7 @@ impl<I> Registers<I> {
             ::device_driver::RO,
         >::new(self.interface(), address as u8, field_sets::ActivePdoContract::new)
     }
-    ///Active PDO contract
+    /// Active PDO contract
     pub fn active_rdo_contract(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -439,7 +443,7 @@ impl<I> Registers<I> {
             ::device_driver::RO,
         >::new(self.interface(), address as u8, field_sets::ActiveRdoContract::new)
     }
-    ///PD status
+    /// PD status
     pub fn pd_status(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -458,7 +462,7 @@ impl<I> Registers<I> {
             ::device_driver::RO,
         >::new(self.interface(), address as u8, field_sets::PdStatus::new)
     }
-    ///Display Port Configuration
+    /// Display Port Configuration
     pub fn dp_config(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -477,7 +481,6 @@ impl<I> Registers<I> {
             ::device_driver::RW,
         >::new(self.interface(), address as u8, field_sets::DpConfig::new)
     }
-    ///
     pub fn tbt_config(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -496,7 +499,6 @@ impl<I> Registers<I> {
             ::device_driver::RW,
         >::new(self.interface(), address as u8, field_sets::TbtConfig::new)
     }
-    ///
     pub fn user_vid_status(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -515,7 +517,7 @@ impl<I> Registers<I> {
             ::device_driver::RO,
         >::new(self.interface(), address as u8, field_sets::UserVidStatus::new)
     }
-    ///Intel VID status
+    /// Intel VID status
     pub fn intel_vid_status(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -534,7 +536,7 @@ impl<I> Registers<I> {
             ::device_driver::RO,
         >::new(self.interface(), address as u8, field_sets::IntelVidStatus::new)
     }
-    ///Received User SVID Attention VDM
+    /// Received User SVID Attention VDM
     pub fn rx_attn_vdm(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -553,7 +555,7 @@ impl<I> Registers<I> {
             ::device_driver::RO,
         >::new(self.interface(), address as u8, field_sets::RxAttnVdm::new)
     }
-    ///Received ADO
+    /// Received ADO
     pub fn rx_ado(
         &mut self,
     ) -> ::device_driver::RegisterOperation<
@@ -575,8 +577,9 @@ impl<I> Registers<I> {
 }
 /// Module containing the generated fieldsets of the registers and commands
 pub mod field_sets {
+    #[allow(unused_imports)]
     use super::*;
-    ///Controller operation mode
+    /// Controller operation mode
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct Mode {
         /// The internal bits
@@ -597,7 +600,7 @@ pub mod field_sets {
     impl Mode {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
-            Self { bits: [0u8, 0u8, 0u8, 0u8] }
+            Self { bits: [0, 0, 0, 0] }
         }
         /// Create a new instance, loaded with all zeroes
         pub const fn new_zero() -> Self {
@@ -605,7 +608,7 @@ pub mod field_sets {
         }
         ///Read the `mode` field of the register.
         ///
-        ///Controller operation mode
+        /// Controller operation mode
         pub fn mode(&self) -> u32 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -617,7 +620,7 @@ pub mod field_sets {
         }
         ///Write the `mode` field of the register.
         ///
-        ///Controller operation mode
+        /// Controller operation mode
         pub fn set_mode(&mut self, value: u32) {
             let raw = value;
             unsafe {
@@ -640,13 +643,17 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for Mode {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("Mode").field("mode", &self.mode()).finish()
+            let mut d = f.debug_struct("Mode");
+            d.field("mode", &self.mode());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for Mode {
         fn format(&self, f: defmt::Formatter) {
-            defmt::write!(f, "Mode {{ mode: {=u32} }}", self.mode())
+            defmt::write!(f, "Mode {{ ");
+            defmt::write!(f, "mode: {=u32}, ", & self.mode());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for Mode {
@@ -700,7 +707,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Customer use
+    /// Customer use
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct CustomerUse {
         /// The internal bits
@@ -722,7 +729,7 @@ pub mod field_sets {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
             Self {
-                bits: [0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8],
+                bits: [0, 0, 0, 0, 0, 0, 0, 0],
             }
         }
         /// Create a new instance, loaded with all zeroes
@@ -731,7 +738,7 @@ pub mod field_sets {
         }
         ///Read the `customer_use` field of the register.
         ///
-        ///Controller operation mode
+        /// Controller operation mode
         pub fn customer_use(&self) -> u64 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -743,7 +750,7 @@ pub mod field_sets {
         }
         ///Write the `customer_use` field of the register.
         ///
-        ///Controller operation mode
+        /// Controller operation mode
         pub fn set_customer_use(&mut self, value: u64) {
             let raw = value;
             unsafe {
@@ -766,19 +773,17 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for CustomerUse {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("CustomerUse")
-                .field("customer_use", &self.customer_use())
-                .finish()
+            let mut d = f.debug_struct("CustomerUse");
+            d.field("customer_use", &self.customer_use());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for CustomerUse {
         fn format(&self, f: defmt::Formatter) {
-            defmt::write!(
-                f,
-                "CustomerUse {{ customer_use: {=u64} }}",
-                self.customer_use(),
-            )
+            defmt::write!(f, "CustomerUse {{ ");
+            defmt::write!(f, "customer_use: {=u64}, ", & self.customer_use());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for CustomerUse {
@@ -832,7 +837,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Command 1 register
+    /// Command 1 register
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct Cmd1 {
         /// The internal bits
@@ -853,7 +858,7 @@ pub mod field_sets {
     impl Cmd1 {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
-            Self { bits: [0u8, 0u8, 0u8, 0u8] }
+            Self { bits: [0, 0, 0, 0] }
         }
         /// Create a new instance, loaded with all zeroes
         pub const fn new_zero() -> Self {
@@ -861,7 +866,7 @@ pub mod field_sets {
         }
         ///Read the `command` field of the register.
         ///
-        ///Command value
+        /// Command value
         pub fn command(&self) -> u32 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -873,7 +878,7 @@ pub mod field_sets {
         }
         ///Write the `command` field of the register.
         ///
-        ///Command value
+        /// Command value
         pub fn set_command(&mut self, value: u32) {
             let raw = value;
             unsafe {
@@ -896,13 +901,17 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for Cmd1 {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("Cmd1").field("command", &self.command()).finish()
+            let mut d = f.debug_struct("Cmd1");
+            d.field("command", &self.command());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for Cmd1 {
         fn format(&self, f: defmt::Formatter) {
-            defmt::write!(f, "Cmd1 {{ command: {=u32} }}", self.command())
+            defmt::write!(f, "Cmd1 {{ ");
+            defmt::write!(f, "command: {=u32}, ", & self.command());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for Cmd1 {
@@ -956,7 +965,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Boot FW version
+    /// Boot FW version
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct Version {
         /// The internal bits
@@ -977,7 +986,7 @@ pub mod field_sets {
     impl Version {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
-            Self { bits: [0u8, 0u8, 0u8, 0u8] }
+            Self { bits: [0, 0, 0, 0] }
         }
         /// Create a new instance, loaded with all zeroes
         pub const fn new_zero() -> Self {
@@ -985,7 +994,7 @@ pub mod field_sets {
         }
         ///Read the `version` field of the register.
         ///
-        ///Boot FW version
+        /// Boot FW version
         pub fn version(&self) -> u32 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -997,7 +1006,7 @@ pub mod field_sets {
         }
         ///Write the `version` field of the register.
         ///
-        ///Boot FW version
+        /// Boot FW version
         pub fn set_version(&mut self, value: u32) {
             let raw = value;
             unsafe {
@@ -1020,13 +1029,17 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for Version {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("Version").field("version", &self.version()).finish()
+            let mut d = f.debug_struct("Version");
+            d.field("version", &self.version());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for Version {
         fn format(&self, f: defmt::Formatter) {
-            defmt::write!(f, "Version {{ version: {=u32} }}", self.version())
+            defmt::write!(f, "Version {{ ");
+            defmt::write!(f, "version: {=u32}, ", & self.version());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for Version {
@@ -1080,7 +1093,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Asserted interrupts for I2C1
+    /// Asserted interrupts for I2C1
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct IntEventBus1 {
         /// The internal bits
@@ -1102,7 +1115,7 @@ pub mod field_sets {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
             Self {
-                bits: [8u8, 0u8, 0u8, 2u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8],
+                bits: [8, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0],
             }
         }
         /// Create a new instance, loaded with all zeroes
@@ -1112,18 +1125,18 @@ pub mod field_sets {
         ///Create a new instance, loaded with the reset value of the `IntMaskBus1` ref
         pub const fn new_as_int_mask_bus_1() -> Self {
             Self {
-                bits: [10u8, 56u8, 48u8, 205u8, 0u8, 0u8, 0u8, 15u8, 0u8, 0u8, 0u8],
+                bits: [10, 56, 48, 205, 0, 0, 0, 15, 0, 0, 0],
             }
         }
         ///Create a new instance, loaded with the reset value of the `IntClearBus1` ref
         pub const fn new_as_int_clear_bus_1() -> Self {
             Self {
-                bits: [0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8],
+                bits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             }
         }
         ///Read the `hard_reset` field of the register.
         ///
-        ///A PD hard reset has been performed
+        /// A PD hard reset has been performed
         pub fn hard_reset(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1135,7 +1148,7 @@ pub mod field_sets {
         }
         ///Read the `plug_event` field of the register.
         ///
-        ///A plug has been inserted or removed
+        /// A plug has been inserted or removed
         pub fn plug_event(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1147,7 +1160,7 @@ pub mod field_sets {
         }
         ///Read the `power_swap_completed` field of the register.
         ///
-        ///Power swap completed
+        /// Power swap completed
         pub fn power_swap_completed(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1159,7 +1172,7 @@ pub mod field_sets {
         }
         ///Read the `data_swap_completed` field of the register.
         ///
-        ///Data swap completed
+        /// Data swap completed
         pub fn data_swap_completed(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1171,7 +1184,7 @@ pub mod field_sets {
         }
         ///Read the `fast_role_swap_completed` field of the register.
         ///
-        ///Fast role swap completed
+        /// Fast role swap completed
         pub fn fast_role_swap_completed(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1183,7 +1196,7 @@ pub mod field_sets {
         }
         ///Read the `source_cap_updated` field of the register.
         ///
-        ///Source capabilities updated
+        /// Source capabilities updated
         pub fn source_cap_updated(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1195,7 +1208,7 @@ pub mod field_sets {
         }
         ///Read the `sink_ready` field of the register.
         ///
-        ///Asserts under an implicit contract or an explicit contract when PS_RDY has been received
+        /// Asserts under an implicit contract or an explicit contract when PS_RDY has been received
         pub fn sink_ready(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1207,7 +1220,7 @@ pub mod field_sets {
         }
         ///Read the `overcurrent` field of the register.
         ///
-        ///Overcurrent
+        /// Overcurrent
         pub fn overcurrent(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1219,7 +1232,7 @@ pub mod field_sets {
         }
         ///Read the `attention_received` field of the register.
         ///
-        ///Attention received
+        /// Attention received
         pub fn attention_received(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1231,7 +1244,7 @@ pub mod field_sets {
         }
         ///Read the `vdm_received` field of the register.
         ///
-        ///VDM received
+        /// VDM received
         pub fn vdm_received(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1243,7 +1256,7 @@ pub mod field_sets {
         }
         ///Read the `new_consumer_contract` field of the register.
         ///
-        ///New contract as consumer
+        /// New contract as consumer
         pub fn new_consumer_contract(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1255,7 +1268,7 @@ pub mod field_sets {
         }
         ///Read the `new_provider_contract` field of the register.
         ///
-        ///New contract as provider
+        /// New contract as provider
         pub fn new_provider_contract(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1267,7 +1280,7 @@ pub mod field_sets {
         }
         ///Read the `source_caps_received` field of the register.
         ///
-        ///Source capabilities received
+        /// Source capabilities received
         pub fn source_caps_received(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1279,7 +1292,7 @@ pub mod field_sets {
         }
         ///Read the `sink_caps_received` field of the register.
         ///
-        ///Sink capabilities received
+        /// Sink capabilities received
         pub fn sink_caps_received(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1291,7 +1304,7 @@ pub mod field_sets {
         }
         ///Read the `power_swap_requested` field of the register.
         ///
-        ///Power swap requested
+        /// Power swap requested
         pub fn power_swap_requested(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1303,7 +1316,7 @@ pub mod field_sets {
         }
         ///Read the `data_swap_requested` field of the register.
         ///
-        ///Data swap requested
+        /// Data swap requested
         pub fn data_swap_requested(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1315,7 +1328,7 @@ pub mod field_sets {
         }
         ///Read the `usb_host_present` field of the register.
         ///
-        ///USB host present
+        /// USB host present
         pub fn usb_host_present(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1327,7 +1340,7 @@ pub mod field_sets {
         }
         ///Read the `usb_host_not_present` field of the register.
         ///
-        ///Set when USB host status transitions to anything other than present
+        /// Set when USB host status transitions to anything other than present
         pub fn usb_host_not_present(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1339,7 +1352,7 @@ pub mod field_sets {
         }
         ///Read the `power_path_switch_changed` field of the register.
         ///
-        ///Power path status register changed
+        /// Power path status register changed
         pub fn power_path_switch_changed(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1351,7 +1364,7 @@ pub mod field_sets {
         }
         ///Read the `data_status_updated` field of the register.
         ///
-        ///Data status register changed
+        /// Data status register changed
         pub fn data_status_updated(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1363,7 +1376,7 @@ pub mod field_sets {
         }
         ///Read the `status_updated` field of the register.
         ///
-        ///Status register changed
+        /// Status register changed
         pub fn status_updated(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1375,7 +1388,7 @@ pub mod field_sets {
         }
         ///Read the `pd_status_updated` field of the register.
         ///
-        ///PD status register changed
+        /// PD status register changed
         pub fn pd_status_updated(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1387,7 +1400,7 @@ pub mod field_sets {
         }
         ///Read the `cmd_1_completed` field of the register.
         ///
-        ///Command 1 completed
+        /// Command 1 completed
         pub fn cmd_1_completed(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1399,7 +1412,7 @@ pub mod field_sets {
         }
         ///Read the `cmd_2_completed` field of the register.
         ///
-        ///Command 2 completed
+        /// Command 2 completed
         pub fn cmd_2_completed(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1411,7 +1424,7 @@ pub mod field_sets {
         }
         ///Read the `device_incompatible` field of the register.
         ///
-        ///Device lacks PD or has incompatible PD version
+        /// Device lacks PD or has incompatible PD version
         pub fn device_incompatible(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1423,7 +1436,7 @@ pub mod field_sets {
         }
         ///Read the `cannot_source` field of the register.
         ///
-        ///Source cannot supply requested voltage or current
+        /// Source cannot supply requested voltage or current
         pub fn cannot_source(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1435,7 +1448,7 @@ pub mod field_sets {
         }
         ///Read the `can_source_later` field of the register.
         ///
-        ///Source can supply requested voltage or current later
+        /// Source can supply requested voltage or current later
         pub fn can_source_later(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1447,7 +1460,7 @@ pub mod field_sets {
         }
         ///Read the `power_event_error` field of the register.
         ///
-        ///Voltage or current exceeded
+        /// Voltage or current exceeded
         pub fn power_event_error(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1459,7 +1472,7 @@ pub mod field_sets {
         }
         ///Read the `no_caps_response` field of the register.
         ///
-        ///Device did not response to get caps message
+        /// Device did not response to get caps message
         pub fn no_caps_response(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1471,7 +1484,7 @@ pub mod field_sets {
         }
         ///Read the `protocol_error` field of the register.
         ///
-        ///Unexpected message received from partner
+        /// Unexpected message received from partner
         pub fn protocol_error(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1483,7 +1496,7 @@ pub mod field_sets {
         }
         ///Read the `sink_transition_completed` field of the register.
         ///
-        ///Sink transition completed
+        /// Sink transition completed
         pub fn sink_transition_completed(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1495,7 +1508,7 @@ pub mod field_sets {
         }
         ///Read the `plug_early_notification` field of the register.
         ///
-        ///Plug connected but not debounced
+        /// Plug connected but not debounced
         pub fn plug_early_notification(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1507,7 +1520,7 @@ pub mod field_sets {
         }
         ///Read the `prochot_notification` field of the register.
         ///
-        ///Prochot asserted
+        /// Prochot asserted
         pub fn prochot_notification(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1519,7 +1532,7 @@ pub mod field_sets {
         }
         ///Read the `source_cannot_provide` field of the register.
         ///
-        ///Source cannot produce negociated voltage or current
+        /// Source cannot produce negociated voltage or current
         pub fn source_cannot_provide(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1531,7 +1544,7 @@ pub mod field_sets {
         }
         ///Read the `am_entry_fail` field of the register.
         ///
-        ///Alternate mode entry failed
+        /// Alternate mode entry failed
         pub fn am_entry_fail(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1543,7 +1556,7 @@ pub mod field_sets {
         }
         ///Read the `am_entered` field of the register.
         ///
-        ///Alternate mode entered
+        /// Alternate mode entered
         pub fn am_entered(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1555,7 +1568,7 @@ pub mod field_sets {
         }
         ///Read the `discover_mode_completed` field of the register.
         ///
-        ///Discover modes process completed
+        /// Discover modes process completed
         pub fn discover_mode_completed(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1567,7 +1580,7 @@ pub mod field_sets {
         }
         ///Read the `exit_mode_completed` field of the register.
         ///
-        ///Exit mode process completed
+        /// Exit mode process completed
         pub fn exit_mode_completed(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1579,7 +1592,7 @@ pub mod field_sets {
         }
         ///Read the `data_reset_started` field of the register.
         ///
-        ///Data reset process started
+        /// Data reset process started
         pub fn data_reset_started(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1591,7 +1604,7 @@ pub mod field_sets {
         }
         ///Read the `usb_status_updated` field of the register.
         ///
-        ///USB status updated
+        /// USB status updated
         pub fn usb_status_updated(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1603,7 +1616,7 @@ pub mod field_sets {
         }
         ///Read the `connection_manager_updated` field of the register.
         ///
-        ///Connection manager updated
+        /// Connection manager updated
         pub fn connection_manager_updated(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1615,7 +1628,7 @@ pub mod field_sets {
         }
         ///Read the `usvid_mode_entered` field of the register.
         ///
-        ///User VID alternate mode entered
+        /// User VID alternate mode entered
         pub fn usvid_mode_entered(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1627,7 +1640,7 @@ pub mod field_sets {
         }
         ///Read the `usvid_mode_exited` field of the register.
         ///
-        ///User VID alternate mode entered
+        /// User VID alternate mode entered
         pub fn usvid_mode_exited(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1639,7 +1652,7 @@ pub mod field_sets {
         }
         ///Read the `usvid_attention_vdm_received` field of the register.
         ///
-        ///User VID SVDM attention received
+        /// User VID SVDM attention received
         pub fn usvid_attention_vdm_received(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1651,7 +1664,7 @@ pub mod field_sets {
         }
         ///Read the `usvid_other_vdm_received` field of the register.
         ///
-        ///User VID SVDM non-attention or unstructured VDM received
+        /// User VID SVDM non-attention or unstructured VDM received
         pub fn usvid_other_vdm_received(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1663,7 +1676,7 @@ pub mod field_sets {
         }
         ///Read the `external_dc_dc_event` field of the register.
         ///
-        ///External DCDC event
+        /// External DCDC event
         pub fn external_dc_dc_event(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1675,7 +1688,7 @@ pub mod field_sets {
         }
         ///Read the `dp_sid_status_updated` field of the register.
         ///
-        ///DP SID status register changed
+        /// DP SID status register changed
         pub fn dp_sid_status_updated(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1687,7 +1700,7 @@ pub mod field_sets {
         }
         ///Read the `intel_vid_status_updated` field of the register.
         ///
-        ///Intel VID status register changed
+        /// Intel VID status register changed
         pub fn intel_vid_status_updated(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1699,7 +1712,7 @@ pub mod field_sets {
         }
         ///Read the `pd_3_status_updated` field of the register.
         ///
-        ///PD3 status register changed
+        /// PD3 status register changed
         pub fn pd_3_status_updated(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1711,7 +1724,7 @@ pub mod field_sets {
         }
         ///Read the `tx_memory_buffer_empty` field of the register.
         ///
-        ///TX memory buffer empty
+        /// TX memory buffer empty
         pub fn tx_memory_buffer_empty(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1723,7 +1736,7 @@ pub mod field_sets {
         }
         ///Read the `mbrd_buffer_ready` field of the register.
         ///
-        ///Buffer for mbrd command received and ready
+        /// Buffer for mbrd command received and ready
         pub fn mbrd_buffer_ready(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1735,7 +1748,7 @@ pub mod field_sets {
         }
         ///Read the `soc_ack_timeout` field of the register.
         ///
-        ///SOC ack timeout
+        /// SOC ack timeout
         pub fn soc_ack_timeout(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1747,7 +1760,7 @@ pub mod field_sets {
         }
         ///Read the `not_supported_received` field of the register.
         ///
-        ///Not supported PD message received
+        /// Not supported PD message received
         pub fn not_supported_received(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1759,7 +1772,7 @@ pub mod field_sets {
         }
         ///Read the `crossbar_error` field of the register.
         ///
-        ///Error configuring the crossbar mux
+        /// Error configuring the crossbar mux
         pub fn crossbar_error(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1771,7 +1784,7 @@ pub mod field_sets {
         }
         ///Read the `mailbox_updated` field of the register.
         ///
-        ///Mailbox updated
+        /// Mailbox updated
         pub fn mailbox_updated(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1783,7 +1796,7 @@ pub mod field_sets {
         }
         ///Read the `bus_error` field of the register.
         ///
-        ///I2C error communicating with external bus
+        /// I2C error communicating with external bus
         pub fn bus_error(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1795,7 +1808,7 @@ pub mod field_sets {
         }
         ///Read the `external_dc_dc_status_changed` field of the register.
         ///
-        ///External DCDC status changed
+        /// External DCDC status changed
         pub fn external_dc_dc_status_changed(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1807,7 +1820,7 @@ pub mod field_sets {
         }
         ///Read the `frs_signal_received` field of the register.
         ///
-        ///Fast role swap signal received
+        /// Fast role swap signal received
         pub fn frs_signal_received(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1819,7 +1832,7 @@ pub mod field_sets {
         }
         ///Read the `chunk_response_received` field of the register.
         ///
-        ///Chunk response received
+        /// Chunk response received
         pub fn chunk_response_received(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1831,7 +1844,7 @@ pub mod field_sets {
         }
         ///Read the `chunk_request_received` field of the register.
         ///
-        ///Chunk request received
+        /// Chunk request received
         pub fn chunk_request_received(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1843,7 +1856,7 @@ pub mod field_sets {
         }
         ///Read the `alert_message_received` field of the register.
         ///
-        ///Alert message received
+        /// Alert message received
         pub fn alert_message_received(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1855,7 +1868,7 @@ pub mod field_sets {
         }
         ///Read the `patch_loaded` field of the register.
         ///
-        ///Patch loaded to device
+        /// Patch loaded to device
         pub fn patch_loaded(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1867,7 +1880,7 @@ pub mod field_sets {
         }
         ///Read the `ready_f_211` field of the register.
         ///
-        ///Ready for F211 image
+        /// Ready for F211 image
         pub fn ready_f_211(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1879,7 +1892,7 @@ pub mod field_sets {
         }
         ///Read the `boot_error` field of the register.
         ///
-        ///Boot error
+        /// Boot error
         pub fn boot_error(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1891,7 +1904,7 @@ pub mod field_sets {
         }
         ///Read the `ready_for_data_block` field of the register.
         ///
-        ///Ready for data block
+        /// Ready for data block
         pub fn ready_for_data_block(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -1903,7 +1916,7 @@ pub mod field_sets {
         }
         ///Write the `hard_reset` field of the register.
         ///
-        ///A PD hard reset has been performed
+        /// A PD hard reset has been performed
         pub fn set_hard_reset(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -1915,7 +1928,7 @@ pub mod field_sets {
         }
         ///Write the `plug_event` field of the register.
         ///
-        ///A plug has been inserted or removed
+        /// A plug has been inserted or removed
         pub fn set_plug_event(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -1927,7 +1940,7 @@ pub mod field_sets {
         }
         ///Write the `power_swap_completed` field of the register.
         ///
-        ///Power swap completed
+        /// Power swap completed
         pub fn set_power_swap_completed(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -1939,7 +1952,7 @@ pub mod field_sets {
         }
         ///Write the `data_swap_completed` field of the register.
         ///
-        ///Data swap completed
+        /// Data swap completed
         pub fn set_data_swap_completed(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -1951,7 +1964,7 @@ pub mod field_sets {
         }
         ///Write the `fast_role_swap_completed` field of the register.
         ///
-        ///Fast role swap completed
+        /// Fast role swap completed
         pub fn set_fast_role_swap_completed(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -1963,7 +1976,7 @@ pub mod field_sets {
         }
         ///Write the `source_cap_updated` field of the register.
         ///
-        ///Source capabilities updated
+        /// Source capabilities updated
         pub fn set_source_cap_updated(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -1975,7 +1988,7 @@ pub mod field_sets {
         }
         ///Write the `sink_ready` field of the register.
         ///
-        ///Asserts under an implicit contract or an explicit contract when PS_RDY has been received
+        /// Asserts under an implicit contract or an explicit contract when PS_RDY has been received
         pub fn set_sink_ready(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -1987,7 +2000,7 @@ pub mod field_sets {
         }
         ///Write the `overcurrent` field of the register.
         ///
-        ///Overcurrent
+        /// Overcurrent
         pub fn set_overcurrent(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -1999,7 +2012,7 @@ pub mod field_sets {
         }
         ///Write the `attention_received` field of the register.
         ///
-        ///Attention received
+        /// Attention received
         pub fn set_attention_received(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2011,7 +2024,7 @@ pub mod field_sets {
         }
         ///Write the `vdm_received` field of the register.
         ///
-        ///VDM received
+        /// VDM received
         pub fn set_vdm_received(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2023,7 +2036,7 @@ pub mod field_sets {
         }
         ///Write the `new_consumer_contract` field of the register.
         ///
-        ///New contract as consumer
+        /// New contract as consumer
         pub fn set_new_consumer_contract(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2035,7 +2048,7 @@ pub mod field_sets {
         }
         ///Write the `new_provider_contract` field of the register.
         ///
-        ///New contract as provider
+        /// New contract as provider
         pub fn set_new_provider_contract(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2047,7 +2060,7 @@ pub mod field_sets {
         }
         ///Write the `source_caps_received` field of the register.
         ///
-        ///Source capabilities received
+        /// Source capabilities received
         pub fn set_source_caps_received(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2059,7 +2072,7 @@ pub mod field_sets {
         }
         ///Write the `sink_caps_received` field of the register.
         ///
-        ///Sink capabilities received
+        /// Sink capabilities received
         pub fn set_sink_caps_received(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2071,7 +2084,7 @@ pub mod field_sets {
         }
         ///Write the `power_swap_requested` field of the register.
         ///
-        ///Power swap requested
+        /// Power swap requested
         pub fn set_power_swap_requested(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2083,7 +2096,7 @@ pub mod field_sets {
         }
         ///Write the `data_swap_requested` field of the register.
         ///
-        ///Data swap requested
+        /// Data swap requested
         pub fn set_data_swap_requested(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2095,7 +2108,7 @@ pub mod field_sets {
         }
         ///Write the `usb_host_present` field of the register.
         ///
-        ///USB host present
+        /// USB host present
         pub fn set_usb_host_present(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2107,7 +2120,7 @@ pub mod field_sets {
         }
         ///Write the `usb_host_not_present` field of the register.
         ///
-        ///Set when USB host status transitions to anything other than present
+        /// Set when USB host status transitions to anything other than present
         pub fn set_usb_host_not_present(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2119,7 +2132,7 @@ pub mod field_sets {
         }
         ///Write the `power_path_switch_changed` field of the register.
         ///
-        ///Power path status register changed
+        /// Power path status register changed
         pub fn set_power_path_switch_changed(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2131,7 +2144,7 @@ pub mod field_sets {
         }
         ///Write the `data_status_updated` field of the register.
         ///
-        ///Data status register changed
+        /// Data status register changed
         pub fn set_data_status_updated(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2143,7 +2156,7 @@ pub mod field_sets {
         }
         ///Write the `status_updated` field of the register.
         ///
-        ///Status register changed
+        /// Status register changed
         pub fn set_status_updated(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2155,7 +2168,7 @@ pub mod field_sets {
         }
         ///Write the `pd_status_updated` field of the register.
         ///
-        ///PD status register changed
+        /// PD status register changed
         pub fn set_pd_status_updated(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2167,7 +2180,7 @@ pub mod field_sets {
         }
         ///Write the `cmd_1_completed` field of the register.
         ///
-        ///Command 1 completed
+        /// Command 1 completed
         pub fn set_cmd_1_completed(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2179,7 +2192,7 @@ pub mod field_sets {
         }
         ///Write the `cmd_2_completed` field of the register.
         ///
-        ///Command 2 completed
+        /// Command 2 completed
         pub fn set_cmd_2_completed(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2191,7 +2204,7 @@ pub mod field_sets {
         }
         ///Write the `device_incompatible` field of the register.
         ///
-        ///Device lacks PD or has incompatible PD version
+        /// Device lacks PD or has incompatible PD version
         pub fn set_device_incompatible(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2203,7 +2216,7 @@ pub mod field_sets {
         }
         ///Write the `cannot_source` field of the register.
         ///
-        ///Source cannot supply requested voltage or current
+        /// Source cannot supply requested voltage or current
         pub fn set_cannot_source(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2215,7 +2228,7 @@ pub mod field_sets {
         }
         ///Write the `can_source_later` field of the register.
         ///
-        ///Source can supply requested voltage or current later
+        /// Source can supply requested voltage or current later
         pub fn set_can_source_later(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2227,7 +2240,7 @@ pub mod field_sets {
         }
         ///Write the `power_event_error` field of the register.
         ///
-        ///Voltage or current exceeded
+        /// Voltage or current exceeded
         pub fn set_power_event_error(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2239,7 +2252,7 @@ pub mod field_sets {
         }
         ///Write the `no_caps_response` field of the register.
         ///
-        ///Device did not response to get caps message
+        /// Device did not response to get caps message
         pub fn set_no_caps_response(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2251,7 +2264,7 @@ pub mod field_sets {
         }
         ///Write the `protocol_error` field of the register.
         ///
-        ///Unexpected message received from partner
+        /// Unexpected message received from partner
         pub fn set_protocol_error(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2263,7 +2276,7 @@ pub mod field_sets {
         }
         ///Write the `sink_transition_completed` field of the register.
         ///
-        ///Sink transition completed
+        /// Sink transition completed
         pub fn set_sink_transition_completed(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2275,7 +2288,7 @@ pub mod field_sets {
         }
         ///Write the `plug_early_notification` field of the register.
         ///
-        ///Plug connected but not debounced
+        /// Plug connected but not debounced
         pub fn set_plug_early_notification(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2287,7 +2300,7 @@ pub mod field_sets {
         }
         ///Write the `prochot_notification` field of the register.
         ///
-        ///Prochot asserted
+        /// Prochot asserted
         pub fn set_prochot_notification(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2299,7 +2312,7 @@ pub mod field_sets {
         }
         ///Write the `source_cannot_provide` field of the register.
         ///
-        ///Source cannot produce negociated voltage or current
+        /// Source cannot produce negociated voltage or current
         pub fn set_source_cannot_provide(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2311,7 +2324,7 @@ pub mod field_sets {
         }
         ///Write the `am_entry_fail` field of the register.
         ///
-        ///Alternate mode entry failed
+        /// Alternate mode entry failed
         pub fn set_am_entry_fail(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2323,7 +2336,7 @@ pub mod field_sets {
         }
         ///Write the `am_entered` field of the register.
         ///
-        ///Alternate mode entered
+        /// Alternate mode entered
         pub fn set_am_entered(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2335,7 +2348,7 @@ pub mod field_sets {
         }
         ///Write the `discover_mode_completed` field of the register.
         ///
-        ///Discover modes process completed
+        /// Discover modes process completed
         pub fn set_discover_mode_completed(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2347,7 +2360,7 @@ pub mod field_sets {
         }
         ///Write the `exit_mode_completed` field of the register.
         ///
-        ///Exit mode process completed
+        /// Exit mode process completed
         pub fn set_exit_mode_completed(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2359,7 +2372,7 @@ pub mod field_sets {
         }
         ///Write the `data_reset_started` field of the register.
         ///
-        ///Data reset process started
+        /// Data reset process started
         pub fn set_data_reset_started(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2371,7 +2384,7 @@ pub mod field_sets {
         }
         ///Write the `usb_status_updated` field of the register.
         ///
-        ///USB status updated
+        /// USB status updated
         pub fn set_usb_status_updated(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2383,7 +2396,7 @@ pub mod field_sets {
         }
         ///Write the `connection_manager_updated` field of the register.
         ///
-        ///Connection manager updated
+        /// Connection manager updated
         pub fn set_connection_manager_updated(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2395,7 +2408,7 @@ pub mod field_sets {
         }
         ///Write the `usvid_mode_entered` field of the register.
         ///
-        ///User VID alternate mode entered
+        /// User VID alternate mode entered
         pub fn set_usvid_mode_entered(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2407,7 +2420,7 @@ pub mod field_sets {
         }
         ///Write the `usvid_mode_exited` field of the register.
         ///
-        ///User VID alternate mode entered
+        /// User VID alternate mode entered
         pub fn set_usvid_mode_exited(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2419,7 +2432,7 @@ pub mod field_sets {
         }
         ///Write the `usvid_attention_vdm_received` field of the register.
         ///
-        ///User VID SVDM attention received
+        /// User VID SVDM attention received
         pub fn set_usvid_attention_vdm_received(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2431,7 +2444,7 @@ pub mod field_sets {
         }
         ///Write the `usvid_other_vdm_received` field of the register.
         ///
-        ///User VID SVDM non-attention or unstructured VDM received
+        /// User VID SVDM non-attention or unstructured VDM received
         pub fn set_usvid_other_vdm_received(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2443,7 +2456,7 @@ pub mod field_sets {
         }
         ///Write the `external_dc_dc_event` field of the register.
         ///
-        ///External DCDC event
+        /// External DCDC event
         pub fn set_external_dc_dc_event(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2455,7 +2468,7 @@ pub mod field_sets {
         }
         ///Write the `dp_sid_status_updated` field of the register.
         ///
-        ///DP SID status register changed
+        /// DP SID status register changed
         pub fn set_dp_sid_status_updated(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2467,7 +2480,7 @@ pub mod field_sets {
         }
         ///Write the `intel_vid_status_updated` field of the register.
         ///
-        ///Intel VID status register changed
+        /// Intel VID status register changed
         pub fn set_intel_vid_status_updated(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2479,7 +2492,7 @@ pub mod field_sets {
         }
         ///Write the `pd_3_status_updated` field of the register.
         ///
-        ///PD3 status register changed
+        /// PD3 status register changed
         pub fn set_pd_3_status_updated(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2491,7 +2504,7 @@ pub mod field_sets {
         }
         ///Write the `tx_memory_buffer_empty` field of the register.
         ///
-        ///TX memory buffer empty
+        /// TX memory buffer empty
         pub fn set_tx_memory_buffer_empty(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2503,7 +2516,7 @@ pub mod field_sets {
         }
         ///Write the `mbrd_buffer_ready` field of the register.
         ///
-        ///Buffer for mbrd command received and ready
+        /// Buffer for mbrd command received and ready
         pub fn set_mbrd_buffer_ready(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2515,7 +2528,7 @@ pub mod field_sets {
         }
         ///Write the `soc_ack_timeout` field of the register.
         ///
-        ///SOC ack timeout
+        /// SOC ack timeout
         pub fn set_soc_ack_timeout(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2527,7 +2540,7 @@ pub mod field_sets {
         }
         ///Write the `not_supported_received` field of the register.
         ///
-        ///Not supported PD message received
+        /// Not supported PD message received
         pub fn set_not_supported_received(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2539,7 +2552,7 @@ pub mod field_sets {
         }
         ///Write the `crossbar_error` field of the register.
         ///
-        ///Error configuring the crossbar mux
+        /// Error configuring the crossbar mux
         pub fn set_crossbar_error(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2551,7 +2564,7 @@ pub mod field_sets {
         }
         ///Write the `mailbox_updated` field of the register.
         ///
-        ///Mailbox updated
+        /// Mailbox updated
         pub fn set_mailbox_updated(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2563,7 +2576,7 @@ pub mod field_sets {
         }
         ///Write the `bus_error` field of the register.
         ///
-        ///I2C error communicating with external bus
+        /// I2C error communicating with external bus
         pub fn set_bus_error(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2575,7 +2588,7 @@ pub mod field_sets {
         }
         ///Write the `external_dc_dc_status_changed` field of the register.
         ///
-        ///External DCDC status changed
+        /// External DCDC status changed
         pub fn set_external_dc_dc_status_changed(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2587,7 +2600,7 @@ pub mod field_sets {
         }
         ///Write the `frs_signal_received` field of the register.
         ///
-        ///Fast role swap signal received
+        /// Fast role swap signal received
         pub fn set_frs_signal_received(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2599,7 +2612,7 @@ pub mod field_sets {
         }
         ///Write the `chunk_response_received` field of the register.
         ///
-        ///Chunk response received
+        /// Chunk response received
         pub fn set_chunk_response_received(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2611,7 +2624,7 @@ pub mod field_sets {
         }
         ///Write the `chunk_request_received` field of the register.
         ///
-        ///Chunk request received
+        /// Chunk request received
         pub fn set_chunk_request_received(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2623,7 +2636,7 @@ pub mod field_sets {
         }
         ///Write the `alert_message_received` field of the register.
         ///
-        ///Alert message received
+        /// Alert message received
         pub fn set_alert_message_received(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2635,7 +2648,7 @@ pub mod field_sets {
         }
         ///Write the `patch_loaded` field of the register.
         ///
-        ///Patch loaded to device
+        /// Patch loaded to device
         pub fn set_patch_loaded(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2647,7 +2660,7 @@ pub mod field_sets {
         }
         ///Write the `ready_f_211` field of the register.
         ///
-        ///Ready for F211 image
+        /// Ready for F211 image
         pub fn set_ready_f_211(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2659,7 +2672,7 @@ pub mod field_sets {
         }
         ///Write the `boot_error` field of the register.
         ///
-        ///Boot error
+        /// Boot error
         pub fn set_boot_error(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2671,7 +2684,7 @@ pub mod field_sets {
         }
         ///Write the `ready_for_data_block` field of the register.
         ///
-        ///Ready for data block
+        /// Ready for data block
         pub fn set_ready_for_data_block(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -2694,153 +2707,237 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for IntEventBus1 {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("IntEventBus1")
-                .field("hard_reset", &self.hard_reset())
-                .field("plug_event", &self.plug_event())
-                .field("power_swap_completed", &self.power_swap_completed())
-                .field("data_swap_completed", &self.data_swap_completed())
-                .field("fast_role_swap_completed", &self.fast_role_swap_completed())
-                .field("source_cap_updated", &self.source_cap_updated())
-                .field("sink_ready", &self.sink_ready())
-                .field("overcurrent", &self.overcurrent())
-                .field("attention_received", &self.attention_received())
-                .field("vdm_received", &self.vdm_received())
-                .field("new_consumer_contract", &self.new_consumer_contract())
-                .field("new_provider_contract", &self.new_provider_contract())
-                .field("source_caps_received", &self.source_caps_received())
-                .field("sink_caps_received", &self.sink_caps_received())
-                .field("power_swap_requested", &self.power_swap_requested())
-                .field("data_swap_requested", &self.data_swap_requested())
-                .field("usb_host_present", &self.usb_host_present())
-                .field("usb_host_not_present", &self.usb_host_not_present())
-                .field("power_path_switch_changed", &self.power_path_switch_changed())
-                .field("data_status_updated", &self.data_status_updated())
-                .field("status_updated", &self.status_updated())
-                .field("pd_status_updated", &self.pd_status_updated())
-                .field("cmd_1_completed", &self.cmd_1_completed())
-                .field("cmd_2_completed", &self.cmd_2_completed())
-                .field("device_incompatible", &self.device_incompatible())
-                .field("cannot_source", &self.cannot_source())
-                .field("can_source_later", &self.can_source_later())
-                .field("power_event_error", &self.power_event_error())
-                .field("no_caps_response", &self.no_caps_response())
-                .field("protocol_error", &self.protocol_error())
-                .field("sink_transition_completed", &self.sink_transition_completed())
-                .field("plug_early_notification", &self.plug_early_notification())
-                .field("prochot_notification", &self.prochot_notification())
-                .field("source_cannot_provide", &self.source_cannot_provide())
-                .field("am_entry_fail", &self.am_entry_fail())
-                .field("am_entered", &self.am_entered())
-                .field("discover_mode_completed", &self.discover_mode_completed())
-                .field("exit_mode_completed", &self.exit_mode_completed())
-                .field("data_reset_started", &self.data_reset_started())
-                .field("usb_status_updated", &self.usb_status_updated())
-                .field("connection_manager_updated", &self.connection_manager_updated())
-                .field("usvid_mode_entered", &self.usvid_mode_entered())
-                .field("usvid_mode_exited", &self.usvid_mode_exited())
-                .field(
-                    "usvid_attention_vdm_received",
-                    &self.usvid_attention_vdm_received(),
-                )
-                .field("usvid_other_vdm_received", &self.usvid_other_vdm_received())
-                .field("external_dc_dc_event", &self.external_dc_dc_event())
-                .field("dp_sid_status_updated", &self.dp_sid_status_updated())
-                .field("intel_vid_status_updated", &self.intel_vid_status_updated())
-                .field("pd_3_status_updated", &self.pd_3_status_updated())
-                .field("tx_memory_buffer_empty", &self.tx_memory_buffer_empty())
-                .field("mbrd_buffer_ready", &self.mbrd_buffer_ready())
-                .field("soc_ack_timeout", &self.soc_ack_timeout())
-                .field("not_supported_received", &self.not_supported_received())
-                .field("crossbar_error", &self.crossbar_error())
-                .field("mailbox_updated", &self.mailbox_updated())
-                .field("bus_error", &self.bus_error())
-                .field(
-                    "external_dc_dc_status_changed",
-                    &self.external_dc_dc_status_changed(),
-                )
-                .field("frs_signal_received", &self.frs_signal_received())
-                .field("chunk_response_received", &self.chunk_response_received())
-                .field("chunk_request_received", &self.chunk_request_received())
-                .field("alert_message_received", &self.alert_message_received())
-                .field("patch_loaded", &self.patch_loaded())
-                .field("ready_f_211", &self.ready_f_211())
-                .field("boot_error", &self.boot_error())
-                .field("ready_for_data_block", &self.ready_for_data_block())
-                .finish()
+            let mut d = f.debug_struct("IntEventBus1");
+            d.field("hard_reset", &self.hard_reset());
+            d.field("plug_event", &self.plug_event());
+            d.field("power_swap_completed", &self.power_swap_completed());
+            d.field("data_swap_completed", &self.data_swap_completed());
+            d.field("fast_role_swap_completed", &self.fast_role_swap_completed());
+            d.field("source_cap_updated", &self.source_cap_updated());
+            d.field("sink_ready", &self.sink_ready());
+            d.field("overcurrent", &self.overcurrent());
+            d.field("attention_received", &self.attention_received());
+            d.field("vdm_received", &self.vdm_received());
+            d.field("new_consumer_contract", &self.new_consumer_contract());
+            d.field("new_provider_contract", &self.new_provider_contract());
+            d.field("source_caps_received", &self.source_caps_received());
+            d.field("sink_caps_received", &self.sink_caps_received());
+            d.field("power_swap_requested", &self.power_swap_requested());
+            d.field("data_swap_requested", &self.data_swap_requested());
+            d.field("usb_host_present", &self.usb_host_present());
+            d.field("usb_host_not_present", &self.usb_host_not_present());
+            d.field("power_path_switch_changed", &self.power_path_switch_changed());
+            d.field("data_status_updated", &self.data_status_updated());
+            d.field("status_updated", &self.status_updated());
+            d.field("pd_status_updated", &self.pd_status_updated());
+            d.field("cmd_1_completed", &self.cmd_1_completed());
+            d.field("cmd_2_completed", &self.cmd_2_completed());
+            d.field("device_incompatible", &self.device_incompatible());
+            d.field("cannot_source", &self.cannot_source());
+            d.field("can_source_later", &self.can_source_later());
+            d.field("power_event_error", &self.power_event_error());
+            d.field("no_caps_response", &self.no_caps_response());
+            d.field("protocol_error", &self.protocol_error());
+            d.field("sink_transition_completed", &self.sink_transition_completed());
+            d.field("plug_early_notification", &self.plug_early_notification());
+            d.field("prochot_notification", &self.prochot_notification());
+            d.field("source_cannot_provide", &self.source_cannot_provide());
+            d.field("am_entry_fail", &self.am_entry_fail());
+            d.field("am_entered", &self.am_entered());
+            d.field("discover_mode_completed", &self.discover_mode_completed());
+            d.field("exit_mode_completed", &self.exit_mode_completed());
+            d.field("data_reset_started", &self.data_reset_started());
+            d.field("usb_status_updated", &self.usb_status_updated());
+            d.field("connection_manager_updated", &self.connection_manager_updated());
+            d.field("usvid_mode_entered", &self.usvid_mode_entered());
+            d.field("usvid_mode_exited", &self.usvid_mode_exited());
+            d.field(
+                "usvid_attention_vdm_received",
+                &self.usvid_attention_vdm_received(),
+            );
+            d.field("usvid_other_vdm_received", &self.usvid_other_vdm_received());
+            d.field("external_dc_dc_event", &self.external_dc_dc_event());
+            d.field("dp_sid_status_updated", &self.dp_sid_status_updated());
+            d.field("intel_vid_status_updated", &self.intel_vid_status_updated());
+            d.field("pd_3_status_updated", &self.pd_3_status_updated());
+            d.field("tx_memory_buffer_empty", &self.tx_memory_buffer_empty());
+            d.field("mbrd_buffer_ready", &self.mbrd_buffer_ready());
+            d.field("soc_ack_timeout", &self.soc_ack_timeout());
+            d.field("not_supported_received", &self.not_supported_received());
+            d.field("crossbar_error", &self.crossbar_error());
+            d.field("mailbox_updated", &self.mailbox_updated());
+            d.field("bus_error", &self.bus_error());
+            d.field(
+                "external_dc_dc_status_changed",
+                &self.external_dc_dc_status_changed(),
+            );
+            d.field("frs_signal_received", &self.frs_signal_received());
+            d.field("chunk_response_received", &self.chunk_response_received());
+            d.field("chunk_request_received", &self.chunk_request_received());
+            d.field("alert_message_received", &self.alert_message_received());
+            d.field("patch_loaded", &self.patch_loaded());
+            d.field("ready_f_211", &self.ready_f_211());
+            d.field("boot_error", &self.boot_error());
+            d.field("ready_for_data_block", &self.ready_for_data_block());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for IntEventBus1 {
         fn format(&self, f: defmt::Formatter) {
+            defmt::write!(f, "IntEventBus1 {{ ");
+            defmt::write!(f, "hard_reset: {=bool}, ", & self.hard_reset());
+            defmt::write!(f, "plug_event: {=bool}, ", & self.plug_event());
             defmt::write!(
-                f,
-                "IntEventBus1 {{ hard_reset: {=bool}, plug_event: {=bool}, power_swap_completed: {=bool}, data_swap_completed: {=bool}, fast_role_swap_completed: {=bool}, source_cap_updated: {=bool}, sink_ready: {=bool}, overcurrent: {=bool}, attention_received: {=bool}, vdm_received: {=bool}, new_consumer_contract: {=bool}, new_provider_contract: {=bool}, source_caps_received: {=bool}, sink_caps_received: {=bool}, power_swap_requested: {=bool}, data_swap_requested: {=bool}, usb_host_present: {=bool}, usb_host_not_present: {=bool}, power_path_switch_changed: {=bool}, data_status_updated: {=bool}, status_updated: {=bool}, pd_status_updated: {=bool}, cmd_1_completed: {=bool}, cmd_2_completed: {=bool}, device_incompatible: {=bool}, cannot_source: {=bool}, can_source_later: {=bool}, power_event_error: {=bool}, no_caps_response: {=bool}, protocol_error: {=bool}, sink_transition_completed: {=bool}, plug_early_notification: {=bool}, prochot_notification: {=bool}, source_cannot_provide: {=bool}, am_entry_fail: {=bool}, am_entered: {=bool}, discover_mode_completed: {=bool}, exit_mode_completed: {=bool}, data_reset_started: {=bool}, usb_status_updated: {=bool}, connection_manager_updated: {=bool}, usvid_mode_entered: {=bool}, usvid_mode_exited: {=bool}, usvid_attention_vdm_received: {=bool}, usvid_other_vdm_received: {=bool}, external_dc_dc_event: {=bool}, dp_sid_status_updated: {=bool}, intel_vid_status_updated: {=bool}, pd_3_status_updated: {=bool}, tx_memory_buffer_empty: {=bool}, mbrd_buffer_ready: {=bool}, soc_ack_timeout: {=bool}, not_supported_received: {=bool}, crossbar_error: {=bool}, mailbox_updated: {=bool}, bus_error: {=bool}, external_dc_dc_status_changed: {=bool}, frs_signal_received: {=bool}, chunk_response_received: {=bool}, chunk_request_received: {=bool}, alert_message_received: {=bool}, patch_loaded: {=bool}, ready_f_211: {=bool}, boot_error: {=bool}, ready_for_data_block: {=bool} }}",
-                self.hard_reset(),
-                self.plug_event(),
-                self.power_swap_completed(),
-                self.data_swap_completed(),
-                self.fast_role_swap_completed(),
-                self.source_cap_updated(),
-                self.sink_ready(),
-                self.overcurrent(),
-                self.attention_received(),
-                self.vdm_received(),
-                self.new_consumer_contract(),
-                self.new_provider_contract(),
-                self.source_caps_received(),
-                self.sink_caps_received(),
-                self.power_swap_requested(),
-                self.data_swap_requested(),
-                self.usb_host_present(),
-                self.usb_host_not_present(),
-                self.power_path_switch_changed(),
-                self.data_status_updated(),
-                self.status_updated(),
-                self.pd_status_updated(),
-                self.cmd_1_completed(),
-                self.cmd_2_completed(),
-                self.device_incompatible(),
-                self.cannot_source(),
-                self.can_source_later(),
-                self.power_event_error(),
-                self.no_caps_response(),
-                self.protocol_error(),
-                self.sink_transition_completed(),
-                self.plug_early_notification(),
-                self.prochot_notification(),
-                self.source_cannot_provide(),
-                self.am_entry_fail(),
-                self.am_entered(),
-                self.discover_mode_completed(),
-                self.exit_mode_completed(),
-                self.data_reset_started(),
-                self.usb_status_updated(),
-                self.connection_manager_updated(),
-                self.usvid_mode_entered(),
-                self.usvid_mode_exited(),
-                self.usvid_attention_vdm_received(),
-                self.usvid_other_vdm_received(),
-                self.external_dc_dc_event(),
-                self.dp_sid_status_updated(),
-                self.intel_vid_status_updated(),
-                self.pd_3_status_updated(),
-                self.tx_memory_buffer_empty(),
-                self.mbrd_buffer_ready(),
-                self.soc_ack_timeout(),
-                self.not_supported_received(),
-                self.crossbar_error(),
-                self.mailbox_updated(),
-                self.bus_error(),
-                self.external_dc_dc_status_changed(),
-                self.frs_signal_received(),
-                self.chunk_response_received(),
-                self.chunk_request_received(),
-                self.alert_message_received(),
-                self.patch_loaded(),
-                self.ready_f_211(),
-                self.boot_error(),
-                self.ready_for_data_block(),
-            )
+                f, "power_swap_completed: {=bool}, ", & self.power_swap_completed()
+            );
+            defmt::write!(
+                f, "data_swap_completed: {=bool}, ", & self.data_swap_completed()
+            );
+            defmt::write!(
+                f, "fast_role_swap_completed: {=bool}, ", & self
+                .fast_role_swap_completed()
+            );
+            defmt::write!(
+                f, "source_cap_updated: {=bool}, ", & self.source_cap_updated()
+            );
+            defmt::write!(f, "sink_ready: {=bool}, ", & self.sink_ready());
+            defmt::write!(f, "overcurrent: {=bool}, ", & self.overcurrent());
+            defmt::write!(
+                f, "attention_received: {=bool}, ", & self.attention_received()
+            );
+            defmt::write!(f, "vdm_received: {=bool}, ", & self.vdm_received());
+            defmt::write!(
+                f, "new_consumer_contract: {=bool}, ", & self.new_consumer_contract()
+            );
+            defmt::write!(
+                f, "new_provider_contract: {=bool}, ", & self.new_provider_contract()
+            );
+            defmt::write!(
+                f, "source_caps_received: {=bool}, ", & self.source_caps_received()
+            );
+            defmt::write!(
+                f, "sink_caps_received: {=bool}, ", & self.sink_caps_received()
+            );
+            defmt::write!(
+                f, "power_swap_requested: {=bool}, ", & self.power_swap_requested()
+            );
+            defmt::write!(
+                f, "data_swap_requested: {=bool}, ", & self.data_swap_requested()
+            );
+            defmt::write!(f, "usb_host_present: {=bool}, ", & self.usb_host_present());
+            defmt::write!(
+                f, "usb_host_not_present: {=bool}, ", & self.usb_host_not_present()
+            );
+            defmt::write!(
+                f, "power_path_switch_changed: {=bool}, ", & self
+                .power_path_switch_changed()
+            );
+            defmt::write!(
+                f, "data_status_updated: {=bool}, ", & self.data_status_updated()
+            );
+            defmt::write!(f, "status_updated: {=bool}, ", & self.status_updated());
+            defmt::write!(f, "pd_status_updated: {=bool}, ", & self.pd_status_updated());
+            defmt::write!(f, "cmd_1_completed: {=bool}, ", & self.cmd_1_completed());
+            defmt::write!(f, "cmd_2_completed: {=bool}, ", & self.cmd_2_completed());
+            defmt::write!(
+                f, "device_incompatible: {=bool}, ", & self.device_incompatible()
+            );
+            defmt::write!(f, "cannot_source: {=bool}, ", & self.cannot_source());
+            defmt::write!(f, "can_source_later: {=bool}, ", & self.can_source_later());
+            defmt::write!(f, "power_event_error: {=bool}, ", & self.power_event_error());
+            defmt::write!(f, "no_caps_response: {=bool}, ", & self.no_caps_response());
+            defmt::write!(f, "protocol_error: {=bool}, ", & self.protocol_error());
+            defmt::write!(
+                f, "sink_transition_completed: {=bool}, ", & self
+                .sink_transition_completed()
+            );
+            defmt::write!(
+                f, "plug_early_notification: {=bool}, ", & self.plug_early_notification()
+            );
+            defmt::write!(
+                f, "prochot_notification: {=bool}, ", & self.prochot_notification()
+            );
+            defmt::write!(
+                f, "source_cannot_provide: {=bool}, ", & self.source_cannot_provide()
+            );
+            defmt::write!(f, "am_entry_fail: {=bool}, ", & self.am_entry_fail());
+            defmt::write!(f, "am_entered: {=bool}, ", & self.am_entered());
+            defmt::write!(
+                f, "discover_mode_completed: {=bool}, ", & self.discover_mode_completed()
+            );
+            defmt::write!(
+                f, "exit_mode_completed: {=bool}, ", & self.exit_mode_completed()
+            );
+            defmt::write!(
+                f, "data_reset_started: {=bool}, ", & self.data_reset_started()
+            );
+            defmt::write!(
+                f, "usb_status_updated: {=bool}, ", & self.usb_status_updated()
+            );
+            defmt::write!(
+                f, "connection_manager_updated: {=bool}, ", & self
+                .connection_manager_updated()
+            );
+            defmt::write!(
+                f, "usvid_mode_entered: {=bool}, ", & self.usvid_mode_entered()
+            );
+            defmt::write!(f, "usvid_mode_exited: {=bool}, ", & self.usvid_mode_exited());
+            defmt::write!(
+                f, "usvid_attention_vdm_received: {=bool}, ", & self
+                .usvid_attention_vdm_received()
+            );
+            defmt::write!(
+                f, "usvid_other_vdm_received: {=bool}, ", & self
+                .usvid_other_vdm_received()
+            );
+            defmt::write!(
+                f, "external_dc_dc_event: {=bool}, ", & self.external_dc_dc_event()
+            );
+            defmt::write!(
+                f, "dp_sid_status_updated: {=bool}, ", & self.dp_sid_status_updated()
+            );
+            defmt::write!(
+                f, "intel_vid_status_updated: {=bool}, ", & self
+                .intel_vid_status_updated()
+            );
+            defmt::write!(
+                f, "pd_3_status_updated: {=bool}, ", & self.pd_3_status_updated()
+            );
+            defmt::write!(
+                f, "tx_memory_buffer_empty: {=bool}, ", & self.tx_memory_buffer_empty()
+            );
+            defmt::write!(f, "mbrd_buffer_ready: {=bool}, ", & self.mbrd_buffer_ready());
+            defmt::write!(f, "soc_ack_timeout: {=bool}, ", & self.soc_ack_timeout());
+            defmt::write!(
+                f, "not_supported_received: {=bool}, ", & self.not_supported_received()
+            );
+            defmt::write!(f, "crossbar_error: {=bool}, ", & self.crossbar_error());
+            defmt::write!(f, "mailbox_updated: {=bool}, ", & self.mailbox_updated());
+            defmt::write!(f, "bus_error: {=bool}, ", & self.bus_error());
+            defmt::write!(
+                f, "external_dc_dc_status_changed: {=bool}, ", & self
+                .external_dc_dc_status_changed()
+            );
+            defmt::write!(
+                f, "frs_signal_received: {=bool}, ", & self.frs_signal_received()
+            );
+            defmt::write!(
+                f, "chunk_response_received: {=bool}, ", & self.chunk_response_received()
+            );
+            defmt::write!(
+                f, "chunk_request_received: {=bool}, ", & self.chunk_request_received()
+            );
+            defmt::write!(
+                f, "alert_message_received: {=bool}, ", & self.alert_message_received()
+            );
+            defmt::write!(f, "patch_loaded: {=bool}, ", & self.patch_loaded());
+            defmt::write!(f, "ready_f_211: {=bool}, ", & self.ready_f_211());
+            defmt::write!(f, "boot_error: {=bool}, ", & self.boot_error());
+            defmt::write!(
+                f, "ready_for_data_block: {=bool}, ", & self.ready_for_data_block()
+            );
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for IntEventBus1 {
@@ -2894,7 +2991,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Set Sx App Config - system power state for application configuration
+    /// Set Sx App Config - system power state for application configuration
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct SxAppConfig {
         /// The internal bits
@@ -2915,7 +3012,7 @@ pub mod field_sets {
     impl SxAppConfig {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
-            Self { bits: [0u8, 0u8] }
+            Self { bits: [0, 0] }
         }
         /// Create a new instance, loaded with all zeroes
         pub const fn new_zero() -> Self {
@@ -2923,7 +3020,7 @@ pub mod field_sets {
         }
         ///Read the `sleep_state` field of the register.
         ///
-        ///Current system power state
+        /// Current system power state
         pub fn sleep_state(&self) -> super::SystemPowerState {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -2935,7 +3032,7 @@ pub mod field_sets {
         }
         ///Write the `sleep_state` field of the register.
         ///
-        ///Current system power state
+        /// Current system power state
         pub fn set_sleep_state(&mut self, value: super::SystemPowerState) {
             let raw = value.into();
             unsafe {
@@ -2958,15 +3055,17 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for SxAppConfig {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("SxAppConfig")
-                .field("sleep_state", &self.sleep_state())
-                .finish()
+            let mut d = f.debug_struct("SxAppConfig");
+            d.field("sleep_state", &self.sleep_state());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for SxAppConfig {
         fn format(&self, f: defmt::Formatter) {
-            defmt::write!(f, "SxAppConfig {{ sleep_state: {} }}", self.sleep_state())
+            defmt::write!(f, "SxAppConfig {{ ");
+            defmt::write!(f, "sleep_state: {}, ", & self.sleep_state());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for SxAppConfig {
@@ -3020,7 +3119,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Port status
+    /// Port status
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct Status {
         /// The internal bits
@@ -3041,9 +3140,7 @@ pub mod field_sets {
     impl Status {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
-            Self {
-                bits: [0u8, 0u8, 0u8, 0u8, 0u8],
-            }
+            Self { bits: [0, 0, 0, 0, 0] }
         }
         /// Create a new instance, loaded with all zeroes
         pub const fn new_zero() -> Self {
@@ -3051,7 +3148,7 @@ pub mod field_sets {
         }
         ///Read the `plug_present` field of the register.
         ///
-        ///Plug present
+        /// Plug present
         pub fn plug_present(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3063,7 +3160,7 @@ pub mod field_sets {
         }
         ///Read the `connection_state` field of the register.
         ///
-        ///Connection state
+        /// Connection state
         pub fn connection_state(&self) -> super::PlugMode {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3075,7 +3172,7 @@ pub mod field_sets {
         }
         ///Read the `plug_orientation` field of the register.
         ///
-        ///Connector oreintation, 0 for normal, 1 for flipped
+        /// Connector oreintation, 0 for normal, 1 for flipped
         pub fn plug_orientation(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3087,7 +3184,7 @@ pub mod field_sets {
         }
         ///Read the `port_role` field of the register.
         ///
-        ///PD role, 0 for sink, 1 for source
+        /// PD role, 0 for sink, 1 for source
         pub fn port_role(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3099,7 +3196,7 @@ pub mod field_sets {
         }
         ///Read the `data_role` field of the register.
         ///
-        ///Data role, 0 for UFP, 1 for DFP
+        /// Data role, 0 for UFP, 1 for DFP
         pub fn data_role(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3111,7 +3208,7 @@ pub mod field_sets {
         }
         ///Read the `erp_mode` field of the register.
         ///
-        ///Is EPR mode active
+        /// Is EPR mode active
         pub fn erp_mode(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3123,7 +3220,7 @@ pub mod field_sets {
         }
         ///Read the `vbus_status` field of the register.
         ///
-        ///Vbus status
+        /// Vbus status
         pub fn vbus_status(&self) -> super::VbusMode {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3135,7 +3232,7 @@ pub mod field_sets {
         }
         ///Read the `usb_host` field of the register.
         ///
-        ///USB host mode
+        /// USB host mode
         pub fn usb_host(&self) -> super::UsbHostMode {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3147,7 +3244,7 @@ pub mod field_sets {
         }
         ///Read the `legacy` field of the register.
         ///
-        ///Legacy mode stotus
+        /// Legacy mode stotus
         pub fn legacy(&self) -> super::LegacyMode {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3159,7 +3256,7 @@ pub mod field_sets {
         }
         ///Read the `bist_in_progress` field of the register.
         ///
-        ///If a BIST is in progress
+        /// If a BIST is in progress
         pub fn bist_in_progress(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3171,7 +3268,7 @@ pub mod field_sets {
         }
         ///Read the `soc_ack_timeout` field of the register.
         ///
-        ///Set when the SOC acknolwedgement has timed out
+        /// Set when the SOC acknolwedgement has timed out
         pub fn soc_ack_timeout(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3183,7 +3280,7 @@ pub mod field_sets {
         }
         ///Read the `am_status` field of the register.
         ///
-        ///Alternate mode entry status
+        /// Alternate mode entry status
         pub fn am_status(&self) -> super::AmStatus {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3195,7 +3292,7 @@ pub mod field_sets {
         }
         ///Write the `plug_present` field of the register.
         ///
-        ///Plug present
+        /// Plug present
         pub fn set_plug_present(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -3207,7 +3304,7 @@ pub mod field_sets {
         }
         ///Write the `connection_state` field of the register.
         ///
-        ///Connection state
+        /// Connection state
         pub fn set_connection_state(&mut self, value: super::PlugMode) {
             let raw = value.into();
             unsafe {
@@ -3219,7 +3316,7 @@ pub mod field_sets {
         }
         ///Write the `plug_orientation` field of the register.
         ///
-        ///Connector oreintation, 0 for normal, 1 for flipped
+        /// Connector oreintation, 0 for normal, 1 for flipped
         pub fn set_plug_orientation(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -3231,7 +3328,7 @@ pub mod field_sets {
         }
         ///Write the `port_role` field of the register.
         ///
-        ///PD role, 0 for sink, 1 for source
+        /// PD role, 0 for sink, 1 for source
         pub fn set_port_role(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -3243,7 +3340,7 @@ pub mod field_sets {
         }
         ///Write the `data_role` field of the register.
         ///
-        ///Data role, 0 for UFP, 1 for DFP
+        /// Data role, 0 for UFP, 1 for DFP
         pub fn set_data_role(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -3255,7 +3352,7 @@ pub mod field_sets {
         }
         ///Write the `erp_mode` field of the register.
         ///
-        ///Is EPR mode active
+        /// Is EPR mode active
         pub fn set_erp_mode(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -3267,7 +3364,7 @@ pub mod field_sets {
         }
         ///Write the `vbus_status` field of the register.
         ///
-        ///Vbus status
+        /// Vbus status
         pub fn set_vbus_status(&mut self, value: super::VbusMode) {
             let raw = value.into();
             unsafe {
@@ -3279,7 +3376,7 @@ pub mod field_sets {
         }
         ///Write the `usb_host` field of the register.
         ///
-        ///USB host mode
+        /// USB host mode
         pub fn set_usb_host(&mut self, value: super::UsbHostMode) {
             let raw = value.into();
             unsafe {
@@ -3291,7 +3388,7 @@ pub mod field_sets {
         }
         ///Write the `legacy` field of the register.
         ///
-        ///Legacy mode stotus
+        /// Legacy mode stotus
         pub fn set_legacy(&mut self, value: super::LegacyMode) {
             let raw = value.into();
             unsafe {
@@ -3303,7 +3400,7 @@ pub mod field_sets {
         }
         ///Write the `bist_in_progress` field of the register.
         ///
-        ///If a BIST is in progress
+        /// If a BIST is in progress
         pub fn set_bist_in_progress(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -3315,7 +3412,7 @@ pub mod field_sets {
         }
         ///Write the `soc_ack_timeout` field of the register.
         ///
-        ///Set when the SOC acknolwedgement has timed out
+        /// Set when the SOC acknolwedgement has timed out
         pub fn set_soc_ack_timeout(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -3327,7 +3424,7 @@ pub mod field_sets {
         }
         ///Write the `am_status` field of the register.
         ///
-        ///Alternate mode entry status
+        /// Alternate mode entry status
         pub fn set_am_status(&mut self, value: super::AmStatus) {
             let raw = value.into();
             unsafe {
@@ -3350,41 +3447,39 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for Status {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("Status")
-                .field("plug_present", &self.plug_present())
-                .field("connection_state", &self.connection_state())
-                .field("plug_orientation", &self.plug_orientation())
-                .field("port_role", &self.port_role())
-                .field("data_role", &self.data_role())
-                .field("erp_mode", &self.erp_mode())
-                .field("vbus_status", &self.vbus_status())
-                .field("usb_host", &self.usb_host())
-                .field("legacy", &self.legacy())
-                .field("bist_in_progress", &self.bist_in_progress())
-                .field("soc_ack_timeout", &self.soc_ack_timeout())
-                .field("am_status", &self.am_status())
-                .finish()
+            let mut d = f.debug_struct("Status");
+            d.field("plug_present", &self.plug_present());
+            d.field("connection_state", &self.connection_state());
+            d.field("plug_orientation", &self.plug_orientation());
+            d.field("port_role", &self.port_role());
+            d.field("data_role", &self.data_role());
+            d.field("erp_mode", &self.erp_mode());
+            d.field("vbus_status", &self.vbus_status());
+            d.field("usb_host", &self.usb_host());
+            d.field("legacy", &self.legacy());
+            d.field("bist_in_progress", &self.bist_in_progress());
+            d.field("soc_ack_timeout", &self.soc_ack_timeout());
+            d.field("am_status", &self.am_status());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for Status {
         fn format(&self, f: defmt::Formatter) {
-            defmt::write!(
-                f,
-                "Status {{ plug_present: {=bool}, connection_state: {}, plug_orientation: {=bool}, port_role: {=bool}, data_role: {=bool}, erp_mode: {=bool}, vbus_status: {}, usb_host: {}, legacy: {}, bist_in_progress: {=bool}, soc_ack_timeout: {=bool}, am_status: {} }}",
-                self.plug_present(),
-                self.connection_state(),
-                self.plug_orientation(),
-                self.port_role(),
-                self.data_role(),
-                self.erp_mode(),
-                self.vbus_status(),
-                self.usb_host(),
-                self.legacy(),
-                self.bist_in_progress(),
-                self.soc_ack_timeout(),
-                self.am_status(),
-            )
+            defmt::write!(f, "Status {{ ");
+            defmt::write!(f, "plug_present: {=bool}, ", & self.plug_present());
+            defmt::write!(f, "connection_state: {}, ", & self.connection_state());
+            defmt::write!(f, "plug_orientation: {=bool}, ", & self.plug_orientation());
+            defmt::write!(f, "port_role: {=bool}, ", & self.port_role());
+            defmt::write!(f, "data_role: {=bool}, ", & self.data_role());
+            defmt::write!(f, "erp_mode: {=bool}, ", & self.erp_mode());
+            defmt::write!(f, "vbus_status: {}, ", & self.vbus_status());
+            defmt::write!(f, "usb_host: {}, ", & self.usb_host());
+            defmt::write!(f, "legacy: {}, ", & self.legacy());
+            defmt::write!(f, "bist_in_progress: {=bool}, ", & self.bist_in_progress());
+            defmt::write!(f, "soc_ack_timeout: {=bool}, ", & self.soc_ack_timeout());
+            defmt::write!(f, "am_status: {}, ", & self.am_status());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for Status {
@@ -3438,7 +3533,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Power path status
+    /// Power path status
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct UsbStatus {
         /// The internal bits
@@ -3460,7 +3555,7 @@ pub mod field_sets {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
             Self {
-                bits: [0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8],
+                bits: [0, 0, 0, 0, 0, 0, 0, 0, 0],
             }
         }
         /// Create a new instance, loaded with all zeroes
@@ -3469,7 +3564,7 @@ pub mod field_sets {
         }
         ///Read the `eudo_sop_sent_status` field of the register.
         ///
-        ///Enter USB4 mode status
+        /// Enter USB4 mode status
         pub fn eudo_sop_sent_status(&self) -> super::EudoSopSentStatus {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3481,7 +3576,7 @@ pub mod field_sets {
         }
         ///Read the `usb_4_required_plug_mode` field of the register.
         ///
-        ///USB4 plug mode requirement
+        /// USB4 plug mode requirement
         pub fn usb_4_required_plug_mode(&self) -> super::Usb4RequiredPlugMode {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3493,7 +3588,7 @@ pub mod field_sets {
         }
         ///Read the `usb_mode_active_on_plug` field of the register.
         ///
-        ///USB4 mode active on plug
+        /// USB4 mode active on plug
         pub fn usb_mode_active_on_plug(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3505,7 +3600,7 @@ pub mod field_sets {
         }
         ///Read the `vpro_entry_failed` field of the register.
         ///
-        ///vPro mode error. This bit is asserted ifa n error occurred while trying to enter the vPro mode.
+        /// vPro mode error. This bit is asserted ifa n error occurred while trying to enter the vPro mode.
         pub fn vpro_entry_failed(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3517,7 +3612,7 @@ pub mod field_sets {
         }
         ///Read the `usb_reentry_needed` field of the register.
         ///
-        ///USB re-entry is needed
+        /// USB re-entry is needed
         pub fn usb_reentry_needed(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3529,7 +3624,7 @@ pub mod field_sets {
         }
         ///Read the `enter_usb_data_object` field of the register.
         ///
-        ///Enter_USB Data Object (EUDO)
+        /// Enter_USB Data Object (EUDO)
         pub fn enter_usb_data_object(&self) -> u32 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3541,7 +3636,7 @@ pub mod field_sets {
         }
         ///Read the `tbt_enter_mode_vdo` field of the register.
         ///
-        ///vPro mode VDO.
+        /// vPro mode VDO.
         pub fn tbt_enter_mode_vdo(&self) -> u32 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3553,7 +3648,7 @@ pub mod field_sets {
         }
         ///Write the `eudo_sop_sent_status` field of the register.
         ///
-        ///Enter USB4 mode status
+        /// Enter USB4 mode status
         pub fn set_eudo_sop_sent_status(&mut self, value: super::EudoSopSentStatus) {
             let raw = value.into();
             unsafe {
@@ -3565,7 +3660,7 @@ pub mod field_sets {
         }
         ///Write the `usb_4_required_plug_mode` field of the register.
         ///
-        ///USB4 plug mode requirement
+        /// USB4 plug mode requirement
         pub fn set_usb_4_required_plug_mode(
             &mut self,
             value: super::Usb4RequiredPlugMode,
@@ -3580,7 +3675,7 @@ pub mod field_sets {
         }
         ///Write the `usb_mode_active_on_plug` field of the register.
         ///
-        ///USB4 mode active on plug
+        /// USB4 mode active on plug
         pub fn set_usb_mode_active_on_plug(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -3592,7 +3687,7 @@ pub mod field_sets {
         }
         ///Write the `vpro_entry_failed` field of the register.
         ///
-        ///vPro mode error. This bit is asserted ifa n error occurred while trying to enter the vPro mode.
+        /// vPro mode error. This bit is asserted ifa n error occurred while trying to enter the vPro mode.
         pub fn set_vpro_entry_failed(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -3604,7 +3699,7 @@ pub mod field_sets {
         }
         ///Write the `usb_reentry_needed` field of the register.
         ///
-        ///USB re-entry is needed
+        /// USB re-entry is needed
         pub fn set_usb_reentry_needed(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -3616,7 +3711,7 @@ pub mod field_sets {
         }
         ///Write the `enter_usb_data_object` field of the register.
         ///
-        ///Enter_USB Data Object (EUDO)
+        /// Enter_USB Data Object (EUDO)
         pub fn set_enter_usb_data_object(&mut self, value: u32) {
             let raw = value;
             unsafe {
@@ -3628,7 +3723,7 @@ pub mod field_sets {
         }
         ///Write the `tbt_enter_mode_vdo` field of the register.
         ///
-        ///vPro mode VDO.
+        /// vPro mode VDO.
         pub fn set_tbt_enter_mode_vdo(&mut self, value: u32) {
             let raw = value;
             unsafe {
@@ -3651,31 +3746,41 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for UsbStatus {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("UsbStatus")
-                .field("eudo_sop_sent_status", &self.eudo_sop_sent_status())
-                .field("usb_4_required_plug_mode", &self.usb_4_required_plug_mode())
-                .field("usb_mode_active_on_plug", &self.usb_mode_active_on_plug())
-                .field("vpro_entry_failed", &self.vpro_entry_failed())
-                .field("usb_reentry_needed", &self.usb_reentry_needed())
-                .field("enter_usb_data_object", &self.enter_usb_data_object())
-                .field("tbt_enter_mode_vdo", &self.tbt_enter_mode_vdo())
-                .finish()
+            let mut d = f.debug_struct("UsbStatus");
+            d.field("eudo_sop_sent_status", &self.eudo_sop_sent_status());
+            d.field("usb_4_required_plug_mode", &self.usb_4_required_plug_mode());
+            d.field("usb_mode_active_on_plug", &self.usb_mode_active_on_plug());
+            d.field("vpro_entry_failed", &self.vpro_entry_failed());
+            d.field("usb_reentry_needed", &self.usb_reentry_needed());
+            d.field("enter_usb_data_object", &self.enter_usb_data_object());
+            d.field("tbt_enter_mode_vdo", &self.tbt_enter_mode_vdo());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for UsbStatus {
         fn format(&self, f: defmt::Formatter) {
+            defmt::write!(f, "UsbStatus {{ ");
             defmt::write!(
-                f,
-                "UsbStatus {{ eudo_sop_sent_status: {}, usb_4_required_plug_mode: {}, usb_mode_active_on_plug: {=bool}, vpro_entry_failed: {=bool}, usb_reentry_needed: {=bool}, enter_usb_data_object: {=u32}, tbt_enter_mode_vdo: {=u32} }}",
-                self.eudo_sop_sent_status(),
-                self.usb_4_required_plug_mode(),
-                self.usb_mode_active_on_plug(),
-                self.vpro_entry_failed(),
-                self.usb_reentry_needed(),
-                self.enter_usb_data_object(),
-                self.tbt_enter_mode_vdo(),
-            )
+                f, "eudo_sop_sent_status: {}, ", & self.eudo_sop_sent_status()
+            );
+            defmt::write!(
+                f, "usb_4_required_plug_mode: {}, ", & self.usb_4_required_plug_mode()
+            );
+            defmt::write!(
+                f, "usb_mode_active_on_plug: {=bool}, ", & self.usb_mode_active_on_plug()
+            );
+            defmt::write!(f, "vpro_entry_failed: {=bool}, ", & self.vpro_entry_failed());
+            defmt::write!(
+                f, "usb_reentry_needed: {=bool}, ", & self.usb_reentry_needed()
+            );
+            defmt::write!(
+                f, "enter_usb_data_object: {=u32}, ", & self.enter_usb_data_object()
+            );
+            defmt::write!(
+                f, "tbt_enter_mode_vdo: {=u32}, ", & self.tbt_enter_mode_vdo()
+            );
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for UsbStatus {
@@ -3729,7 +3834,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Power path status
+    /// Power path status
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct PowerPathStatus {
         /// The internal bits
@@ -3750,9 +3855,7 @@ pub mod field_sets {
     impl PowerPathStatus {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
-            Self {
-                bits: [0u8, 0u8, 0u8, 0u8, 0u8],
-            }
+            Self { bits: [0, 0, 0, 0, 0] }
         }
         /// Create a new instance, loaded with all zeroes
         pub const fn new_zero() -> Self {
@@ -3760,7 +3863,7 @@ pub mod field_sets {
         }
         ///Read the `pa_vconn_sw` field of the register.
         ///
-        ///PA Vconn switch status
+        /// PA Vconn switch status
         pub fn pa_vconn_sw(&self) -> super::PpVconnSw {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3772,7 +3875,7 @@ pub mod field_sets {
         }
         ///Read the `pb_vconn_sw` field of the register.
         ///
-        ///PA Vconn switch status
+        /// PA Vconn switch status
         pub fn pb_vconn_sw(&self) -> super::PpVconnSw {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3784,7 +3887,7 @@ pub mod field_sets {
         }
         ///Read the `pa_int_vbus_sw` field of the register.
         ///
-        ///PA int vbus switch status
+        /// PA int vbus switch status
         pub fn pa_int_vbus_sw(&self) -> super::PpIntVbusSw {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3796,7 +3899,7 @@ pub mod field_sets {
         }
         ///Read the `pb_int_vbus_sw` field of the register.
         ///
-        ///PB int vbus switch status
+        /// PB int vbus switch status
         pub fn pb_int_vbus_sw(&self) -> super::PpIntVbusSw {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3808,7 +3911,7 @@ pub mod field_sets {
         }
         ///Read the `pa_ext_vbus_sw` field of the register.
         ///
-        ///PA ext vbus switch status
+        /// PA ext vbus switch status
         pub fn pa_ext_vbus_sw(&self) -> super::PpExtVbusSw {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3820,7 +3923,7 @@ pub mod field_sets {
         }
         ///Read the `pb_ext_vbus_sw` field of the register.
         ///
-        ///PB ext vbus switch status
+        /// PB ext vbus switch status
         pub fn pb_ext_vbus_sw(&self) -> super::PpExtVbusSw {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3832,7 +3935,7 @@ pub mod field_sets {
         }
         ///Read the `pa_int_vbus_oc` field of the register.
         ///
-        ///PA int vbus overcurrent
+        /// PA int vbus overcurrent
         pub fn pa_int_vbus_oc(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3844,7 +3947,7 @@ pub mod field_sets {
         }
         ///Read the `pb_int_vbus_oc` field of the register.
         ///
-        ///PB int vbus overcurrent
+        /// PB int vbus overcurrent
         pub fn pb_int_vbus_oc(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3856,7 +3959,7 @@ pub mod field_sets {
         }
         ///Read the `pa_vconn_oc` field of the register.
         ///
-        ///PA vconn overcurrent
+        /// PA vconn overcurrent
         pub fn pa_vconn_oc(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3868,7 +3971,7 @@ pub mod field_sets {
         }
         ///Read the `pb_vconn_oc` field of the register.
         ///
-        ///PB vconn overcurrent
+        /// PB vconn overcurrent
         pub fn pb_vconn_oc(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3880,7 +3983,7 @@ pub mod field_sets {
         }
         ///Read the `power_source` field of the register.
         ///
-        ///How the PD controller is powered
+        /// How the PD controller is powered
         pub fn power_source(&self) -> super::PpPowerSource {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -3892,7 +3995,7 @@ pub mod field_sets {
         }
         ///Write the `pa_vconn_sw` field of the register.
         ///
-        ///PA Vconn switch status
+        /// PA Vconn switch status
         pub fn set_pa_vconn_sw(&mut self, value: super::PpVconnSw) {
             let raw = value.into();
             unsafe {
@@ -3904,7 +4007,7 @@ pub mod field_sets {
         }
         ///Write the `pb_vconn_sw` field of the register.
         ///
-        ///PA Vconn switch status
+        /// PA Vconn switch status
         pub fn set_pb_vconn_sw(&mut self, value: super::PpVconnSw) {
             let raw = value.into();
             unsafe {
@@ -3916,7 +4019,7 @@ pub mod field_sets {
         }
         ///Write the `pa_int_vbus_sw` field of the register.
         ///
-        ///PA int vbus switch status
+        /// PA int vbus switch status
         pub fn set_pa_int_vbus_sw(&mut self, value: super::PpIntVbusSw) {
             let raw = value.into();
             unsafe {
@@ -3928,7 +4031,7 @@ pub mod field_sets {
         }
         ///Write the `pb_int_vbus_sw` field of the register.
         ///
-        ///PB int vbus switch status
+        /// PB int vbus switch status
         pub fn set_pb_int_vbus_sw(&mut self, value: super::PpIntVbusSw) {
             let raw = value.into();
             unsafe {
@@ -3940,7 +4043,7 @@ pub mod field_sets {
         }
         ///Write the `pa_ext_vbus_sw` field of the register.
         ///
-        ///PA ext vbus switch status
+        /// PA ext vbus switch status
         pub fn set_pa_ext_vbus_sw(&mut self, value: super::PpExtVbusSw) {
             let raw = value.into();
             unsafe {
@@ -3952,7 +4055,7 @@ pub mod field_sets {
         }
         ///Write the `pb_ext_vbus_sw` field of the register.
         ///
-        ///PB ext vbus switch status
+        /// PB ext vbus switch status
         pub fn set_pb_ext_vbus_sw(&mut self, value: super::PpExtVbusSw) {
             let raw = value.into();
             unsafe {
@@ -3964,7 +4067,7 @@ pub mod field_sets {
         }
         ///Write the `pa_int_vbus_oc` field of the register.
         ///
-        ///PA int vbus overcurrent
+        /// PA int vbus overcurrent
         pub fn set_pa_int_vbus_oc(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -3976,7 +4079,7 @@ pub mod field_sets {
         }
         ///Write the `pb_int_vbus_oc` field of the register.
         ///
-        ///PB int vbus overcurrent
+        /// PB int vbus overcurrent
         pub fn set_pb_int_vbus_oc(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -3988,7 +4091,7 @@ pub mod field_sets {
         }
         ///Write the `pa_vconn_oc` field of the register.
         ///
-        ///PA vconn overcurrent
+        /// PA vconn overcurrent
         pub fn set_pa_vconn_oc(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4000,7 +4103,7 @@ pub mod field_sets {
         }
         ///Write the `pb_vconn_oc` field of the register.
         ///
-        ///PB vconn overcurrent
+        /// PB vconn overcurrent
         pub fn set_pb_vconn_oc(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4012,7 +4115,7 @@ pub mod field_sets {
         }
         ///Write the `power_source` field of the register.
         ///
-        ///How the PD controller is powered
+        /// How the PD controller is powered
         pub fn set_power_source(&mut self, value: super::PpPowerSource) {
             let raw = value.into();
             unsafe {
@@ -4035,39 +4138,37 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for PowerPathStatus {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("PowerPathStatus")
-                .field("pa_vconn_sw", &self.pa_vconn_sw())
-                .field("pb_vconn_sw", &self.pb_vconn_sw())
-                .field("pa_int_vbus_sw", &self.pa_int_vbus_sw())
-                .field("pb_int_vbus_sw", &self.pb_int_vbus_sw())
-                .field("pa_ext_vbus_sw", &self.pa_ext_vbus_sw())
-                .field("pb_ext_vbus_sw", &self.pb_ext_vbus_sw())
-                .field("pa_int_vbus_oc", &self.pa_int_vbus_oc())
-                .field("pb_int_vbus_oc", &self.pb_int_vbus_oc())
-                .field("pa_vconn_oc", &self.pa_vconn_oc())
-                .field("pb_vconn_oc", &self.pb_vconn_oc())
-                .field("power_source", &self.power_source())
-                .finish()
+            let mut d = f.debug_struct("PowerPathStatus");
+            d.field("pa_vconn_sw", &self.pa_vconn_sw());
+            d.field("pb_vconn_sw", &self.pb_vconn_sw());
+            d.field("pa_int_vbus_sw", &self.pa_int_vbus_sw());
+            d.field("pb_int_vbus_sw", &self.pb_int_vbus_sw());
+            d.field("pa_ext_vbus_sw", &self.pa_ext_vbus_sw());
+            d.field("pb_ext_vbus_sw", &self.pb_ext_vbus_sw());
+            d.field("pa_int_vbus_oc", &self.pa_int_vbus_oc());
+            d.field("pb_int_vbus_oc", &self.pb_int_vbus_oc());
+            d.field("pa_vconn_oc", &self.pa_vconn_oc());
+            d.field("pb_vconn_oc", &self.pb_vconn_oc());
+            d.field("power_source", &self.power_source());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for PowerPathStatus {
         fn format(&self, f: defmt::Formatter) {
-            defmt::write!(
-                f,
-                "PowerPathStatus {{ pa_vconn_sw: {}, pb_vconn_sw: {}, pa_int_vbus_sw: {}, pb_int_vbus_sw: {}, pa_ext_vbus_sw: {}, pb_ext_vbus_sw: {}, pa_int_vbus_oc: {=bool}, pb_int_vbus_oc: {=bool}, pa_vconn_oc: {=bool}, pb_vconn_oc: {=bool}, power_source: {} }}",
-                self.pa_vconn_sw(),
-                self.pb_vconn_sw(),
-                self.pa_int_vbus_sw(),
-                self.pb_int_vbus_sw(),
-                self.pa_ext_vbus_sw(),
-                self.pb_ext_vbus_sw(),
-                self.pa_int_vbus_oc(),
-                self.pb_int_vbus_oc(),
-                self.pa_vconn_oc(),
-                self.pb_vconn_oc(),
-                self.power_source(),
-            )
+            defmt::write!(f, "PowerPathStatus {{ ");
+            defmt::write!(f, "pa_vconn_sw: {}, ", & self.pa_vconn_sw());
+            defmt::write!(f, "pb_vconn_sw: {}, ", & self.pb_vconn_sw());
+            defmt::write!(f, "pa_int_vbus_sw: {}, ", & self.pa_int_vbus_sw());
+            defmt::write!(f, "pb_int_vbus_sw: {}, ", & self.pb_int_vbus_sw());
+            defmt::write!(f, "pa_ext_vbus_sw: {}, ", & self.pa_ext_vbus_sw());
+            defmt::write!(f, "pb_ext_vbus_sw: {}, ", & self.pb_ext_vbus_sw());
+            defmt::write!(f, "pa_int_vbus_oc: {=bool}, ", & self.pa_int_vbus_oc());
+            defmt::write!(f, "pb_int_vbus_oc: {=bool}, ", & self.pb_int_vbus_oc());
+            defmt::write!(f, "pa_vconn_oc: {=bool}, ", & self.pa_vconn_oc());
+            defmt::write!(f, "pb_vconn_oc: {=bool}, ", & self.pb_vconn_oc());
+            defmt::write!(f, "power_source: {}, ", & self.power_source());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for PowerPathStatus {
@@ -4121,7 +4222,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Global system configuration
+    /// Global system configuration
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct SystemConfig {
         /// The internal bits
@@ -4143,23 +4244,7 @@ pub mod field_sets {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
             Self {
-                bits: [
-                    5u8,
-                    137u8,
-                    51u8,
-                    140u8,
-                    25u8,
-                    16u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                ],
+                bits: [5, 137, 51, 140, 25, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             }
         }
         /// Create a new instance, loaded with all zeroes
@@ -4168,7 +4253,7 @@ pub mod field_sets {
         }
         ///Read the `pa_vconn_config` field of the register.
         ///
-        ///Enable PA VCONN
+        /// Enable PA VCONN
         pub fn pa_vconn_config(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4180,7 +4265,7 @@ pub mod field_sets {
         }
         ///Read the `pb_vconn_config` field of the register.
         ///
-        ///Enable PB VCONN
+        /// Enable PB VCONN
         pub fn pb_vconn_config(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4192,7 +4277,7 @@ pub mod field_sets {
         }
         ///Read the `pa_pp_5_v_vbus_sw_config` field of the register.
         ///
-        ///PA PP5V VBUS configuration
+        /// PA PP5V VBUS configuration
         pub fn pa_pp_5_v_vbus_sw_config(&self) -> super::VbusSwConfig {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4204,7 +4289,7 @@ pub mod field_sets {
         }
         ///Read the `pb_pp_5_v_vbus_sw_config` field of the register.
         ///
-        ///PB PP5V VBUS configuration
+        /// PB PP5V VBUS configuration
         pub fn pb_pp_5_v_vbus_sw_config(&self) -> super::VbusSwConfig {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4216,7 +4301,7 @@ pub mod field_sets {
         }
         ///Read the `ilim_over_shoot` field of the register.
         ///
-        ///PP_5V ILIM configuration
+        /// PP_5V ILIM configuration
         pub fn ilim_over_shoot(&self) -> super::IlimOverShoot {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4228,7 +4313,7 @@ pub mod field_sets {
         }
         ///Read the `pa_ppext_vbus_sw_config` field of the register.
         ///
-        ///PA PPEXT configuration
+        /// PA PPEXT configuration
         pub fn pa_ppext_vbus_sw_config(&self) -> super::PpextVbusSwConfig {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4240,7 +4325,7 @@ pub mod field_sets {
         }
         ///Read the `pb_ppext_vbus_sw_config` field of the register.
         ///
-        ///PB PPEXT configuration
+        /// PB PPEXT configuration
         pub fn pb_ppext_vbus_sw_config(&self) -> super::PpextVbusSwConfig {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4252,7 +4337,7 @@ pub mod field_sets {
         }
         ///Read the `rcp_threshold` field of the register.
         ///
-        ///Threshold used for RCP on PP_EXT
+        /// Threshold used for RCP on PP_EXT
         pub fn rcp_threshold(&self) -> super::RcpThreshold {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4264,7 +4349,7 @@ pub mod field_sets {
         }
         ///Read the `multi_port_sink_policy_highest_power` field of the register.
         ///
-        ///Automatic sink-path coordination, true for highest power, false for no sink management
+        /// Automatic sink-path coordination, true for highest power, false for no sink management
         pub fn multi_port_sink_policy_highest_power(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4276,7 +4361,7 @@ pub mod field_sets {
         }
         ///Read the `tbt_controller_type` field of the register.
         ///
-        ///Type of TBT controller
+        /// Type of TBT controller
         pub fn tbt_controller_type(&self) -> super::TbtControllerType {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4288,7 +4373,7 @@ pub mod field_sets {
         }
         ///Read the `enable_one_ufp_policy` field of the register.
         ///
-        ///Enable bit for simple UFP policy manager
+        /// Enable bit for simple UFP policy manager
         pub fn enable_one_ufp_policy(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4300,7 +4385,7 @@ pub mod field_sets {
         }
         ///Read the `enable_spm` field of the register.
         ///
-        ///Enable bit for simple source power management
+        /// Enable bit for simple source power management
         pub fn enable_spm(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4312,7 +4397,7 @@ pub mod field_sets {
         }
         ///Read the `multi_port_sink_non_overlap_time` field of the register.
         ///
-        ///Delay configuration for MultiPortSinkPolicy
+        /// Delay configuration for MultiPortSinkPolicy
         pub fn multi_port_sink_non_overlap_time(
             &self,
         ) -> super::MultiPortSinkNonOverlapTime {
@@ -4326,7 +4411,7 @@ pub mod field_sets {
         }
         ///Read the `enable_i_2_c_multi_controller_mode` field of the register.
         ///
-        ///Enables I2C Multi Controller mode
+        /// Enables I2C Multi Controller mode
         pub fn enable_i_2_c_multi_controller_mode(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4338,7 +4423,7 @@ pub mod field_sets {
         }
         ///Read the `i_2_c_timeout` field of the register.
         ///
-        ///I2C bus timeout
+        /// I2C bus timeout
         pub fn i_2_c_timeout(&self) -> super::I2CTimeout {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4350,7 +4435,7 @@ pub mod field_sets {
         }
         ///Read the `disable_eeprom_updates` field of the register.
         ///
-        ///EEPROM updates not allowed if this bit asserted
+        /// EEPROM updates not allowed if this bit asserted
         pub fn disable_eeprom_updates(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4362,7 +4447,7 @@ pub mod field_sets {
         }
         ///Read the `emulate_single_port` field of the register.
         ///
-        ///Enable only port A
+        /// Enable only port A
         pub fn emulate_single_port(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4374,7 +4459,7 @@ pub mod field_sets {
         }
         ///Read the `minimum_current_advertisement_1_a_5` field of the register.
         ///
-        ///SPM minimum current advertisement, true for 1.5 A, false for USB default
+        /// SPM minimum current advertisement, true for 1.5 A, false for USB default
         pub fn minimum_current_advertisement_1_a_5(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4386,7 +4471,7 @@ pub mod field_sets {
         }
         ///Read the `usb_default_current` field of the register.
         ///
-        ///Value for USB default current
+        /// Value for USB default current
         pub fn usb_default_current(&self) -> super::UsbDefaultCurrent {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4398,7 +4483,7 @@ pub mod field_sets {
         }
         ///Read the `epr_supported_as_source` field of the register.
         ///
-        ///EPR supported as source
+        /// EPR supported as source
         pub fn epr_supported_as_source(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4410,7 +4495,7 @@ pub mod field_sets {
         }
         ///Read the `epr_supported_as_sink` field of the register.
         ///
-        ///EPR supported as sink
+        /// EPR supported as sink
         pub fn epr_supported_as_sink(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4422,7 +4507,7 @@ pub mod field_sets {
         }
         ///Read the `enable_low_power_mode_am_entry_exit` field of the register.
         ///
-        ///Enable AM entry/exit on low-power mode exit/entry
+        /// Enable AM entry/exit on low-power mode exit/entry
         pub fn enable_low_power_mode_am_entry_exit(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4434,7 +4519,7 @@ pub mod field_sets {
         }
         ///Read the `crossbar_polling_mode` field of the register.
         ///
-        ///Enable crossbar polling mode
+        /// Enable crossbar polling mode
         pub fn crossbar_polling_mode(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4446,7 +4531,7 @@ pub mod field_sets {
         }
         ///Read the `crossbar_config_type_1_extended` field of the register.
         ///
-        ///Enable crossbar type 1 extended write
+        /// Enable crossbar type 1 extended write
         pub fn crossbar_config_type_1_extended(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4458,7 +4543,7 @@ pub mod field_sets {
         }
         ///Read the `external_dcdc_status_polling_interval` field of the register.
         ///
-        ///External DCDC Status Polling Interval
+        /// External DCDC Status Polling Interval
         pub fn external_dcdc_status_polling_interval(&self) -> u8 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4470,7 +4555,7 @@ pub mod field_sets {
         }
         ///Read the `port_1_i_2_c_2_target_address` field of the register.
         ///
-        ///Target address for Port 1 on I2C2s
+        /// Target address for Port 1 on I2C2s
         pub fn port_1_i_2_c_2_target_address(&self) -> u8 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4482,7 +4567,7 @@ pub mod field_sets {
         }
         ///Read the `port_2_i_2_c_2_target_address` field of the register.
         ///
-        ///Target address for Port 2 on I2C2s
+        /// Target address for Port 2 on I2C2s
         pub fn port_2_i_2_c_2_target_address(&self) -> u8 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4494,7 +4579,7 @@ pub mod field_sets {
         }
         ///Read the `vsys_prevents_high_power` field of the register.
         ///
-        ///Halts setting up external DCDC configuration until 5V power is present from the system
+        /// Halts setting up external DCDC configuration until 5V power is present from the system
         pub fn vsys_prevents_high_power(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4506,7 +4591,7 @@ pub mod field_sets {
         }
         ///Read the `wait_for_vin_3_v_3` field of the register.
         ///
-        ///Stalls the PD in PTCH mode until Vsys is present
+        /// Stalls the PD in PTCH mode until Vsys is present
         pub fn wait_for_vin_3_v_3(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4518,7 +4603,7 @@ pub mod field_sets {
         }
         ///Read the `wait_for_minimum_power` field of the register.
         ///
-        ///Stalls the PD in PTCH mode until a power connection is made that meets the needed conditions
+        /// Stalls the PD in PTCH mode until a power connection is made that meets the needed conditions
         pub fn wait_for_minimum_power(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4530,7 +4615,7 @@ pub mod field_sets {
         }
         ///Read the `auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3` field of the register.
         ///
-        ///On detecting VIN_3V3, auto clear the dead battery flag and reset the connection on the source port to update PD contract negotiated when the battery was dead
+        /// On detecting VIN_3V3, auto clear the dead battery flag and reset the connection on the source port to update PD contract negotiated when the battery was dead
         pub fn auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4542,7 +4627,7 @@ pub mod field_sets {
         }
         ///Read the `source_policy_mode` field of the register.
         ///
-        ///Source Policy Mode
+        /// Source Policy Mode
         pub fn source_policy_mode(&self) -> u8 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -4554,7 +4639,7 @@ pub mod field_sets {
         }
         ///Write the `pa_vconn_config` field of the register.
         ///
-        ///Enable PA VCONN
+        /// Enable PA VCONN
         pub fn set_pa_vconn_config(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4566,7 +4651,7 @@ pub mod field_sets {
         }
         ///Write the `pb_vconn_config` field of the register.
         ///
-        ///Enable PB VCONN
+        /// Enable PB VCONN
         pub fn set_pb_vconn_config(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4578,7 +4663,7 @@ pub mod field_sets {
         }
         ///Write the `pa_pp_5_v_vbus_sw_config` field of the register.
         ///
-        ///PA PP5V VBUS configuration
+        /// PA PP5V VBUS configuration
         pub fn set_pa_pp_5_v_vbus_sw_config(&mut self, value: super::VbusSwConfig) {
             let raw = value.into();
             unsafe {
@@ -4590,7 +4675,7 @@ pub mod field_sets {
         }
         ///Write the `pb_pp_5_v_vbus_sw_config` field of the register.
         ///
-        ///PB PP5V VBUS configuration
+        /// PB PP5V VBUS configuration
         pub fn set_pb_pp_5_v_vbus_sw_config(&mut self, value: super::VbusSwConfig) {
             let raw = value.into();
             unsafe {
@@ -4602,7 +4687,7 @@ pub mod field_sets {
         }
         ///Write the `ilim_over_shoot` field of the register.
         ///
-        ///PP_5V ILIM configuration
+        /// PP_5V ILIM configuration
         pub fn set_ilim_over_shoot(&mut self, value: super::IlimOverShoot) {
             let raw = value.into();
             unsafe {
@@ -4614,7 +4699,7 @@ pub mod field_sets {
         }
         ///Write the `pa_ppext_vbus_sw_config` field of the register.
         ///
-        ///PA PPEXT configuration
+        /// PA PPEXT configuration
         pub fn set_pa_ppext_vbus_sw_config(&mut self, value: super::PpextVbusSwConfig) {
             let raw = value.into();
             unsafe {
@@ -4626,7 +4711,7 @@ pub mod field_sets {
         }
         ///Write the `pb_ppext_vbus_sw_config` field of the register.
         ///
-        ///PB PPEXT configuration
+        /// PB PPEXT configuration
         pub fn set_pb_ppext_vbus_sw_config(&mut self, value: super::PpextVbusSwConfig) {
             let raw = value.into();
             unsafe {
@@ -4638,7 +4723,7 @@ pub mod field_sets {
         }
         ///Write the `rcp_threshold` field of the register.
         ///
-        ///Threshold used for RCP on PP_EXT
+        /// Threshold used for RCP on PP_EXT
         pub fn set_rcp_threshold(&mut self, value: super::RcpThreshold) {
             let raw = value.into();
             unsafe {
@@ -4650,7 +4735,7 @@ pub mod field_sets {
         }
         ///Write the `multi_port_sink_policy_highest_power` field of the register.
         ///
-        ///Automatic sink-path coordination, true for highest power, false for no sink management
+        /// Automatic sink-path coordination, true for highest power, false for no sink management
         pub fn set_multi_port_sink_policy_highest_power(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4662,7 +4747,7 @@ pub mod field_sets {
         }
         ///Write the `tbt_controller_type` field of the register.
         ///
-        ///Type of TBT controller
+        /// Type of TBT controller
         pub fn set_tbt_controller_type(&mut self, value: super::TbtControllerType) {
             let raw = value.into();
             unsafe {
@@ -4674,7 +4759,7 @@ pub mod field_sets {
         }
         ///Write the `enable_one_ufp_policy` field of the register.
         ///
-        ///Enable bit for simple UFP policy manager
+        /// Enable bit for simple UFP policy manager
         pub fn set_enable_one_ufp_policy(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4686,7 +4771,7 @@ pub mod field_sets {
         }
         ///Write the `enable_spm` field of the register.
         ///
-        ///Enable bit for simple source power management
+        /// Enable bit for simple source power management
         pub fn set_enable_spm(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4698,7 +4783,7 @@ pub mod field_sets {
         }
         ///Write the `multi_port_sink_non_overlap_time` field of the register.
         ///
-        ///Delay configuration for MultiPortSinkPolicy
+        /// Delay configuration for MultiPortSinkPolicy
         pub fn set_multi_port_sink_non_overlap_time(
             &mut self,
             value: super::MultiPortSinkNonOverlapTime,
@@ -4713,7 +4798,7 @@ pub mod field_sets {
         }
         ///Write the `enable_i_2_c_multi_controller_mode` field of the register.
         ///
-        ///Enables I2C Multi Controller mode
+        /// Enables I2C Multi Controller mode
         pub fn set_enable_i_2_c_multi_controller_mode(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4725,7 +4810,7 @@ pub mod field_sets {
         }
         ///Write the `i_2_c_timeout` field of the register.
         ///
-        ///I2C bus timeout
+        /// I2C bus timeout
         pub fn set_i_2_c_timeout(&mut self, value: super::I2CTimeout) {
             let raw = value.into();
             unsafe {
@@ -4737,7 +4822,7 @@ pub mod field_sets {
         }
         ///Write the `disable_eeprom_updates` field of the register.
         ///
-        ///EEPROM updates not allowed if this bit asserted
+        /// EEPROM updates not allowed if this bit asserted
         pub fn set_disable_eeprom_updates(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4749,7 +4834,7 @@ pub mod field_sets {
         }
         ///Write the `emulate_single_port` field of the register.
         ///
-        ///Enable only port A
+        /// Enable only port A
         pub fn set_emulate_single_port(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4761,7 +4846,7 @@ pub mod field_sets {
         }
         ///Write the `minimum_current_advertisement_1_a_5` field of the register.
         ///
-        ///SPM minimum current advertisement, true for 1.5 A, false for USB default
+        /// SPM minimum current advertisement, true for 1.5 A, false for USB default
         pub fn set_minimum_current_advertisement_1_a_5(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4773,7 +4858,7 @@ pub mod field_sets {
         }
         ///Write the `usb_default_current` field of the register.
         ///
-        ///Value for USB default current
+        /// Value for USB default current
         pub fn set_usb_default_current(&mut self, value: super::UsbDefaultCurrent) {
             let raw = value.into();
             unsafe {
@@ -4785,7 +4870,7 @@ pub mod field_sets {
         }
         ///Write the `epr_supported_as_source` field of the register.
         ///
-        ///EPR supported as source
+        /// EPR supported as source
         pub fn set_epr_supported_as_source(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4797,7 +4882,7 @@ pub mod field_sets {
         }
         ///Write the `epr_supported_as_sink` field of the register.
         ///
-        ///EPR supported as sink
+        /// EPR supported as sink
         pub fn set_epr_supported_as_sink(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4809,7 +4894,7 @@ pub mod field_sets {
         }
         ///Write the `enable_low_power_mode_am_entry_exit` field of the register.
         ///
-        ///Enable AM entry/exit on low-power mode exit/entry
+        /// Enable AM entry/exit on low-power mode exit/entry
         pub fn set_enable_low_power_mode_am_entry_exit(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4821,7 +4906,7 @@ pub mod field_sets {
         }
         ///Write the `crossbar_polling_mode` field of the register.
         ///
-        ///Enable crossbar polling mode
+        /// Enable crossbar polling mode
         pub fn set_crossbar_polling_mode(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4833,7 +4918,7 @@ pub mod field_sets {
         }
         ///Write the `crossbar_config_type_1_extended` field of the register.
         ///
-        ///Enable crossbar type 1 extended write
+        /// Enable crossbar type 1 extended write
         pub fn set_crossbar_config_type_1_extended(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4845,7 +4930,7 @@ pub mod field_sets {
         }
         ///Write the `external_dcdc_status_polling_interval` field of the register.
         ///
-        ///External DCDC Status Polling Interval
+        /// External DCDC Status Polling Interval
         pub fn set_external_dcdc_status_polling_interval(&mut self, value: u8) {
             let raw = value;
             unsafe {
@@ -4857,7 +4942,7 @@ pub mod field_sets {
         }
         ///Write the `port_1_i_2_c_2_target_address` field of the register.
         ///
-        ///Target address for Port 1 on I2C2s
+        /// Target address for Port 1 on I2C2s
         pub fn set_port_1_i_2_c_2_target_address(&mut self, value: u8) {
             let raw = value;
             unsafe {
@@ -4869,7 +4954,7 @@ pub mod field_sets {
         }
         ///Write the `port_2_i_2_c_2_target_address` field of the register.
         ///
-        ///Target address for Port 2 on I2C2s
+        /// Target address for Port 2 on I2C2s
         pub fn set_port_2_i_2_c_2_target_address(&mut self, value: u8) {
             let raw = value;
             unsafe {
@@ -4881,7 +4966,7 @@ pub mod field_sets {
         }
         ///Write the `vsys_prevents_high_power` field of the register.
         ///
-        ///Halts setting up external DCDC configuration until 5V power is present from the system
+        /// Halts setting up external DCDC configuration until 5V power is present from the system
         pub fn set_vsys_prevents_high_power(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4893,7 +4978,7 @@ pub mod field_sets {
         }
         ///Write the `wait_for_vin_3_v_3` field of the register.
         ///
-        ///Stalls the PD in PTCH mode until Vsys is present
+        /// Stalls the PD in PTCH mode until Vsys is present
         pub fn set_wait_for_vin_3_v_3(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4905,7 +4990,7 @@ pub mod field_sets {
         }
         ///Write the `wait_for_minimum_power` field of the register.
         ///
-        ///Stalls the PD in PTCH mode until a power connection is made that meets the needed conditions
+        /// Stalls the PD in PTCH mode until a power connection is made that meets the needed conditions
         pub fn set_wait_for_minimum_power(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -4917,7 +5002,7 @@ pub mod field_sets {
         }
         ///Write the `auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3` field of the register.
         ///
-        ///On detecting VIN_3V3, auto clear the dead battery flag and reset the connection on the source port to update PD contract negotiated when the battery was dead
+        /// On detecting VIN_3V3, auto clear the dead battery flag and reset the connection on the source port to update PD contract negotiated when the battery was dead
         pub fn set_auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3(
             &mut self,
             value: bool,
@@ -4932,7 +5017,7 @@ pub mod field_sets {
         }
         ///Write the `source_policy_mode` field of the register.
         ///
-        ///Source Policy Mode
+        /// Source Policy Mode
         pub fn set_source_policy_mode(&mut self, value: u8) {
             let raw = value;
             unsafe {
@@ -4955,111 +5040,166 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for SystemConfig {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("SystemConfig")
-                .field("pa_vconn_config", &self.pa_vconn_config())
-                .field("pb_vconn_config", &self.pb_vconn_config())
-                .field("pa_pp_5_v_vbus_sw_config", &self.pa_pp_5_v_vbus_sw_config())
-                .field("pb_pp_5_v_vbus_sw_config", &self.pb_pp_5_v_vbus_sw_config())
-                .field("ilim_over_shoot", &self.ilim_over_shoot())
-                .field("pa_ppext_vbus_sw_config", &self.pa_ppext_vbus_sw_config())
-                .field("pb_ppext_vbus_sw_config", &self.pb_ppext_vbus_sw_config())
-                .field("rcp_threshold", &self.rcp_threshold())
-                .field(
-                    "multi_port_sink_policy_highest_power",
-                    &self.multi_port_sink_policy_highest_power(),
-                )
-                .field("tbt_controller_type", &self.tbt_controller_type())
-                .field("enable_one_ufp_policy", &self.enable_one_ufp_policy())
-                .field("enable_spm", &self.enable_spm())
-                .field(
-                    "multi_port_sink_non_overlap_time",
-                    &self.multi_port_sink_non_overlap_time(),
-                )
-                .field(
-                    "enable_i_2_c_multi_controller_mode",
-                    &self.enable_i_2_c_multi_controller_mode(),
-                )
-                .field("i_2_c_timeout", &self.i_2_c_timeout())
-                .field("disable_eeprom_updates", &self.disable_eeprom_updates())
-                .field("emulate_single_port", &self.emulate_single_port())
-                .field(
-                    "minimum_current_advertisement_1_a_5",
-                    &self.minimum_current_advertisement_1_a_5(),
-                )
-                .field("usb_default_current", &self.usb_default_current())
-                .field("epr_supported_as_source", &self.epr_supported_as_source())
-                .field("epr_supported_as_sink", &self.epr_supported_as_sink())
-                .field(
-                    "enable_low_power_mode_am_entry_exit",
-                    &self.enable_low_power_mode_am_entry_exit(),
-                )
-                .field("crossbar_polling_mode", &self.crossbar_polling_mode())
-                .field(
-                    "crossbar_config_type_1_extended",
-                    &self.crossbar_config_type_1_extended(),
-                )
-                .field(
-                    "external_dcdc_status_polling_interval",
-                    &self.external_dcdc_status_polling_interval(),
-                )
-                .field(
-                    "port_1_i_2_c_2_target_address",
-                    &self.port_1_i_2_c_2_target_address(),
-                )
-                .field(
-                    "port_2_i_2_c_2_target_address",
-                    &self.port_2_i_2_c_2_target_address(),
-                )
-                .field("vsys_prevents_high_power", &self.vsys_prevents_high_power())
-                .field("wait_for_vin_3_v_3", &self.wait_for_vin_3_v_3())
-                .field("wait_for_minimum_power", &self.wait_for_minimum_power())
-                .field(
-                    "auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3",
-                    &self.auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3(),
-                )
-                .field("source_policy_mode", &self.source_policy_mode())
-                .finish()
+            let mut d = f.debug_struct("SystemConfig");
+            d.field("pa_vconn_config", &self.pa_vconn_config());
+            d.field("pb_vconn_config", &self.pb_vconn_config());
+            d.field("pa_pp_5_v_vbus_sw_config", &self.pa_pp_5_v_vbus_sw_config());
+            d.field("pb_pp_5_v_vbus_sw_config", &self.pb_pp_5_v_vbus_sw_config());
+            d.field("ilim_over_shoot", &self.ilim_over_shoot());
+            d.field("pa_ppext_vbus_sw_config", &self.pa_ppext_vbus_sw_config());
+            d.field("pb_ppext_vbus_sw_config", &self.pb_ppext_vbus_sw_config());
+            d.field("rcp_threshold", &self.rcp_threshold());
+            d.field(
+                "multi_port_sink_policy_highest_power",
+                &self.multi_port_sink_policy_highest_power(),
+            );
+            d.field("tbt_controller_type", &self.tbt_controller_type());
+            d.field("enable_one_ufp_policy", &self.enable_one_ufp_policy());
+            d.field("enable_spm", &self.enable_spm());
+            d.field(
+                "multi_port_sink_non_overlap_time",
+                &self.multi_port_sink_non_overlap_time(),
+            );
+            d.field(
+                "enable_i_2_c_multi_controller_mode",
+                &self.enable_i_2_c_multi_controller_mode(),
+            );
+            d.field("i_2_c_timeout", &self.i_2_c_timeout());
+            d.field("disable_eeprom_updates", &self.disable_eeprom_updates());
+            d.field("emulate_single_port", &self.emulate_single_port());
+            d.field(
+                "minimum_current_advertisement_1_a_5",
+                &self.minimum_current_advertisement_1_a_5(),
+            );
+            d.field("usb_default_current", &self.usb_default_current());
+            d.field("epr_supported_as_source", &self.epr_supported_as_source());
+            d.field("epr_supported_as_sink", &self.epr_supported_as_sink());
+            d.field(
+                "enable_low_power_mode_am_entry_exit",
+                &self.enable_low_power_mode_am_entry_exit(),
+            );
+            d.field("crossbar_polling_mode", &self.crossbar_polling_mode());
+            d.field(
+                "crossbar_config_type_1_extended",
+                &self.crossbar_config_type_1_extended(),
+            );
+            d.field(
+                "external_dcdc_status_polling_interval",
+                &self.external_dcdc_status_polling_interval(),
+            );
+            d.field(
+                "port_1_i_2_c_2_target_address",
+                &self.port_1_i_2_c_2_target_address(),
+            );
+            d.field(
+                "port_2_i_2_c_2_target_address",
+                &self.port_2_i_2_c_2_target_address(),
+            );
+            d.field("vsys_prevents_high_power", &self.vsys_prevents_high_power());
+            d.field("wait_for_vin_3_v_3", &self.wait_for_vin_3_v_3());
+            d.field("wait_for_minimum_power", &self.wait_for_minimum_power());
+            d.field(
+                "auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3",
+                &self.auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3(),
+            );
+            d.field("source_policy_mode", &self.source_policy_mode());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for SystemConfig {
         fn format(&self, f: defmt::Formatter) {
+            defmt::write!(f, "SystemConfig {{ ");
+            defmt::write!(f, "pa_vconn_config: {=bool}, ", & self.pa_vconn_config());
+            defmt::write!(f, "pb_vconn_config: {=bool}, ", & self.pb_vconn_config());
             defmt::write!(
-                f,
-                "SystemConfig {{ pa_vconn_config: {=bool}, pb_vconn_config: {=bool}, pa_pp_5_v_vbus_sw_config: {}, pb_pp_5_v_vbus_sw_config: {}, ilim_over_shoot: {}, pa_ppext_vbus_sw_config: {}, pb_ppext_vbus_sw_config: {}, rcp_threshold: {}, multi_port_sink_policy_highest_power: {=bool}, tbt_controller_type: {}, enable_one_ufp_policy: {=bool}, enable_spm: {=bool}, multi_port_sink_non_overlap_time: {}, enable_i_2_c_multi_controller_mode: {=bool}, i_2_c_timeout: {}, disable_eeprom_updates: {=bool}, emulate_single_port: {=bool}, minimum_current_advertisement_1_a_5: {=bool}, usb_default_current: {}, epr_supported_as_source: {=bool}, epr_supported_as_sink: {=bool}, enable_low_power_mode_am_entry_exit: {=bool}, crossbar_polling_mode: {=bool}, crossbar_config_type_1_extended: {=bool}, external_dcdc_status_polling_interval: {=u8}, port_1_i_2_c_2_target_address: {=u8}, port_2_i_2_c_2_target_address: {=u8}, vsys_prevents_high_power: {=bool}, wait_for_vin_3_v_3: {=bool}, wait_for_minimum_power: {=bool}, auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3: {=bool}, source_policy_mode: {=u8} }}",
-                self.pa_vconn_config(),
-                self.pb_vconn_config(),
-                self.pa_pp_5_v_vbus_sw_config(),
-                self.pb_pp_5_v_vbus_sw_config(),
-                self.ilim_over_shoot(),
-                self.pa_ppext_vbus_sw_config(),
-                self.pb_ppext_vbus_sw_config(),
-                self.rcp_threshold(),
-                self.multi_port_sink_policy_highest_power(),
-                self.tbt_controller_type(),
-                self.enable_one_ufp_policy(),
-                self.enable_spm(),
-                self.multi_port_sink_non_overlap_time(),
-                self.enable_i_2_c_multi_controller_mode(),
-                self.i_2_c_timeout(),
-                self.disable_eeprom_updates(),
-                self.emulate_single_port(),
-                self.minimum_current_advertisement_1_a_5(),
-                self.usb_default_current(),
-                self.epr_supported_as_source(),
-                self.epr_supported_as_sink(),
-                self.enable_low_power_mode_am_entry_exit(),
-                self.crossbar_polling_mode(),
-                self.crossbar_config_type_1_extended(),
-                self.external_dcdc_status_polling_interval(),
-                self.port_1_i_2_c_2_target_address(),
-                self.port_2_i_2_c_2_target_address(),
-                self.vsys_prevents_high_power(),
-                self.wait_for_vin_3_v_3(),
-                self.wait_for_minimum_power(),
-                self.auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3(),
-                self.source_policy_mode(),
-            )
+                f, "pa_pp_5_v_vbus_sw_config: {}, ", & self.pa_pp_5_v_vbus_sw_config()
+            );
+            defmt::write!(
+                f, "pb_pp_5_v_vbus_sw_config: {}, ", & self.pb_pp_5_v_vbus_sw_config()
+            );
+            defmt::write!(f, "ilim_over_shoot: {}, ", & self.ilim_over_shoot());
+            defmt::write!(
+                f, "pa_ppext_vbus_sw_config: {}, ", & self.pa_ppext_vbus_sw_config()
+            );
+            defmt::write!(
+                f, "pb_ppext_vbus_sw_config: {}, ", & self.pb_ppext_vbus_sw_config()
+            );
+            defmt::write!(f, "rcp_threshold: {}, ", & self.rcp_threshold());
+            defmt::write!(
+                f, "multi_port_sink_policy_highest_power: {=bool}, ", & self
+                .multi_port_sink_policy_highest_power()
+            );
+            defmt::write!(f, "tbt_controller_type: {}, ", & self.tbt_controller_type());
+            defmt::write!(
+                f, "enable_one_ufp_policy: {=bool}, ", & self.enable_one_ufp_policy()
+            );
+            defmt::write!(f, "enable_spm: {=bool}, ", & self.enable_spm());
+            defmt::write!(
+                f, "multi_port_sink_non_overlap_time: {}, ", & self
+                .multi_port_sink_non_overlap_time()
+            );
+            defmt::write!(
+                f, "enable_i_2_c_multi_controller_mode: {=bool}, ", & self
+                .enable_i_2_c_multi_controller_mode()
+            );
+            defmt::write!(f, "i_2_c_timeout: {}, ", & self.i_2_c_timeout());
+            defmt::write!(
+                f, "disable_eeprom_updates: {=bool}, ", & self.disable_eeprom_updates()
+            );
+            defmt::write!(
+                f, "emulate_single_port: {=bool}, ", & self.emulate_single_port()
+            );
+            defmt::write!(
+                f, "minimum_current_advertisement_1_a_5: {=bool}, ", & self
+                .minimum_current_advertisement_1_a_5()
+            );
+            defmt::write!(f, "usb_default_current: {}, ", & self.usb_default_current());
+            defmt::write!(
+                f, "epr_supported_as_source: {=bool}, ", & self.epr_supported_as_source()
+            );
+            defmt::write!(
+                f, "epr_supported_as_sink: {=bool}, ", & self.epr_supported_as_sink()
+            );
+            defmt::write!(
+                f, "enable_low_power_mode_am_entry_exit: {=bool}, ", & self
+                .enable_low_power_mode_am_entry_exit()
+            );
+            defmt::write!(
+                f, "crossbar_polling_mode: {=bool}, ", & self.crossbar_polling_mode()
+            );
+            defmt::write!(
+                f, "crossbar_config_type_1_extended: {=bool}, ", & self
+                .crossbar_config_type_1_extended()
+            );
+            defmt::write!(
+                f, "external_dcdc_status_polling_interval: {=u8}, ", & self
+                .external_dcdc_status_polling_interval()
+            );
+            defmt::write!(
+                f, "port_1_i_2_c_2_target_address: {=u8}, ", & self
+                .port_1_i_2_c_2_target_address()
+            );
+            defmt::write!(
+                f, "port_2_i_2_c_2_target_address: {=u8}, ", & self
+                .port_2_i_2_c_2_target_address()
+            );
+            defmt::write!(
+                f, "vsys_prevents_high_power: {=bool}, ", & self
+                .vsys_prevents_high_power()
+            );
+            defmt::write!(
+                f, "wait_for_vin_3_v_3: {=bool}, ", & self.wait_for_vin_3_v_3()
+            );
+            defmt::write!(
+                f, "wait_for_minimum_power: {=bool}, ", & self.wait_for_minimum_power()
+            );
+            defmt::write!(
+                f, "auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3: {=bool}, ", & self
+                .auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3()
+            );
+            defmt::write!(f, "source_policy_mode: {=u8}, ", & self.source_policy_mode());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for SystemConfig {
@@ -5113,7 +5253,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Port control
+    /// Port control
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct PortControl {
         /// The internal bits
@@ -5135,7 +5275,7 @@ pub mod field_sets {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
             Self {
-                bits: [17u8, 195u8, 65u8, 0u8, 0u8, 6u8, 0u8, 0u8],
+                bits: [17, 195, 65, 0, 0, 6, 0, 0],
             }
         }
         /// Create a new instance, loaded with all zeroes
@@ -5144,7 +5284,7 @@ pub mod field_sets {
         }
         ///Read the `typec_current` field of the register.
         ///
-        ///Type-C current limit
+        /// Type-C current limit
         pub fn typec_current(&self) -> super::TypecCurrent {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5156,7 +5296,7 @@ pub mod field_sets {
         }
         ///Read the `process_swap_to_sink` field of the register.
         ///
-        ///Process swap to sink
+        /// Process swap to sink
         pub fn process_swap_to_sink(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5168,7 +5308,7 @@ pub mod field_sets {
         }
         ///Read the `initiate_swap_to_sink` field of the register.
         ///
-        ///Initiate swap to sink
+        /// Initiate swap to sink
         pub fn initiate_swap_to_sink(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5180,7 +5320,7 @@ pub mod field_sets {
         }
         ///Read the `process_swap_to_source` field of the register.
         ///
-        ///Process swap to source
+        /// Process swap to source
         pub fn process_swap_to_source(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5192,7 +5332,7 @@ pub mod field_sets {
         }
         ///Read the `initiate_swap_to_source` field of the register.
         ///
-        ///Initiate swap to source
+        /// Initiate swap to source
         pub fn initiate_swap_to_source(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5204,7 +5344,7 @@ pub mod field_sets {
         }
         ///Read the `auto_alert_enable` field of the register.
         ///
-        ///Automatically initiate alert messaging
+        /// Automatically initiate alert messaging
         pub fn auto_alert_enable(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5216,7 +5356,7 @@ pub mod field_sets {
         }
         ///Read the `auto_pps_status_enable` field of the register.
         ///
-        ///Automatically return PPS_Status
+        /// Automatically return PPS_Status
         pub fn auto_pps_status_enable(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5228,7 +5368,7 @@ pub mod field_sets {
         }
         ///Read the `retimer_fw_update` field of the register.
         ///
-        ///Enable retimer firmware update
+        /// Enable retimer firmware update
         pub fn retimer_fw_update(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5240,7 +5380,7 @@ pub mod field_sets {
         }
         ///Read the `process_swap_to_ufp` field of the register.
         ///
-        ///Process swap to UFP
+        /// Process swap to UFP
         pub fn process_swap_to_ufp(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5252,7 +5392,7 @@ pub mod field_sets {
         }
         ///Read the `initiate_swap_to_ufp` field of the register.
         ///
-        ///Initiate swap to UFP
+        /// Initiate swap to UFP
         pub fn initiate_swap_to_ufp(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5264,7 +5404,7 @@ pub mod field_sets {
         }
         ///Read the `process_swap_to_dfp` field of the register.
         ///
-        ///Process swap to DFP
+        /// Process swap to DFP
         pub fn process_swap_to_dfp(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5276,7 +5416,7 @@ pub mod field_sets {
         }
         ///Read the `initiate_swap_to_dfp` field of the register.
         ///
-        ///Initiate swap to DFP
+        /// Initiate swap to DFP
         pub fn initiate_swap_to_dfp(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5288,7 +5428,7 @@ pub mod field_sets {
         }
         ///Read the `automatic_id_request` field of the register.
         ///
-        ///Automatically issue discover identity VDMs to appropriate SOPs
+        /// Automatically issue discover identity VDMs to appropriate SOPs
         pub fn automatic_id_request(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5300,7 +5440,7 @@ pub mod field_sets {
         }
         ///Read the `am_intrusive_mode` field of the register.
         ///
-        ///Allow host to manage alt mode process
+        /// Allow host to manage alt mode process
         pub fn am_intrusive_mode(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5312,7 +5452,7 @@ pub mod field_sets {
         }
         ///Read the `force_usb_3_gen_1` field of the register.
         ///
-        ///Force USB3 Gen1 mode
+        /// Force USB3 Gen1 mode
         pub fn force_usb_3_gen_1(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5324,7 +5464,7 @@ pub mod field_sets {
         }
         ///Read the `unconstrained_power` field of the register.
         ///
-        ///External power present
+        /// External power present
         pub fn unconstrained_power(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5336,7 +5476,7 @@ pub mod field_sets {
         }
         ///Read the `enable_current_monitor` field of the register.
         ///
-        ///Enable current monitor using onboard ADC
+        /// Enable current monitor using onboard ADC
         pub fn enable_current_monitor(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5348,7 +5488,7 @@ pub mod field_sets {
         }
         ///Read the `sink_control` field of the register.
         ///
-        ///Disable PP3/4 switches automatically
+        /// Disable PP3/4 switches automatically
         pub fn sink_control(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5360,7 +5500,7 @@ pub mod field_sets {
         }
         ///Read the `fr_swap_enabled` field of the register.
         ///
-        ///Enable fast role swap
+        /// Enable fast role swap
         pub fn fr_swap_enabled(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5372,7 +5512,7 @@ pub mod field_sets {
         }
         ///Read the `usb_disable` field of the register.
         ///
-        ///Disable USB data
+        /// Disable USB data
         pub fn usb_disable(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5384,7 +5524,7 @@ pub mod field_sets {
         }
         ///Read the `vconn_current_limit` field of the register.
         ///
-        ///Vconn current limit
+        /// Vconn current limit
         pub fn vconn_current_limit(&self) -> super::VconnCurrentLimit {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5396,7 +5536,7 @@ pub mod field_sets {
         }
         ///Read the `active_dbg_channel` field of the register.
         ///
-        ///SBU Channel Control
+        /// SBU Channel Control
         pub fn active_dbg_channel(&self) -> super::ActiveDbgChannel {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5408,7 +5548,7 @@ pub mod field_sets {
         }
         ///Write the `typec_current` field of the register.
         ///
-        ///Type-C current limit
+        /// Type-C current limit
         pub fn set_typec_current(&mut self, value: super::TypecCurrent) {
             let raw = value.into();
             unsafe {
@@ -5420,7 +5560,7 @@ pub mod field_sets {
         }
         ///Write the `process_swap_to_sink` field of the register.
         ///
-        ///Process swap to sink
+        /// Process swap to sink
         pub fn set_process_swap_to_sink(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5432,7 +5572,7 @@ pub mod field_sets {
         }
         ///Write the `initiate_swap_to_sink` field of the register.
         ///
-        ///Initiate swap to sink
+        /// Initiate swap to sink
         pub fn set_initiate_swap_to_sink(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5444,7 +5584,7 @@ pub mod field_sets {
         }
         ///Write the `process_swap_to_source` field of the register.
         ///
-        ///Process swap to source
+        /// Process swap to source
         pub fn set_process_swap_to_source(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5456,7 +5596,7 @@ pub mod field_sets {
         }
         ///Write the `initiate_swap_to_source` field of the register.
         ///
-        ///Initiate swap to source
+        /// Initiate swap to source
         pub fn set_initiate_swap_to_source(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5468,7 +5608,7 @@ pub mod field_sets {
         }
         ///Write the `auto_alert_enable` field of the register.
         ///
-        ///Automatically initiate alert messaging
+        /// Automatically initiate alert messaging
         pub fn set_auto_alert_enable(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5480,7 +5620,7 @@ pub mod field_sets {
         }
         ///Write the `auto_pps_status_enable` field of the register.
         ///
-        ///Automatically return PPS_Status
+        /// Automatically return PPS_Status
         pub fn set_auto_pps_status_enable(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5492,7 +5632,7 @@ pub mod field_sets {
         }
         ///Write the `retimer_fw_update` field of the register.
         ///
-        ///Enable retimer firmware update
+        /// Enable retimer firmware update
         pub fn set_retimer_fw_update(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5504,7 +5644,7 @@ pub mod field_sets {
         }
         ///Write the `process_swap_to_ufp` field of the register.
         ///
-        ///Process swap to UFP
+        /// Process swap to UFP
         pub fn set_process_swap_to_ufp(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5516,7 +5656,7 @@ pub mod field_sets {
         }
         ///Write the `initiate_swap_to_ufp` field of the register.
         ///
-        ///Initiate swap to UFP
+        /// Initiate swap to UFP
         pub fn set_initiate_swap_to_ufp(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5528,7 +5668,7 @@ pub mod field_sets {
         }
         ///Write the `process_swap_to_dfp` field of the register.
         ///
-        ///Process swap to DFP
+        /// Process swap to DFP
         pub fn set_process_swap_to_dfp(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5540,7 +5680,7 @@ pub mod field_sets {
         }
         ///Write the `initiate_swap_to_dfp` field of the register.
         ///
-        ///Initiate swap to DFP
+        /// Initiate swap to DFP
         pub fn set_initiate_swap_to_dfp(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5552,7 +5692,7 @@ pub mod field_sets {
         }
         ///Write the `automatic_id_request` field of the register.
         ///
-        ///Automatically issue discover identity VDMs to appropriate SOPs
+        /// Automatically issue discover identity VDMs to appropriate SOPs
         pub fn set_automatic_id_request(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5564,7 +5704,7 @@ pub mod field_sets {
         }
         ///Write the `am_intrusive_mode` field of the register.
         ///
-        ///Allow host to manage alt mode process
+        /// Allow host to manage alt mode process
         pub fn set_am_intrusive_mode(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5576,7 +5716,7 @@ pub mod field_sets {
         }
         ///Write the `force_usb_3_gen_1` field of the register.
         ///
-        ///Force USB3 Gen1 mode
+        /// Force USB3 Gen1 mode
         pub fn set_force_usb_3_gen_1(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5588,7 +5728,7 @@ pub mod field_sets {
         }
         ///Write the `unconstrained_power` field of the register.
         ///
-        ///External power present
+        /// External power present
         pub fn set_unconstrained_power(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5600,7 +5740,7 @@ pub mod field_sets {
         }
         ///Write the `enable_current_monitor` field of the register.
         ///
-        ///Enable current monitor using onboard ADC
+        /// Enable current monitor using onboard ADC
         pub fn set_enable_current_monitor(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5612,7 +5752,7 @@ pub mod field_sets {
         }
         ///Write the `sink_control` field of the register.
         ///
-        ///Disable PP3/4 switches automatically
+        /// Disable PP3/4 switches automatically
         pub fn set_sink_control(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5624,7 +5764,7 @@ pub mod field_sets {
         }
         ///Write the `fr_swap_enabled` field of the register.
         ///
-        ///Enable fast role swap
+        /// Enable fast role swap
         pub fn set_fr_swap_enabled(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5636,7 +5776,7 @@ pub mod field_sets {
         }
         ///Write the `usb_disable` field of the register.
         ///
-        ///Disable USB data
+        /// Disable USB data
         pub fn set_usb_disable(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -5648,7 +5788,7 @@ pub mod field_sets {
         }
         ///Write the `vconn_current_limit` field of the register.
         ///
-        ///Vconn current limit
+        /// Vconn current limit
         pub fn set_vconn_current_limit(&mut self, value: super::VconnCurrentLimit) {
             let raw = value.into();
             unsafe {
@@ -5660,7 +5800,7 @@ pub mod field_sets {
         }
         ///Write the `active_dbg_channel` field of the register.
         ///
-        ///SBU Channel Control
+        /// SBU Channel Control
         pub fn set_active_dbg_channel(&mut self, value: super::ActiveDbgChannel) {
             let raw = value.into();
             unsafe {
@@ -5683,61 +5823,83 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for PortControl {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("PortControl")
-                .field("typec_current", &self.typec_current())
-                .field("process_swap_to_sink", &self.process_swap_to_sink())
-                .field("initiate_swap_to_sink", &self.initiate_swap_to_sink())
-                .field("process_swap_to_source", &self.process_swap_to_source())
-                .field("initiate_swap_to_source", &self.initiate_swap_to_source())
-                .field("auto_alert_enable", &self.auto_alert_enable())
-                .field("auto_pps_status_enable", &self.auto_pps_status_enable())
-                .field("retimer_fw_update", &self.retimer_fw_update())
-                .field("process_swap_to_ufp", &self.process_swap_to_ufp())
-                .field("initiate_swap_to_ufp", &self.initiate_swap_to_ufp())
-                .field("process_swap_to_dfp", &self.process_swap_to_dfp())
-                .field("initiate_swap_to_dfp", &self.initiate_swap_to_dfp())
-                .field("automatic_id_request", &self.automatic_id_request())
-                .field("am_intrusive_mode", &self.am_intrusive_mode())
-                .field("force_usb_3_gen_1", &self.force_usb_3_gen_1())
-                .field("unconstrained_power", &self.unconstrained_power())
-                .field("enable_current_monitor", &self.enable_current_monitor())
-                .field("sink_control", &self.sink_control())
-                .field("fr_swap_enabled", &self.fr_swap_enabled())
-                .field("usb_disable", &self.usb_disable())
-                .field("vconn_current_limit", &self.vconn_current_limit())
-                .field("active_dbg_channel", &self.active_dbg_channel())
-                .finish()
+            let mut d = f.debug_struct("PortControl");
+            d.field("typec_current", &self.typec_current());
+            d.field("process_swap_to_sink", &self.process_swap_to_sink());
+            d.field("initiate_swap_to_sink", &self.initiate_swap_to_sink());
+            d.field("process_swap_to_source", &self.process_swap_to_source());
+            d.field("initiate_swap_to_source", &self.initiate_swap_to_source());
+            d.field("auto_alert_enable", &self.auto_alert_enable());
+            d.field("auto_pps_status_enable", &self.auto_pps_status_enable());
+            d.field("retimer_fw_update", &self.retimer_fw_update());
+            d.field("process_swap_to_ufp", &self.process_swap_to_ufp());
+            d.field("initiate_swap_to_ufp", &self.initiate_swap_to_ufp());
+            d.field("process_swap_to_dfp", &self.process_swap_to_dfp());
+            d.field("initiate_swap_to_dfp", &self.initiate_swap_to_dfp());
+            d.field("automatic_id_request", &self.automatic_id_request());
+            d.field("am_intrusive_mode", &self.am_intrusive_mode());
+            d.field("force_usb_3_gen_1", &self.force_usb_3_gen_1());
+            d.field("unconstrained_power", &self.unconstrained_power());
+            d.field("enable_current_monitor", &self.enable_current_monitor());
+            d.field("sink_control", &self.sink_control());
+            d.field("fr_swap_enabled", &self.fr_swap_enabled());
+            d.field("usb_disable", &self.usb_disable());
+            d.field("vconn_current_limit", &self.vconn_current_limit());
+            d.field("active_dbg_channel", &self.active_dbg_channel());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for PortControl {
         fn format(&self, f: defmt::Formatter) {
+            defmt::write!(f, "PortControl {{ ");
+            defmt::write!(f, "typec_current: {}, ", & self.typec_current());
             defmt::write!(
-                f,
-                "PortControl {{ typec_current: {}, process_swap_to_sink: {=bool}, initiate_swap_to_sink: {=bool}, process_swap_to_source: {=bool}, initiate_swap_to_source: {=bool}, auto_alert_enable: {=bool}, auto_pps_status_enable: {=bool}, retimer_fw_update: {=bool}, process_swap_to_ufp: {=bool}, initiate_swap_to_ufp: {=bool}, process_swap_to_dfp: {=bool}, initiate_swap_to_dfp: {=bool}, automatic_id_request: {=bool}, am_intrusive_mode: {=bool}, force_usb_3_gen_1: {=bool}, unconstrained_power: {=bool}, enable_current_monitor: {=bool}, sink_control: {=bool}, fr_swap_enabled: {=bool}, usb_disable: {=bool}, vconn_current_limit: {}, active_dbg_channel: {} }}",
-                self.typec_current(),
-                self.process_swap_to_sink(),
-                self.initiate_swap_to_sink(),
-                self.process_swap_to_source(),
-                self.initiate_swap_to_source(),
-                self.auto_alert_enable(),
-                self.auto_pps_status_enable(),
-                self.retimer_fw_update(),
-                self.process_swap_to_ufp(),
-                self.initiate_swap_to_ufp(),
-                self.process_swap_to_dfp(),
-                self.initiate_swap_to_dfp(),
-                self.automatic_id_request(),
-                self.am_intrusive_mode(),
-                self.force_usb_3_gen_1(),
-                self.unconstrained_power(),
-                self.enable_current_monitor(),
-                self.sink_control(),
-                self.fr_swap_enabled(),
-                self.usb_disable(),
-                self.vconn_current_limit(),
-                self.active_dbg_channel(),
-            )
+                f, "process_swap_to_sink: {=bool}, ", & self.process_swap_to_sink()
+            );
+            defmt::write!(
+                f, "initiate_swap_to_sink: {=bool}, ", & self.initiate_swap_to_sink()
+            );
+            defmt::write!(
+                f, "process_swap_to_source: {=bool}, ", & self.process_swap_to_source()
+            );
+            defmt::write!(
+                f, "initiate_swap_to_source: {=bool}, ", & self.initiate_swap_to_source()
+            );
+            defmt::write!(f, "auto_alert_enable: {=bool}, ", & self.auto_alert_enable());
+            defmt::write!(
+                f, "auto_pps_status_enable: {=bool}, ", & self.auto_pps_status_enable()
+            );
+            defmt::write!(f, "retimer_fw_update: {=bool}, ", & self.retimer_fw_update());
+            defmt::write!(
+                f, "process_swap_to_ufp: {=bool}, ", & self.process_swap_to_ufp()
+            );
+            defmt::write!(
+                f, "initiate_swap_to_ufp: {=bool}, ", & self.initiate_swap_to_ufp()
+            );
+            defmt::write!(
+                f, "process_swap_to_dfp: {=bool}, ", & self.process_swap_to_dfp()
+            );
+            defmt::write!(
+                f, "initiate_swap_to_dfp: {=bool}, ", & self.initiate_swap_to_dfp()
+            );
+            defmt::write!(
+                f, "automatic_id_request: {=bool}, ", & self.automatic_id_request()
+            );
+            defmt::write!(f, "am_intrusive_mode: {=bool}, ", & self.am_intrusive_mode());
+            defmt::write!(f, "force_usb_3_gen_1: {=bool}, ", & self.force_usb_3_gen_1());
+            defmt::write!(
+                f, "unconstrained_power: {=bool}, ", & self.unconstrained_power()
+            );
+            defmt::write!(
+                f, "enable_current_monitor: {=bool}, ", & self.enable_current_monitor()
+            );
+            defmt::write!(f, "sink_control: {=bool}, ", & self.sink_control());
+            defmt::write!(f, "fr_swap_enabled: {=bool}, ", & self.fr_swap_enabled());
+            defmt::write!(f, "usb_disable: {=bool}, ", & self.usb_disable());
+            defmt::write!(f, "vconn_current_limit: {}, ", & self.vconn_current_limit());
+            defmt::write!(f, "active_dbg_channel: {}, ", & self.active_dbg_channel());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for PortControl {
@@ -5791,7 +5953,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Active PDO contract
+    /// Active PDO contract
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct ActivePdoContract {
         /// The internal bits
@@ -5812,9 +5974,7 @@ pub mod field_sets {
     impl ActivePdoContract {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
-            Self {
-                bits: [0u8, 0u8, 0u8, 0u8, 0u8, 0u8],
-            }
+            Self { bits: [0, 0, 0, 0, 0, 0] }
         }
         /// Create a new instance, loaded with all zeroes
         pub const fn new_zero() -> Self {
@@ -5822,7 +5982,7 @@ pub mod field_sets {
         }
         ///Read the `active_pdo` field of the register.
         ///
-        ///Active PDO
+        /// Active PDO
         pub fn active_pdo(&self) -> u32 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5834,7 +5994,7 @@ pub mod field_sets {
         }
         ///Read the `first_pdo_control` field of the register.
         ///
-        ///Bits 20-29 of the first PDO
+        /// Bits 20-29 of the first PDO
         pub fn first_pdo_control(&self) -> u16 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -5846,7 +6006,7 @@ pub mod field_sets {
         }
         ///Write the `active_pdo` field of the register.
         ///
-        ///Active PDO
+        /// Active PDO
         pub fn set_active_pdo(&mut self, value: u32) {
             let raw = value;
             unsafe {
@@ -5858,7 +6018,7 @@ pub mod field_sets {
         }
         ///Write the `first_pdo_control` field of the register.
         ///
-        ///Bits 20-29 of the first PDO
+        /// Bits 20-29 of the first PDO
         pub fn set_first_pdo_control(&mut self, value: u16) {
             let raw = value;
             unsafe {
@@ -5881,21 +6041,19 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for ActivePdoContract {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("ActivePdoContract")
-                .field("active_pdo", &self.active_pdo())
-                .field("first_pdo_control", &self.first_pdo_control())
-                .finish()
+            let mut d = f.debug_struct("ActivePdoContract");
+            d.field("active_pdo", &self.active_pdo());
+            d.field("first_pdo_control", &self.first_pdo_control());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for ActivePdoContract {
         fn format(&self, f: defmt::Formatter) {
-            defmt::write!(
-                f,
-                "ActivePdoContract {{ active_pdo: {=u32}, first_pdo_control: {=u16} }}",
-                self.active_pdo(),
-                self.first_pdo_control(),
-            )
+            defmt::write!(f, "ActivePdoContract {{ ");
+            defmt::write!(f, "active_pdo: {=u32}, ", & self.active_pdo());
+            defmt::write!(f, "first_pdo_control: {=u16}, ", & self.first_pdo_control());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for ActivePdoContract {
@@ -5949,7 +6107,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Active PDO contract
+    /// Active PDO contract
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct ActiveRdoContract {
         /// The internal bits
@@ -5971,24 +6129,7 @@ pub mod field_sets {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
             Self {
-                bits: [
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                    0u8,
-                ],
+                bits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             }
         }
         /// Create a new instance, loaded with all zeroes
@@ -5997,7 +6138,7 @@ pub mod field_sets {
         }
         ///Read the `active_rdo` field of the register.
         ///
-        ///Active RDO
+        /// Active RDO
         pub fn active_rdo(&self) -> u32 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6009,7 +6150,7 @@ pub mod field_sets {
         }
         ///Read the `source_epr_mode_do` field of the register.
         ///
-        ///Source EPR mode data object
+        /// Source EPR mode data object
         pub fn source_epr_mode_do(&self) -> u32 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6021,7 +6162,7 @@ pub mod field_sets {
         }
         ///Read the `sink_epr_mode_do` field of the register.
         ///
-        ///Sink EPR mode data object
+        /// Sink EPR mode data object
         pub fn sink_epr_mode_do(&self) -> u32 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6033,7 +6174,7 @@ pub mod field_sets {
         }
         ///Read the `accepted_active_rdo` field of the register.
         ///
-        ///Accepted active RDO contract
+        /// Accepted active RDO contract
         pub fn accepted_active_rdo(&self) -> u32 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6045,7 +6186,7 @@ pub mod field_sets {
         }
         ///Write the `active_rdo` field of the register.
         ///
-        ///Active RDO
+        /// Active RDO
         pub fn set_active_rdo(&mut self, value: u32) {
             let raw = value;
             unsafe {
@@ -6057,7 +6198,7 @@ pub mod field_sets {
         }
         ///Write the `source_epr_mode_do` field of the register.
         ///
-        ///Source EPR mode data object
+        /// Source EPR mode data object
         pub fn set_source_epr_mode_do(&mut self, value: u32) {
             let raw = value;
             unsafe {
@@ -6069,7 +6210,7 @@ pub mod field_sets {
         }
         ///Write the `sink_epr_mode_do` field of the register.
         ///
-        ///Sink EPR mode data object
+        /// Sink EPR mode data object
         pub fn set_sink_epr_mode_do(&mut self, value: u32) {
             let raw = value;
             unsafe {
@@ -6081,7 +6222,7 @@ pub mod field_sets {
         }
         ///Write the `accepted_active_rdo` field of the register.
         ///
-        ///Accepted active RDO contract
+        /// Accepted active RDO contract
         pub fn set_accepted_active_rdo(&mut self, value: u32) {
             let raw = value;
             unsafe {
@@ -6104,25 +6245,27 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for ActiveRdoContract {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("ActiveRdoContract")
-                .field("active_rdo", &self.active_rdo())
-                .field("source_epr_mode_do", &self.source_epr_mode_do())
-                .field("sink_epr_mode_do", &self.sink_epr_mode_do())
-                .field("accepted_active_rdo", &self.accepted_active_rdo())
-                .finish()
+            let mut d = f.debug_struct("ActiveRdoContract");
+            d.field("active_rdo", &self.active_rdo());
+            d.field("source_epr_mode_do", &self.source_epr_mode_do());
+            d.field("sink_epr_mode_do", &self.sink_epr_mode_do());
+            d.field("accepted_active_rdo", &self.accepted_active_rdo());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for ActiveRdoContract {
         fn format(&self, f: defmt::Formatter) {
+            defmt::write!(f, "ActiveRdoContract {{ ");
+            defmt::write!(f, "active_rdo: {=u32}, ", & self.active_rdo());
             defmt::write!(
-                f,
-                "ActiveRdoContract {{ active_rdo: {=u32}, source_epr_mode_do: {=u32}, sink_epr_mode_do: {=u32}, accepted_active_rdo: {=u32} }}",
-                self.active_rdo(),
-                self.source_epr_mode_do(),
-                self.sink_epr_mode_do(),
-                self.accepted_active_rdo(),
-            )
+                f, "source_epr_mode_do: {=u32}, ", & self.source_epr_mode_do()
+            );
+            defmt::write!(f, "sink_epr_mode_do: {=u32}, ", & self.sink_epr_mode_do());
+            defmt::write!(
+                f, "accepted_active_rdo: {=u32}, ", & self.accepted_active_rdo()
+            );
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for ActiveRdoContract {
@@ -6176,7 +6319,7 @@ pub mod field_sets {
             self
         }
     }
-    ///PD status
+    /// PD status
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct PdStatus {
         /// The internal bits
@@ -6197,7 +6340,7 @@ pub mod field_sets {
     impl PdStatus {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
-            Self { bits: [0u8, 0u8, 0u8, 0u8] }
+            Self { bits: [0, 0, 0, 0] }
         }
         /// Create a new instance, loaded with all zeroes
         pub const fn new_zero() -> Self {
@@ -6205,7 +6348,7 @@ pub mod field_sets {
         }
         ///Read the `cc_pull_up` field of the register.
         ///
-        ///CC pull up value
+        /// CC pull up value
         pub fn cc_pull_up(&self) -> super::PdCcPullUp {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6217,7 +6360,7 @@ pub mod field_sets {
         }
         ///Read the `port_type` field of the register.
         ///
-        ///Port type
+        /// Port type
         pub fn port_type(&self) -> super::PdPortType {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6229,7 +6372,7 @@ pub mod field_sets {
         }
         ///Read the `is_source` field of the register.
         ///
-        ///Present role
+        /// Present role
         pub fn is_source(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6241,7 +6384,7 @@ pub mod field_sets {
         }
         ///Read the `soft_reset_details` field of the register.
         ///
-        ///Soft reset details
+        /// Soft reset details
         pub fn soft_reset_details(&self) -> super::PdSoftResetDetails {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6253,7 +6396,7 @@ pub mod field_sets {
         }
         ///Read the `hard_reset_details` field of the register.
         ///
-        ///Soft reset details
+        /// Soft reset details
         pub fn hard_reset_details(&self) -> super::PdHardResetDetails {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6265,7 +6408,7 @@ pub mod field_sets {
         }
         ///Read the `error_recovery_details` field of the register.
         ///
-        ///Soft reset details
+        /// Soft reset details
         pub fn error_recovery_details(&self) -> super::PdErrorRecoveryDetails {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6277,7 +6420,7 @@ pub mod field_sets {
         }
         ///Read the `data_reset_details` field of the register.
         ///
-        ///Data reset details
+        /// Data reset details
         pub fn data_reset_details(&self) -> super::PdDataResetDetails {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6289,7 +6432,7 @@ pub mod field_sets {
         }
         ///Write the `cc_pull_up` field of the register.
         ///
-        ///CC pull up value
+        /// CC pull up value
         pub fn set_cc_pull_up(&mut self, value: super::PdCcPullUp) {
             let raw = value.into();
             unsafe {
@@ -6301,7 +6444,7 @@ pub mod field_sets {
         }
         ///Write the `port_type` field of the register.
         ///
-        ///Port type
+        /// Port type
         pub fn set_port_type(&mut self, value: super::PdPortType) {
             let raw = value.into();
             unsafe {
@@ -6313,7 +6456,7 @@ pub mod field_sets {
         }
         ///Write the `is_source` field of the register.
         ///
-        ///Present role
+        /// Present role
         pub fn set_is_source(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -6325,7 +6468,7 @@ pub mod field_sets {
         }
         ///Write the `soft_reset_details` field of the register.
         ///
-        ///Soft reset details
+        /// Soft reset details
         pub fn set_soft_reset_details(&mut self, value: super::PdSoftResetDetails) {
             let raw = value.into();
             unsafe {
@@ -6337,7 +6480,7 @@ pub mod field_sets {
         }
         ///Write the `hard_reset_details` field of the register.
         ///
-        ///Soft reset details
+        /// Soft reset details
         pub fn set_hard_reset_details(&mut self, value: super::PdHardResetDetails) {
             let raw = value.into();
             unsafe {
@@ -6349,7 +6492,7 @@ pub mod field_sets {
         }
         ///Write the `error_recovery_details` field of the register.
         ///
-        ///Soft reset details
+        /// Soft reset details
         pub fn set_error_recovery_details(
             &mut self,
             value: super::PdErrorRecoveryDetails,
@@ -6364,7 +6507,7 @@ pub mod field_sets {
         }
         ///Write the `data_reset_details` field of the register.
         ///
-        ///Data reset details
+        /// Data reset details
         pub fn set_data_reset_details(&mut self, value: super::PdDataResetDetails) {
             let raw = value.into();
             unsafe {
@@ -6387,31 +6530,31 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for PdStatus {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("PdStatus")
-                .field("cc_pull_up", &self.cc_pull_up())
-                .field("port_type", &self.port_type())
-                .field("is_source", &self.is_source())
-                .field("soft_reset_details", &self.soft_reset_details())
-                .field("hard_reset_details", &self.hard_reset_details())
-                .field("error_recovery_details", &self.error_recovery_details())
-                .field("data_reset_details", &self.data_reset_details())
-                .finish()
+            let mut d = f.debug_struct("PdStatus");
+            d.field("cc_pull_up", &self.cc_pull_up());
+            d.field("port_type", &self.port_type());
+            d.field("is_source", &self.is_source());
+            d.field("soft_reset_details", &self.soft_reset_details());
+            d.field("hard_reset_details", &self.hard_reset_details());
+            d.field("error_recovery_details", &self.error_recovery_details());
+            d.field("data_reset_details", &self.data_reset_details());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for PdStatus {
         fn format(&self, f: defmt::Formatter) {
+            defmt::write!(f, "PdStatus {{ ");
+            defmt::write!(f, "cc_pull_up: {}, ", & self.cc_pull_up());
+            defmt::write!(f, "port_type: {}, ", & self.port_type());
+            defmt::write!(f, "is_source: {=bool}, ", & self.is_source());
+            defmt::write!(f, "soft_reset_details: {}, ", & self.soft_reset_details());
+            defmt::write!(f, "hard_reset_details: {}, ", & self.hard_reset_details());
             defmt::write!(
-                f,
-                "PdStatus {{ cc_pull_up: {}, port_type: {}, is_source: {=bool}, soft_reset_details: {}, hard_reset_details: {}, error_recovery_details: {}, data_reset_details: {} }}",
-                self.cc_pull_up(),
-                self.port_type(),
-                self.is_source(),
-                self.soft_reset_details(),
-                self.hard_reset_details(),
-                self.error_recovery_details(),
-                self.data_reset_details(),
-            )
+                f, "error_recovery_details: {}, ", & self.error_recovery_details()
+            );
+            defmt::write!(f, "data_reset_details: {}, ", & self.data_reset_details());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for PdStatus {
@@ -6465,7 +6608,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Display Port Configuration
+    /// Display Port Configuration
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct DpConfig {
         /// The internal bits
@@ -6487,7 +6630,7 @@ pub mod field_sets {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
             Self {
-                bits: [3u8, 6u8, 28u8, 0u8, 0u8, 1u8, 1u8, 0u8, 0u8, 0u8],
+                bits: [3, 6, 28, 0, 0, 1, 1, 0, 0, 0],
             }
         }
         /// Create a new instance, loaded with all zeroes
@@ -6496,7 +6639,7 @@ pub mod field_sets {
         }
         ///Read the `enable_dp_svid` field of the register.
         ///
-        ///Assert this bit to enable DisplayPort SVID.
+        /// Assert this bit to enable DisplayPort SVID.
         pub fn enable_dp_svid(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6508,7 +6651,7 @@ pub mod field_sets {
         }
         ///Read the `enable_dp_mode` field of the register.
         ///
-        ///Assert this bit to enable DisplayPort Alternate mode.
+        /// Assert this bit to enable DisplayPort Alternate mode.
         pub fn enable_dp_mode(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6520,7 +6663,7 @@ pub mod field_sets {
         }
         ///Read the `dp_port_capability` field of the register.
         ///
-        ///Display port capabilities
+        /// Display port capabilities
         pub fn dp_port_capability(&self) -> super::DpPortCapability {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6532,7 +6675,7 @@ pub mod field_sets {
         }
         ///Read the `dp_transport_signalling` field of the register.
         ///
-        ///Signaling for transport of DisplayPort protocol.
+        /// Signaling for transport of DisplayPort protocol.
         pub fn dp_transport_signalling(&self) -> super::DpTransportSignalling {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6544,7 +6687,7 @@ pub mod field_sets {
         }
         ///Read the `usb_data_path` field of the register.
         ///
-        ///USB data path support.
+        /// USB data path support.
         pub fn usb_data_path(&self) -> super::DpUsbDataPath {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6556,7 +6699,7 @@ pub mod field_sets {
         }
         ///Read the `dfpd_pin_assignment` field of the register.
         ///
-        ///DFP_D Pin Assignments Supported. Each bit corresponds to an allowed pin assignment. Multiple pin assignments may be allowed.
+        /// DFP_D Pin Assignments Supported. Each bit corresponds to an allowed pin assignment. Multiple pin assignments may be allowed.
         pub fn dfpd_pin_assignment(&self) -> u8 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6568,7 +6711,7 @@ pub mod field_sets {
         }
         ///Read the `ufpd_pin_assignment` field of the register.
         ///
-        ///UFP_D Pin Assignments Supported. Each bit corresponds to an allowed pin assignment. Multiple pin assignments may be allowed.
+        /// UFP_D Pin Assignments Supported. Each bit corresponds to an allowed pin assignment. Multiple pin assignments may be allowed.
         pub fn ufpd_pin_assignment(&self) -> u8 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6580,7 +6723,7 @@ pub mod field_sets {
         }
         ///Read the `multi_function_preferred` field of the register.
         ///
-        ///Assert this bit if multi-function is preferred.
+        /// Assert this bit if multi-function is preferred.
         pub fn multi_function_preferred(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6592,7 +6735,7 @@ pub mod field_sets {
         }
         ///Read the `dfpd_ufpd_connection_status` field of the register.
         ///
-        ///This field indicates the status of the connection.
+        /// This field indicates the status of the connection.
         pub fn dfpd_ufpd_connection_status(&self) -> super::DfpdUfpdConnected {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6604,7 +6747,7 @@ pub mod field_sets {
         }
         ///Read the `dp_vdo_version` field of the register.
         ///
-        ///DP VDO Version
+        /// DP VDO Version
         pub fn dp_vdo_version(&self) -> super::DpVdoVersion {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6616,7 +6759,7 @@ pub mod field_sets {
         }
         ///Read the `dp_mode_auto_entry_allowed` field of the register.
         ///
-        ///Assert this bit to enable auto-entry.
+        /// Assert this bit to enable auto-entry.
         pub fn dp_mode_auto_entry_allowed(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6628,7 +6771,7 @@ pub mod field_sets {
         }
         ///Read the `port_capability` field of the register.
         ///
-        ///Port Capability
+        /// Port Capability
         pub fn port_capability(&self) -> super::PortCapability {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6640,7 +6783,7 @@ pub mod field_sets {
         }
         ///Read the `transport_signalling` field of the register.
         ///
-        ///Transport Signalling
+        /// Transport Signalling
         pub fn transport_signalling(&self) -> u8 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6652,7 +6795,7 @@ pub mod field_sets {
         }
         ///Read the `receptacle_indication` field of the register.
         ///
-        ///Receptacle Indication.
+        /// Receptacle Indication.
         pub fn receptacle_indication(&self) -> super::ReceptacleIndication {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6664,7 +6807,7 @@ pub mod field_sets {
         }
         ///Read the `usb_2_signalling_not_used` field of the register.
         ///
-        ///USB2 signaling requirement on A6 - A7 or B6 - B7 (D+/D-) while in DP configuration.
+        /// USB2 signaling requirement on A6 - A7 or B6 - B7 (D+/D-) while in DP configuration.
         pub fn usb_2_signalling_not_used(&self) -> super::Usb2SignalingNotUsed {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6676,7 +6819,7 @@ pub mod field_sets {
         }
         ///Read the `dp_source_device_pin_assignments_supported` field of the register.
         ///
-        ///DP Source DevicePinAssignments Supported
+        /// DP Source DevicePinAssignments Supported
         pub fn dp_source_device_pin_assignments_supported(&self) -> u8 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6688,7 +6831,7 @@ pub mod field_sets {
         }
         ///Read the `dp_sink_device_pin_assignments_supported` field of the register.
         ///
-        ///DP Sink DevicePinAssignments Supported
+        /// DP Sink DevicePinAssignments Supported
         pub fn dp_sink_device_pin_assignments_supported(&self) -> u8 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6700,7 +6843,7 @@ pub mod field_sets {
         }
         ///Read the `uhbr_13` field of the register.
         ///
-        ///UHBR13
+        /// UHBR13
         pub fn uhbr_13(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6712,7 +6855,7 @@ pub mod field_sets {
         }
         ///Read the `active_component` field of the register.
         ///
-        ///ActiveComponent
+        /// ActiveComponent
         pub fn active_component(&self) -> super::ActiveComponent {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6724,7 +6867,7 @@ pub mod field_sets {
         }
         ///Read the `dpam_version` field of the register.
         ///
-        ///DPAM version
+        /// DPAM version
         pub fn dpam_version(&self) -> super::DpamVersion {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -6736,7 +6879,7 @@ pub mod field_sets {
         }
         ///Write the `enable_dp_svid` field of the register.
         ///
-        ///Assert this bit to enable DisplayPort SVID.
+        /// Assert this bit to enable DisplayPort SVID.
         pub fn set_enable_dp_svid(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -6748,7 +6891,7 @@ pub mod field_sets {
         }
         ///Write the `enable_dp_mode` field of the register.
         ///
-        ///Assert this bit to enable DisplayPort Alternate mode.
+        /// Assert this bit to enable DisplayPort Alternate mode.
         pub fn set_enable_dp_mode(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -6760,7 +6903,7 @@ pub mod field_sets {
         }
         ///Write the `dp_port_capability` field of the register.
         ///
-        ///Display port capabilities
+        /// Display port capabilities
         pub fn set_dp_port_capability(&mut self, value: super::DpPortCapability) {
             let raw = value.into();
             unsafe {
@@ -6772,7 +6915,7 @@ pub mod field_sets {
         }
         ///Write the `dp_transport_signalling` field of the register.
         ///
-        ///Signaling for transport of DisplayPort protocol.
+        /// Signaling for transport of DisplayPort protocol.
         pub fn set_dp_transport_signalling(
             &mut self,
             value: super::DpTransportSignalling,
@@ -6787,7 +6930,7 @@ pub mod field_sets {
         }
         ///Write the `usb_data_path` field of the register.
         ///
-        ///USB data path support.
+        /// USB data path support.
         pub fn set_usb_data_path(&mut self, value: super::DpUsbDataPath) {
             let raw = value.into();
             unsafe {
@@ -6799,7 +6942,7 @@ pub mod field_sets {
         }
         ///Write the `dfpd_pin_assignment` field of the register.
         ///
-        ///DFP_D Pin Assignments Supported. Each bit corresponds to an allowed pin assignment. Multiple pin assignments may be allowed.
+        /// DFP_D Pin Assignments Supported. Each bit corresponds to an allowed pin assignment. Multiple pin assignments may be allowed.
         pub fn set_dfpd_pin_assignment(&mut self, value: u8) {
             let raw = value;
             unsafe {
@@ -6811,7 +6954,7 @@ pub mod field_sets {
         }
         ///Write the `ufpd_pin_assignment` field of the register.
         ///
-        ///UFP_D Pin Assignments Supported. Each bit corresponds to an allowed pin assignment. Multiple pin assignments may be allowed.
+        /// UFP_D Pin Assignments Supported. Each bit corresponds to an allowed pin assignment. Multiple pin assignments may be allowed.
         pub fn set_ufpd_pin_assignment(&mut self, value: u8) {
             let raw = value;
             unsafe {
@@ -6823,7 +6966,7 @@ pub mod field_sets {
         }
         ///Write the `multi_function_preferred` field of the register.
         ///
-        ///Assert this bit if multi-function is preferred.
+        /// Assert this bit if multi-function is preferred.
         pub fn set_multi_function_preferred(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -6835,7 +6978,7 @@ pub mod field_sets {
         }
         ///Write the `dfpd_ufpd_connection_status` field of the register.
         ///
-        ///This field indicates the status of the connection.
+        /// This field indicates the status of the connection.
         pub fn set_dfpd_ufpd_connection_status(
             &mut self,
             value: super::DfpdUfpdConnected,
@@ -6850,7 +6993,7 @@ pub mod field_sets {
         }
         ///Write the `dp_vdo_version` field of the register.
         ///
-        ///DP VDO Version
+        /// DP VDO Version
         pub fn set_dp_vdo_version(&mut self, value: super::DpVdoVersion) {
             let raw = value.into();
             unsafe {
@@ -6862,7 +7005,7 @@ pub mod field_sets {
         }
         ///Write the `dp_mode_auto_entry_allowed` field of the register.
         ///
-        ///Assert this bit to enable auto-entry.
+        /// Assert this bit to enable auto-entry.
         pub fn set_dp_mode_auto_entry_allowed(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -6874,7 +7017,7 @@ pub mod field_sets {
         }
         ///Write the `port_capability` field of the register.
         ///
-        ///Port Capability
+        /// Port Capability
         pub fn set_port_capability(&mut self, value: super::PortCapability) {
             let raw = value.into();
             unsafe {
@@ -6886,7 +7029,7 @@ pub mod field_sets {
         }
         ///Write the `transport_signalling` field of the register.
         ///
-        ///Transport Signalling
+        /// Transport Signalling
         pub fn set_transport_signalling(&mut self, value: u8) {
             let raw = value;
             unsafe {
@@ -6898,7 +7041,7 @@ pub mod field_sets {
         }
         ///Write the `receptacle_indication` field of the register.
         ///
-        ///Receptacle Indication.
+        /// Receptacle Indication.
         pub fn set_receptacle_indication(&mut self, value: super::ReceptacleIndication) {
             let raw = value.into();
             unsafe {
@@ -6910,7 +7053,7 @@ pub mod field_sets {
         }
         ///Write the `usb_2_signalling_not_used` field of the register.
         ///
-        ///USB2 signaling requirement on A6 - A7 or B6 - B7 (D+/D-) while in DP configuration.
+        /// USB2 signaling requirement on A6 - A7 or B6 - B7 (D+/D-) while in DP configuration.
         pub fn set_usb_2_signalling_not_used(
             &mut self,
             value: super::Usb2SignalingNotUsed,
@@ -6925,7 +7068,7 @@ pub mod field_sets {
         }
         ///Write the `dp_source_device_pin_assignments_supported` field of the register.
         ///
-        ///DP Source DevicePinAssignments Supported
+        /// DP Source DevicePinAssignments Supported
         pub fn set_dp_source_device_pin_assignments_supported(&mut self, value: u8) {
             let raw = value;
             unsafe {
@@ -6937,7 +7080,7 @@ pub mod field_sets {
         }
         ///Write the `dp_sink_device_pin_assignments_supported` field of the register.
         ///
-        ///DP Sink DevicePinAssignments Supported
+        /// DP Sink DevicePinAssignments Supported
         pub fn set_dp_sink_device_pin_assignments_supported(&mut self, value: u8) {
             let raw = value;
             unsafe {
@@ -6949,7 +7092,7 @@ pub mod field_sets {
         }
         ///Write the `uhbr_13` field of the register.
         ///
-        ///UHBR13
+        /// UHBR13
         pub fn set_uhbr_13(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -6961,7 +7104,7 @@ pub mod field_sets {
         }
         ///Write the `active_component` field of the register.
         ///
-        ///ActiveComponent
+        /// ActiveComponent
         pub fn set_active_component(&mut self, value: super::ActiveComponent) {
             let raw = value.into();
             unsafe {
@@ -6973,7 +7116,7 @@ pub mod field_sets {
         }
         ///Write the `dpam_version` field of the register.
         ///
-        ///DPAM version
+        /// DPAM version
         pub fn set_dpam_version(&mut self, value: super::DpamVersion) {
             let raw = value.into();
             unsafe {
@@ -6996,66 +7139,88 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for DpConfig {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("DpConfig")
-                .field("enable_dp_svid", &self.enable_dp_svid())
-                .field("enable_dp_mode", &self.enable_dp_mode())
-                .field("dp_port_capability", &self.dp_port_capability())
-                .field("dp_transport_signalling", &self.dp_transport_signalling())
-                .field("usb_data_path", &self.usb_data_path())
-                .field("dfpd_pin_assignment", &self.dfpd_pin_assignment())
-                .field("ufpd_pin_assignment", &self.ufpd_pin_assignment())
-                .field("multi_function_preferred", &self.multi_function_preferred())
-                .field(
-                    "dfpd_ufpd_connection_status",
-                    &self.dfpd_ufpd_connection_status(),
-                )
-                .field("dp_vdo_version", &self.dp_vdo_version())
-                .field("dp_mode_auto_entry_allowed", &self.dp_mode_auto_entry_allowed())
-                .field("port_capability", &self.port_capability())
-                .field("transport_signalling", &self.transport_signalling())
-                .field("receptacle_indication", &self.receptacle_indication())
-                .field("usb_2_signalling_not_used", &self.usb_2_signalling_not_used())
-                .field(
-                    "dp_source_device_pin_assignments_supported",
-                    &self.dp_source_device_pin_assignments_supported(),
-                )
-                .field(
-                    "dp_sink_device_pin_assignments_supported",
-                    &self.dp_sink_device_pin_assignments_supported(),
-                )
-                .field("uhbr_13", &self.uhbr_13())
-                .field("active_component", &self.active_component())
-                .field("dpam_version", &self.dpam_version())
-                .finish()
+            let mut d = f.debug_struct("DpConfig");
+            d.field("enable_dp_svid", &self.enable_dp_svid());
+            d.field("enable_dp_mode", &self.enable_dp_mode());
+            d.field("dp_port_capability", &self.dp_port_capability());
+            d.field("dp_transport_signalling", &self.dp_transport_signalling());
+            d.field("usb_data_path", &self.usb_data_path());
+            d.field("dfpd_pin_assignment", &self.dfpd_pin_assignment());
+            d.field("ufpd_pin_assignment", &self.ufpd_pin_assignment());
+            d.field("multi_function_preferred", &self.multi_function_preferred());
+            d.field("dfpd_ufpd_connection_status", &self.dfpd_ufpd_connection_status());
+            d.field("dp_vdo_version", &self.dp_vdo_version());
+            d.field("dp_mode_auto_entry_allowed", &self.dp_mode_auto_entry_allowed());
+            d.field("port_capability", &self.port_capability());
+            d.field("transport_signalling", &self.transport_signalling());
+            d.field("receptacle_indication", &self.receptacle_indication());
+            d.field("usb_2_signalling_not_used", &self.usb_2_signalling_not_used());
+            d.field(
+                "dp_source_device_pin_assignments_supported",
+                &self.dp_source_device_pin_assignments_supported(),
+            );
+            d.field(
+                "dp_sink_device_pin_assignments_supported",
+                &self.dp_sink_device_pin_assignments_supported(),
+            );
+            d.field("uhbr_13", &self.uhbr_13());
+            d.field("active_component", &self.active_component());
+            d.field("dpam_version", &self.dpam_version());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for DpConfig {
         fn format(&self, f: defmt::Formatter) {
+            defmt::write!(f, "DpConfig {{ ");
+            defmt::write!(f, "enable_dp_svid: {=bool}, ", & self.enable_dp_svid());
+            defmt::write!(f, "enable_dp_mode: {=bool}, ", & self.enable_dp_mode());
+            defmt::write!(f, "dp_port_capability: {}, ", & self.dp_port_capability());
             defmt::write!(
-                f,
-                "DpConfig {{ enable_dp_svid: {=bool}, enable_dp_mode: {=bool}, dp_port_capability: {}, dp_transport_signalling: {}, usb_data_path: {}, dfpd_pin_assignment: {=u8}, ufpd_pin_assignment: {=u8}, multi_function_preferred: {=bool}, dfpd_ufpd_connection_status: {}, dp_vdo_version: {}, dp_mode_auto_entry_allowed: {=bool}, port_capability: {}, transport_signalling: {=u8}, receptacle_indication: {}, usb_2_signalling_not_used: {}, dp_source_device_pin_assignments_supported: {=u8}, dp_sink_device_pin_assignments_supported: {=u8}, uhbr_13: {=bool}, active_component: {}, dpam_version: {} }}",
-                self.enable_dp_svid(),
-                self.enable_dp_mode(),
-                self.dp_port_capability(),
-                self.dp_transport_signalling(),
-                self.usb_data_path(),
-                self.dfpd_pin_assignment(),
-                self.ufpd_pin_assignment(),
-                self.multi_function_preferred(),
-                self.dfpd_ufpd_connection_status(),
-                self.dp_vdo_version(),
-                self.dp_mode_auto_entry_allowed(),
-                self.port_capability(),
-                self.transport_signalling(),
-                self.receptacle_indication(),
-                self.usb_2_signalling_not_used(),
-                self.dp_source_device_pin_assignments_supported(),
-                self.dp_sink_device_pin_assignments_supported(),
-                self.uhbr_13(),
-                self.active_component(),
-                self.dpam_version(),
-            )
+                f, "dp_transport_signalling: {}, ", & self.dp_transport_signalling()
+            );
+            defmt::write!(f, "usb_data_path: {}, ", & self.usb_data_path());
+            defmt::write!(
+                f, "dfpd_pin_assignment: {=u8}, ", & self.dfpd_pin_assignment()
+            );
+            defmt::write!(
+                f, "ufpd_pin_assignment: {=u8}, ", & self.ufpd_pin_assignment()
+            );
+            defmt::write!(
+                f, "multi_function_preferred: {=bool}, ", & self
+                .multi_function_preferred()
+            );
+            defmt::write!(
+                f, "dfpd_ufpd_connection_status: {}, ", & self
+                .dfpd_ufpd_connection_status()
+            );
+            defmt::write!(f, "dp_vdo_version: {}, ", & self.dp_vdo_version());
+            defmt::write!(
+                f, "dp_mode_auto_entry_allowed: {=bool}, ", & self
+                .dp_mode_auto_entry_allowed()
+            );
+            defmt::write!(f, "port_capability: {}, ", & self.port_capability());
+            defmt::write!(
+                f, "transport_signalling: {=u8}, ", & self.transport_signalling()
+            );
+            defmt::write!(
+                f, "receptacle_indication: {}, ", & self.receptacle_indication()
+            );
+            defmt::write!(
+                f, "usb_2_signalling_not_used: {}, ", & self.usb_2_signalling_not_used()
+            );
+            defmt::write!(
+                f, "dp_source_device_pin_assignments_supported: {=u8}, ", & self
+                .dp_source_device_pin_assignments_supported()
+            );
+            defmt::write!(
+                f, "dp_sink_device_pin_assignments_supported: {=u8}, ", & self
+                .dp_sink_device_pin_assignments_supported()
+            );
+            defmt::write!(f, "uhbr_13: {=bool}, ", & self.uhbr_13());
+            defmt::write!(f, "active_component: {}, ", & self.active_component());
+            defmt::write!(f, "dpam_version: {}, ", & self.dpam_version());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for DpConfig {
@@ -7109,7 +7274,6 @@ pub mod field_sets {
             self
         }
     }
-    ///
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct TbtConfig {
         /// The internal bits
@@ -7131,7 +7295,7 @@ pub mod field_sets {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
             Self {
-                bits: [0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8],
+                bits: [0, 0, 0, 0, 0, 0, 0, 0],
             }
         }
         /// Create a new instance, loaded with all zeroes
@@ -7140,7 +7304,7 @@ pub mod field_sets {
         }
         ///Read the `tbt_vid_en` field of the register.
         ///
-        ///Assert this bit to enable Thunderbolt VID.
+        /// Assert this bit to enable Thunderbolt VID.
         pub fn tbt_vid_en(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7152,7 +7316,7 @@ pub mod field_sets {
         }
         ///Read the `tbt_mode_en` field of the register.
         ///
-        ///Assert this bit to enable TBT mode.
+        /// Assert this bit to enable TBT mode.
         pub fn tbt_mode_en(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7164,7 +7328,7 @@ pub mod field_sets {
         }
         ///Read the `advertise_900_ma_implicit_contract` field of the register.
         ///
-        ///Advertise 900mA Implicit Contract.
+        /// Advertise 900mA Implicit Contract.
         pub fn advertise_900_ma_implicit_contract(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7176,7 +7340,7 @@ pub mod field_sets {
         }
         ///Read the `i_2_c_3_power_on_delay` field of the register.
         ///
-        ///Delay for the Controller I2C commands at power on.
+        /// Delay for the Controller I2C commands at power on.
         pub fn i_2_c_3_power_on_delay(&self) -> u8 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7188,7 +7352,7 @@ pub mod field_sets {
         }
         ///Read the `pl_4_handling_en` field of the register.
         ///
-        ///Enable PL4 Handling.
+        /// Enable PL4 Handling.
         pub fn pl_4_handling_en(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7200,7 +7364,7 @@ pub mod field_sets {
         }
         ///Read the `tbt_emarker_override` field of the register.
         ///
-        ///Configuration for non-responsive Cable Plug.
+        /// Configuration for non-responsive Cable Plug.
         pub fn tbt_emarker_override(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7212,7 +7376,7 @@ pub mod field_sets {
         }
         ///Read the `an_min_power_required` field of the register.
         ///
-        ///Power required for TBT mode entry.
+        /// Power required for TBT mode entry.
         pub fn an_min_power_required(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7224,7 +7388,7 @@ pub mod field_sets {
         }
         ///Read the `dual_tbt_retimer_present` field of the register.
         ///
-        ///Assert this bit when there is a second TBT retimer on this port.
+        /// Assert this bit when there is a second TBT retimer on this port.
         pub fn dual_tbt_retimer_present(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7236,7 +7400,7 @@ pub mod field_sets {
         }
         ///Read the `tbt_retimer_present` field of the register.
         ///
-        ///Assert this bit when there is a TBT retimer on this port.
+        /// Assert this bit when there is a TBT retimer on this port.
         pub fn tbt_retimer_present(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7248,7 +7412,7 @@ pub mod field_sets {
         }
         ///Read the `data_status_hpd_events` field of the register.
         ///
-        ///This bit controls how HPD events are configured.
+        /// This bit controls how HPD events are configured.
         pub fn data_status_hpd_events(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7260,7 +7424,7 @@ pub mod field_sets {
         }
         ///Read the `retimer_compliance_support` field of the register.
         ///
-        ///Assert this bit causes the PD controller to place an attached Intel Retimer into compliance mode.
+        /// Assert this bit causes the PD controller to place an attached Intel Retimer into compliance mode.
         pub fn retimer_compliance_support(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7272,7 +7436,7 @@ pub mod field_sets {
         }
         ///Read the `legacy_tbt_adapter` field of the register.
         ///
-        ///Legacy TBT Adapter.
+        /// Legacy TBT Adapter.
         pub fn legacy_tbt_adapter(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7284,7 +7448,7 @@ pub mod field_sets {
         }
         ///Read the `tbt_auto_entry_allowed` field of the register.
         ///
-        ///Assert this bit to enable TBT auto-entry.
+        /// Assert this bit to enable TBT auto-entry.
         pub fn tbt_auto_entry_allowed(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7296,7 +7460,7 @@ pub mod field_sets {
         }
         ///Read the `usb_data_path` field of the register.
         ///
-        ///USB data path support.
+        /// USB data path support.
         pub fn usb_data_path(&self) -> super::TbtUsbDataPath {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7308,7 +7472,7 @@ pub mod field_sets {
         }
         ///Read the `source_vconn_delay` field of the register.
         ///
-        ///Configurable delay for BR.
+        /// Configurable delay for BR.
         pub fn source_vconn_delay(&self) -> u8 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7320,7 +7484,7 @@ pub mod field_sets {
         }
         ///Write the `tbt_vid_en` field of the register.
         ///
-        ///Assert this bit to enable Thunderbolt VID.
+        /// Assert this bit to enable Thunderbolt VID.
         pub fn set_tbt_vid_en(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7332,7 +7496,7 @@ pub mod field_sets {
         }
         ///Write the `tbt_mode_en` field of the register.
         ///
-        ///Assert this bit to enable TBT mode.
+        /// Assert this bit to enable TBT mode.
         pub fn set_tbt_mode_en(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7344,7 +7508,7 @@ pub mod field_sets {
         }
         ///Write the `advertise_900_ma_implicit_contract` field of the register.
         ///
-        ///Advertise 900mA Implicit Contract.
+        /// Advertise 900mA Implicit Contract.
         pub fn set_advertise_900_ma_implicit_contract(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7356,7 +7520,7 @@ pub mod field_sets {
         }
         ///Write the `i_2_c_3_power_on_delay` field of the register.
         ///
-        ///Delay for the Controller I2C commands at power on.
+        /// Delay for the Controller I2C commands at power on.
         pub fn set_i_2_c_3_power_on_delay(&mut self, value: u8) {
             let raw = value;
             unsafe {
@@ -7368,7 +7532,7 @@ pub mod field_sets {
         }
         ///Write the `pl_4_handling_en` field of the register.
         ///
-        ///Enable PL4 Handling.
+        /// Enable PL4 Handling.
         pub fn set_pl_4_handling_en(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7380,7 +7544,7 @@ pub mod field_sets {
         }
         ///Write the `tbt_emarker_override` field of the register.
         ///
-        ///Configuration for non-responsive Cable Plug.
+        /// Configuration for non-responsive Cable Plug.
         pub fn set_tbt_emarker_override(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7392,7 +7556,7 @@ pub mod field_sets {
         }
         ///Write the `an_min_power_required` field of the register.
         ///
-        ///Power required for TBT mode entry.
+        /// Power required for TBT mode entry.
         pub fn set_an_min_power_required(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7404,7 +7568,7 @@ pub mod field_sets {
         }
         ///Write the `dual_tbt_retimer_present` field of the register.
         ///
-        ///Assert this bit when there is a second TBT retimer on this port.
+        /// Assert this bit when there is a second TBT retimer on this port.
         pub fn set_dual_tbt_retimer_present(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7416,7 +7580,7 @@ pub mod field_sets {
         }
         ///Write the `tbt_retimer_present` field of the register.
         ///
-        ///Assert this bit when there is a TBT retimer on this port.
+        /// Assert this bit when there is a TBT retimer on this port.
         pub fn set_tbt_retimer_present(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7428,7 +7592,7 @@ pub mod field_sets {
         }
         ///Write the `data_status_hpd_events` field of the register.
         ///
-        ///This bit controls how HPD events are configured.
+        /// This bit controls how HPD events are configured.
         pub fn set_data_status_hpd_events(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7440,7 +7604,7 @@ pub mod field_sets {
         }
         ///Write the `retimer_compliance_support` field of the register.
         ///
-        ///Assert this bit causes the PD controller to place an attached Intel Retimer into compliance mode.
+        /// Assert this bit causes the PD controller to place an attached Intel Retimer into compliance mode.
         pub fn set_retimer_compliance_support(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7452,7 +7616,7 @@ pub mod field_sets {
         }
         ///Write the `legacy_tbt_adapter` field of the register.
         ///
-        ///Legacy TBT Adapter.
+        /// Legacy TBT Adapter.
         pub fn set_legacy_tbt_adapter(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7464,7 +7628,7 @@ pub mod field_sets {
         }
         ///Write the `tbt_auto_entry_allowed` field of the register.
         ///
-        ///Assert this bit to enable TBT auto-entry.
+        /// Assert this bit to enable TBT auto-entry.
         pub fn set_tbt_auto_entry_allowed(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7476,7 +7640,7 @@ pub mod field_sets {
         }
         ///Write the `usb_data_path` field of the register.
         ///
-        ///USB data path support.
+        /// USB data path support.
         pub fn set_usb_data_path(&mut self, value: super::TbtUsbDataPath) {
             let raw = value.into();
             unsafe {
@@ -7488,7 +7652,7 @@ pub mod field_sets {
         }
         ///Write the `source_vconn_delay` field of the register.
         ///
-        ///Configurable delay for BR.
+        /// Configurable delay for BR.
         pub fn set_source_vconn_delay(&mut self, value: u8) {
             let raw = value;
             unsafe {
@@ -7511,50 +7675,71 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for TbtConfig {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("TbtConfig")
-                .field("tbt_vid_en", &self.tbt_vid_en())
-                .field("tbt_mode_en", &self.tbt_mode_en())
-                .field(
-                    "advertise_900_ma_implicit_contract",
-                    &self.advertise_900_ma_implicit_contract(),
-                )
-                .field("i_2_c_3_power_on_delay", &self.i_2_c_3_power_on_delay())
-                .field("pl_4_handling_en", &self.pl_4_handling_en())
-                .field("tbt_emarker_override", &self.tbt_emarker_override())
-                .field("an_min_power_required", &self.an_min_power_required())
-                .field("dual_tbt_retimer_present", &self.dual_tbt_retimer_present())
-                .field("tbt_retimer_present", &self.tbt_retimer_present())
-                .field("data_status_hpd_events", &self.data_status_hpd_events())
-                .field("retimer_compliance_support", &self.retimer_compliance_support())
-                .field("legacy_tbt_adapter", &self.legacy_tbt_adapter())
-                .field("tbt_auto_entry_allowed", &self.tbt_auto_entry_allowed())
-                .field("usb_data_path", &self.usb_data_path())
-                .field("source_vconn_delay", &self.source_vconn_delay())
-                .finish()
+            let mut d = f.debug_struct("TbtConfig");
+            d.field("tbt_vid_en", &self.tbt_vid_en());
+            d.field("tbt_mode_en", &self.tbt_mode_en());
+            d.field(
+                "advertise_900_ma_implicit_contract",
+                &self.advertise_900_ma_implicit_contract(),
+            );
+            d.field("i_2_c_3_power_on_delay", &self.i_2_c_3_power_on_delay());
+            d.field("pl_4_handling_en", &self.pl_4_handling_en());
+            d.field("tbt_emarker_override", &self.tbt_emarker_override());
+            d.field("an_min_power_required", &self.an_min_power_required());
+            d.field("dual_tbt_retimer_present", &self.dual_tbt_retimer_present());
+            d.field("tbt_retimer_present", &self.tbt_retimer_present());
+            d.field("data_status_hpd_events", &self.data_status_hpd_events());
+            d.field("retimer_compliance_support", &self.retimer_compliance_support());
+            d.field("legacy_tbt_adapter", &self.legacy_tbt_adapter());
+            d.field("tbt_auto_entry_allowed", &self.tbt_auto_entry_allowed());
+            d.field("usb_data_path", &self.usb_data_path());
+            d.field("source_vconn_delay", &self.source_vconn_delay());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for TbtConfig {
         fn format(&self, f: defmt::Formatter) {
+            defmt::write!(f, "TbtConfig {{ ");
+            defmt::write!(f, "tbt_vid_en: {=bool}, ", & self.tbt_vid_en());
+            defmt::write!(f, "tbt_mode_en: {=bool}, ", & self.tbt_mode_en());
             defmt::write!(
-                f,
-                "TbtConfig {{ tbt_vid_en: {=bool}, tbt_mode_en: {=bool}, advertise_900_ma_implicit_contract: {=bool}, i_2_c_3_power_on_delay: {=u8}, pl_4_handling_en: {=bool}, tbt_emarker_override: {=bool}, an_min_power_required: {=bool}, dual_tbt_retimer_present: {=bool}, tbt_retimer_present: {=bool}, data_status_hpd_events: {=bool}, retimer_compliance_support: {=bool}, legacy_tbt_adapter: {=bool}, tbt_auto_entry_allowed: {=bool}, usb_data_path: {}, source_vconn_delay: {=u8} }}",
-                self.tbt_vid_en(),
-                self.tbt_mode_en(),
-                self.advertise_900_ma_implicit_contract(),
-                self.i_2_c_3_power_on_delay(),
-                self.pl_4_handling_en(),
-                self.tbt_emarker_override(),
-                self.an_min_power_required(),
-                self.dual_tbt_retimer_present(),
-                self.tbt_retimer_present(),
-                self.data_status_hpd_events(),
-                self.retimer_compliance_support(),
-                self.legacy_tbt_adapter(),
-                self.tbt_auto_entry_allowed(),
-                self.usb_data_path(),
-                self.source_vconn_delay(),
-            )
+                f, "advertise_900_ma_implicit_contract: {=bool}, ", & self
+                .advertise_900_ma_implicit_contract()
+            );
+            defmt::write!(
+                f, "i_2_c_3_power_on_delay: {=u8}, ", & self.i_2_c_3_power_on_delay()
+            );
+            defmt::write!(f, "pl_4_handling_en: {=bool}, ", & self.pl_4_handling_en());
+            defmt::write!(
+                f, "tbt_emarker_override: {=bool}, ", & self.tbt_emarker_override()
+            );
+            defmt::write!(
+                f, "an_min_power_required: {=bool}, ", & self.an_min_power_required()
+            );
+            defmt::write!(
+                f, "dual_tbt_retimer_present: {=bool}, ", & self
+                .dual_tbt_retimer_present()
+            );
+            defmt::write!(
+                f, "tbt_retimer_present: {=bool}, ", & self.tbt_retimer_present()
+            );
+            defmt::write!(
+                f, "data_status_hpd_events: {=bool}, ", & self.data_status_hpd_events()
+            );
+            defmt::write!(
+                f, "retimer_compliance_support: {=bool}, ", & self
+                .retimer_compliance_support()
+            );
+            defmt::write!(
+                f, "legacy_tbt_adapter: {=bool}, ", & self.legacy_tbt_adapter()
+            );
+            defmt::write!(
+                f, "tbt_auto_entry_allowed: {=bool}, ", & self.tbt_auto_entry_allowed()
+            );
+            defmt::write!(f, "usb_data_path: {}, ", & self.usb_data_path());
+            defmt::write!(f, "source_vconn_delay: {=u8}, ", & self.source_vconn_delay());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for TbtConfig {
@@ -7608,7 +7793,6 @@ pub mod field_sets {
             self
         }
     }
-    ///
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct UserVidStatus {
         /// The internal bits
@@ -7629,7 +7813,7 @@ pub mod field_sets {
     impl UserVidStatus {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
-            Self { bits: [0u8, 0u8] }
+            Self { bits: [0, 0] }
         }
         /// Create a new instance, loaded with all zeroes
         pub const fn new_zero() -> Self {
@@ -7637,7 +7821,7 @@ pub mod field_sets {
         }
         ///Read the `usvid_detected` field of the register.
         ///
-        ///Asserted when a User VID has been detected.
+        /// Asserted when a User VID has been detected.
         pub fn usvid_detected(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7649,7 +7833,7 @@ pub mod field_sets {
         }
         ///Read the `usvid_active` field of the register.
         ///
-        ///Asserted when a User VID is active.
+        /// Asserted when a User VID is active.
         pub fn usvid_active(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7661,7 +7845,7 @@ pub mod field_sets {
         }
         ///Read the `usvid_error_code` field of the register.
         ///
-        ///Error code
+        /// Error code
         pub fn usvid_error_code(&self) -> u8 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7673,7 +7857,7 @@ pub mod field_sets {
         }
         ///Read the `mode_1` field of the register.
         ///
-        ///Asserted when Mode1 has been entered
+        /// Asserted when Mode1 has been entered
         pub fn mode_1(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7685,7 +7869,7 @@ pub mod field_sets {
         }
         ///Read the `mode_2` field of the register.
         ///
-        ///Asserted when Mode2 has been entered
+        /// Asserted when Mode2 has been entered
         pub fn mode_2(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7697,7 +7881,7 @@ pub mod field_sets {
         }
         ///Read the `mode_3` field of the register.
         ///
-        ///Asserted when Mode3 has been entered
+        /// Asserted when Mode3 has been entered
         pub fn mode_3(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7709,7 +7893,7 @@ pub mod field_sets {
         }
         ///Read the `mode_4` field of the register.
         ///
-        ///Asserted when Mode4 has been entered
+        /// Asserted when Mode4 has been entered
         pub fn mode_4(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7721,7 +7905,7 @@ pub mod field_sets {
         }
         ///Write the `usvid_detected` field of the register.
         ///
-        ///Asserted when a User VID has been detected.
+        /// Asserted when a User VID has been detected.
         pub fn set_usvid_detected(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7733,7 +7917,7 @@ pub mod field_sets {
         }
         ///Write the `usvid_active` field of the register.
         ///
-        ///Asserted when a User VID is active.
+        /// Asserted when a User VID is active.
         pub fn set_usvid_active(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7745,7 +7929,7 @@ pub mod field_sets {
         }
         ///Write the `usvid_error_code` field of the register.
         ///
-        ///Error code
+        /// Error code
         pub fn set_usvid_error_code(&mut self, value: u8) {
             let raw = value;
             unsafe {
@@ -7757,7 +7941,7 @@ pub mod field_sets {
         }
         ///Write the `mode_1` field of the register.
         ///
-        ///Asserted when Mode1 has been entered
+        /// Asserted when Mode1 has been entered
         pub fn set_mode_1(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7769,7 +7953,7 @@ pub mod field_sets {
         }
         ///Write the `mode_2` field of the register.
         ///
-        ///Asserted when Mode2 has been entered
+        /// Asserted when Mode2 has been entered
         pub fn set_mode_2(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7781,7 +7965,7 @@ pub mod field_sets {
         }
         ///Write the `mode_3` field of the register.
         ///
-        ///Asserted when Mode3 has been entered
+        /// Asserted when Mode3 has been entered
         pub fn set_mode_3(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7793,7 +7977,7 @@ pub mod field_sets {
         }
         ///Write the `mode_4` field of the register.
         ///
-        ///Asserted when Mode4 has been entered
+        /// Asserted when Mode4 has been entered
         pub fn set_mode_4(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -7816,31 +8000,29 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for UserVidStatus {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("UserVidStatus")
-                .field("usvid_detected", &self.usvid_detected())
-                .field("usvid_active", &self.usvid_active())
-                .field("usvid_error_code", &self.usvid_error_code())
-                .field("mode_1", &self.mode_1())
-                .field("mode_2", &self.mode_2())
-                .field("mode_3", &self.mode_3())
-                .field("mode_4", &self.mode_4())
-                .finish()
+            let mut d = f.debug_struct("UserVidStatus");
+            d.field("usvid_detected", &self.usvid_detected());
+            d.field("usvid_active", &self.usvid_active());
+            d.field("usvid_error_code", &self.usvid_error_code());
+            d.field("mode_1", &self.mode_1());
+            d.field("mode_2", &self.mode_2());
+            d.field("mode_3", &self.mode_3());
+            d.field("mode_4", &self.mode_4());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for UserVidStatus {
         fn format(&self, f: defmt::Formatter) {
-            defmt::write!(
-                f,
-                "UserVidStatus {{ usvid_detected: {=bool}, usvid_active: {=bool}, usvid_error_code: {=u8}, mode_1: {=bool}, mode_2: {=bool}, mode_3: {=bool}, mode_4: {=bool} }}",
-                self.usvid_detected(),
-                self.usvid_active(),
-                self.usvid_error_code(),
-                self.mode_1(),
-                self.mode_2(),
-                self.mode_3(),
-                self.mode_4(),
-            )
+            defmt::write!(f, "UserVidStatus {{ ");
+            defmt::write!(f, "usvid_detected: {=bool}, ", & self.usvid_detected());
+            defmt::write!(f, "usvid_active: {=bool}, ", & self.usvid_active());
+            defmt::write!(f, "usvid_error_code: {=u8}, ", & self.usvid_error_code());
+            defmt::write!(f, "mode_1: {=bool}, ", & self.mode_1());
+            defmt::write!(f, "mode_2: {=bool}, ", & self.mode_2());
+            defmt::write!(f, "mode_3: {=bool}, ", & self.mode_3());
+            defmt::write!(f, "mode_4: {=bool}, ", & self.mode_4());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for UserVidStatus {
@@ -7894,7 +8076,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Intel VID status
+    /// Intel VID status
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct IntelVidStatus {
         /// The internal bits
@@ -7916,7 +8098,7 @@ pub mod field_sets {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
             Self {
-                bits: [0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8],
+                bits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             }
         }
         /// Create a new instance, loaded with all zeroes
@@ -7925,7 +8107,7 @@ pub mod field_sets {
         }
         ///Read the `intel_vid_detected` field of the register.
         ///
-        ///Indicates if Intel VID is detected.
+        /// Indicates if Intel VID is detected.
         pub fn intel_vid_detected(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7937,7 +8119,7 @@ pub mod field_sets {
         }
         ///Read the `tbt_mode_active` field of the register.
         ///
-        ///Indicates if TBT Mode is active.
+        /// Indicates if TBT Mode is active.
         pub fn tbt_mode_active(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7949,7 +8131,7 @@ pub mod field_sets {
         }
         ///Read the `forced_tbt_mode` field of the register.
         ///
-        ///Retimer in TBT state and ready for FW update
+        /// Retimer in TBT state and ready for FW update
         pub fn forced_tbt_mode(&self) -> bool {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7961,7 +8143,7 @@ pub mod field_sets {
         }
         ///Read the `tbt_attention_data` field of the register.
         ///
-        ///Attention message contents
+        /// Attention message contents
         pub fn tbt_attention_data(&self) -> u32 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7973,7 +8155,7 @@ pub mod field_sets {
         }
         ///Read the `tbt_enter_mode_data` field of the register.
         ///
-        ///Data for TBT Enter mode message
+        /// Data for TBT Enter mode message
         pub fn tbt_enter_mode_data(&self) -> u16 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7985,7 +8167,7 @@ pub mod field_sets {
         }
         ///Read the `tbt_mode_data_rx_sop` field of the register.
         ///
-        ///Data for Discover Modes response
+        /// Data for Discover Modes response
         pub fn tbt_mode_data_rx_sop(&self) -> u16 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -7997,7 +8179,7 @@ pub mod field_sets {
         }
         ///Read the `tbt_mode_data_rx_sop_prime` field of the register.
         ///
-        ///Data for Discover Modes (SOP')
+        /// Data for Discover Modes (SOP')
         pub fn tbt_mode_data_rx_sop_prime(&self) -> u16 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -8009,7 +8191,7 @@ pub mod field_sets {
         }
         ///Write the `intel_vid_detected` field of the register.
         ///
-        ///Indicates if Intel VID is detected.
+        /// Indicates if Intel VID is detected.
         pub fn set_intel_vid_detected(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -8021,7 +8203,7 @@ pub mod field_sets {
         }
         ///Write the `tbt_mode_active` field of the register.
         ///
-        ///Indicates if TBT Mode is active.
+        /// Indicates if TBT Mode is active.
         pub fn set_tbt_mode_active(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -8033,7 +8215,7 @@ pub mod field_sets {
         }
         ///Write the `forced_tbt_mode` field of the register.
         ///
-        ///Retimer in TBT state and ready for FW update
+        /// Retimer in TBT state and ready for FW update
         pub fn set_forced_tbt_mode(&mut self, value: bool) {
             let raw = value as _;
             unsafe {
@@ -8045,7 +8227,7 @@ pub mod field_sets {
         }
         ///Write the `tbt_attention_data` field of the register.
         ///
-        ///Attention message contents
+        /// Attention message contents
         pub fn set_tbt_attention_data(&mut self, value: u32) {
             let raw = value;
             unsafe {
@@ -8057,7 +8239,7 @@ pub mod field_sets {
         }
         ///Write the `tbt_enter_mode_data` field of the register.
         ///
-        ///Data for TBT Enter mode message
+        /// Data for TBT Enter mode message
         pub fn set_tbt_enter_mode_data(&mut self, value: u16) {
             let raw = value;
             unsafe {
@@ -8069,7 +8251,7 @@ pub mod field_sets {
         }
         ///Write the `tbt_mode_data_rx_sop` field of the register.
         ///
-        ///Data for Discover Modes response
+        /// Data for Discover Modes response
         pub fn set_tbt_mode_data_rx_sop(&mut self, value: u16) {
             let raw = value;
             unsafe {
@@ -8081,7 +8263,7 @@ pub mod field_sets {
         }
         ///Write the `tbt_mode_data_rx_sop_prime` field of the register.
         ///
-        ///Data for Discover Modes (SOP')
+        /// Data for Discover Modes (SOP')
         pub fn set_tbt_mode_data_rx_sop_prime(&mut self, value: u16) {
             let raw = value;
             unsafe {
@@ -8104,31 +8286,40 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for IntelVidStatus {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("IntelVidStatus")
-                .field("intel_vid_detected", &self.intel_vid_detected())
-                .field("tbt_mode_active", &self.tbt_mode_active())
-                .field("forced_tbt_mode", &self.forced_tbt_mode())
-                .field("tbt_attention_data", &self.tbt_attention_data())
-                .field("tbt_enter_mode_data", &self.tbt_enter_mode_data())
-                .field("tbt_mode_data_rx_sop", &self.tbt_mode_data_rx_sop())
-                .field("tbt_mode_data_rx_sop_prime", &self.tbt_mode_data_rx_sop_prime())
-                .finish()
+            let mut d = f.debug_struct("IntelVidStatus");
+            d.field("intel_vid_detected", &self.intel_vid_detected());
+            d.field("tbt_mode_active", &self.tbt_mode_active());
+            d.field("forced_tbt_mode", &self.forced_tbt_mode());
+            d.field("tbt_attention_data", &self.tbt_attention_data());
+            d.field("tbt_enter_mode_data", &self.tbt_enter_mode_data());
+            d.field("tbt_mode_data_rx_sop", &self.tbt_mode_data_rx_sop());
+            d.field("tbt_mode_data_rx_sop_prime", &self.tbt_mode_data_rx_sop_prime());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for IntelVidStatus {
         fn format(&self, f: defmt::Formatter) {
+            defmt::write!(f, "IntelVidStatus {{ ");
             defmt::write!(
-                f,
-                "IntelVidStatus {{ intel_vid_detected: {=bool}, tbt_mode_active: {=bool}, forced_tbt_mode: {=bool}, tbt_attention_data: {=u32}, tbt_enter_mode_data: {=u16}, tbt_mode_data_rx_sop: {=u16}, tbt_mode_data_rx_sop_prime: {=u16} }}",
-                self.intel_vid_detected(),
-                self.tbt_mode_active(),
-                self.forced_tbt_mode(),
-                self.tbt_attention_data(),
-                self.tbt_enter_mode_data(),
-                self.tbt_mode_data_rx_sop(),
-                self.tbt_mode_data_rx_sop_prime(),
-            )
+                f, "intel_vid_detected: {=bool}, ", & self.intel_vid_detected()
+            );
+            defmt::write!(f, "tbt_mode_active: {=bool}, ", & self.tbt_mode_active());
+            defmt::write!(f, "forced_tbt_mode: {=bool}, ", & self.forced_tbt_mode());
+            defmt::write!(
+                f, "tbt_attention_data: {=u32}, ", & self.tbt_attention_data()
+            );
+            defmt::write!(
+                f, "tbt_enter_mode_data: {=u16}, ", & self.tbt_enter_mode_data()
+            );
+            defmt::write!(
+                f, "tbt_mode_data_rx_sop: {=u16}, ", & self.tbt_mode_data_rx_sop()
+            );
+            defmt::write!(
+                f, "tbt_mode_data_rx_sop_prime: {=u16}, ", & self
+                .tbt_mode_data_rx_sop_prime()
+            );
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for IntelVidStatus {
@@ -8182,7 +8373,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Received User SVID Attention VDM
+    /// Received User SVID Attention VDM
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct RxAttnVdm {
         /// The internal bits
@@ -8204,7 +8395,7 @@ pub mod field_sets {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
             Self {
-                bits: [0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8],
+                bits: [0, 0, 0, 0, 0, 0, 0, 0, 0],
             }
         }
         /// Create a new instance, loaded with all zeroes
@@ -8213,7 +8404,7 @@ pub mod field_sets {
         }
         ///Read the `num_of_valid_vdos` field of the register.
         ///
-        ///Number of valid Vdos received
+        /// Number of valid Vdos received
         pub fn num_of_valid_vdos(&self) -> u8 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -8225,7 +8416,7 @@ pub mod field_sets {
         }
         ///Read the `seq_num` field of the register.
         ///
-        ///Increments by one every time this register is updated
+        /// Increments by one every time this register is updated
         pub fn seq_num(&self) -> u8 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -8237,7 +8428,7 @@ pub mod field_sets {
         }
         ///Read the `vdm_header` field of the register.
         ///
-        ///VDM header, Rx Vdm data object 1
+        /// VDM header, Rx Vdm data object 1
         pub fn vdm_header(&self) -> u32 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -8249,7 +8440,7 @@ pub mod field_sets {
         }
         ///Read the `vdo` field of the register.
         ///
-        ///VDM data object, Rx Vdm data object 2
+        /// VDM data object, Rx Vdm data object 2
         pub fn vdo(&self) -> u32 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -8261,7 +8452,7 @@ pub mod field_sets {
         }
         ///Write the `num_of_valid_vdos` field of the register.
         ///
-        ///Number of valid Vdos received
+        /// Number of valid Vdos received
         pub fn set_num_of_valid_vdos(&mut self, value: u8) {
             let raw = value;
             unsafe {
@@ -8273,7 +8464,7 @@ pub mod field_sets {
         }
         ///Write the `seq_num` field of the register.
         ///
-        ///Increments by one every time this register is updated
+        /// Increments by one every time this register is updated
         pub fn set_seq_num(&mut self, value: u8) {
             let raw = value;
             unsafe {
@@ -8285,7 +8476,7 @@ pub mod field_sets {
         }
         ///Write the `vdm_header` field of the register.
         ///
-        ///VDM header, Rx Vdm data object 1
+        /// VDM header, Rx Vdm data object 1
         pub fn set_vdm_header(&mut self, value: u32) {
             let raw = value;
             unsafe {
@@ -8297,7 +8488,7 @@ pub mod field_sets {
         }
         ///Write the `vdo` field of the register.
         ///
-        ///VDM data object, Rx Vdm data object 2
+        /// VDM data object, Rx Vdm data object 2
         pub fn set_vdo(&mut self, value: u32) {
             let raw = value;
             unsafe {
@@ -8320,25 +8511,23 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for RxAttnVdm {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("RxAttnVdm")
-                .field("num_of_valid_vdos", &self.num_of_valid_vdos())
-                .field("seq_num", &self.seq_num())
-                .field("vdm_header", &self.vdm_header())
-                .field("vdo", &self.vdo())
-                .finish()
+            let mut d = f.debug_struct("RxAttnVdm");
+            d.field("num_of_valid_vdos", &self.num_of_valid_vdos());
+            d.field("seq_num", &self.seq_num());
+            d.field("vdm_header", &self.vdm_header());
+            d.field("vdo", &self.vdo());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for RxAttnVdm {
         fn format(&self, f: defmt::Formatter) {
-            defmt::write!(
-                f,
-                "RxAttnVdm {{ num_of_valid_vdos: {=u8}, seq_num: {=u8}, vdm_header: {=u32}, vdo: {=u32} }}",
-                self.num_of_valid_vdos(),
-                self.seq_num(),
-                self.vdm_header(),
-                self.vdo(),
-            )
+            defmt::write!(f, "RxAttnVdm {{ ");
+            defmt::write!(f, "num_of_valid_vdos: {=u8}, ", & self.num_of_valid_vdos());
+            defmt::write!(f, "seq_num: {=u8}, ", & self.seq_num());
+            defmt::write!(f, "vdm_header: {=u32}, ", & self.vdm_header());
+            defmt::write!(f, "vdo: {=u32}, ", & self.vdo());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for RxAttnVdm {
@@ -8392,7 +8581,7 @@ pub mod field_sets {
             self
         }
     }
-    ///Received ADO
+    /// Received ADO
     #[derive(Copy, Clone, Eq, PartialEq)]
     pub struct RxAdo {
         /// The internal bits
@@ -8413,7 +8602,7 @@ pub mod field_sets {
     impl RxAdo {
         /// Create a new instance, loaded with the reset value (if any)
         pub const fn new() -> Self {
-            Self { bits: [0u8, 0u8, 0u8, 0u8] }
+            Self { bits: [0, 0, 0, 0] }
         }
         /// Create a new instance, loaded with all zeroes
         pub const fn new_zero() -> Self {
@@ -8421,7 +8610,7 @@ pub mod field_sets {
         }
         ///Read the `ado` field of the register.
         ///
-        ///ADO
+        /// ADO
         pub fn ado(&self) -> u32 {
             let raw = unsafe {
                 ::device_driver::ops::load_lsb0::<
@@ -8433,7 +8622,7 @@ pub mod field_sets {
         }
         ///Write the `ado` field of the register.
         ///
-        ///ADO
+        /// ADO
         pub fn set_ado(&mut self, value: u32) {
             let raw = value;
             unsafe {
@@ -8456,13 +8645,17 @@ pub mod field_sets {
     }
     impl core::fmt::Debug for RxAdo {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
-            f.debug_struct("RxAdo").field("ado", &self.ado()).finish()
+            let mut d = f.debug_struct("RxAdo");
+            d.field("ado", &self.ado());
+            d.finish()
         }
     }
     #[cfg(feature = "defmt")]
     impl defmt::Format for RxAdo {
         fn format(&self, f: defmt::Formatter) {
-            defmt::write!(f, "RxAdo {{ ado: {=u32} }}", self.ado())
+            defmt::write!(f, "RxAdo {{ ");
+            defmt::write!(f, "ado: {=u32}, ", & self.ado());
+            defmt::write!(f, "}}");
         }
     }
     impl core::ops::BitAnd for RxAdo {
@@ -8518,45 +8711,43 @@ pub mod field_sets {
     }
     /// Enum containing all possible field set types
     pub enum FieldSetValue {
-        ///Controller operation mode
+        /// Controller operation mode
         Mode(Mode),
-        ///Customer use
+        /// Customer use
         CustomerUse(CustomerUse),
-        ///Command 1 register
+        /// Command 1 register
         Cmd1(Cmd1),
-        ///Boot FW version
+        /// Boot FW version
         Version(Version),
-        ///Asserted interrupts for I2C1
+        /// Asserted interrupts for I2C1
         IntEventBus1(IntEventBus1),
-        ///Set Sx App Config - system power state for application configuration
+        /// Set Sx App Config - system power state for application configuration
         SxAppConfig(SxAppConfig),
-        ///Port status
+        /// Port status
         Status(Status),
-        ///Power path status
+        /// Power path status
         UsbStatus(UsbStatus),
-        ///Power path status
+        /// Power path status
         PowerPathStatus(PowerPathStatus),
-        ///Global system configuration
+        /// Global system configuration
         SystemConfig(SystemConfig),
-        ///Port control
+        /// Port control
         PortControl(PortControl),
-        ///Active PDO contract
+        /// Active PDO contract
         ActivePdoContract(ActivePdoContract),
-        ///Active PDO contract
+        /// Active PDO contract
         ActiveRdoContract(ActiveRdoContract),
-        ///PD status
+        /// PD status
         PdStatus(PdStatus),
-        ///Display Port Configuration
+        /// Display Port Configuration
         DpConfig(DpConfig),
-        ///
         TbtConfig(TbtConfig),
-        ///
         UserVidStatus(UserVidStatus),
-        ///Intel VID status
+        /// Intel VID status
         IntelVidStatus(IntelVidStatus),
-        ///Received User SVID Attention VDM
+        /// Received User SVID Attention VDM
         RxAttnVdm(RxAttnVdm),
-        ///Received ADO
+        /// Received ADO
         RxAdo(RxAdo),
     }
     impl core::fmt::Debug for FieldSetValue {
@@ -8582,6 +8773,7 @@ pub mod field_sets {
                 Self::IntelVidStatus(val) => core::fmt::Debug::fmt(val, f),
                 Self::RxAttnVdm(val) => core::fmt::Debug::fmt(val, f),
                 Self::RxAdo(val) => core::fmt::Debug::fmt(val, f),
+                #[allow(unreachable_patterns)]
                 _ => unreachable!(),
             }
         }
@@ -8610,7 +8802,6 @@ pub mod field_sets {
                 Self::IntelVidStatus(val) => defmt::Format::format(val, f),
                 Self::RxAttnVdm(val) => defmt::Format::format(val, f),
                 Self::RxAdo(val) => defmt::Format::format(val, f),
-                _ => unreachable!(),
             }
         }
     }
@@ -8715,22 +8906,15 @@ pub mod field_sets {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum SystemPowerState {
-    ///
     S0 = 0,
-    ///
     S3 = 1,
-    ///
     S4 = 2,
-    ///
     S5 = 3,
-    ///
     S0Ix = 4,
-    ///
     Reserved(u8) = 5,
 }
 impl From<u8> for SystemPowerState {
@@ -8757,26 +8941,17 @@ impl From<SystemPowerState> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum PlugMode {
-    ///
     NotConnected = 0,
-    ///
     Disabled = 1,
-    ///
     Audio = 2,
-    ///
     Debug = 3,
-    ///
     RaDetected = 4,
-    ///
     Reserved = 5,
-    ///
     ConnectedNoRa = 6,
-    ///
     Connected = 7,
 }
 impl core::convert::TryFrom<u8> for PlugMode {
@@ -8814,18 +8989,13 @@ impl From<PlugMode> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum VbusMode {
-    ///
     AtVsafe0 = 0,
-    ///
     Atvsafe5 = 1,
-    ///
     Normal = 2,
-    ///
     Other = 3,
 }
 impl core::convert::TryFrom<u8> for VbusMode {
@@ -8855,18 +9025,13 @@ impl From<VbusMode> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum UsbHostMode {
-    ///
     NoHost = 0,
-    ///
     AttachedNoData = 1,
-    ///
     AttachedNoPd = 2,
-    ///
     HostPresent = 3,
 }
 impl core::convert::TryFrom<u8> for UsbHostMode {
@@ -8896,18 +9061,13 @@ impl From<UsbHostMode> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum LegacyMode {
-    ///
     NoLegacy = 0,
-    ///
     LegacySink = 1,
-    ///
     LegacySource = 2,
-    ///
     LegacySinkDeadBattery = 3,
 }
 impl core::convert::TryFrom<u8> for LegacyMode {
@@ -8937,18 +9097,13 @@ impl From<LegacyMode> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum AmStatus {
-    ///
     NoneAttempted = 0,
-    ///
     EntrySuccessful = 1,
-    ///
     EntryFailed = 2,
-    ///
     PartialSuccess = 3,
 }
 impl core::convert::TryFrom<u8> for AmStatus {
@@ -8978,18 +9133,13 @@ impl From<AmStatus> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum EudoSopSentStatus {
-    ///
     NoEnterUsb = 0,
-    ///
     EnterUsbTimeout = 1,
-    ///
     EnterUsbFailure = 2,
-    ///
     SuccessfulEnterUsb = 3,
 }
 impl core::convert::TryFrom<u8> for EudoSopSentStatus {
@@ -9019,18 +9169,13 @@ impl From<EudoSopSentStatus> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Usb4RequiredPlugMode {
-    ///
     None = 0,
-    ///
     Reserved = 1,
-    ///
     Usb4 = 2,
-    ///
     Tbt3 = 3,
 }
 impl core::convert::TryFrom<u8> for Usb4RequiredPlugMode {
@@ -9060,18 +9205,13 @@ impl From<Usb4RequiredPlugMode> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum PpVconnSw {
-    ///
     Disabled = 0,
-    ///
     DisabledFault = 1,
-    ///
     Cc1 = 2,
-    ///
     Cc2 = 3,
 }
 impl core::convert::TryFrom<u8> for PpVconnSw {
@@ -9101,18 +9241,13 @@ impl From<PpVconnSw> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum PpIntVbusSw {
-    ///
     Disabled = 0,
-    ///
     DisabledFault = 1,
-    ///
     EnabledOutput = 2,
-    ///
     Unknown(u8) = 3,
 }
 impl From<u8> for PpIntVbusSw {
@@ -9135,18 +9270,13 @@ impl From<PpIntVbusSw> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum PpExtVbusSw {
-    ///
     Disabled = 0,
-    ///
     DisabledFault = 1,
-    ///
     EnabledInput = 3,
-    ///
     Unknown(u8) = 4,
 }
 impl From<u8> for PpExtVbusSw {
@@ -9169,16 +9299,12 @@ impl From<PpExtVbusSw> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum PpPowerSource {
-    ///
     Vin = 1,
-    ///
     Vbus = 2,
-    ///
     Unknown(u8) = 3,
 }
 impl From<u8> for PpPowerSource {
@@ -9199,16 +9325,12 @@ impl From<PpPowerSource> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum VbusSwConfig {
-    ///
     Disabled = 0,
-    ///
     Source = 1,
-    ///
     Reserved(u8) = 2,
 }
 impl From<u8> for VbusSwConfig {
@@ -9229,18 +9351,13 @@ impl From<VbusSwConfig> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum IlimOverShoot {
-    ///
     NoOvershoot = 0,
-    ///
     Overshoot100Ma = 1,
-    ///
     Overshoot200Ma = 2,
-    ///
     Reserved(u8) = 3,
 }
 impl From<u8> for IlimOverShoot {
@@ -9263,26 +9380,17 @@ impl From<IlimOverShoot> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum PpextVbusSwConfig {
-    ///
     Unused = 0,
-    ///
     Source = 1,
-    ///
     Sink = 2,
-    ///
     SinkWaitSrdyNonDeadBattery = 3,
-    ///
     BiDirectional = 4,
-    ///
     BiDirectionalWaitSrdy = 5,
-    ///
     SinkWaitSrdy = 6,
-    ///
     BiDirectionalPpextDisabled = 7,
 }
 impl core::convert::TryFrom<u8> for PpextVbusSwConfig {
@@ -9320,18 +9428,13 @@ impl From<PpextVbusSwConfig> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum RcpThreshold {
-    ///
     Threshold6Mv = 0,
-    ///
     Threshold8Mv = 1,
-    ///
     Threshold10Mv = 2,
-    ///
     Threshold12Mv = 3,
 }
 impl core::convert::TryFrom<u8> for RcpThreshold {
@@ -9361,24 +9464,16 @@ impl From<RcpThreshold> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum TbtControllerType {
-    ///
     Default = 0,
-    ///
     Ar = 1,
-    ///
     Tr = 2,
-    ///
     Icl = 3,
-    ///
     Gr = 4,
-    ///
     Br = 5,
-    ///
     Reserved(u8) = 6,
 }
 impl From<u8> for TbtControllerType {
@@ -9407,18 +9502,13 @@ impl From<TbtControllerType> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum MultiPortSinkNonOverlapTime {
-    ///
     Delay1Ms = 0,
-    ///
     Delay5Ms = 1,
-    ///
     Delay10Ms = 2,
-    ///
     Delay15Ms = 3,
 }
 impl core::convert::TryFrom<u8> for MultiPortSinkNonOverlapTime {
@@ -9448,26 +9538,17 @@ impl From<MultiPortSinkNonOverlapTime> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum I2CTimeout {
-    ///
     Timeout25Ms = 0,
-    ///
     Timeout50Ms = 1,
-    ///
     Timeout75Ms = 2,
-    ///
     Timeout100Ms = 3,
-    ///
     Timeout125Ms = 4,
-    ///
     Timeout150Ms = 5,
-    ///
     Timeout175Ms = 6,
-    ///
     Timeout1000Ms = 7,
 }
 impl core::convert::TryFrom<u8> for I2CTimeout {
@@ -9505,18 +9586,13 @@ impl From<I2CTimeout> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum UsbDefaultCurrent {
-    ///
     UsbDefault = 0,
-    ///
     Current900Ma = 1,
-    ///
     Current150Ma = 2,
-    ///
     Reserved(u8) = 3,
 }
 impl From<u8> for UsbDefaultCurrent {
@@ -9539,18 +9615,13 @@ impl From<UsbDefaultCurrent> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum TypecCurrent {
-    ///
     UsbDefault = 0,
-    ///
     Current1A5 = 1,
-    ///
     Current3A0 = 2,
-    ///
     Reserved(u8) = 3,
 }
 impl From<u8> for TypecCurrent {
@@ -9573,16 +9644,12 @@ impl From<TypecCurrent> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum VconnCurrentLimit {
-    ///
     Current410Ma = 0,
-    ///
     Current590Ma = 1,
-    ///
     Other(u8) = 2,
 }
 impl From<u8> for VconnCurrentLimit {
@@ -9603,18 +9670,13 @@ impl From<VconnCurrentLimit> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ActiveDbgChannel {
-    ///
     Dbg = 0,
-    ///
     SbRxTx = 1,
-    ///
     Aux = 2,
-    ///
     Open = 3,
 }
 impl core::convert::TryFrom<u8> for ActiveDbgChannel {
@@ -9644,18 +9706,13 @@ impl From<ActiveDbgChannel> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum PdCcPullUp {
-    ///
     NoPull = 0,
-    ///
     UsbDefault = 1,
-    ///
     Current1A5 = 2,
-    ///
     Current3A0 = 3,
 }
 impl core::convert::TryFrom<u8> for PdCcPullUp {
@@ -9685,18 +9742,13 @@ impl From<PdCcPullUp> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum PdPortType {
-    ///
     SinkSource = 0,
-    ///
     Sink = 1,
-    ///
     Source = 2,
-    ///
     SourceSink = 3,
 }
 impl core::convert::TryFrom<u8> for PdPortType {
@@ -9726,64 +9778,36 @@ impl From<PdPortType> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum PdSoftResetDetails {
-    ///
     NoSoftReset = 0,
-    ///
     SoftResetReceived = 1,
-    ///
     InvalidSourceCapabilities = 4,
-    ///
     MessageRetriesExhausted = 5,
-    ///
     UnexpectedAcceptMessage = 6,
-    ///
     UnexpectedControlMessage = 7,
-    ///
     UnexpectedGetSinkCapMessage = 8,
-    ///
     UnexpectedGetSourceCapMessage = 9,
-    ///
     UnexpectedGotoMinMessage = 10,
-    ///
     UnexpectedPsrdyMessage = 11,
-    ///
     UnexpectedPingMessage = 12,
-    ///
     UnexpectedRejectMessage = 13,
-    ///
     UnexpectedRequestMessage = 14,
-    ///
     UnexpectedSinkCapabilitiesMessage = 15,
-    ///
     UnexpectedSourceCapabilitiesMessage = 16,
-    ///
     UnexpectedSwapMessage = 17,
-    ///
     UnexpectedWaitCapabilitiesMessage = 18,
-    ///
     UnknownControlMessage = 19,
-    ///
     UnknownDataMessage = 20,
-    ///
     InitializeSopController = 21,
-    ///
     InitializeSopPrimeController = 22,
-    ///
     UnexpectedExtendedMessage = 23,
-    ///
     UnknownExtendedMessage = 24,
-    ///
     UnexpectedDataMessage = 25,
-    ///
     UnexpectedNotSupportedMessage = 26,
-    ///
     UnexpectedGetStatusMessage = 27,
-    ///
     Reserved(u8) = 28,
 }
 impl From<u8> for PdSoftResetDetails {
@@ -9852,50 +9876,29 @@ impl From<PdSoftResetDetails> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum PdHardResetDetails {
-    ///
     ResetValueNoHardReset = 0,
-    ///
     ReceivedFromPortPartner = 1,
-    ///
     RequestedByHost = 2,
-    ///
     InvalidDrSwapRequest = 3,
-    ///
     DischargeFailed = 4,
-    ///
     NoResponseTimeout = 5,
-    ///
     SendSoftReset = 6,
-    ///
     SinkSelectCapability = 7,
-    ///
     SinkTransitionSink = 8,
-    ///
     SinkWaitForCapabilities = 9,
-    ///
     SoftReset = 10,
-    ///
     SourceOnTimeout = 11,
-    ///
     SourceCapabilityResponse = 12,
-    ///
     SourceSendCapabilities = 13,
-    ///
     SourcingFault = 14,
-    ///
     UnableToSource = 15,
-    ///
     FrsFailure = 16,
-    ///
     UnexpectedMessage = 17,
-    ///
     VconnRecoverySequenceFailure = 18,
-    ///
     Reserved(u8) = 19,
 }
 impl From<u8> for PdHardResetDetails {
@@ -9950,84 +9953,46 @@ impl From<PdHardResetDetails> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum PdErrorRecoveryDetails {
-    ///
     NoErrorRecovery = 0,
-    ///
     OverTemperatureShutdown = 1,
-    ///
     Pp5VLow = 2,
-    ///
     FaultInputGpioAsserted = 3,
-    ///
     OverVoltageOnPxVbus = 4,
-    ///
     IlimOnPp5V = 6,
-    ///
     IlimOnPpCable = 7,
-    ///
     OvpOnCcDetected = 8,
-    ///
     BackToNormalSystemPowerState = 9,
-    ///
     InvalidDrSwap = 16,
-    ///
     PrSwapNoGoodCrc = 17,
-    ///
     FrSwapNoGoodCrc = 18,
-    ///
     NoResponseTimeout = 21,
-    ///
     PrSwapSourceOffTimer = 22,
-    ///
     PrSwapSourceOnTimer = 23,
-    ///
     FrSwapSourceOnTimer = 24,
-    ///
     FrSwapTypeCSourceFailed = 25,
-    ///
     FrSwapSenderResponseTimer = 26,
-    ///
     FrSwapSourceOffTimer = 27,
-    ///
     PolicyEngineErrorAttached = 28,
-    ///
     PortConfig = 32,
-    ///
     ErrorWithDataControl = 33,
-    ///
     SwappingErrorDeadBattery = 34,
-    ///
     HostUpdatedGlobalSystemConfig = 35,
-    ///
     HostIssuedGaid = 36,
-    ///
     HostIssuedDisc = 38,
-    ///
     HostIssuedResetUcsi = 39,
-    ///
     ErrorAttached = 48,
-    ///
     VconnFailedToDischarge = 49,
-    ///
     SystemPowerState = 50,
-    ///
     HostDataControlUsbDisable = 51,
-    ///
     SpmClientPortDisableChanged = 52,
-    ///
     GpioEventTypecDisable = 53,
-    ///
     CrOvp = 54,
-    ///
     SbcOvp = 55,
-    ///
     SbcRxOvp = 56,
-    ///
     Reserved(u8) = 57,
 }
 impl From<u8> for PdErrorRecoveryDetails {
@@ -10116,22 +10081,15 @@ impl From<PdErrorRecoveryDetails> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum PdDataResetDetails {
-    ///
     NoDataReset = 0,
-    ///
     ReceivedFromPortPartner = 1,
-    ///
     RequestedByHostDrst = 2,
-    ///
     RequestedByHostDataControl = 3,
-    ///
     ExitUsb4FollowingDrSwap = 4,
-    ///
     Reserved(u8) = 5,
 }
 impl From<u8> for PdDataResetDetails {
@@ -10158,18 +10116,13 @@ impl From<PdDataResetDetails> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum DpPortCapability {
-    ///
     Reserved = 0,
-    ///
     UfpD = 1,
-    ///
     DfpD = 2,
-    ///
     Reserved2 = 3,
 }
 impl core::convert::TryFrom<u8> for DpPortCapability {
@@ -10199,16 +10152,12 @@ impl From<DpPortCapability> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum DpTransportSignalling {
-    ///
     Usb = 0,
-    ///
     Dp = 1,
-    ///
     Reserved(u8) = 2,
 }
 impl From<u8> for DpTransportSignalling {
@@ -10229,14 +10178,11 @@ impl From<DpTransportSignalling> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum DpUsbDataPath {
-    ///
     MayBeRequired = 0,
-    ///
     NotRequired = 1,
 }
 impl core::convert::TryFrom<u8> for DpUsbDataPath {
@@ -10262,18 +10208,13 @@ impl From<DpUsbDataPath> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum DfpdUfpdConnected {
-    ///
     Neither = 0,
-    ///
     DfpD = 1,
-    ///
     UfpD = 2,
-    ///
     Both = 3,
 }
 impl core::convert::TryFrom<u8> for DfpdUfpdConnected {
@@ -10303,16 +10244,12 @@ impl From<DfpdUfpdConnected> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum DpVdoVersion {
-    ///
     DpV20 = 0,
-    ///
     DpV21 = 1,
-    ///
     Reserved(u8) = 2,
 }
 impl From<u8> for DpVdoVersion {
@@ -10333,18 +10270,13 @@ impl From<DpVdoVersion> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum PortCapability {
-    ///
     Reserved = 0,
-    ///
     DpSink = 1,
-    ///
     DpSource = 2,
-    ///
     BothDpSourceAndSink = 3,
 }
 impl core::convert::TryFrom<u8> for PortCapability {
@@ -10374,14 +10306,11 @@ impl From<PortCapability> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ReceptacleIndication {
-    ///
     Plug = 0,
-    ///
     Receptacle = 1,
 }
 impl core::convert::TryFrom<u8> for ReceptacleIndication {
@@ -10407,14 +10336,11 @@ impl From<ReceptacleIndication> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Usb2SignalingNotUsed {
-    ///
     MayBeRequired = 0,
-    ///
     NotNeededOnA6A7 = 1,
 }
 impl core::convert::TryFrom<u8> for Usb2SignalingNotUsed {
@@ -10440,18 +10366,13 @@ impl From<Usb2SignalingNotUsed> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ActiveComponent {
-    ///
     Passive = 0,
-    ///
     Retimer = 1,
-    ///
     Redriver = 2,
-    ///
     Optical = 3,
 }
 impl core::convert::TryFrom<u8> for ActiveComponent {
@@ -10481,16 +10402,12 @@ impl From<ActiveComponent> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum DpamVersion {
-    ///
     Version2OrEarlier = 0,
-    ///
     Version2P1OrHigher = 1,
-    ///
     Reserved(u8) = 2,
 }
 impl From<u8> for DpamVersion {
@@ -10511,14 +10428,11 @@ impl From<DpamVersion> for u8 {
         }
     }
 }
-///
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum TbtUsbDataPath {
-    ///
     MayBeRequired = 0,
-    ///
     NotRequired = 1,
 }
 impl core::convert::TryFrom<u8> for TbtUsbDataPath {
