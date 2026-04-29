@@ -22,6 +22,40 @@ pub const ADDR: u8 = 0x48;
 /// This exceeds the maximum supported length by the [`device_driver`] crate.
 pub const LEN: usize = 200 / 8;
 
+/// Index of the DFP VDO in the Received SOP Identity Data Object's Product Type VDOs
+/// when the port partner supports dual-role (UFP and DFP) functionality.
+///
+/// - See [`SINGLE_ROLE_DFP_PRODUCT_TYPE_VDOS_INDEX`].
+/// - See PD spec 6.4.4.3.1 Discover Identity.
+const DUAL_ROLE_DFP_PRODUCT_TYPE_VDOS_INDEX: usize = 2;
+
+/// Index of the DFP VDO in the Received SOP Identity Data Object's Product Type VDOs
+/// when the port partner only supports single-role (DFP only) functionality.
+///
+/// - See [`DUAL_ROLE_DFP_PRODUCT_TYPE_VDOS_INDEX`].
+/// - See PD spec 6.4.4.3.1 Discover Identity.
+const SINGLE_ROLE_DFP_PRODUCT_TYPE_VDOS_INDEX: usize = 0;
+
+/// Index of the ID Header VDO in the Received SOP Identity Data Object's VDO list.
+///
+/// See [`ReceivedSopIdentityData::id_header`].
+const ID_HEADER_VDO_INDEX: usize = 0;
+
+/// Index of the Cert Stat VDO in the Received SOP Identity Data Object's VDO list.
+///
+/// See [`ReceivedSopIdentityData::cert_stat`].
+const CERT_STAT_VDO_INDEX: usize = 1;
+
+/// Index of the Product VDO in the Received SOP Identity Data Object's VDO list.
+///
+/// See [`ReceivedSopIdentityData::product_vdo`].
+const PRODUCT_VDO_INDEX: usize = 2;
+
+/// Index of the first Product Type VDO in the Received SOP Identity Data Object's VDO list.
+///
+/// See [`ReceivedSopIdentityData::product_type_vdos`].
+const PRODUCT_TYPE_VDOS_STARTING_INDEX: usize = 3;
+
 bitfield! {
     /// Received SOP Identity Data Object register
     #[derive(Clone, Copy, PartialEq, Eq)]
@@ -96,7 +130,7 @@ impl ReceivedSopIdentityData {
     /// If there are, attempts to parse it as an [`IdHeaderVdo`] and returns the result.
     /// If that fails, returns the raw VDO for further analysis.
     pub fn id_header(&self) -> Option<Result<IdHeaderVdo, id_header_vdo::Raw>> {
-        let raw = self.vdos().next()?;
+        let raw = self.vdos().nth(ID_HEADER_VDO_INDEX)?;
         let raw = id_header_vdo::Raw(raw);
         match IdHeaderVdo::try_from(raw) {
             Ok(id_header) => Some(Ok(id_header)),
@@ -110,14 +144,14 @@ impl ReceivedSopIdentityData {
     /// Contains the XID assigned by USB-IF to the product before certification,
     /// in binary format.
     pub fn cert_stat(&self) -> Option<CertStatVdo> {
-        self.vdos().nth(1).map(CertStatVdo)
+        self.vdos().nth(CERT_STAT_VDO_INDEX).map(CertStatVdo)
     }
 
     /// Contains identity information relating to the product.
     ///
     /// See PD spec 6.4.4.3.1.3 Product VDO, table 6.38 Product VDO.
     pub fn product_vdo(&self) -> Option<ProductVdo> {
-        self.vdos().nth(2).map(ProductVdo::from)
+        self.vdos().nth(PRODUCT_VDO_INDEX).map(ProductVdo::from)
     }
 
     /// Return an iterator over the Product Type VDOs, if present.
@@ -125,7 +159,7 @@ impl ReceivedSopIdentityData {
     /// The interpretation of these VDOs is context-specific based on the contents
     /// of the [`Self::id_header`]. Some or all may be padding with the value of `0x00000000`.
     pub fn product_type_vdos(&self) -> impl Iterator<Item = ProductTypeVdo> {
-        self.vdos().skip(3).map(ProductTypeVdo)
+        self.vdos().skip(PRODUCT_TYPE_VDOS_STARTING_INDEX).map(ProductTypeVdo)
     }
 }
 
@@ -323,7 +357,11 @@ impl TryFrom<ReceivedSopIdentityData>
 
                 // we're already a DFP at this scope, so we're DRD if we're also a UFP
                 let is_dual_role = !matches!(id.product_type_ufp, id_header_vdo::ProductTypeUfp::NotAUfp);
-                let index = if is_dual_role { 2 } else { 0 };
+                let index = if is_dual_role {
+                    DUAL_ROLE_DFP_PRODUCT_TYPE_VDOS_INDEX
+                } else {
+                    SINGLE_ROLE_DFP_PRODUCT_TYPE_VDOS_INDEX
+                };
                 let dfp_vdo = value
                     .product_type_vdos()
                     .nth(index)
