@@ -1,10 +1,7 @@
 //! Interrupt related code.
-
 use core::array::from_fn;
-use core::future::Future;
 
 use embassy_sync::blocking_mutex::raw::RawMutex;
-use embassy_sync::mutex::MutexGuard;
 use embassy_time::{with_timeout, Duration};
 use embedded_hal::digital::InputPin;
 use embedded_hal_async::i2c::I2c;
@@ -12,7 +9,6 @@ use embedded_usb_pd::{Error, LocalPortId, PdError};
 use itertools::izip;
 
 use crate::asynchronous::embassy::controller::Controller;
-use crate::asynchronous::internal;
 use crate::registers::field_sets::IntEventBus1;
 use crate::{error, trace, warn, MAX_SUPPORTED_PORTS};
 
@@ -36,10 +32,6 @@ pub struct InterruptProcessor<'a, M: RawMutex, B: I2c> {
 }
 
 impl<'a, M: RawMutex, B: I2c> InterruptProcessor<'a, M, B> {
-    fn lock_inner(&mut self) -> impl Future<Output = MutexGuard<'_, M, internal::Tps6699x<B>>> {
-        self.controller.inner.lock()
-    }
-
     /// Process interrupts
     pub async fn process_interrupt(
         &mut self,
@@ -52,50 +44,56 @@ impl<'a, M: RawMutex, B: I2c> InterruptProcessor<'a, M, B> {
             .try_take()
             .unwrap_or([IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS]);
 
+        let interrupts_enabled = self.controller.interrupts_enabled();
+        let mut inner = self.controller.inner.lock().await;
+
+        // Note: `interrupts_enabled` and `flags` are both of size MAX_SUPPORTED_PORTS and so
+        // will always have a 1:1 mapping. If `num_ports` ever returns a value larger than
+        // MAX_SUPPORTED_PORTS, `port` will simply be capped at MAX_SUPPORTED_PORTS.
+        for (port, (interrupt_enabled, flag, command_complete)) in izip!(
+            interrupts_enabled.iter(),
+            flags.iter_mut(),
+            self.controller.command_complete.iter()
+        )
+        .take(self.controller.num_ports)
+        .enumerate()
         {
-            let interrupts_enabled = self.controller.interrupts_enabled();
-            let mut inner = self.lock_inner().await;
+            let port_id = LocalPortId(port as u8);
 
-            // Note: `interrupts_enabled` and `flags` are both of size MAX_SUPPORTED_PORTS and so
-            // will always have a 1:1 mapping. If `num_ports` ever returns a value larger than
-            // MAX_SUPPORTED_PORTS, `port` will simply be capped at MAX_SUPPORTED_PORTS.
-            for (port, (interrupt_enabled, flag)) in interrupts_enabled
-                .iter()
-                .zip(flags.iter_mut())
-                .take(inner.num_ports())
-                .enumerate()
-            {
-                let port_id = LocalPortId(port as u8);
+            if !interrupt_enabled {
+                trace!("{:?}: Interrupts disabled", port_id);
+                continue;
+            }
 
-                if !interrupt_enabled {
-                    trace!("{:?}: Interrupt for disabled", port_id);
-                    continue;
+            match int.is_high() {
+                Ok(true) => {
+                    // Early exit if checking the last port cleared the interrupt
+                    trace!("Interrupt line is high, exiting");
+                    break;
                 }
-
-                match int.is_high() {
-                    Ok(true) => {
-                        // Early exit if checking the last port cleared the interrupt
-                        trace!("Interrupt line is high, exiting");
-                        break;
-                    }
-                    Err(_) => {
-                        error!("Failed to read interrupt line");
-                        return PdError::Failed.into();
-                    }
-                    _ => {}
+                Err(_) => {
+                    error!("Failed to read interrupt line");
+                    return PdError::Failed.into();
                 }
+                _ => {}
+            }
 
-                match with_timeout(timeout, inner.clear_interrupt(port_id)).await {
-                    Ok(res) => match res {
-                        Ok(event) => *flag |= event,
-                        Err(_e) => {
-                            continue;
+            match with_timeout(timeout, inner.clear_interrupt(port_id)).await {
+                Ok(res) => match res {
+                    Ok(event) => {
+                        *flag |= event;
+                        if event.cmd_1_completed() {
+                            command_complete.signal(());
                         }
-                    },
+                    }
                     Err(_) => {
-                        error!("{:?}: clear_interrupt timeout", port_id);
+                        error!("{:?}: clear_interrupt failed", port_id);
                         continue;
                     }
+                },
+                Err(_) => {
+                    error!("{:?}: clear_interrupt timeout", port_id);
+                    continue;
                 }
             }
         }
@@ -209,17 +207,11 @@ impl<'a, M: RawMutex, B: I2c> InterruptReceiver<'a, M, B> {
     ///
     /// Drop safety: Safe, unhandled interrupts will be re-signaled.
     pub async fn wait_any(&mut self, clean_current: bool) -> [IntEventBus1; MAX_SUPPORTED_PORTS] {
-        let mut mask = IntEventBus1::all();
-        mask.set_cmd_1_completed(false);
-        self.wait_any_masked(clean_current, [mask; MAX_SUPPORTED_PORTS]).await
+        self.wait_any_masked(clean_current, [IntEventBus1::all(); MAX_SUPPORTED_PORTS])
+            .await
     }
 
     /// Wait for an interrupt to occur that matches any bits in the given mask.
-    ///
-    /// Setting cmd1 complete in the mask may interfere with the command execution flow if this function is called simultaneously.
-    /// Avoid setting cmd1 complete in the mask unless you are specifically waiting for that interrupt. Use [`Self::wait_any`] if
-    /// you want to wait for any interrupt without worrying about cmd1 complete interactions.
-    /// Drop safety: Safe, unhandled interrupts will be re-signaled.
     pub async fn wait_any_masked(
         &mut self,
         clear_current: bool,
@@ -431,10 +423,10 @@ mod test {
 
         pd.controller.interrupt_waker.signal([port0, port1]);
 
-        // `wait_any` shouldn't consume the cmd1 complete interrupt
         let mut flags0 = IntEventBus1::new_zero();
         flags0.set_new_consumer_contract(true);
         flags0.set_sink_ready(true);
+        flags0.set_cmd_1_completed(true);
 
         let mut flags1 = IntEventBus1::new_zero();
         flags1.set_plug_event(true);
@@ -443,19 +435,12 @@ mod test {
         let flags = receiver.wait_any(false).await;
         assert_eq!(flags, [flags0, flags1]);
 
-        // Use all mask to get leftover interrupts
-        let mut leftover0 = IntEventBus1::new_zero();
-        leftover0.set_cmd_1_completed(true);
-
-        let leftover1 = IntEventBus1::new_zero();
-
+        // This should timeout because there are no leftover interrupts
         let leftover_flags = with_timeout(
             Duration::from_millis(10),
             receiver.wait_any_masked(false, [IntEventBus1::all(), IntEventBus1::all()]),
         )
-        .await
-        .unwrap();
-        assert_eq!(leftover_flags[0], leftover0);
-        assert_eq!(leftover_flags[1], leftover1);
+        .await;
+        assert_eq!(leftover_flags, Err(TimeoutError));
     }
 }

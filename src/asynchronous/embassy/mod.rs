@@ -1,5 +1,4 @@
 //! This module contains a high-level API uses embassy synchronization types
-use core::array::from_fn;
 use core::future::Future;
 use core::iter::zip;
 use core::sync::atomic::AtomicBool;
@@ -47,6 +46,8 @@ pub mod controller {
         pub(super) config: Config,
         /// Low-level TPS6699x driver
         pub(super) inner: Mutex<M, internal::Tps6699x<B>>,
+        /// Command completion signals
+        pub(super) command_complete: [Signal<M, ()>; MAX_SUPPORTED_PORTS],
         /// Signal for awaiting an interrupt
         pub(super) interrupt_waker: Signal<M, [IntEventBus1; MAX_SUPPORTED_PORTS]>,
         /// Current interrupt state
@@ -67,6 +68,7 @@ pub mod controller {
                 config,
                 inner: Mutex::new(internal::Tps6699x::new(bus, addr, num_ports)),
                 interrupt_waker: Signal::new(),
+                command_complete: [const { Signal::new() }; MAX_SUPPORTED_PORTS],
                 interrupts_enabled: [const { AtomicBool::new(true) }; MAX_SUPPORTED_PORTS],
                 num_ports,
             })
@@ -274,29 +276,25 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         indata: Option<&[u8]>,
         outdata: Option<&mut [u8]>,
     ) -> Result<ReturnValue, Error<B::Error>> {
+        // Size of the command_complete array is MAX_SUPPORTED_PORTS so the `get`` call below doesn't guarentee
+        // that the port is valid because it wouldn't catch trying to access a second port on a controller with
+        // only one port.
+        if port.0 as usize >= self.controller.num_ports {
+            return Err(Error::Pd(PdError::InvalidPort));
+        }
+
+        let command_complete = self
+            .controller
+            .command_complete
+            .get(port.0 as usize)
+            .ok_or(Error::Pd(PdError::InvalidPort))?;
+        command_complete.reset();
         {
             let mut inner = self.lock_inner().await;
             inner.send_command(port, cmd, indata).await?;
         }
 
-        let mut cmd_complete = IntEventBus1::new_zero();
-        cmd_complete.set_cmd_1_completed(true);
-
-        let mut receiver = InterruptReceiver {
-            controller: self.controller,
-        };
-        let _flags = receiver
-            .wait_any_masked(
-                false,
-                from_fn(|i| {
-                    if i == port.0 as usize {
-                        cmd_complete
-                    } else {
-                        IntEventBus1::new_zero()
-                    }
-                }),
-            )
-            .await;
+        command_complete.wait().await;
         {
             let mut inner = self.lock_inner().await;
             inner.read_command_result(port, outdata, cmd.has_return_value()).await
