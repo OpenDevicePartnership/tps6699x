@@ -104,6 +104,15 @@ pub enum Command {
     /// [`ReturnValue`]
     Drst = u32_from_str(*b"DRST"),
 
+    /// Hard Reset
+    ///
+    /// # Input
+    /// None
+    ///
+    /// # Output
+    /// [`ReturnValue`]
+    HRST = u32_from_str(*b"HRST"),
+
     /// Send VDM.
     ///
     /// # Input
@@ -170,6 +179,8 @@ impl TryFrom<u32> for Command {
             Ok(Command::Muxr)
         } else if Command::Drst == value {
             Ok(Command::Drst)
+        } else if Command::HRST == value {
+            Ok(Command::HRST)
         } else if Command::VDMs == value {
             Ok(Command::VDMs)
         } else if Command::Ucsi == value {
@@ -718,6 +729,7 @@ mod test {
         assert_eq!(Command::try_from(Command::Dbfg as u32).unwrap(), Command::Dbfg);
         assert_eq!(Command::try_from(Command::Muxr as u32).unwrap(), Command::Muxr);
         assert_eq!(Command::try_from(Command::Drst as u32).unwrap(), Command::Drst);
+        assert_eq!(Command::try_from(Command::HRST as u32).unwrap(), Command::HRST);
         assert_eq!(Command::try_from(Command::VDMs as u32).unwrap(), Command::VDMs);
         assert_eq!(Command::try_from(Command::Ucsi as u32).unwrap(), Command::Ucsi);
         assert_eq!(Command::try_from(0xFFFFFFFFu32), Err(PdError::InvalidParams));
