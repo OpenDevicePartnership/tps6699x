@@ -579,14 +579,6 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         inner.set_sx_app_config(port, state).await
     }
 
-    /// Get the discovered SVIDs on a port returned from `Discover SVIDs REQ` messages.
-    pub async fn get_discovered_svids(
-        &mut self,
-        port: LocalPortId,
-    ) -> Result<registers::discovered_svids::DiscoveredSvids, Error<B::Error>> {
-        self.lock_inner().await.get_discovered_svids(port).await
-    }
-
     /// Get Rx ADO
     pub async fn get_rx_ado(
         &mut self,
@@ -710,22 +702,6 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         self.lock_inner().await.modify_tx_identity(port, f).await
     }
 
-    /// Get the latest received SOP identity data
-    pub async fn get_received_sop_identity_data(
-        &mut self,
-        port: LocalPortId,
-    ) -> Result<registers::received_sop_identity_data::ReceivedSopIdentityData, Error<B::Error>> {
-        self.lock_inner().await.get_received_sop_identity_data(port).await
-    }
-
-    /// Get the latest received SOP Prime identity data
-    pub async fn get_received_sop_prime_identity_data(
-        &mut self,
-        port: LocalPortId,
-    ) -> Result<registers::received_sop_prime_identity_data::ReceivedSopPrimeIdentityData, Error<B::Error>> {
-        self.lock_inner().await.get_received_sop_prime_identity_data(port).await
-    }
-
     /// Get DP config
     pub async fn get_dp_config(
         &mut self,
@@ -758,11 +734,6 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     /// Execute the [`Command::Drst`] command.
     pub async fn execute_drst(&mut self, port: LocalPortId) -> Result<ReturnValue, Error<B::Error>> {
         self.execute_command(port, Command::Drst, None, None).await
-    }
-
-    /// Execute the [`Command::HRST`] command.
-    pub async fn execute_hrst(&mut self, port: LocalPortId) -> Result<ReturnValue, Error<B::Error>> {
-        self.execute_command(port, Command::HRST, None, None).await
     }
 
     /// Get Rx discovered custom modes
