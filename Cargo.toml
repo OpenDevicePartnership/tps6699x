@@ -12,7 +12,7 @@ embedded-hal = "1.0.0"
 embedded-hal-async = "1.0.0"
 embedded-usb-pd = { git = "https://github.com/OpenDevicePartnership/embedded-usb-pd", default-features = false }
 # When updating `device-driver`, also update the version of device-driver-cli in the README and in the device-driver.yml workflow.
-device-driver = { version = "1.0.3", default-features = false }
+device-driver = { version = "1.0.9", default-features = false }
 defmt = { version = "0.3.0", optional = true }
 log = { version = "0.4.14", optional = true }
 embassy-sync = { version = "0.8.0", optional = true }
