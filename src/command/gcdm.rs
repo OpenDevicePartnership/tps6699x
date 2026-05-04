@@ -1,5 +1,5 @@
 //! Get custom discovered modes command
-use embedded_usb_pd::vdm::Svid;
+use embedded_usb_pd::vdm::structured::Svid;
 
 /// Input data length
 pub const INPUT_LEN: usize = 3;
