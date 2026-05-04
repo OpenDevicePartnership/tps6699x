@@ -99,22 +99,22 @@ mod tests {
 
     fn make_src_caps() -> RxCaps<source::Pdo> {
         let spr = source::Pdo::Fixed(SrcFixedData {
+            flags: Default::default(),
             voltage_mv: 5000,
             current_ma: 3000,
             peak_current: source::PeakCurrent::Pct100,
-            ..Default::default()
         });
         let epr0 = source::Pdo::Fixed(SrcFixedData {
+            flags: Default::default(),
             voltage_mv: 28000,
             current_ma: 3000,
             peak_current: source::PeakCurrent::Pct100,
-            ..Default::default()
         });
         let epr1 = source::Pdo::Fixed(SrcFixedData {
+            flags: Default::default(),
             voltage_mv: 28000,
             current_ma: 5000,
             peak_current: source::PeakCurrent::Pct100,
-            ..Default::default()
         });
         RxCaps {
             spr: heapless::Vec::from_iter([spr]),
@@ -124,22 +124,34 @@ mod tests {
 
     fn make_snk_caps() -> RxCaps<sink::Pdo> {
         let spr0 = sink::Pdo::Fixed(SnkFixedData {
+            dual_role_power: false,
+            higher_capability: false,
+            unconstrained_power: false,
+            usb_comms_capable: false,
+            dual_role_data: false,
             frs_required_current: sink::FrsRequiredCurrent::None,
             voltage_mv: 5000,
             operational_current_ma: 900,
-            ..Default::default()
         });
         let spr1 = sink::Pdo::Fixed(SnkFixedData {
+            dual_role_power: false,
+            higher_capability: false,
+            unconstrained_power: false,
+            usb_comms_capable: false,
+            dual_role_data: false,
             frs_required_current: sink::FrsRequiredCurrent::None,
             voltage_mv: 5000,
             operational_current_ma: 3000,
-            ..Default::default()
         });
         let epr = sink::Pdo::Fixed(SnkFixedData {
+            dual_role_power: false,
+            higher_capability: false,
+            unconstrained_power: false,
+            usb_comms_capable: false,
+            dual_role_data: false,
             frs_required_current: sink::FrsRequiredCurrent::None,
             voltage_mv: 20000,
             operational_current_ma: 3000,
-            ..Default::default()
         });
         RxCaps {
             spr: heapless::Vec::from_iter([spr0, spr1]),
@@ -157,28 +169,28 @@ mod tests {
         assert_eq!(
             generic.spr[0],
             pdo::Pdo::Source(source::Pdo::Fixed(SrcFixedData {
+                flags: Default::default(),
                 voltage_mv: 5000,
                 current_ma: 3000,
                 peak_current: source::PeakCurrent::Pct100,
-                ..Default::default()
             }))
         );
         assert_eq!(
             generic.epr[0],
             pdo::Pdo::Source(source::Pdo::Fixed(SrcFixedData {
+                flags: Default::default(),
                 voltage_mv: 28000,
                 current_ma: 3000,
                 peak_current: source::PeakCurrent::Pct100,
-                ..Default::default()
             }))
         );
         assert_eq!(
             generic.epr[1],
             pdo::Pdo::Source(source::Pdo::Fixed(SrcFixedData {
+                flags: Default::default(),
                 voltage_mv: 28000,
                 current_ma: 5000,
                 peak_current: source::PeakCurrent::Pct100,
-                ..Default::default()
             }))
         );
     }
@@ -193,28 +205,40 @@ mod tests {
         assert_eq!(
             generic.spr[0],
             pdo::Pdo::Sink(sink::Pdo::Fixed(SnkFixedData {
+                dual_role_power: false,
+                higher_capability: false,
+                unconstrained_power: false,
+                usb_comms_capable: false,
+                dual_role_data: false,
                 frs_required_current: sink::FrsRequiredCurrent::None,
                 voltage_mv: 5000,
                 operational_current_ma: 900,
-                ..Default::default()
             }))
         );
         assert_eq!(
             generic.spr[1],
             pdo::Pdo::Sink(sink::Pdo::Fixed(SnkFixedData {
+                dual_role_power: false,
+                higher_capability: false,
+                unconstrained_power: false,
+                usb_comms_capable: false,
+                dual_role_data: false,
                 frs_required_current: sink::FrsRequiredCurrent::None,
                 voltage_mv: 5000,
                 operational_current_ma: 3000,
-                ..Default::default()
             }))
         );
         assert_eq!(
             generic.epr[0],
             pdo::Pdo::Sink(sink::Pdo::Fixed(SnkFixedData {
+                dual_role_power: false,
+                higher_capability: false,
+                unconstrained_power: false,
+                usb_comms_capable: false,
+                dual_role_data: false,
                 frs_required_current: sink::FrsRequiredCurrent::None,
                 voltage_mv: 20000,
                 operational_current_ma: 3000,
-                ..Default::default()
             }))
         );
     }
