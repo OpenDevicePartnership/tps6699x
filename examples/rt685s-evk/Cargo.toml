@@ -40,7 +40,7 @@ futures = { version = "0.3.30", default-features = false, features = [
 ] }
 rand = { version = "0.8.5", default-features = false }
 
-embedded-usb-pd = { git = "https://github.com/OpenDevicePartnership/embedded-usb-pd", default-features = false }
+embedded-usb-pd = { git = "https://github.com/OpenDevicePartnership/embedded-usb-pd", tag = "v0.1.0", default-features = false }
 
 mimxrt600-fcb = "0.1.0"
 tps6699x = { path = "../../.", features = ["defmt", "embassy"] }
