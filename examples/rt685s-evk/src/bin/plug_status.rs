@@ -26,10 +26,10 @@ bind_interrupts!(struct Irqs {
 type Bus<'a> = I2cDevice<'a, NoopRawMutex, I2cMaster<'a, Async>>;
 type Controller<'a> = pd_controller::controller::Controller<NoopRawMutex, Bus<'a>>;
 
-type Interrupt<'a> = pd_controller::Interrupt<'a, NoopRawMutex, Bus<'a>>;
+type InterruptProcessor<'a> = pd_controller::interrupt::InterruptProcessor<'a, NoopRawMutex, Bus<'a>>;
 
 #[embassy_executor::task]
-async fn interrupt_task(mut int_in: Input<'static>, mut interrupt: Interrupt<'static>) {
+async fn interrupt_task(mut int_in: Input<'static>, mut interrupt: InterruptProcessor<'static>) {
     pd_controller::task::interrupt_task(&mut int_in, [&mut interrupt].as_mut_slice()).await;
 }
 
@@ -46,17 +46,17 @@ async fn main(spawner: Spawner) {
     let device = I2cDevice::new(bus);
 
     static CONTROLLER: StaticCell<Controller<'static>> = StaticCell::new();
-    let controller = CONTROLLER.init(Controller::new_tps66994(device, ADDR0).unwrap());
-    let (mut pd, interrupt) = controller.make_parts();
+    let controller = CONTROLLER.init(Controller::new_tps66994(device, Default::default(), ADDR0).unwrap());
+    let (mut pd, interrupt_processor, mut interrupt_receiver) = controller.make_parts();
 
     info!("Spawing PD interrupt task");
-    spawner.spawn(interrupt_task(int_in, interrupt).unwrap());
+    spawner.spawn(interrupt_task(int_in, interrupt_processor).unwrap());
 
     loop {
         let mut plug_event_mask = IntEventBus1::new_zero();
         plug_event_mask.set_plug_event(true);
-        let flags = pd
-            .wait_interrupt_any(false, [plug_event_mask; MAX_SUPPORTED_PORTS])
+        let flags = interrupt_receiver
+            .wait_any_masked(false, [plug_event_mask; MAX_SUPPORTED_PORTS])
             .await;
 
         for (i, flag) in flags.iter().enumerate().take(pd.num_ports()) {

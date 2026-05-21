@@ -27,10 +27,10 @@ bind_interrupts!(struct Irqs {
 type Bus<'a> = I2cDevice<'a, NoopRawMutex, I2cMaster<'a, Async>>;
 type Controller<'a> = pd_controller::controller::Controller<NoopRawMutex, Bus<'a>>;
 
-type Interrupt<'a> = pd_controller::Interrupt<'a, NoopRawMutex, Bus<'a>>;
+type InterruptProcessor<'a> = pd_controller::interrupt::InterruptProcessor<'a, NoopRawMutex, Bus<'a>>;
 
 #[embassy_executor::task]
-async fn interrupt_task(mut int_in: Input<'static>, mut interrupt: Interrupt<'static>) {
+async fn interrupt_task(mut int_in: Input<'static>, mut interrupt: InterruptProcessor<'static>) {
     pd_controller::task::interrupt_task(&mut int_in, [&mut interrupt].as_mut_slice()).await;
 }
 
@@ -47,15 +47,15 @@ async fn main(spawner: Spawner) {
     let device = I2cDevice::new(bus);
 
     static CONTROLLER: StaticCell<Controller<'static>> = StaticCell::new();
-    let controller = CONTROLLER.init(Controller::new_tps66994(device, ADDR0).unwrap());
-    let (mut pd, interrupt) = controller.make_parts();
+    let controller = CONTROLLER.init(Controller::new_tps66994(device, Default::default(), ADDR0).unwrap());
+    let (mut pd, interrupt_processor, _interrupt_receiver) = controller.make_parts();
 
     let mut delay = Delay;
     info!("Resetting PD controller");
     pd.reset(&mut delay).await.unwrap();
 
     info!("Spawing PD interrupt task");
-    spawner.spawn(interrupt_task(int_in, interrupt).unwrap());
+    spawner.spawn(interrupt_task(int_in, interrupt_processor).unwrap());
 
     let pd_fw_bytes = [0u8].as_slice(); //include_bytes!("../../fw.bin").as_slice();
 
