@@ -3,13 +3,13 @@ use embedded_hal::digital::InputPin;
 use embedded_hal_async::digital::Wait;
 use embedded_hal_async::i2c::I2c;
 
-use super::Interrupt;
+use super::interrupt::InterruptProcessor;
 use crate::{error, trace, warn};
 
 /// Task to process all given interrupts
 pub async fn interrupt_task<M: RawMutex, B: I2c, INT: Wait + InputPin>(
     int: &mut INT,
-    interrupts: &mut [&mut Interrupt<'_, M, B>],
+    interrupts: &mut [&mut InterruptProcessor<'_, M, B>],
 ) {
     let mut retry_strategy = retry_strategy::ExponentialBackoff::default();
     loop {
