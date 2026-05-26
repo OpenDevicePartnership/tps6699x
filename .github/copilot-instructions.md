@@ -1,3 +1,12 @@
+# NOTE FOR AI AGENTS
+#
+# The authoritative guide for working in this repository is `AGENTS.md` at the
+# repository root. It is a strict superset of this file (project overview,
+# build/test/lint commands, coding conventions, async/panic safety, commit
+# conventions including the `Assisted-by` trailer, and PR-review focus areas).
+# Read `AGENTS.md` first; this file is preserved for backward compatibility
+# with tools that still look for `.github/copilot-instructions.md`.
+
 # Rust PR Review Instructions
 CI overview:
 * CI will build the project and run `cargo test` and `cargo clippy`.
