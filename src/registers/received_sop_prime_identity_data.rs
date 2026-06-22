@@ -10,7 +10,7 @@ use embedded_usb_pd::vdm::structured::command::discover_identity::active_cable_v
 };
 use embedded_usb_pd::vdm::structured::command::discover_identity::passive_cable_vdo::ParsePassiveCableVdoError;
 use embedded_usb_pd::vdm::structured::command::discover_identity::sop_prime::{
-    id_header_vdo, IdHeaderVdo, ProductTypeVdos,
+    IdHeaderVdo, ProductTypeVdos, id_header_vdo,
 };
 use embedded_usb_pd::vdm::structured::command::discover_identity::vpd_vdo::ParseVpdVdoError;
 use embedded_usb_pd::vdm::structured::command::discover_identity::{

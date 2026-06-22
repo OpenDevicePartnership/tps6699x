@@ -7,20 +7,20 @@ use bincode::config;
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use embassy_sync::mutex::{Mutex, MutexGuard};
 use embassy_sync::signal::Signal;
-use embassy_time::{with_timeout, Timer};
+use embassy_time::{Timer, with_timeout};
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::ado::{self, Ado};
 use embedded_usb_pd::pdinfo::AltMode;
-use embedded_usb_pd::{pdo, Error, LocalPortId, PdError};
+use embedded_usb_pd::{Error, LocalPortId, PdError, pdo};
 
 use crate::asynchronous::embassy::interrupt::InterruptReceiver;
 use crate::asynchronous::internal;
 use crate::asynchronous::interrupt::InterruptController;
-use crate::command::{gcdm, muxr, trig, vdms, Command, ReturnValue, SrdySwitch};
+use crate::command::{Command, ReturnValue, SrdySwitch, gcdm, muxr, trig, vdms};
 use crate::registers::autonegotiate_sink::AutoComputeSinkMaxVoltage;
 use crate::registers::field_sets::IntEventBus1;
-use crate::{error, registers, trace, DeviceError, Mode, MAX_SUPPORTED_PORTS};
+use crate::{DeviceError, MAX_SUPPORTED_PORTS, Mode, error, registers, trace};
 
 pub mod fw_update;
 pub mod interrupt;

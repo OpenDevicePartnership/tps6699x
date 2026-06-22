@@ -283,7 +283,7 @@ impl AutonegotiateSink {
 
     /// Get the raw byte representation of the autonegotiate sink register.
     pub fn as_bytes(&self) -> &[u8; LEN] {
-        &self.0 .0
+        &self.0.0
     }
 
     /// Configuration for tie-breaker in PDO selection.
@@ -616,7 +616,7 @@ impl From<[u8; LEN]> for AutonegotiateSink {
 
 impl From<AutonegotiateSink> for [u8; LEN] {
     fn from(value: AutonegotiateSink) -> Self {
-        value.0 .0
+        value.0.0
     }
 }
 

@@ -121,7 +121,7 @@ pub(crate) mod test {
     use tokio::time::sleep;
 
     use super::*;
-    use crate::command::{TfudArgs, TfuiArgs, TFUD_ARGS_LEN};
+    use crate::command::{TFUD_ARGS_LEN, TfudArgs, TfuiArgs};
     use crate::fw_update::{APP_IMAGE_SIZE_OFFSET, HEADER_BLOCK_LEN, HEADER_METADATA_OFFSET};
 
     pub const PORT0_ADDR0: u8 = ADDR0[0];

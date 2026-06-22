@@ -5,9 +5,9 @@ use embedded_usb_pd::pdinfo::AltMode;
 use embedded_usb_pd::pdo::{self, sink, source};
 use embedded_usb_pd::{Error, LocalPortId, PdError};
 
-use crate::registers::rx_caps::{RxCapsError, EPR_PDO_START_INDEX};
+use crate::registers::rx_caps::{EPR_PDO_START_INDEX, RxCapsError};
 use crate::{
-    registers, warn, DeviceError, Mode, MAX_SUPPORTED_PORTS, PORT0, PORT1, TPS66993_NUM_PORTS, TPS66994_NUM_PORTS,
+    DeviceError, MAX_SUPPORTED_PORTS, Mode, PORT0, PORT1, TPS66993_NUM_PORTS, TPS66994_NUM_PORTS, registers, warn,
 };
 
 mod command;
@@ -1124,8 +1124,8 @@ mod test {
         buf[0] = rx_caps::LEN as u8;
         // Set header: low 3 bits are SPR PDO count
         buf[1] = 0xa; // 2 SPR PDOs, 1 EPR PDOs
-                      // Fill PDOs with test data
-                      // SPR PDO 0 - Fixed PDO at 5V, 3A, 100% peak current
+        // Fill PDOs with test data
+        // SPR PDO 0 - Fixed PDO at 5V, 3A, 100% peak current
         buf[2..6].copy_from_slice(&TEST_SRC_PDO_FIXED_5V3A_RAW.to_le_bytes());
         // SPR PDO 1 - Fixed PDO at 5V, 1.5A, 100% peak current
         buf[6..10].copy_from_slice(&TEST_SRC_PDO_FIXED_5V1A5_RAW.to_le_bytes());

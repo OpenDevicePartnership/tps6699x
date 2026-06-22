@@ -1,8 +1,8 @@
 //! The `Trig` command.
 
+use bincode::Encode;
 use bincode::enc::Encoder;
 use bincode::error::EncodeError;
-use bincode::Encode;
 
 /// The length of the arguments for the `Trig` command.
 #[allow(dead_code)]

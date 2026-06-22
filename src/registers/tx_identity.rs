@@ -180,7 +180,7 @@ impl TxIdentity {
 
     /// Get the raw byte representation of the Tx Identity register.
     pub fn as_bytes(&self) -> &[u8; LEN] {
-        &self.0 .0
+        &self.0.0
     }
 
     /// Get number of valid VDOs
@@ -324,7 +324,7 @@ impl From<[u8; LEN]> for TxIdentity {
 
 impl From<TxIdentity> for [u8; LEN] {
     fn from(value: TxIdentity) -> Self {
-        value.0 .0
+        value.0.0
     }
 }
 

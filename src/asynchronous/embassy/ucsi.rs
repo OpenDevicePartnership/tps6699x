@@ -1,8 +1,8 @@
 //! UCSI related functionality
 use bincode::{decode_from_slice_with_context, encode_into_slice};
+use embedded_usb_pd::PowerRole;
 use embedded_usb_pd::pdo::PDO_LEN;
 use embedded_usb_pd::ucsi::lpm;
-use embedded_usb_pd::PowerRole;
 
 use super::*;
 use crate::registers::REG_DATA1_LEN;

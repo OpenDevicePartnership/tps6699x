@@ -536,7 +536,7 @@ impl PortConfig {
 
     /// Get the raw byte representation of the port configuration register.
     pub fn as_bytes(&self) -> &[u8; LEN] {
-        &self.0 .0
+        &self.0.0
     }
 
     /// Configuration for flipping PX_SBTX/RX.
@@ -879,7 +879,7 @@ impl From<[u8; LEN]> for PortConfig {
 
 impl From<PortConfig> for [u8; LEN] {
     fn from(value: PortConfig) -> Self {
-        value.0 .0
+        value.0.0
     }
 }
 

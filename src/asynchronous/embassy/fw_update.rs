@@ -9,7 +9,7 @@ use super::Tps6699x;
 use crate::asynchronous::fw_update::UpdateTarget;
 use crate::command::*;
 use crate::fw_update::*;
-use crate::{error, info, warn, PORT0};
+use crate::{PORT0, error, info, warn};
 
 impl<M: RawMutex, B: I2c> UpdateTarget for Tps6699x<'_, M, B> {
     /// Enter firmware update mode with the TFUs command

@@ -10,12 +10,12 @@ use embedded_usb_pd::{Error, PdError};
 use super::interrupt::InterruptController;
 use crate::command::{ReturnValue, TfudArgs, TfuiArgs, TfuqBlockStatus};
 use crate::fw_update::{
-    State, UpdateConfig, APP_CONFIG_BLOCK_INDEX, DATA_BLOCK_LEN, DATA_BLOCK_METADATA_LEN, DATA_BLOCK_START_INDEX,
-    HEADER_BLOCK_INDEX, HEADER_BLOCK_LEN, HEADER_BLOCK_OFFSET, HEADER_METADATA_LEN, HEADER_METADATA_OFFSET,
-    IMAGE_ID_LEN, MAX_METADATA_LEN, TFUD_BURST_WRITE_DELAY_MS, TFUI_BURST_WRITE_DELAY_MS, UPDATE_CHUNK_LENGTH,
+    APP_CONFIG_BLOCK_INDEX, DATA_BLOCK_LEN, DATA_BLOCK_METADATA_LEN, DATA_BLOCK_START_INDEX, HEADER_BLOCK_INDEX,
+    HEADER_BLOCK_LEN, HEADER_BLOCK_OFFSET, HEADER_METADATA_LEN, HEADER_METADATA_OFFSET, IMAGE_ID_LEN, MAX_METADATA_LEN,
+    State, TFUD_BURST_WRITE_DELAY_MS, TFUI_BURST_WRITE_DELAY_MS, UPDATE_CHUNK_LENGTH, UpdateConfig,
 };
 use crate::stream::*;
-use crate::{debug, error, info, trace, warn, PORT0};
+use crate::{PORT0, debug, error, info, trace, warn};
 
 /// Size of args_buffer used for reading various metadata
 const BUFFER_LENGTH: usize = MAX_METADATA_LEN;
@@ -756,9 +756,9 @@ pub async fn perform_fw_update_borrowed<T: UpdateTarget>(
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::asynchronous::interrupt::InterruptGuard;
-    use crate::test::{generate_mock_fw, Delay};
     use crate::MAX_SUPPORTED_PORTS;
+    use crate::asynchronous::interrupt::InterruptGuard;
+    use crate::test::{Delay, generate_mock_fw};
     extern crate std;
 
     /// Simple mock update target for testing that validates the length of the data written
