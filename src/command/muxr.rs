@@ -57,3 +57,66 @@ bitfield! {
     /// `I2C_CNTLR_CONFIG.TargetAddrTbt2` as the target address.
     pub bool, en_retry_on_target_addr_tbt, set_en_retry_on_target_addr_tbt: 8;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_input_nonzero_roundtrip() {
+        // Set specific flags via setters
+        let mut input = Input(0);
+        input.set_en_retry_on_target_addr_1(true);
+        input.set_en_retry_on_target_addr_3(true);
+        input.set_en_retry_on_target_addr_5(true);
+        input.set_en_retry_on_target_addr_7(true);
+        input.set_en_retry_on_target_addr_tbt(true);
+
+        // Assert raw u16 value: bits 0, 2, 4, 6, 8 = 0x0155
+        const EXPECTED: u16 = 0x0155;
+        assert_eq!(input.0, EXPECTED);
+
+        // Reconstruct from the expected u16 and verify all getters
+        let input2 = Input(EXPECTED);
+        assert!(input2.en_retry_on_target_addr_1());
+        assert!(!input2.en_retry_on_target_addr_2());
+        assert!(input2.en_retry_on_target_addr_3());
+        assert!(!input2.en_retry_on_target_addr_4());
+        assert!(input2.en_retry_on_target_addr_5());
+        assert!(!input2.en_retry_on_target_addr_6());
+        assert!(input2.en_retry_on_target_addr_7());
+        assert!(!input2.en_retry_on_target_addr_8());
+        assert!(input2.en_retry_on_target_addr_tbt());
+    }
+
+    #[test]
+    fn test_input_all_flags_roundtrip() {
+        // Set all flags via setters
+        let mut input = Input(0);
+        input.set_en_retry_on_target_addr_1(true);
+        input.set_en_retry_on_target_addr_2(true);
+        input.set_en_retry_on_target_addr_3(true);
+        input.set_en_retry_on_target_addr_4(true);
+        input.set_en_retry_on_target_addr_5(true);
+        input.set_en_retry_on_target_addr_6(true);
+        input.set_en_retry_on_target_addr_7(true);
+        input.set_en_retry_on_target_addr_8(true);
+        input.set_en_retry_on_target_addr_tbt(true);
+
+        // All 9 flags set: bits 0-8 = 0x01FF
+        const EXPECTED: u16 = 0x01FF;
+        assert_eq!(input.0, EXPECTED);
+
+        // Reconstruct and verify
+        let input2 = Input(EXPECTED);
+        assert!(input2.en_retry_on_target_addr_1());
+        assert!(input2.en_retry_on_target_addr_2());
+        assert!(input2.en_retry_on_target_addr_3());
+        assert!(input2.en_retry_on_target_addr_4());
+        assert!(input2.en_retry_on_target_addr_5());
+        assert!(input2.en_retry_on_target_addr_6());
+        assert!(input2.en_retry_on_target_addr_7());
+        assert!(input2.en_retry_on_target_addr_8());
+        assert!(input2.en_retry_on_target_addr_tbt());
+    }
+}

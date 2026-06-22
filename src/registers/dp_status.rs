@@ -51,3 +51,54 @@ bitfield! {
 /// The actual flags bitfield is generic over the size of the array
 /// Provide this type alias for convenience
 pub type DpStatus = DpStatusRaw<[u8; LEN]>;
+
+#[cfg(test)]
+mod tests {
+    use super::{DpStatus, DpStatusRaw, LEN};
+
+    #[test]
+    fn test_dp_status_nonzero_roundtrip() {
+        const EXPECTED: [u8; LEN] = [
+            0x03, 0xDD, 0xCC, 0xBB, 0xAA, 0x44, 0x33, 0x22, 0x11, 0x88, 0x77, 0x66, 0x55, 0xCC, 0xBB, 0xAA, 0x99, 0x00,
+            0xFF, 0xEE, 0xDD, 0x78, 0x56, 0x34, 0x12, 0xF0, 0xDE, 0xBC, 0x9A, 0xDF, 0x9B, 0x57, 0x13, 0xE0, 0xAC, 0x68,
+            0x24, 0xDA,
+        ];
+
+        let mut status: DpStatus = DpStatusRaw([0u8; LEN]);
+        status.set_dp_detected(1);
+        status.set_dp_mode_active(1);
+        status.set_dp_status_tx(0xAABBCCDD);
+        status.set_dp_status_rx(0x11223344);
+        status.set_dp_configure_message(0x55667788);
+        status.set_dp_mode_data(0x99AABBCC);
+        status.set_dp_status_to_plug(0xDDEEFF00);
+        status.set_dp_status_ack_from_plug(0x12345678);
+        status.set_dp_config_to_plug(0x9ABCDEF0);
+        status.set_dp_config_from_plug(0x13579BDF);
+        status.set_dp_mode_data_sopprime(0x2468ACE0);
+        status.set_dp_signalling_rate(0xA);
+        status.set_cable_uhbr13_5_support(1);
+        status.set_cable_active_component(2);
+        status.set_dp_ufp_vdo_version(1);
+
+        let bytes = status.0;
+        assert_eq!(bytes, EXPECTED);
+
+        let status2: DpStatus = DpStatusRaw(EXPECTED);
+        assert_eq!(status2.dp_detected(), 1);
+        assert_eq!(status2.dp_mode_active(), 1);
+        assert_eq!(status2.dp_status_tx(), 0xAABBCCDD);
+        assert_eq!(status2.dp_status_rx(), 0x11223344);
+        assert_eq!(status2.dp_configure_message(), 0x55667788);
+        assert_eq!(status2.dp_mode_data(), 0x99AABBCC);
+        assert_eq!(status2.dp_status_to_plug(), 0xDDEEFF00);
+        assert_eq!(status2.dp_status_ack_from_plug(), 0x12345678);
+        assert_eq!(status2.dp_config_to_plug(), 0x9ABCDEF0);
+        assert_eq!(status2.dp_config_from_plug(), 0x13579BDF);
+        assert_eq!(status2.dp_mode_data_sopprime(), 0x2468ACE0);
+        assert_eq!(status2.dp_signalling_rate(), 0xA);
+        assert_eq!(status2.cable_uhbr13_5_support(), 1);
+        assert_eq!(status2.cable_active_component(), 2);
+        assert_eq!(status2.dp_ufp_vdo_version(), 1);
+    }
+}

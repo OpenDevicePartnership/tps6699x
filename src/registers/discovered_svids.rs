@@ -207,4 +207,38 @@ mod tests {
         assert_eq!(reg.svid_sop().len(), 8);
         assert_eq!(reg.svid_sop_prime().len(), 8);
     }
+
+    #[test]
+    fn test_discovered_svids_nonzero_roundtrip() {
+        let mut reg = DiscoveredSvids::default();
+
+        // Set header counts and SVIDs
+        reg.0.set_number_sop_svids(4);
+        reg.0.set_number_sop_prime_svids(3);
+        reg.0.set_svid_sop0(0xFF01);
+        reg.0.set_svid_sop1(0xABCD);
+        reg.0.set_svid_sop2(0x5678);
+        reg.0.set_svid_sop3(0x9A00);
+        reg.0.set_svid_sop_prime0(0x1234);
+        reg.0.set_svid_sop_prime1(0xDEF0);
+        reg.0.set_svid_sop_prime2(0x00FF);
+
+        // sop_count=4, sop_prime_count=3, followed by sop/sop' values
+        const EXPECTED: [u8; LEN] = [
+            0x34, 0x01, 0xFF, 0xCD, 0xAB, 0x78, 0x56, 0x00, 0x9A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x34,
+            0x12, 0xF0, 0xDE, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        ];
+        assert_eq!(reg.0 .0, EXPECTED);
+
+        // Reconstruct from expected bytes and verify getters
+        let reg2 = DiscoveredSvids::from(EXPECTED);
+        assert_eq!(reg2.number_sop_svids(), 4);
+        assert_eq!(reg2.number_sop_prime_svids(), 3);
+
+        let sop: Vec<Svid> = reg2.svid_sop().collect();
+        assert_eq!(sop, vec![Svid(0xFF01), Svid(0xABCD), Svid(0x5678), Svid(0x9A00)]);
+
+        let sop_prime: Vec<Svid> = reg2.svid_sop_prime().collect();
+        assert_eq!(sop_prime, vec![Svid(0x1234), Svid(0xDEF0), Svid(0x00FF)]);
+    }
 }

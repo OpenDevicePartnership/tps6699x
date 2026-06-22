@@ -93,3 +93,44 @@ impl Default for RxOtherVdm {
         Self::DEFAULT.into()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_rx_other_vdm_nonzero() {
+        // Construct with setters on the raw bitfield
+        let mut raw = RxOtherVdmRaw([0u8; LEN]);
+        raw.set_num_of_valid_vdos(7);
+        raw.set_sop_type(2);
+        raw.set_sequence_number(6);
+        raw.set_vdo1(0xDEADBEEF);
+        raw.set_vdo2(0x11223344);
+        raw.set_vdo3(0x55667788);
+        raw.set_vdo4(0x9ABCDEF0);
+        raw.set_vdo5(0x13579BDF);
+        raw.set_vdo6(0x2468ACE0);
+        raw.set_vdo7(0xFEDCBA98);
+
+        // Convert to bytes and assert against expected
+        // Byte 0: num_of_valid_vdos(2:0)=7, sop_type(4:3)=2, sequence_number(7:5)=6
+        const EXPECTED: [u8; LEN] = [
+            0xD7, 0xEF, 0xBE, 0xAD, 0xDE, 0x44, 0x33, 0x22, 0x11, 0x88, 0x77, 0x66, 0x55, 0xF0, 0xDE, 0xBC, 0x9A, 0xDF,
+            0x9B, 0x57, 0x13, 0xE0, 0xAC, 0x68, 0x24, 0x98, 0xBA, 0xDC, 0xFE,
+        ];
+        assert_eq!(raw.0, EXPECTED);
+
+        // Reconstruct from expected bytes and verify getters
+        let vdm = RxOtherVdm::from(EXPECTED);
+        assert!(vdm.is_valid_other_vdm());
+        let data = vdm.vdm_data();
+        assert_eq!(data[0], 0xDEADBEEF);
+        assert_eq!(data[1], 0x11223344);
+        assert_eq!(data[2], 0x55667788);
+        assert_eq!(data[3], 0x9ABCDEF0);
+        assert_eq!(data[4], 0x13579BDF);
+        assert_eq!(data[5], 0x2468ACE0);
+        assert_eq!(data[6], 0xFEDCBA98);
+    }
+}
