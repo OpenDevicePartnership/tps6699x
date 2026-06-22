@@ -8,7 +8,7 @@ use embedded_usb_pd::{Error, LocalPortId, PdError};
 
 use super::Tps6699x;
 use crate::command::*;
-use crate::{debug, error, registers as regs, Mode, PORT0};
+use crate::{Mode, PORT0, debug, error, registers as regs};
 
 impl<B: I2c> Tps6699x<B> {
     /// Sends a command without verifying that it is valid
@@ -75,11 +75,11 @@ impl<B: I2c> Tps6699x<B> {
             regs::REG_DATA1_LEN
         };
 
-        if let Some(ref data) = data {
-            if data.len() > max_len {
-                // Data length too long
-                return PdError::InvalidParams.into();
-            }
+        if let Some(ref data) = data
+            && data.len() > max_len
+        {
+            // Data length too long
+            return PdError::InvalidParams.into();
         }
 
         // Read and return value and data
