@@ -2,7 +2,7 @@
 use core::array::from_fn;
 
 use embassy_sync::blocking_mutex::raw::RawMutex;
-use embassy_time::{with_timeout, Duration};
+use embassy_time::{Duration, with_timeout};
 use embedded_hal::digital::InputPin;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::{Error, LocalPortId, PdError};
@@ -10,7 +10,7 @@ use itertools::izip;
 
 use crate::asynchronous::embassy::controller::Controller;
 use crate::registers::field_sets::IntEventBus1;
-use crate::{error, trace, warn, MAX_SUPPORTED_PORTS};
+use crate::{MAX_SUPPORTED_PORTS, error, trace, warn};
 
 /// Configuration for [`InterruptProcessor`]
 #[non_exhaustive]
@@ -241,13 +241,13 @@ impl<'a, M: RawMutex, B: I2c> InterruptReceiver<'a, M, B> {
 #[cfg(test)]
 mod test {
     use embassy_sync::blocking_mutex::raw::NoopRawMutex;
-    use embassy_time::{with_timeout, Duration, TimeoutError};
+    use embassy_time::{Duration, TimeoutError, with_timeout};
     use embedded_hal_mock::eh1::i2c::Mock;
     use static_cell::StaticCell;
 
     use super::*;
-    use crate::asynchronous::embassy::controller::Controller;
     use crate::ADDR0;
+    use crate::asynchronous::embassy::controller::Controller;
 
     /// Tests `wait_any_masked` with a mask for both ports.
     #[tokio::test]

@@ -1,6 +1,6 @@
 //! Higher-level wrapper for the rx src/sink caps register.
 
-use embedded_usb_pd::pdo::{self, sink, source, Common};
+use embedded_usb_pd::pdo::{self, Common, sink, source};
 
 use crate::registers::rx_caps::{NUM_EPR_PDOS, NUM_SPR_PDOS};
 

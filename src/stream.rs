@@ -78,8 +78,7 @@ impl SeekingStream {
         } else {
             trace!(
                 "Still waiting for target byte: {:#x} current: {:#x}",
-                self.target,
-                self.position
+                self.target, self.position
             );
             // Still waiting for a particular byte
             self.position += data.len();

@@ -88,7 +88,7 @@ impl Input {
     }
 
     pub fn as_bytes(&self) -> &[u8; INPUT_LEN] {
-        &self.0 .0
+        &self.0.0
     }
 
     pub fn set_num_vdo(&mut self, num: u8) {
@@ -132,7 +132,7 @@ impl Input {
 
 impl From<Input> for [u8; INPUT_LEN] {
     fn from(value: Input) -> Self {
-        value.0 .0
+        value.0.0
     }
 }
 

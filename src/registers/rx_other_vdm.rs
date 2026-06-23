@@ -56,7 +56,7 @@ impl RxOtherVdm {
 
     /// Get the raw byte representation of the port configuration register.
     pub fn as_bytes(&self) -> &[u8; LEN] {
-        &self.0 .0
+        &self.0.0
     }
 
     pub fn is_valid_other_vdm(&self) -> bool {
@@ -84,7 +84,7 @@ impl From<[u8; LEN]> for RxOtherVdm {
 
 impl From<RxOtherVdm> for [u8; LEN] {
     fn from(value: RxOtherVdm) -> Self {
-        value.0 .0
+        value.0.0
     }
 }
 

@@ -1,5 +1,5 @@
 use embedded_usb_pd::type_c::ConnectionState;
-use embedded_usb_pd::{type_c, PdError};
+use embedded_usb_pd::{PdError, type_c};
 
 use crate::Mode;
 

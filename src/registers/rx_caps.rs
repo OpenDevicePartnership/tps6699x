@@ -1,5 +1,5 @@
 use bitfield::bitfield;
-use embedded_usb_pd::pdo::{sink, source, Common, ExpectedPdo, RoleCommon};
+use embedded_usb_pd::pdo::{Common, ExpectedPdo, RoleCommon, sink, source};
 
 /// Rx source caps register address
 pub const RX_SRC_ADDR: u8 = 0x30;
@@ -166,7 +166,7 @@ impl<T: RoleCommon> TryFrom<[u8; LEN]> for RxCaps<T> {
                     return Err(RxCapsError::InvalidPdoIndex(InvalidPdoIndex {
                         requested: i,
                         max: NUM_SPR_PDOS,
-                    }))
+                    }));
                 }
             })
             .map_err(RxCapsError::ExpectedPdo)?;
@@ -188,7 +188,7 @@ impl<T: RoleCommon> TryFrom<[u8; LEN]> for RxCaps<T> {
                     return Err(RxCapsError::InvalidPdoIndex(InvalidPdoIndex {
                         requested: i,
                         max: NUM_EPR_PDOS,
-                    }))
+                    }));
                 }
             })
             .map_err(RxCapsError::ExpectedPdo)?;
@@ -219,8 +219,8 @@ mod test {
         let mut buf = [0u8; LEN];
         // Set header: low 3 bits are SPR PDO count
         buf[0] = 0xa; // 2 SPR PDOs, 1 EPR PDOs
-                      // Fill PDOs with test data
-                      // SPR PDO 0 - Fixed PDO at 5V, 3A, 100% peak current
+        // Fill PDOs with test data
+        // SPR PDO 0 - Fixed PDO at 5V, 3A, 100% peak current
         buf[1..5].copy_from_slice(&TEST_SRC_PDO_FIXED_5V3A_RAW.to_le_bytes());
         // SPR PDO 1 - Fixed PDO at 5V, 1.5A, 100% peak current
         buf[5..9].copy_from_slice(&TEST_SRC_PDO_FIXED_5V1A5_RAW.to_le_bytes());

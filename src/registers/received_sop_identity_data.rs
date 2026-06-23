@@ -6,7 +6,7 @@
 
 use bitfield::bitfield;
 use embedded_usb_pd::vdm::structured::command::discover_identity::sop::{
-    id_header_vdo, DfpProductTypeVdos, IdHeaderVdo, UfpProductTypeVdos,
+    DfpProductTypeVdos, IdHeaderVdo, UfpProductTypeVdos, id_header_vdo,
 };
 use embedded_usb_pd::vdm::structured::command::discover_identity::ufp_vdo::ParseUfpVdoError;
 use embedded_usb_pd::vdm::structured::command::discover_identity::{CertStatVdo, ProductTypeVdo, ProductVdo};
