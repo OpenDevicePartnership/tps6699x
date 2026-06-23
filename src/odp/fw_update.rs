@@ -6,9 +6,9 @@ use embedded_usb_pd::PdError;
 use fw_update_interface::basic::{Error as BasicFwUpdateError, FwUpdate as BasicFwUpdate};
 
 use crate::asynchronous::embassy as tps6699x_drv;
-use crate::asynchronous::fw_update::{disable_all_interrupts, enable_port0_interrupts, BorrowedUpdater, UpdateTarget};
+use crate::asynchronous::fw_update::{BorrowedUpdater, UpdateTarget, disable_all_interrupts, enable_port0_interrupts};
 use crate::odp::driver::{FwUpdateState, Tps6699x};
-use crate::{error, warn, MAX_SUPPORTED_PORTS};
+use crate::{MAX_SUPPORTED_PORTS, error, warn};
 
 /// Converts a PD error into a basic FW update error
 pub fn basic_fw_update_error_from_pd_error(pd_error: PdError) -> BasicFwUpdateError {

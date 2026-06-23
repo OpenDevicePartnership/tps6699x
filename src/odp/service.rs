@@ -6,7 +6,7 @@ use type_c_interface::port::event::PortEventBitfield;
 
 use crate::asynchronous::embassy::interrupt;
 use crate::registers::field_sets::IntEventBus1;
-use crate::{debug, MAX_SUPPORTED_PORTS};
+use crate::{MAX_SUPPORTED_PORTS, debug};
 
 impl<'a, M: RawMutex, BUS: I2c> type_c_service::controller::event_receiver::InterruptReceiver<MAX_SUPPORTED_PORTS>
     for interrupt::InterruptReceiver<'a, M, BUS>
