@@ -13,14 +13,14 @@ dependencies = [
  "proc-macro-error2",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 2.0.117",
 ]
 
 [[package]]
 name = "autocfg"
-version = "1.5.1"
+version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
+checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
 
 [[package]]
 name = "bare-metal"
@@ -95,7 +95,7 @@ checksum = "f48d6ace212fdf1b45fd6b566bb40808415344642b76c3224c07c8df9da81e97"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 2.0.117",
 ]
 
 [[package]]
@@ -106,7 +106,7 @@ checksum = "8769c4854c5ada2852ddf6fd09d15cf43d4c2aaeccb4de6432f5402f08a6003b"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 2.0.117",
 ]
 
 [[package]]
@@ -117,9 +117,9 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "bitflags"
-version = "2.13.0"
+version = "2.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4388bee8683e3d04af747c73422af53102d2bd24d9eadb6cbc100baef4b43f8"
+checksum = "2261d10cca569e4643e526d8dc2e62e433cc8aba21ab764233731f8d369bf394"
 
 [[package]]
 name = "byteorder"
@@ -180,7 +180,7 @@ dependencies = [
  "proc-macro-error2",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 2.0.117",
 ]
 
 [[package]]
@@ -289,7 +289,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40f975432b4e146342a1589c563cffab6b7a692024cb511bf87b6bfe78c84125"
 dependencies = [
  "bitfield-struct",
- "bitflags 2.13.0",
+ "bitflags 2.9.4",
  "defmt 0.3.100",
  "embedded-hal 1.0.0",
  "zerocopy",
@@ -398,7 +398,7 @@ dependencies = [
 [[package]]
 name = "embedded-services"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-services#83913a7fb7b606b7511e378d649ceede2445f5af"
+source = "git+https://github.com/OpenDevicePartnership/embedded-services#ff66417672ff443c401e68ffd2e90a2de92e98de"
 dependencies = [
  "bitfield 0.17.0",
  "cortex-m",
@@ -436,10 +436,10 @@ dependencies = [
 [[package]]
 name = "espi-device"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/haf-ec-service#29af461a6eed94ae3f6a599bf235e49b8e8100aa"
+source = "git+https://github.com/OpenDevicePartnership/haf-ec-service#eb20213dd5b6476cbedadc2cb25be513a7665076"
 dependencies = [
  "bit-register 0.1.0 (git+https://github.com/OpenDevicePartnership/odp-utilities?tag=v0.1.0)",
- "bitflags 2.13.0",
+ "bitflags 2.9.4",
  "num-traits",
  "num_enum",
  "static_assertions",
@@ -461,7 +461,7 @@ checksum = "c39754e157331b013978ec91992bde1ac089843443c49cbc7f46150b0fad0893"
 [[package]]
 name = "fw-update-interface"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-services#83913a7fb7b606b7511e378d649ceede2445f5af"
+source = "git+https://github.com/OpenDevicePartnership/embedded-services#ff66417672ff443c401e68ffd2e90a2de92e98de"
 dependencies = [
  "defmt 0.3.100",
  "embedded-services",
@@ -498,9 +498,9 @@ dependencies = [
 
 [[package]]
 name = "heck"
-version = "0.5.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
+checksum = "95505c38b4572b2d910cecb0281560f54b440a19336cbbcb27bf6ce6adc6f5a8"
 
 [[package]]
 name = "include_dir"
@@ -547,14 +547,14 @@ checksum = "11d3d7f243d5c5a8b9bb5d6dd2b1602c0cb0b9db1621bafc7ed66e35ff9fe092"
 
 [[package]]
 name = "log"
-version = "0.4.32"
+version = "0.4.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "953f07c43838f8e6f9758cab68bf5bed85465e7587ebe0b823f1bcd81978ad3a"
+checksum = "34080505efa8e45a4b816c349525ebe327ceaa8559756f0356cba97ef3bf7432"
 
 [[package]]
 name = "mctp-rs"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-services#83913a7fb7b606b7511e378d649ceede2445f5af"
+source = "git+https://github.com/OpenDevicePartnership/embedded-services#ff66417672ff443c401e68ffd2e90a2de92e98de"
 dependencies = [
  "bit-register 0.1.0 (git+https://github.com/OpenDevicePartnership/odp-utilities)",
  "defmt 0.3.100",
@@ -660,7 +660,7 @@ checksum = "680998035259dcfcafe653688bf2aa6d3e2dc05e98be6ab46afb089dc84f1df8"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 2.0.117",
 ]
 
 [[package]]
@@ -684,7 +684,7 @@ checksum = "c33a9471896f1c69cecef8d20cbe2f7accd12527ce60845ff44c153bb2a21b49"
 [[package]]
 name = "power-policy-interface"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-services#83913a7fb7b606b7511e378d649ceede2445f5af"
+source = "git+https://github.com/OpenDevicePartnership/embedded-services#ff66417672ff443c401e68ffd2e90a2de92e98de"
 dependencies = [
  "bitfield 0.17.0",
  "defmt 0.3.100",
@@ -713,23 +713,23 @@ dependencies = [
  "proc-macro-error-attr2",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 2.0.117",
 ]
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.106"
+version = "1.0.102"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8fd00f0bb2e90d81d1044c2b32617f68fcb9fa3bb7640c23e9c748e53fb30934"
+checksum = "8e0f6df8eaa422d97d72edcd152e1451618fed47fabbdbd5a8864167b1d4aff7"
 dependencies = [
  "unicode-ident",
 ]
 
 [[package]]
 name = "quote"
-version = "1.0.45"
+version = "1.0.42"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41f2619966050689382d2b44f664f4bc593e129785a36d6ee376ddf37259b924"
+checksum = "a338cc41d27e6cc6dce6cefc13a0729dfbb81c262b1f519331575dd80ef3067f"
 dependencies = [
  "proc-macro2",
 ]
@@ -791,7 +791,7 @@ checksum = "d540f220d3187173da220f885ab66608367b6574e925011a9353e4badda91d79"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 2.0.117",
 ]
 
 [[package]]
@@ -826,14 +826,25 @@ dependencies = [
 
 [[package]]
 name = "subenum"
-version = "1.2.0"
+version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5eee3fb942ed39f3971438fcc7e05e20717e599e14c5c7cb50edd0df2a44b274"
+checksum = "4f5d5dfb8556dd04017db5e318bbeac8ab2b0c67b76bf197bfb79e9b29f18ecf"
 dependencies = [
  "heck",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "syn"
+version = "1.0.109"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72b64191b275b66ffe2469e8af2c1cfe3bafa67b529ead792a6d0160888b4237"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "unicode-ident",
 ]
 
 [[package]]
@@ -864,7 +875,7 @@ checksum = "ebc4ee7f67670e9b64d05fa4253e753e016c6c95ff35b89b7941d6b856dec1d5"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 2.0.117",
 ]
 
 [[package]]
@@ -885,7 +896,7 @@ checksum = "385a6cb71ab9ab790c5fe8d67f1645e6c450a7ce006a33de03daa956cf70a496"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 2.0.117",
 ]
 
 [[package]]
@@ -894,7 +905,7 @@ version = "0.1.0"
 dependencies = [
  "bincode",
  "bitfield 0.19.4",
- "bitflags 2.13.0",
+ "bitflags 2.9.4",
  "critical-section",
  "defmt 0.3.100",
  "device-driver",
@@ -920,7 +931,7 @@ dependencies = [
 [[package]]
 name = "tps6699x"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/tps6699x#8bda5b16bb1471a9290a87d251778595fdf4b7c8"
+source = "git+https://github.com/OpenDevicePartnership/tps6699x#dbc2c5e215349e094abe7cc78ff85a2a9fa531c9"
 dependencies = [
  "bincode",
  "bitfield 0.19.4",
@@ -939,7 +950,7 @@ dependencies = [
 [[package]]
 name = "type-c-interface"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-services#83913a7fb7b606b7511e378d649ceede2445f5af"
+source = "git+https://github.com/OpenDevicePartnership/embedded-services#ff66417672ff443c401e68ffd2e90a2de92e98de"
 dependencies = [
  "bitfield 0.17.0",
  "defmt 0.3.100",
@@ -952,10 +963,10 @@ dependencies = [
 [[package]]
 name = "type-c-service"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-services#83913a7fb7b606b7511e378d649ceede2445f5af"
+source = "git+https://github.com/OpenDevicePartnership/embedded-services#ff66417672ff443c401e68ffd2e90a2de92e98de"
 dependencies = [
  "bitfield 0.17.0",
- "bitflags 2.13.0",
+ "bitflags 2.9.4",
  "defmt 0.3.100",
  "embassy-futures",
  "embassy-sync",
@@ -1026,5 +1037,5 @@ checksum = "1ae7f38b72ec2a254e2b87ef277cf2cd4fb97cbebf944faa6f33354da0867930"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 2.0.117",
 ]
