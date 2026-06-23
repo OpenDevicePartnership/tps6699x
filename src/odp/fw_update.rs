@@ -112,7 +112,8 @@ impl<'a, M: RawMutex, B: I2c> BasicFwUpdate for Tps6699x<'a, M, B> {
                     .map_err(|e| basic_fw_update_error_from_pd_error(self.log_error(e)))
             }
         } else {
-            // Not in FW update mode, don't need to do anything
+            // Not in FW update mode, clear any stale state
+            self.update_state = None;
             Ok(())
         }
     }
