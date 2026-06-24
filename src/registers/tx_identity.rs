@@ -463,11 +463,41 @@ mod tests {
     }
 
     #[test]
-    fn test_tx_identity_roundtrip() {
-        let original_bytes = TxIdentity::DEFAULT;
-        let tx_identity = TxIdentity::from(original_bytes);
-        let final_bytes: [u8; LEN] = tx_identity.into();
+    fn test_tx_identity_nonzero_roundtrip() {
+        const EXPECTED: [u8; LEN] = [
+            0x04, 0x34, 0x12, 0x80, 0x55, 0xDD, 0xCC, 0xBB, 0xAA, 0x78, 0x56, 0xBC, 0x9A, 0x44, 0x33, 0x22, 0x11, 0x00,
+            0x00, 0x00, 0x00, 0x88, 0x77, 0x66, 0x55,
+        ];
 
-        assert_eq!(final_bytes, original_bytes);
+        let mut tx = TxIdentity::from([0u8; LEN]);
+        tx.set_number_valid_vdos(4);
+        tx.set_vendor_id(0x1234);
+        tx.set_product_type_dfp(ProductTypeDfp::PowerBrick);
+        tx.set_modal_operation_supported(true);
+        tx.set_product_type_ufp(ProductTypeUfp::PdUsbPeripheral);
+        tx.set_usb_communication_capable_as_device(true);
+        tx.set_usb_communication_capable_as_host(false);
+        tx.set_certification_test_id(0xAABBCCDD);
+        tx.set_bcd_device(0x5678);
+        tx.set_usb_product_id(0x9ABC);
+        tx.set_ufp1_vdo(0x11223344);
+        tx.set_dfp1_vdo(0x55667788);
+
+        let bytes: [u8; LEN] = tx.into();
+        assert_eq!(bytes, EXPECTED);
+
+        let tx = TxIdentity::from(EXPECTED);
+        assert_eq!(tx.number_valid_vdos(), 4);
+        assert_eq!(tx.vendor_id(), 0x1234);
+        assert_eq!(tx.product_type_dfp(), ProductTypeDfp::PowerBrick);
+        assert!(tx.modal_operation_supported());
+        assert_eq!(tx.product_type_ufp(), ProductTypeUfp::PdUsbPeripheral);
+        assert!(tx.usb_communication_capable_as_device());
+        assert!(!tx.usb_communication_capable_as_host());
+        assert_eq!(tx.certification_test_id(), 0xAABBCCDD);
+        assert_eq!(tx.bcd_device(), 0x5678);
+        assert_eq!(tx.usb_product_id(), 0x9ABC);
+        assert_eq!(tx.ufp1_vdo(), 0x11223344);
+        assert_eq!(tx.dfp1_vdo(), 0x55667788);
     }
 }

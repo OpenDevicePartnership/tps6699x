@@ -353,6 +353,33 @@ pub(crate) mod test {
 
     /// Test source PDO fixed 5V 900mA raw
     pub const TEST_SRC_PDO_FIXED_5V900MA_RAW: u32 = test_src_pdo_fixed_raw(5000, 900);
+    /// Test source PDO fixed 5V 900mA
+    pub const TEST_SRC_PDO_FIXED_5V900MA: pdo::source::Pdo = pdo::source::Pdo::Fixed(pdo::source::FixedData {
+        voltage_mv: 5000,
+        current_ma: 900,
+        peak_current: pdo::source::PeakCurrent::Pct100,
+        ..test_src_pdo_fixed_flags()
+    });
+
+    /// Test source PDO fixed 9V 1500mA raw
+    pub const TEST_SRC_PDO_FIXED_9V1500MA_RAW: u32 = test_src_pdo_fixed_raw(9000, 1500);
+    /// Test source PDO fixed 9V 1500mA
+    pub const TEST_SRC_PDO_FIXED_9V1500MA: pdo::source::Pdo = pdo::source::Pdo::Fixed(pdo::source::FixedData {
+        voltage_mv: 9000,
+        current_ma: 1500,
+        peak_current: pdo::source::PeakCurrent::Pct100,
+        ..test_src_pdo_fixed_flags()
+    });
+
+    /// Test source PDO fixed 9V 3000mA raw
+    pub const TEST_SRC_PDO_FIXED_9V3000MA_RAW: u32 = test_src_pdo_fixed_raw(9000, 3000);
+    /// Test source PDO fixed 9V 3000mA
+    pub const TEST_SRC_PDO_FIXED_9V3000MA: pdo::source::Pdo = pdo::source::Pdo::Fixed(pdo::source::FixedData {
+        voltage_mv: 9000,
+        current_ma: 3000,
+        peak_current: pdo::source::PeakCurrent::Pct100,
+        ..test_src_pdo_fixed_flags()
+    });
 
     /// Test source EPR PDO fixed 28V 5A raw
     pub const TEST_SRC_EPR_PDO_FIXED_28V5A_RAW: u32 = test_src_pdo_fixed_raw(28000, 5000);
@@ -366,9 +393,23 @@ pub(crate) mod test {
 
     /// Test source EPR PDO fixed 28V 3A raw
     pub const TEST_SRC_EPR_PDO_FIXED_28V3A_RAW: u32 = test_src_pdo_fixed_raw(28000, 3000);
+    /// Test source EPR PDO fixed 28V 3A
+    pub const TEST_SRC_EPR_PDO_FIXED_28V3A: pdo::source::Pdo = pdo::source::Pdo::Fixed(pdo::source::FixedData {
+        voltage_mv: 28000,
+        current_ma: 3000,
+        peak_current: pdo::source::PeakCurrent::Pct100,
+        ..test_src_pdo_fixed_flags()
+    });
 
     /// Test source EPR PDO fixed 28V 1.5A raw
     pub const TEST_SRC_EPR_PDO_FIXED_28V1A5_RAW: u32 = test_src_pdo_fixed_raw(28000, 1500);
+    /// Test source EPR PDO fixed 28V 1.5A
+    pub const TEST_SRC_EPR_PDO_FIXED_28V1A5: pdo::source::Pdo = pdo::source::Pdo::Fixed(pdo::source::FixedData {
+        voltage_mv: 28000,
+        current_ma: 1500,
+        peak_current: pdo::source::PeakCurrent::Pct100,
+        ..test_src_pdo_fixed_flags()
+    });
 
     /// Test invalid source APDO raw, invalid due to APDO type being 11b
     pub const TEST_SRC_APDO_INVALID_RAW: u32 = 0xF0000000;

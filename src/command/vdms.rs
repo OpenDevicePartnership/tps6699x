@@ -147,3 +147,64 @@ impl Default for Input {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_input_nonzero_roundtrip() {
+        let mut input = Input::new();
+
+        input.set_num_vdo(7);
+        input.set_version(Version::Two);
+        input.set_sop_target(SopTarget::SopDoublePrime);
+        input.set_am_intrusive_mode(true);
+        input.set_vdo(0, 0xDEADBEEF);
+        input.set_vdo(1, 0xA1B2C3D4);
+        input.set_vdo(2, 0x12345678);
+        input.set_vdo(3, 0x9ABCDEF0);
+        input.set_vdo(4, 0x13579BDF);
+        input.set_vdo(5, 0x2468ACE0);
+        input.set_vdo(6, 0xFDB97531);
+        input.set_initiator(true);
+        input.set_initiator_wait_timer(0xAB);
+
+        // Byte 0: num_vdo(2:0)=7, version(3)=1, sop_target(5:4)=2, am_intrusive(7)=1
+        const EXPECTED: [u8; INPUT_LEN] = [
+            0xAF, 0xEF, 0xBE, 0xAD, 0xDE, 0xD4, 0xC3, 0xB2, 0xA1, 0x78, 0x56, 0x34, 0x12, 0xF0, 0xDE, 0xBC, 0x9A, 0xDF,
+            0x9B, 0x57, 0x13, 0xE0, 0xAC, 0x68, 0x24, 0x31, 0x75, 0xB9, 0xFD, 0x01, 0xAB,
+        ];
+        assert_eq!(input.as_bytes(), &EXPECTED);
+
+        // Reconstruct from bytes and verify all getters
+        let input2 = Input::from(EXPECTED);
+        assert_eq!(input2.0.num_vdo(), 7);
+        assert!(input2.0.version());
+        assert_eq!(input2.0.sop_target(), 2);
+        assert!(input2.0.am_intrusive_mode());
+        assert_eq!(input2.0.vdo1(), 0xDEADBEEF);
+        assert_eq!(input2.0.vdo2(), 0xA1B2C3D4);
+        assert_eq!(input2.0.vdo3(), 0x12345678);
+        assert_eq!(input2.0.vdo4(), 0x9ABCDEF0);
+        assert_eq!(input2.0.vdo5(), 0x13579BDF);
+        assert_eq!(input2.0.vdo6(), 0x2468ACE0);
+        assert_eq!(input2.0.vdo7(), 0xFDB97531);
+        assert!(input2.0.initiator());
+        assert_eq!(input2.0.initiator_wait_timer(), 0xAB);
+    }
+
+    #[test]
+    fn test_sop_target_from_conversions() {
+        assert_eq!(u8::from(SopTarget::Sop), 0);
+        assert_eq!(u8::from(SopTarget::SopPrime), 1);
+        assert_eq!(u8::from(SopTarget::SopDoublePrime), 2);
+        assert_eq!(u8::from(SopTarget::SopDebug), 3);
+    }
+
+    #[test]
+    fn test_version_from_conversions() {
+        assert!(!bool::from(Version::One));
+        assert!(bool::from(Version::Two));
+    }
+}

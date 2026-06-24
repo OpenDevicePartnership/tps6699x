@@ -782,10 +782,91 @@ mod tests {
     }
 
     #[test]
-    fn test_autonegotiate_sink_roundtrip() {
-        let original_bytes = AutonegotiateSink::DEFAULT;
-        let sink = AutonegotiateSink::from(original_bytes);
-        let roundtrip_bytes: [u8; LEN] = sink.into();
-        assert_eq!(roundtrip_bytes, original_bytes);
+    fn test_autonegotiate_sink_nonzero_roundtrip() {
+        let mut sink = AutonegotiateSink::from([0u8; LEN]);
+        const EXPECTED: [u8; LEN] = [
+            0xFF, 0xB7, 0x1A, 0x0F, 0x90, 0x91, 0xE1, 0x01, 0x3D, 0x00, 0xB8, 0xAA, 0x3C, 0xF4, 0x01, 0x00, 0x01, 0x00,
+            0x00, 0x00, 0x7F, 0x78, 0x15, 0x00,
+        ];
+
+        sink.set_auto_neg_rdo_priority(AutoNegRdoPriority::LowerVoltage);
+        sink.set_no_usb_suspend(true);
+        sink.set_auto_compute_sink_min_power(AutoComputeSinkMinPower::ComputedByPdController);
+        sink.set_no_capability_mismatch(NoCapabilityMismatch::Disabled);
+        sink.set_auto_compute_sink_min_voltage(AutoComputeSinkMinVoltage::ComputedByPdController);
+        sink.set_auto_compute_sink_max_voltage(AutoComputeSinkMaxVoltage::ComputedByPdController);
+        sink.set_auto_disable_sink_upon_capability_mismatch(true);
+        sink.set_auto_disable_input_for_sink_standby(true);
+        sink.set_auto_disable_input_for_sink_standby_in_dbm(true);
+        sink.set_auto_enable_standby_srdy(true);
+        sink.set_auto_enable_input_after_snk_ready_in_dbm(true);
+
+        sink.set_auto_neg_max_current(0x1AB);
+        sink.set_auto_neg_sink_min_required_power(15_000);
+        sink.set_auto_neg_max_voltage(20_000);
+        sink.set_auto_neg_min_voltage(5_000);
+        sink.set_auto_neg_capabilities_mismatch_power(7_500);
+
+        sink.set_pps_enable_sink_mode(true);
+        sink.set_pps_request_interval(PpsRequestInterval::TwoSeconds);
+        sink.set_pps_source_operating_mode(true);
+        sink.set_pps_required_full_voltage_range(true);
+        sink.set_pps_disable_sink_upon_non_apdo_contract(true);
+
+        sink.set_enable_sink_path_above_pps_sink_voltage_threshold(true);
+        sink.set_disable_sink_if_not_in_pps_contract(true);
+        sink.set_pps_sink_voltage_threshold(0x555);
+        sink.set_pps_operating_current(3_000);
+        sink.set_pps_output_voltage(5_000);
+
+        sink.set_epr_avs_enable_sink_mode(true);
+        sink.set_epr_avs_operating_current(0x7F);
+        sink.set_epr_avs_output_voltage(0x0ABC);
+
+        let bytes: [u8; LEN] = sink.clone().into();
+        assert_eq!(bytes, EXPECTED);
+
+        let sink = AutonegotiateSink::from(EXPECTED);
+        assert_eq!(sink.auto_neg_rdo_priority(), AutoNegRdoPriority::LowerVoltage);
+        assert!(sink.no_usb_suspend());
+        assert_eq!(
+            sink.auto_compute_sink_min_power(),
+            AutoComputeSinkMinPower::ComputedByPdController
+        );
+        assert_eq!(sink.no_capability_mismatch(), NoCapabilityMismatch::Disabled);
+        assert_eq!(
+            sink.auto_compute_sink_min_voltage(),
+            AutoComputeSinkMinVoltage::ComputedByPdController
+        );
+        assert_eq!(
+            sink.auto_compute_sink_max_voltage(),
+            AutoComputeSinkMaxVoltage::ComputedByPdController
+        );
+        assert!(sink.auto_disable_sink_upon_capability_mismatch());
+        assert!(sink.auto_disable_input_for_sink_standby());
+        assert!(sink.auto_disable_input_for_sink_standby_in_dbm());
+        assert!(sink.auto_enable_standby_srdy());
+        assert!(sink.auto_enable_input_after_snk_ready_in_dbm());
+
+        assert_eq!(sink.auto_neg_max_current(), 0x1AB * MA10_UNIT);
+        assert_eq!(sink.auto_neg_sink_min_required_power(), 15_000);
+        assert_eq!(sink.auto_neg_max_voltage(), 20_000);
+        assert_eq!(sink.auto_neg_min_voltage(), 5_000);
+        assert_eq!(sink.auto_neg_capabilities_mismatch_power(), 7_500);
+
+        assert!(sink.pps_enable_sink_mode());
+        assert_eq!(sink.pps_request_interval(), PpsRequestInterval::TwoSeconds);
+        assert!(sink.pps_source_operating_mode());
+        assert!(sink.pps_required_full_voltage_range());
+        assert!(sink.pps_disable_sink_upon_non_apdo_contract());
+        assert!(sink.enable_sink_path_above_pps_sink_voltage_threshold());
+        assert!(sink.disable_sink_if_not_in_pps_contract());
+        assert_eq!(sink.pps_sink_voltage_threshold(), 0x555);
+        assert_eq!(sink.pps_operating_current(), (3000 / MA50_UNIT) * MA50_UNIT);
+        assert_eq!(sink.pps_output_voltage(), (5000 / MV20_UNIT) * MV20_UNIT);
+
+        assert!(sink.epr_avs_enable_sink_mode());
+        assert_eq!(sink.epr_avs_operating_current(), 0x7F);
+        assert_eq!(sink.epr_avs_output_voltage(), 0x0ABC);
     }
 }

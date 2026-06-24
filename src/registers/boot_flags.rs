@@ -62,3 +62,66 @@ bitfield! {
 /// The actual flags bitfield is generic over the size of the array
 /// Provide this type alias for convenience
 pub type BootFlags = BootFlagsRaw<[u8; LEN]>;
+
+#[cfg(test)]
+mod tests {
+    use super::{BootFlags, BootFlagsRaw, LEN};
+
+    #[test]
+    fn test_boot_flags_nonzero_roundtrip() {
+        const EXPECTED: [u8; LEN] = [
+            0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1F, 0x00,
+            0x00, 0x00, 0x20, 0x21, 0x30, 0x31, 0x40, 0x41, 0x00, 0x00, 0x0D, 0x00, 0x00, 0x00, 0x04, 0x03, 0x02, 0x01,
+            0x08, 0x07, 0x06, 0x05, 0xCD, 0xAB, 0x34, 0x12,
+        ];
+
+        let mut flags: BootFlags = BootFlagsRaw([0u8; LEN]);
+        flags.set_boot_stage(0xA);
+        flags.set_total_num_pps(2);
+        flags.set_is_ext_pp_present(1);
+        flags.set_dead_battery_flag(1);
+        flags.set_db_port_b_power_provider(1);
+        flags.set_db_port_a_power_provider(1);
+        flags.set_port_a_sink_switch(1);
+        flags.set_port_b_sink_switch(1);
+        flags.set_port_a_i2c1_trgt_addr(0x20);
+        flags.set_port_b_i2c1_trgt_addr(0x21);
+        flags.set_port_a_i2c2_trgt_addr(0x30);
+        flags.set_port_b_i2c2_trgt_addr(0x31);
+        flags.set_port_a_i2c4_trgt_addr(0x40);
+        flags.set_port_b_i2c4_trgt_addr(0x41);
+        flags.set_active_bank(1);
+        flags.set_bank0_valid(1);
+        flags.set_bank1_valid(1);
+        flags.set_bank0_fw_version(0x01020304);
+        flags.set_bank1_fw_version(0x05060708);
+        flags.set_adc_in_value(0xABCD);
+        flags.set_adc_in_index(0x1234);
+
+        let bytes = flags.0;
+        assert_eq!(bytes, EXPECTED);
+
+        let flags2: BootFlags = BootFlagsRaw(EXPECTED);
+        assert_eq!(flags2.boot_stage(), 0xA);
+        assert_eq!(flags2.total_num_pps(), 2);
+        assert_eq!(flags2.is_ext_pp_present(), 1);
+        assert_eq!(flags2.dead_battery_flag(), 1);
+        assert_eq!(flags2.db_port_b_power_provider(), 1);
+        assert_eq!(flags2.db_port_a_power_provider(), 1);
+        assert_eq!(flags2.port_a_sink_switch(), 1);
+        assert_eq!(flags2.port_b_sink_switch(), 1);
+        assert_eq!(flags2.port_a_i2c1_trgt_addr(), 0x20);
+        assert_eq!(flags2.port_b_i2c1_trgt_addr(), 0x21);
+        assert_eq!(flags2.port_a_i2c2_trgt_addr(), 0x30);
+        assert_eq!(flags2.port_b_i2c2_trgt_addr(), 0x31);
+        assert_eq!(flags2.port_a_i2c4_trgt_addr(), 0x40);
+        assert_eq!(flags2.port_b_i2c4_trgt_addr(), 0x41);
+        assert_eq!(flags2.active_bank(), 1);
+        assert_eq!(flags2.bank0_valid(), 1);
+        assert_eq!(flags2.bank1_valid(), 1);
+        assert_eq!(flags2.bank0_fw_version(), 0x01020304);
+        assert_eq!(flags2.bank1_fw_version(), 0x05060708);
+        assert_eq!(flags2.adc_in_value(), 0xABCD);
+        assert_eq!(flags2.adc_in_index(), 0x1234);
+    }
+}

@@ -210,37 +210,58 @@ pub type RxSnkCaps = RxCaps<sink::Pdo>;
 mod test {
     use super::*;
     use crate::test::{
-        TEST_SRC_APDO_INVALID_RAW, TEST_SRC_EPR_PDO_FIXED_28V5A, TEST_SRC_EPR_PDO_FIXED_28V5A_RAW,
-        TEST_SRC_PDO_FIXED_5V1A5, TEST_SRC_PDO_FIXED_5V1A5_RAW, TEST_SRC_PDO_FIXED_5V3A, TEST_SRC_PDO_FIXED_5V3A_RAW,
+        TEST_SRC_APDO_INVALID_RAW, TEST_SRC_EPR_PDO_FIXED_28V1A5, TEST_SRC_EPR_PDO_FIXED_28V1A5_RAW,
+        TEST_SRC_EPR_PDO_FIXED_28V3A, TEST_SRC_EPR_PDO_FIXED_28V3A_RAW, TEST_SRC_EPR_PDO_FIXED_28V5A,
+        TEST_SRC_EPR_PDO_FIXED_28V5A_RAW, TEST_SRC_PDO_FIXED_5V1A5, TEST_SRC_PDO_FIXED_5V1A5_RAW,
+        TEST_SRC_PDO_FIXED_5V3A, TEST_SRC_PDO_FIXED_5V3A_RAW, TEST_SRC_PDO_FIXED_5V900MA,
+        TEST_SRC_PDO_FIXED_5V900MA_RAW, TEST_SRC_PDO_FIXED_9V1500MA, TEST_SRC_PDO_FIXED_9V1500MA_RAW,
+        TEST_SRC_PDO_FIXED_9V3000MA, TEST_SRC_PDO_FIXED_9V3000MA_RAW,
     };
 
     #[test]
     fn test_try_from() {
         let mut buf = [0u8; LEN];
-        // Set header: low 3 bits are SPR PDO count
-        buf[0] = 0xa; // 2 SPR PDOs, 1 EPR PDOs
-        // Fill PDOs with test data
-        // SPR PDO 0 - Fixed PDO at 5V, 3A, 100% peak current
+        // 5 SPR PDOs, 3 EPR PDOs, last received is EPR
+        buf[0] = 0x5D;
+
+        // Fill 5 SPR PDOs with distinct values
         buf[1..5].copy_from_slice(&TEST_SRC_PDO_FIXED_5V3A_RAW.to_le_bytes());
-        // SPR PDO 1 - Fixed PDO at 5V, 1.5A, 100% peak current
         buf[5..9].copy_from_slice(&TEST_SRC_PDO_FIXED_5V1A5_RAW.to_le_bytes());
-        // Fake SPR, used to test overread
-        buf[9..13].copy_from_slice(&TEST_SRC_APDO_INVALID_RAW.to_le_bytes());
-        // EPR PDO 0 - Fixed PDO at 28V, 5A, 100% peak current
+        buf[9..13].copy_from_slice(&TEST_SRC_PDO_FIXED_5V900MA_RAW.to_le_bytes());
+        buf[13..17].copy_from_slice(&TEST_SRC_PDO_FIXED_9V1500MA_RAW.to_le_bytes());
+        buf[17..21].copy_from_slice(&TEST_SRC_PDO_FIXED_9V3000MA_RAW.to_le_bytes());
+        // Make sure we don't attempt to parse beyond the end of valid SPR PDOs
+        buf[21..25].copy_from_slice(&TEST_SRC_APDO_INVALID_RAW.to_le_bytes());
+
+        // Fill 3 EPR PDOs
         buf[29..33].copy_from_slice(&TEST_SRC_EPR_PDO_FIXED_28V5A_RAW.to_le_bytes());
-        // Fake EPR, used to test overread
-        buf[33..37].copy_from_slice(&TEST_SRC_APDO_INVALID_RAW.to_le_bytes());
-        // Fake EPR, used to test overread
-        buf[37..41].copy_from_slice(&TEST_SRC_APDO_INVALID_RAW.to_le_bytes());
+        buf[33..37].copy_from_slice(&TEST_SRC_EPR_PDO_FIXED_28V3A_RAW.to_le_bytes());
+        buf[37..41].copy_from_slice(&TEST_SRC_EPR_PDO_FIXED_28V1A5_RAW.to_le_bytes());
+        // Make sure we don't attempt to parse beyond the end of valid EPR PDOs
+        buf[41..45].copy_from_slice(&TEST_SRC_APDO_INVALID_RAW.to_le_bytes());
 
         let rx_src_caps = RxSrcCaps::try_from(buf).unwrap();
-        assert_eq!(rx_src_caps.num_valid_pdos(), 2);
-        assert_eq!(rx_src_caps.num_valid_epr_pdos(), 1);
+        assert_eq!(rx_src_caps.num_valid_pdos(), 5);
+        assert_eq!(rx_src_caps.num_valid_epr_pdos(), 3);
+        assert!(rx_src_caps.last_src_cap_is_epr());
+
+        // Verify PDO values are correct (not corrupted by header)
         assert_eq!(*rx_src_caps.get(0).unwrap(), TEST_SRC_PDO_FIXED_5V3A);
         assert_eq!(*rx_src_caps.get(1).unwrap(), TEST_SRC_PDO_FIXED_5V1A5);
+        assert_eq!(*rx_src_caps.get(2).unwrap(), TEST_SRC_PDO_FIXED_5V900MA);
+        assert_eq!(*rx_src_caps.get(3).unwrap(), TEST_SRC_PDO_FIXED_9V1500MA);
+        assert_eq!(*rx_src_caps.get(4).unwrap(), TEST_SRC_PDO_FIXED_9V3000MA);
         assert_eq!(
             *rx_src_caps.get(EPR_PDO_START_INDEX).unwrap(),
             TEST_SRC_EPR_PDO_FIXED_28V5A
+        );
+        assert_eq!(
+            *rx_src_caps.get(EPR_PDO_START_INDEX + 1).unwrap(),
+            TEST_SRC_EPR_PDO_FIXED_28V3A
+        );
+        assert_eq!(
+            *rx_src_caps.get(EPR_PDO_START_INDEX + 2).unwrap(),
+            TEST_SRC_EPR_PDO_FIXED_28V1A5
         );
     }
 }

@@ -655,6 +655,26 @@ mod test {
     }
 
     #[test]
+    fn test_tfuq_args_encode_all_variants() {
+        // Verify each status_query variant encodes to the correct byte position
+        let cases = [
+            (TfuqStatusQuery::StatusDefault, [0x00, 0x00]),
+            (TfuqStatusQuery::StatusInProgress, [0x01, 0x00]),
+            (TfuqStatusQuery::StatusBank0, [0x02, 0x00]),
+            (TfuqStatusQuery::StatusBank1, [0x03, 0x00]),
+        ];
+        for (query, expected) in cases {
+            let args = TfuqArgs {
+                status_query: query,
+                command: TfuqCommandType::QueryTfuStatus,
+            };
+            let mut buf = [0; TFUQ_ARGS_LEN];
+            bincode::encode_into_slice(args, &mut buf, config::standard().with_fixed_int_encoding()).unwrap();
+            assert_eq!(buf, expected, "Failed for {:?}", query);
+        }
+    }
+
+    #[test]
     fn test_tfuq_return_value_decode() {
         let args = TfuqReturnValue {
             active_host: 0x01,

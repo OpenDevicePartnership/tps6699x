@@ -1133,12 +1133,85 @@ mod tests {
     }
 
     #[test]
-    fn test_port_config_round_trip() {
-        let mut bytes = [0u8; LEN];
-        bytes[0] = 0x42;
-        bytes[17] = 0xFF;
-        let config = PortConfig::from(bytes);
-        let result: [u8; LEN] = config.into();
-        assert_eq!(result, bytes);
+    fn test_port_config_nonzero_roundtrip() {
+        const EXPECTED: [u8; LEN] = [
+            0x86, 0xDD, 0xE2, 0x5C, 0xCD, 0xAB, 0x34, 0x12, 0x01, 0x01, 0x23, 0x01, 0x00, 0x00, 0x00, 0xB0, 0x53, 0x3F,
+        ];
+
+        let mut config = PortConfig::default();
+        config.set_typec_state_machine(TypeCStateMachine::Drp);
+        config.set_crossbar_type(CrossbarType::Type2);
+        config.set_pp_ext_active_low(true);
+        config.set_typec_support_options(TypeCSupportOptions::TrySrcDrp);
+        config.set_disable_pd(true);
+        config.set_usb_communication_capable(true);
+        config.set_debug_accessory_support(true);
+        config.set_usb3_rate(Usb3Rate::Gen2);
+        config.set_crossbar_i2c_controller_enable(true);
+        config.set_vbus_ovp_usage(VbusOvpUsage::Pct111);
+        config.set_ovp_for_pp5v(OvpForPp5v::V5_8);
+        config.set_crossbar_config_type1_extended(true);
+        config.set_remove_safe_state_between_usb3_to_dp_transition(true);
+        config.set_vbus_sink_uvp_trip_hv(VbusSinkUvpTripHv::Pct25);
+        config.set_apdo_vbus_uvp_threshold(0x3);
+        config.set_apdo_ilim_over_shoot(0x2);
+        config.set_apdo_vbus_uvp_trip_point_offset(0xABCD);
+        config.set_vbus_for_valid_pps_status(0x1234);
+        config.set_external_dcdc_type(ExternalDcdcType::Bq25758);
+        config.set_sink_mode_i2c_irq_config(true);
+        config.set_gt_threshold_voltage(0x0123);
+        config.set_enable_internal_auxbiasing(true);
+        config.set_enable_internal_level_shifter(true);
+        config.set_level_shifter_direction_cfg(LevelShifterDirectionCfg::I2cControlled);
+        config.set_sbu_mux_debug_setting(SbuMuxDebugSetting::AnyDebug);
+        config.set_sbu_mux_default_setting(SbuMuxDefaultSetting::EnableDbg);
+        config.set_sbu_mux_usage(SbuMuxUsage::AllAux);
+        config.set_epr_supported_as_source(true);
+        config.set_epr_supported_as_sink(true);
+        config.set_disable_sourcing_in_dbm(true);
+        config.set_flip_crossbar_dbg_setting(true);
+        config.set_flip_crossbar_aux_setting(true);
+        config.set_flip_crossbar_sbtx_setting(true);
+
+        let bytes: [u8; LEN] = config.into();
+        assert_eq!(bytes, EXPECTED);
+
+        let config2 = PortConfig::from(EXPECTED);
+        assert_eq!(config2.typec_state_machine(), TypeCStateMachine::Drp);
+        assert_eq!(config2.crossbar_type(), CrossbarType::Type2);
+        assert!(config2.pp_ext_active_low());
+        assert_eq!(config2.typec_support_options(), TypeCSupportOptions::TrySrcDrp);
+        assert!(config2.disable_pd());
+        assert!(config2.usb_communication_capable());
+        assert!(config2.debug_accessory_support());
+        assert_eq!(config2.usb3_rate(), Usb3Rate::Gen2);
+        assert!(config2.crossbar_i2c_controller_enable());
+        assert_eq!(config2.vbus_ovp_usage(), VbusOvpUsage::Pct111);
+        assert_eq!(config2.ovp_for_pp5v(), OvpForPp5v::V5_8);
+        assert!(config2.crossbar_config_type1_extended());
+        assert!(config2.remove_safe_state_between_usb3_to_dp_transition());
+        assert_eq!(config2.vbus_sink_uvp_trip_hv(), VbusSinkUvpTripHv::Pct25);
+        assert_eq!(config2.apdo_vbus_uvp_threshold(), 0x3);
+        assert_eq!(config2.apdo_ilim_over_shoot(), 0x2);
+        assert_eq!(config2.apdo_vbus_uvp_trip_point_offset(), 0xABCD);
+        assert_eq!(config2.vbus_for_valid_pps_status(), 0x1234);
+        assert_eq!(config2.external_dcdc_type(), ExternalDcdcType::Bq25758);
+        assert!(config2.sink_mode_i2c_irq_config());
+        assert_eq!(config2.gt_threshold_voltage(), 0x0123 * MV50_UNIT);
+        assert!(config2.enable_internal_auxbiasing());
+        assert!(config2.enable_internal_level_shifter());
+        assert_eq!(
+            config2.level_shifter_direction_cfg(),
+            LevelShifterDirectionCfg::I2cControlled
+        );
+        assert_eq!(config2.sbu_mux_debug_setting(), SbuMuxDebugSetting::AnyDebug);
+        assert_eq!(config2.sbu_mux_default_setting(), SbuMuxDefaultSetting::EnableDbg);
+        assert_eq!(config2.sbu_mux_usage(), SbuMuxUsage::AllAux);
+        assert!(config2.epr_supported_as_source());
+        assert!(config2.epr_supported_as_sink());
+        assert!(config2.disable_sourcing_in_dbm());
+        assert!(config2.flip_crossbar_dbg_setting());
+        assert!(config2.flip_crossbar_aux_setting());
+        assert!(config2.flip_crossbar_sbtx_setting());
     }
 }
