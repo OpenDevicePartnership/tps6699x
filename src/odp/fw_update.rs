@@ -11,7 +11,7 @@ use crate::odp::driver::{FwUpdateState, Tps6699x};
 use crate::{MAX_SUPPORTED_PORTS, error, warn};
 
 /// Converts a PD error into a basic FW update error
-pub fn basic_fw_update_error_from_pd_error(pd_error: PdError) -> BasicFwUpdateError {
+fn basic_fw_update_error_from_pd_error(pd_error: PdError) -> BasicFwUpdateError {
     match pd_error {
         PdError::Busy => BasicFwUpdateError::Busy,
         _ => BasicFwUpdateError::Failed,
