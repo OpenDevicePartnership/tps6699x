@@ -162,10 +162,15 @@ impl<'a, M: RawMutex, B: I2c> AccumulatedFlagsAny<'a, M, B> {
         if done {
             // Panic safety: the return type, `accumulated_flags`, and `mask` are all of size MAX_SUPPORTED_PORTS
             // so this will never index out of bounds
-            #[allow(clippy::indexing_slicing)]
-            let handled = from_fn(|i| self.accumulated_flags[i] & self.masks[i]);
+            let handled = from_fn(
+                #[allow(clippy::indexing_slicing)]
+                |i| self.accumulated_flags[i] & self.masks[i],
+            );
             // Put unhandled flags back for signaling in `drop()`
-            self.accumulated_flags = from_fn(|i| self.accumulated_flags[i] & !self.masks[i]);
+            self.accumulated_flags = from_fn(
+                #[allow(clippy::indexing_slicing)]
+                |i| self.accumulated_flags[i] & !self.masks[i],
+            );
             Some(handled)
         } else {
             None
@@ -183,8 +188,10 @@ impl<M: RawMutex, B: I2c> Drop for AccumulatedFlagsAny<'_, M, B> {
             .unwrap_or([IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS]);
         // Panic safety: `unhandled`, `accumulated_flags`, and `mask` are all of size MAX_SUPPORTED_PORTS
         // so this will never index out of bounds
-        #[allow(clippy::indexing_slicing)]
-        let unhandled = from_fn(|i| self.accumulated_flags[i] | new[i]);
+        let unhandled = from_fn(
+            #[allow(clippy::indexing_slicing)]
+            |i| self.accumulated_flags[i] | new[i],
+        );
 
         // Put back any unhandled interrupt flags for future processing
         if unhandled.iter().any(|&f| f != IntEventBus1::new_zero()) {

@@ -14,6 +14,12 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_call:
+    inputs:
+      download-lockfiles:
+        required: false
+        type: boolean
+        default: false
 # If new code is pushed to a PR branch, then cancel in progress workflows for that PR. Ensures that
 # we don't waste CI time, and returns results quicker https://github.com/jonhoo/rust-ci-conf/pull/5
 concurrency:
@@ -35,17 +41,18 @@ jobs:
           components: rustfmt
       - run: cargo fmt --check
 
-  clippy:
+  hack-clippy:
+    # cargo-hack checks combinations of feature flags to ensure that features are all additive
+    # which is required for feature unification
+    # additionally, replacing `check` with `clippy` ensures all combinations of features generate no clippy warnings
     runs-on: ubuntu-latest
-    name: ${{ matrix.toolchain }} / clippy
-    permissions:
-      contents: read
-      checks: write
+    name: ${{ matrix.toolchain }} / ${{ matrix.target }} / clippy
     strategy:
       fail-fast: false
       matrix:
         # Get early warning of new lints which are regularly introduced in beta channels.
         toolchain: [stable, beta]
+        target: [x86_64-unknown-linux-gnu, thumbv8m.main-none-eabihf]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,8 +62,15 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
           components: clippy
-      - name: cargo clippy
-        run: cargo clippy
+      - name: cargo install cargo-hack
+        uses: taiki-e/install-action@cargo-hack
+      - name: Download Cargo.lock files
+        if: ${{ inputs.download-lockfiles }}
+        uses: actions/download-artifact@v4
+        with:
+          name: updated-lock-files
+      - name: cargo hack
+        run: cargo hack --feature-powerset --mutually-exclusive-features=log,defmt clippy --locked --target ${{ matrix.target }}
 
   # Enable once we have a released crate
   # semver:
