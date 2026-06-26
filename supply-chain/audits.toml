@@ -5330,28 +5330,28 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patin
 
 [[trusted.anyhow]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-10-05"
 end = "2026-04-16"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embedded-services/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.anyhow]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-10-05"
 end = "2026-09-04"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.anyhow]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-10-05"
 end = "2026-09-04"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.anyhow]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-10-05"
 end = "2027-05-16"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp108/refs/heads/main/supply-chain/audits.toml"
@@ -5379,21 +5379,21 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq257
 
 [[trusted.bitflags]]
 criteria = "safe-to-deploy"
-user-id = 3204
+user-id = 3204 # Ashley Mannix (KodrAus)
 start = "2019-05-02"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.bitflags]]
 criteria = "safe-to-deploy"
-user-id = 3204
+user-id = 3204 # Ashley Mannix (KodrAus)
 start = "2019-05-02"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.bitflags]]
 criteria = "safe-to-deploy"
-user-id = 3204
+user-id = 3204 # Ashley Mannix (KodrAus)
 start = "2019-05-02"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
@@ -5547,7 +5547,7 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp10
 
 [[trusted.indoc]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-04-28"
 end = "2026-03-24"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
@@ -5568,14 +5568,14 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patin
 
 [[trusted.itoa]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-05-02"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.itoa]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-05-02"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
@@ -5624,14 +5624,14 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embas
 
 [[trusted.linkme]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-08-18"
 end = "2026-03-24"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.linkme-impl]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-08-18"
 end = "2026-03-24"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
@@ -5659,14 +5659,14 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp10
 
 [[trusted.log]]
 criteria = "safe-to-deploy"
-user-id = 3204
+user-id = 3204 # Ashley Mannix (KodrAus)
 start = "2019-07-10"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.log]]
 criteria = "safe-to-deploy"
-user-id = 3204
+user-id = 3204 # Ashley Mannix (KodrAus)
 start = "2019-07-10"
 end = "2027-05-26"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/odp-secure-services/refs/heads/main/supply-chain/audits.toml"
@@ -5792,21 +5792,21 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patin
 
 [[trusted.paste]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-03-19"
 end = "2026-03-24"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.paste]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-03-19"
 end = "2026-09-03"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embedded-services/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.paste]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-03-19"
 end = "2027-05-16"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp108/refs/heads/main/supply-chain/audits.toml"
@@ -5834,91 +5834,91 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patin
 
 [[trusted.prettyplease]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2022-01-04"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.prettyplease]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2022-01-04"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.prettyplease]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2022-01-04"
 end = "2027-05-16"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp108/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.proc-macro2]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-04-23"
 end = "2026-09-03"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embedded-services/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.proc-macro2]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-04-23"
 end = "2026-09-04"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.proc-macro2]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-04-23"
 end = "2026-09-04"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.proc-macro2]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-04-23"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.proc-macro2]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-04-23"
 end = "2026-11-07"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/mcxa-pac/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.proc-macro2]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-04-23"
 end = "2027-05-16"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp108/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.quote]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-04-09"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.quote]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-04-09"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.quote]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-04-09"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.quote]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-04-09"
 end = "2027-05-16"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp108/refs/heads/main/supply-chain/audits.toml"
@@ -6009,35 +6009,35 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp10
 
 [[trusted.rustversion]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-07-08"
 end = "2026-09-03"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embedded-services/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.rustversion]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-07-08"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.ryu]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-05-02"
 end = "2026-03-24"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.ryu]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-05-02"
 end = "2026-09-03"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embedded-services/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.ryu]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-05-02"
 end = "2027-05-16"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp108/refs/heads/main/supply-chain/audits.toml"
@@ -6079,77 +6079,77 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patin
 
 [[trusted.semver]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2021-05-25"
 end = "2026-03-24"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.semver]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2021-05-25"
 end = "2026-11-07"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/mcxa-pac/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.serde]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-03-01"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.serde_core]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2025-09-13"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.serde_derive]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-03-01"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.serde_json]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-02-28"
 end = "2026-09-03"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embedded-services/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.serde_json]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-02-28"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.serde_json]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-02-28"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.serde_json]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-02-28"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.serde_json]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-02-28"
 end = "2027-05-16"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp108/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.serde_yaml]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-05-02"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
@@ -6163,35 +6163,35 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embed
 
 [[trusted.syn]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-03-01"
 end = "2026-03-24"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.syn]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-03-01"
 end = "2026-09-03"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embedded-services/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.syn]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-03-01"
 end = "2026-09-04"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.syn]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-03-01"
 end = "2026-09-04"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.syn]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-03-01"
 end = "2027-05-16"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp108/refs/heads/main/supply-chain/audits.toml"
@@ -6205,56 +6205,56 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patin
 
 [[trusted.thiserror]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-10-09"
 end = "2026-09-03"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embedded-services/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.thiserror]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-10-09"
 end = "2026-09-04"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.thiserror]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-10-09"
 end = "2026-09-04"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.thiserror]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-10-09"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.thiserror-impl]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-10-09"
 end = "2026-09-03"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embedded-services/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.thiserror-impl]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-10-09"
 end = "2026-09-04"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.thiserror-impl]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-10-09"
 end = "2026-09-04"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.thiserror-impl]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2019-10-09"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
@@ -6338,49 +6338,49 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patin
 
 [[trusted.unicode-ident]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2021-10-02"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.unicode-ident]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2021-10-02"
 end = "2026-11-07"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/mcxa-pac/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.unicode-ident]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2021-10-02"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.unicode-ident]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2021-10-02"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.unicode-ident]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2021-10-02"
 end = "2027-05-16"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp108/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.unsafe-libyaml]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2022-07-03"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.uuid]]
 criteria = "safe-to-deploy"
-user-id = 3204
+user-id = 3204 # Ashley Mannix (KodrAus)
 start = "2019-10-18"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
@@ -6842,56 +6842,56 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq257
 
 [[trusted.zerocopy]]
 criteria = "safe-to-deploy"
-user-id = 7178
+user-id = 7178 # Joshua Liebow-Feeser (joshlf)
 start = "2019-02-28"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.zerocopy]]
 criteria = "safe-to-deploy"
-user-id = 7178
+user-id = 7178 # Joshua Liebow-Feeser (joshlf)
 start = "2019-02-28"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.zerocopy]]
 criteria = "safe-to-deploy"
-user-id = 7178
+user-id = 7178 # Joshua Liebow-Feeser (joshlf)
 start = "2019-02-28"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.zerocopy-derive]]
 criteria = "safe-to-deploy"
-user-id = 7178
+user-id = 7178 # Joshua Liebow-Feeser (joshlf)
 start = "2019-02-28"
 end = "2026-10-06"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patina/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.zerocopy-derive]]
 criteria = "safe-to-deploy"
-user-id = 7178
+user-id = 7178 # Joshua Liebow-Feeser (joshlf)
 start = "2019-02-28"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.zerocopy-derive]]
 criteria = "safe-to-deploy"
-user-id = 7178
+user-id = 7178 # Joshua Liebow-Feeser (joshlf)
 start = "2019-02-28"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.zmij]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2025-12-18"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.zmij]]
 criteria = "safe-to-deploy"
-user-id = 3618
+user-id = 3618 # David Tolnay (dtolnay)
 start = "2025-12-18"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"

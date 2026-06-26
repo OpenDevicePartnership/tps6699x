@@ -9,3 +9,9 @@ This driver uses the [device-driver](https://crates.io/crates/device-driver) cra
 $ cargo install device-driver-cli --version 1.0.9
 $ device-driver-cli --manifest device.yaml --device-name Registers -o src/registers/generated.rs
 ```
+
+## Integration with Other ODP crates
+This crate provides implementations for traits defined in the `embedded-services` crate, gated behind these features:
+* `odp-embedded-services` for core PD trait implementations.
+* `odp-type-c-service` for code related to the ODP implementation of the type-C service.
+* `odp-fw-update-interface` for trait implementations for the fw-update-interface traits.

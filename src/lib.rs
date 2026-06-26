@@ -9,6 +9,9 @@ pub mod fw_update;
 pub mod registers;
 pub mod stream;
 
+#[cfg(feature = "odp-embedded-services")]
+pub mod odp;
+
 /// I2C address set 0
 pub const ADDR0: [u8; 2] = [0x20, 0x24];
 /// I2C address set 1
