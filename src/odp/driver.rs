@@ -9,13 +9,15 @@ use embedded_services::named::Named;
 use embedded_services::{debug, error, trace, warn};
 use embedded_usb_pd::ado::Ado;
 use embedded_usb_pd::pdinfo::PowerPathStatus;
-use embedded_usb_pd::pdo::{Common, Contract, Rdo, sink, source};
+use embedded_usb_pd::pdo::{Contract, Rdo, sink, source};
 use embedded_usb_pd::type_c::Current as TypecCurrent;
 use embedded_usb_pd::ucsi::v1_2::lpm;
 use embedded_usb_pd::{DataRole, Error, LocalPortId, PdError, PlugOrientation, PowerRole};
 use heapless::Vec;
 use type_c_interface::control::dp::{DpConfig, DpPinConfig, DpStatus};
-use type_c_interface::control::pd::{PdStateMachineConfig, PortStatus};
+use type_c_interface::control::pd::{
+    PdSinkInfo, PdSourceInfo, PdStateMachineConfig, PortStatus, SinkContract, SourceContract,
+};
 use type_c_interface::control::power::SystemPowerState;
 use type_c_interface::control::retimer::RetimerFwUpdateState;
 use type_c_interface::control::svid::DiscoveredSvids;
@@ -278,13 +280,44 @@ impl<M: RawMutex, B: I2c> Pd for Tps6699x<'_, M, B> {
             if pdo_raw != 0 && rdo_raw != 0 {
                 // Got a valid explicit contract
                 if pd_status.is_source() {
+                    // The sink PDOs may not have arrived yet, but the active contract is still valid.
+                    let mut sink_pdos: [sink::Pdo; 1] = [sink::Pdo::default()];
+                    let (num_sprs, _) = {
+                        self.tps6699x
+                            .lock_inner()
+                            .await
+                            .get_rx_snk_caps(port, &mut sink_pdos[..], &mut [])
+                            .await
+                    }
+                    .map_err(|e| self.log_error(e.into()))?;
+
+                    let rx_fixed_5v_data = if num_sprs > 0 {
+                        if let sink::Pdo::Fixed(data) = sink_pdos[0] {
+                            Some(data)
+                        } else {
+                            error!("Port{}: First rx sink PDO is not fixed", port.0);
+                            return Err(PdError::InvalidParams);
+                        }
+                    } else {
+                        debug!("Port{}: No rx sink PDOs received yet", port.0);
+                        None
+                    };
+
                     let pdo = source::Pdo::try_from(pdo_raw)?;
                     let rdo = Rdo::for_pdo(rdo_raw, pdo).ok_or(PdError::InvalidParams)?;
                     debug!("PDO: {:#?}", pdo);
                     debug!("RDO: {:#?}", rdo);
                     port_status.available_source_contract =
-                        power_capability_try_from_contract(Contract::from_source(pdo, rdo));
-                    port_status.dual_power = pdo.dual_role_power();
+                        power_capability_try_from_contract(Contract::from_source(pdo, rdo)).map(|capability| {
+                            SourceContract {
+                                capability,
+                                pd: Some(PdSourceInfo {
+                                    rx_fixed_5v_data,
+                                    pdo,
+                                    rdo,
+                                }),
+                            }
+                        });
                 } else {
                     // active_rdo_contract doesn't contain the full picture
                     let mut source_pdos: [source::Pdo; 1] = [source::Pdo::default()];
@@ -299,26 +332,39 @@ impl<M: RawMutex, B: I2c> Pd for Tps6699x<'_, M, B> {
                     .map_err(|e| self.log_error(e.into()))?;
 
                     if num_sprs == 0 {
-                        // USB PD spec requires at least one source PDO be present, something is really wrong
-                        error!("Port{} no source PDOs found", port.0);
+                        // A source PDO is required before a sink contract can be negotiated.
+                        error!("Port{} no source PDOs received", port.0);
                         return Err(PdError::InvalidParams);
                     }
+
+                    let source::Pdo::Fixed(rx_fixed_5v_data) = source_pdos[0] else {
+                        error!("Port{}: First rx source PDO is not fixed", port.0);
+                        return Err(PdError::InvalidParams);
+                    };
 
                     let pdo = sink::Pdo::try_from(pdo_raw)?;
                     let rdo = Rdo::for_pdo(rdo_raw, pdo).ok_or(PdError::InvalidParams)?;
                     debug!("PDO: {:#?}", pdo);
                     debug!("RDO: {:#?}", rdo);
                     port_status.available_sink_contract =
-                        power_capability_try_from_contract(Contract::from_sink(pdo, rdo));
-                    port_status.dual_power = source_pdos[0].dual_role_power();
-                    port_status.unconstrained_power = source_pdos[0].unconstrained_power();
+                        power_capability_try_from_contract(Contract::from_sink(pdo, rdo)).map(|capability| {
+                            SinkContract {
+                                capability,
+                                pd: Some(PdSinkInfo {
+                                    rx_fixed_5v_data,
+                                    pdo,
+                                    rdo,
+                                }),
+                            }
+                        });
                 }
             } else if status.port_role() {
                 // port_role is true for source
                 // Implicit source contract
                 let current = TypecCurrent::try_from(port_control.typec_current())?;
                 debug!("Port{} type-C source current: {:#?}", port.0, current);
-                port_status.available_source_contract = Some(power_capability_from_current(current));
+                port_status.available_source_contract =
+                    Some(SourceContract::from_capability(power_capability_from_current(current)));
             } else {
                 // Implicit sink contract
                 let pull = pd_status.cc_pull_up();
@@ -331,7 +377,7 @@ impl<M: RawMutex, B: I2c> Pd for Tps6699x<'_, M, B> {
                     debug!("Port{} type-C sink current: {:#?}", port.0, current);
                     Some(power_capability_from_current(current))
                 };
-                port_status.available_sink_contract = new_contract;
+                port_status.available_sink_contract = new_contract.map(SinkContract::from_capability);
             }
 
             port_status.plug_orientation = if status.plug_orientation() {
