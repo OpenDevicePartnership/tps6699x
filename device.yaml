@@ -396,10 +396,10 @@ Status:
         NotConnected: 0x0
         Disabled: 0x1
         Audio: 0x2
-        Debug: 0x3
+        DebugRdRd: 0x3
         # No connection, but Ra detected
         RaDetected: 0x4
-        Reserved: 0x5
+        DebugRpRp: 0x5
         # Connection, but no Ra detected
         ConnectedNoRa: 0x6
         Connected: 0x7
