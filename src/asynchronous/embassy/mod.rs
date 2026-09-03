@@ -927,7 +927,7 @@ impl<'a, M: RawMutex, B: I2c> Interrupt<'a, M, B> {
                 }
 
                 if !interrupt_asserted && !inner.has_pending_interrupt_clear(port_id)? {
-                    // Early exit if checking the last port cleared the interrupt.
+                    // Interrupt line is deasserted and there is nothing pending to clear on this port.
                     continue;
                 }
 
