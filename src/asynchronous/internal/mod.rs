@@ -137,21 +137,32 @@ impl<B: I2c> Tps6699x<B> {
         })
     }
 
-    /// Clear interrupts on a port, returns asserted interrupts
-    pub async fn clear_interrupt(
+    /// Read asserted interrupts on a port.
+    pub async fn get_event_bus(
         &mut self,
         port: LocalPortId,
     ) -> Result<registers::field_sets::IntEventBus1, Error<B::Error>> {
+        self.borrow_port(port)?
+            .into_registers()
+            .int_event_bus_1()
+            .read_async()
+            .await
+    }
+
+    /// Clear the supplied interrupts on a port.
+    pub async fn clear_interrupt(
+        &mut self,
+        port: LocalPortId,
+        flags: registers::field_sets::IntEventBus1,
+    ) -> Result<(), Error<B::Error>> {
         let p = self.borrow_port(port)?;
         let mut registers = p.into_registers();
 
-        let flags = registers.int_event_bus_1().read_async().await?;
-        // Clear interrupt if anything is set
         if flags != registers::field_sets::IntEventBus1::new_zero() {
             registers.int_clear_bus_1().write_async(|r| *r = flags).await?;
         }
 
-        Ok(flags)
+        Ok(())
     }
 
     /// Modify interrupt mask
@@ -972,31 +983,32 @@ mod test {
         test_rw_ports(&mut tps6699x, PORT1, PORT1_ADDR1).await;
     }
 
-    async fn run_clear_interrupt(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+    async fn run_event_bus_and_clear(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
         use registers::field_sets::IntEventBus1;
 
         // Create a fully asserted interrupt register
         let int = !IntEventBus1::new_zero();
-        let mut transactions = Vec::new();
 
-        // Read the interrupt register
-        transactions.push(create_register_read(expected_addr, 0x14, int));
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_read(expected_addr, 0x14, int)]);
+        assert_eq!(tps6699x.get_event_bus(port).await.unwrap(), int);
+        tps6699x.bus.done();
 
-        // Write to the interrupt clear register
-        transactions.push(create_register_write(expected_addr, 0x18, int));
-        tps6699x.bus.update_expectations(&transactions);
-
-        assert_eq!(tps6699x.clear_interrupt(port).await.unwrap(), int);
+        tps6699x
+            .bus
+            .update_expectations(&[create_register_write(expected_addr, 0x18, int)]);
+        tps6699x.clear_interrupt(port, int).await.unwrap();
         tps6699x.bus.done();
     }
 
     #[tokio::test]
-    async fn test_clear_interrupt() {
+    async fn test_event_bus_and_clear() {
         let mock = Mock::new(&[]);
         let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
 
-        run_clear_interrupt(&mut tps6699x, PORT0, PORT0_ADDR0).await;
-        run_clear_interrupt(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+        run_event_bus_and_clear(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_event_bus_and_clear(&mut tps6699x, PORT1, PORT1_ADDR0).await;
     }
 
     async fn run_get_port_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {

@@ -1,11 +1,13 @@
 //! This module contains a high-level API uses embassy synchronization types
 use core::array::from_fn;
+use core::cell::RefCell;
 use core::future::Future;
 use core::iter::zip;
 use core::sync::atomic::AtomicBool;
 
 use bincode::config;
 use embassy_sync::blocking_mutex::raw::RawMutex;
+use embassy_sync::blocking_mutex::Mutex as BlockingMutex;
 use embassy_sync::mutex::{Mutex, MutexGuard};
 use embassy_sync::signal::Signal;
 use embassy_time::{with_timeout, Duration, Timer};
@@ -39,6 +41,8 @@ pub mod controller {
         pub(super) inner: Mutex<M, internal::Tps6699x<B>>,
         /// Signal for awaiting an interrupt
         pub(super) interrupt_waker: Signal<M, [IntEventBus1; MAX_SUPPORTED_PORTS]>,
+        /// Interrupts read from hardware that still need a confirmed W1C write.
+        pending_interrupt_clears: BlockingMutex<M, RefCell<[IntEventBus1; MAX_SUPPORTED_PORTS]>>,
         /// Current interrupt state
         pub(super) interrupts_enabled: [AtomicBool; MAX_SUPPORTED_PORTS],
         /// Number of active ports
@@ -51,6 +55,9 @@ pub mod controller {
             Ok(Self {
                 inner: Mutex::new(internal::Tps6699x::new(bus, addr, num_ports)),
                 interrupt_waker: Signal::new(),
+                pending_interrupt_clears: BlockingMutex::new(RefCell::new(
+                    [IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS],
+                )),
                 interrupts_enabled: [const { AtomicBool::new(true) }; MAX_SUPPORTED_PORTS],
                 num_ports,
             })
@@ -88,6 +95,40 @@ pub mod controller {
             }
 
             interrupts_enabled
+        }
+
+        pub(super) fn commit_interrupts(&self, port: usize, flags: IntEventBus1) {
+            if flags == IntEventBus1::new_zero() {
+                return;
+            }
+
+            self.pending_interrupt_clears.lock(|pending| {
+                if let Some(port_pending) = pending.borrow_mut().get_mut(port) {
+                    *port_pending |= flags;
+                }
+            });
+
+            let mut accumulated = self
+                .interrupt_waker
+                .try_take()
+                .unwrap_or([IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS]);
+            if let Some(port_flags) = accumulated.get_mut(port) {
+                *port_flags |= flags;
+            }
+            self.interrupt_waker.signal(accumulated);
+        }
+
+        pub(super) fn pending_interrupt_clear(&self, port: usize) -> IntEventBus1 {
+            self.pending_interrupt_clears
+                .lock(|pending| pending.borrow().get(port).copied().unwrap_or(IntEventBus1::new_zero()))
+        }
+
+        pub(super) fn complete_interrupt_clear(&self, port: usize, cleared: IntEventBus1) {
+            self.pending_interrupt_clears.lock(|pending| {
+                if let Some(port_pending) = pending.borrow_mut().get_mut(port) {
+                    *port_pending &= !cleared;
+                }
+            });
         }
     }
 }
@@ -311,21 +352,25 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         port: LocalPortId,
         cmd: Command,
         indata: Option<&[u8]>,
-        outdata: Option<&mut [u8]>,
+        mut outdata: Option<&mut [u8]>,
     ) -> Result<ReturnValue, Error<B::Error>> {
         let timeout = cmd.timeout();
-        let result = with_timeout(timeout, self.execute_command_no_timeout(port, cmd, indata, outdata)).await;
+        let result = with_timeout(
+            timeout,
+            self.execute_command_no_timeout(port, cmd, indata, outdata.as_deref_mut()),
+        )
+        .await;
         if let Ok(result) = result {
             result
         } else {
             error!("Command {:#?} timed out", cmd);
             // See if there's a definite error we can read
             let mut inner = self.lock_inner().await;
-            match inner.read_command_result(port, None, cmd.has_return_value()).await? {
-                ReturnValue::Rejected => PdError::Rejected,
-                _ => PdError::Timeout,
+            match inner.read_command_result(port, outdata, cmd.has_return_value()).await? {
+                ReturnValue::Success => Ok(ReturnValue::Success),
+                ReturnValue::Rejected => Err(PdError::Rejected.into()),
+                _ => Err(PdError::Timeout.into()),
             }
-            .into()
         }
     }
 
@@ -838,25 +883,18 @@ pub struct Interrupt<'a, M: RawMutex, B: I2c> {
 }
 
 impl<'a, M: RawMutex, B: I2c> Interrupt<'a, M, B> {
-    fn lock_inner(&mut self) -> impl Future<Output = MutexGuard<'_, M, internal::Tps6699x<B>>> {
-        self.controller.inner.lock()
-    }
-
     /// Process interrupts
     pub async fn process_interrupt(
         &mut self,
         int: &mut impl InputPin,
     ) -> Result<[IntEventBus1; MAX_SUPPORTED_PORTS], Error<B::Error>> {
-        let mut flags = self
-            .controller
-            .interrupt_waker
-            .try_take()
-            .unwrap_or([IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS]);
+        let mut flags = [IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS];
 
         {
             let interrupts_enabled = self.controller.interrupts_enabled();
-            let mut inner = self.lock_inner().await;
+            let mut inner = self.controller.inner.lock().await;
 
+            // Read and publish every asserted event before starting any destructive W1C writes.
             // Note: `interrupts_enabled` and `flags` are both of size MAX_SUPPORTED_PORTS and so
             // will always have a 1:1 mapping. If `num_ports` ever returns a value larger than
             // MAX_SUPPORTED_PORTS, `port` will simply be capped at MAX_SUPPORTED_PORTS.
@@ -886,22 +924,49 @@ impl<'a, M: RawMutex, B: I2c> Interrupt<'a, M, B> {
                     _ => {}
                 }
 
-                match with_timeout(Duration::from_millis(100), inner.clear_interrupt(port_id)).await {
+                match with_timeout(Duration::from_millis(100), inner.get_event_bus(port_id)).await {
                     Ok(res) => match res {
-                        Ok(event) => *flag |= event,
+                        Ok(event) => {
+                            *flag |= event;
+                            self.controller.commit_interrupts(port, event);
+                        }
                         Err(_e) => {
+                            error!("{:?}: get_event_bus failed", port_id);
                             continue;
                         }
                     },
                     Err(_) => {
-                        error!("{:?}: clear_interrupt timeout", port_id);
+                        error!("{:?}: get_event_bus timeout", port_id);
                         continue;
+                    }
+                }
+            }
+
+            // Pending W1C bits remain recorded until the write completes. Retrying an already
+            // completed W1C is harmless, so cancellation and ambiguous bus failures are safe.
+            for (port, interrupt_enabled) in interrupts_enabled.iter().take(inner.num_ports()).enumerate() {
+                if !interrupt_enabled {
+                    continue;
+                }
+
+                let pending = self.controller.pending_interrupt_clear(port);
+                if pending == IntEventBus1::new_zero() {
+                    continue;
+                }
+
+                let port_id = LocalPortId(port as u8);
+                match with_timeout(Duration::from_millis(100), inner.clear_interrupt(port_id, pending)).await {
+                    Ok(Ok(())) => self.controller.complete_interrupt_clear(port, pending),
+                    Ok(Err(_e)) => {
+                        error!("{:?}: clear_interrupt failed", port_id);
+                    }
+                    Err(_) => {
+                        error!("{:?}: clear_interrupt timeout", port_id);
                     }
                 }
             }
         }
 
-        self.controller.interrupt_waker.signal(flags);
         Ok(flags)
     }
 }
@@ -1000,14 +1065,365 @@ impl<M: RawMutex, B: I2c> Drop for AccumulatedFlagsAny<'_, M, B> {
 
 #[cfg(test)]
 mod test {
+    use core::convert::Infallible;
+    use core::future::pending;
+    use core::time::Duration as CoreDuration;
+
     use embassy_sync::blocking_mutex::raw::NoopRawMutex;
     use embassy_time::{with_timeout, Duration, TimeoutError};
+    use embedded_hal::digital::ErrorType as DigitalErrorType;
+    use embedded_hal::i2c::{ErrorKind, ErrorType, Operation};
+    use embedded_hal_async::i2c::I2c;
     use embedded_hal_mock::eh1::i2c::Mock;
     use static_cell::StaticCell;
 
+    extern crate std;
+    use std::sync::{Arc, Mutex as StdMutex};
+
     use super::*;
     use crate::asynchronous::embassy::controller::Controller;
-    use crate::ADDR0;
+    use crate::asynchronous::fw_update::UpdateTarget;
+    use crate::command::{TfuqBlockStatus, TFUQ_RETURN_LEN};
+    use crate::registers::{REG_DATA1, REG_DATA1_LEN};
+    use crate::test::{create_register_read, create_register_write, Delay, PORT0_ADDR0};
+    use crate::{ADDR0, PORT0};
+
+    struct TestPin {
+        high: bool,
+    }
+
+    impl DigitalErrorType for TestPin {
+        type Error = Infallible;
+    }
+
+    impl InputPin for TestPin {
+        fn is_high(&mut self) -> Result<bool, Self::Error> {
+            Ok(self.high)
+        }
+
+        fn is_low(&mut self) -> Result<bool, Self::Error> {
+            Ok(!self.high)
+        }
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    enum BusFault {
+        None,
+        EventReadPending(usize),
+        EventReadError(usize),
+        ClearPending(usize),
+        ClearError(usize),
+    }
+
+    struct TestBusState {
+        event: IntEventBus1,
+        event_reads: usize,
+        clear_submissions: usize,
+        fault: BusFault,
+    }
+
+    #[derive(Clone)]
+    struct TestBus {
+        state: Arc<StdMutex<TestBusState>>,
+    }
+
+    type TestController = Controller<NoopRawMutex, TestBus>;
+
+    impl TestBus {
+        fn new(event: IntEventBus1, fault: BusFault) -> (Self, Arc<StdMutex<TestBusState>>) {
+            let state = Arc::new(StdMutex::new(TestBusState {
+                event,
+                event_reads: 0,
+                clear_submissions: 0,
+                fault,
+            }));
+            (
+                Self {
+                    state: Arc::clone(&state),
+                },
+                state,
+            )
+        }
+    }
+
+    impl ErrorType for TestBus {
+        type Error = ErrorKind;
+    }
+
+    impl I2c for TestBus {
+        async fn transaction(&mut self, _address: u8, operations: &mut [Operation<'_>]) -> Result<(), Self::Error> {
+            let register = match operations.first() {
+                Some(Operation::Write(data)) => data.first().copied(),
+                _ => None,
+            };
+
+            if register == Some(0x14) {
+                let (event, action) = {
+                    let mut state = self.state.lock().unwrap();
+                    state.event_reads += 1;
+                    let action = match state.fault {
+                        BusFault::EventReadPending(call) if call == state.event_reads => 1,
+                        BusFault::EventReadError(call) if call == state.event_reads => 2,
+                        _ => 0,
+                    };
+                    (state.event, action)
+                };
+
+                if action == 1 {
+                    return pending().await;
+                }
+                if action == 2 {
+                    return Err(ErrorKind::Other);
+                }
+
+                let response = operations.get_mut(1);
+                if let Some(Operation::Read(data)) = response {
+                    let event_bytes: [u8; 11] = event.into();
+                    if let Some(length) = data.first_mut() {
+                        *length = event_bytes.len() as u8;
+                    }
+                    if let Some(payload) = data.get_mut(1..) {
+                        payload.copy_from_slice(&event_bytes);
+                    }
+                    return Ok(());
+                }
+            }
+
+            if register == Some(0x18) {
+                let action = {
+                    let mut state = self.state.lock().unwrap();
+                    state.clear_submissions += 1;
+                    match state.fault {
+                        BusFault::ClearPending(call) if call == state.clear_submissions => 1,
+                        BusFault::ClearError(call) if call == state.clear_submissions => 2,
+                        _ => 0,
+                    }
+                };
+
+                if action == 1 {
+                    return pending().await;
+                }
+                if action == 2 {
+                    return Err(ErrorKind::Other);
+                }
+                return Ok(());
+            }
+
+            Err(ErrorKind::Other)
+        }
+    }
+
+    fn command_complete_event() -> IntEventBus1 {
+        let mut event = IntEventBus1::new_zero();
+        event.set_cmd_1_completed(true);
+        event
+    }
+
+    fn pending_clear<M: RawMutex, B: I2c>(controller: &Controller<M, B>, port: usize) -> IntEventBus1 {
+        controller.pending_interrupt_clear(port)
+    }
+
+    #[tokio::test]
+    async fn test_event_read_cancellation_commits_nothing() {
+        let event = command_complete_event();
+        let (bus, state) = TestBus::new(event, BusFault::EventReadPending(1));
+        let mut controller: TestController = Controller::new_tps66993(bus, ADDR0[0]).unwrap();
+        let (_pd, mut interrupt) = controller.make_parts();
+        let mut pin = TestPin { high: false };
+
+        assert!(
+            tokio::time::timeout(CoreDuration::from_millis(10), interrupt.process_interrupt(&mut pin))
+                .await
+                .is_err()
+        );
+        assert_eq!(pending_clear(&controller, 0), IntEventBus1::new_zero());
+        assert_eq!(controller.interrupt_waker.try_take(), None);
+        assert_eq!(state.lock().unwrap().clear_submissions, 0);
+    }
+
+    #[tokio::test]
+    async fn test_event_read_failure_commits_nothing() {
+        let event = command_complete_event();
+        let (bus, state) = TestBus::new(event, BusFault::EventReadError(1));
+        let mut controller: TestController = Controller::new_tps66993(bus, ADDR0[0]).unwrap();
+        let (_pd, mut interrupt) = controller.make_parts();
+        let mut pin = TestPin { high: false };
+
+        interrupt.process_interrupt(&mut pin).await.unwrap();
+        assert_eq!(pending_clear(&controller, 0), IntEventBus1::new_zero());
+        assert_eq!(controller.interrupt_waker.try_take(), None);
+        assert_eq!(state.lock().unwrap().clear_submissions, 0);
+    }
+
+    #[tokio::test]
+    async fn test_cancellation_before_w1c_submission_keeps_event_pending() {
+        let event = command_complete_event();
+        let (bus, state) = TestBus::new(event, BusFault::EventReadPending(2));
+        let mut controller: TestController = Controller::new_tps66994(bus, ADDR0).unwrap();
+        let (_pd, mut interrupt) = controller.make_parts();
+        let mut pin = TestPin { high: false };
+
+        assert!(
+            tokio::time::timeout(CoreDuration::from_millis(10), interrupt.process_interrupt(&mut pin))
+                .await
+                .is_err()
+        );
+        assert_eq!(pending_clear(interrupt.controller, 0), event);
+        assert_eq!(
+            controller.interrupt_waker.try_take(),
+            Some([event, IntEventBus1::new_zero()])
+        );
+        assert_eq!(state.lock().unwrap().clear_submissions, 0);
+    }
+
+    #[tokio::test]
+    async fn test_cancellation_after_w1c_submission_retries_pending_clear() {
+        let event = command_complete_event();
+        let (bus, state) = TestBus::new(event, BusFault::ClearPending(1));
+        let mut controller: TestController = Controller::new_tps66993(bus, ADDR0[0]).unwrap();
+        let (_pd, mut interrupt) = controller.make_parts();
+        let mut low_pin = TestPin { high: false };
+
+        assert!(
+            tokio::time::timeout(CoreDuration::from_millis(10), interrupt.process_interrupt(&mut low_pin))
+                .await
+                .is_err()
+        );
+        assert_eq!(pending_clear(interrupt.controller, 0), event);
+        assert_eq!(state.lock().unwrap().clear_submissions, 1);
+
+        state.lock().unwrap().fault = BusFault::None;
+        let mut high_pin = TestPin { high: true };
+        interrupt.process_interrupt(&mut high_pin).await.unwrap();
+        assert_eq!(pending_clear(&controller, 0), IntEventBus1::new_zero());
+        assert_eq!(state.lock().unwrap().clear_submissions, 2);
+        assert_eq!(
+            controller.interrupt_waker.try_take(),
+            Some([event, IntEventBus1::new_zero()])
+        );
+    }
+
+    #[tokio::test]
+    async fn test_clear_failure_keeps_event_pending_for_retry() {
+        let event = command_complete_event();
+        let (bus, state) = TestBus::new(event, BusFault::ClearError(1));
+        let mut controller: TestController = Controller::new_tps66993(bus, ADDR0[0]).unwrap();
+        let (_pd, mut interrupt) = controller.make_parts();
+        let mut low_pin = TestPin { high: false };
+
+        interrupt.process_interrupt(&mut low_pin).await.unwrap();
+        assert_eq!(pending_clear(interrupt.controller, 0), event);
+
+        state.lock().unwrap().fault = BusFault::None;
+        let mut high_pin = TestPin { high: true };
+        interrupt.process_interrupt(&mut high_pin).await.unwrap();
+        assert_eq!(pending_clear(&controller, 0), IntEventBus1::new_zero());
+        assert_eq!(state.lock().unwrap().clear_submissions, 2);
+    }
+
+    #[tokio::test]
+    async fn test_clear_completion_retires_only_w1c_responsibility() {
+        let event = command_complete_event();
+        let (bus, state) = TestBus::new(event, BusFault::None);
+        let mut controller: TestController = Controller::new_tps66993(bus, ADDR0[0]).unwrap();
+        let (_pd, mut interrupt) = controller.make_parts();
+        let mut pin = TestPin { high: false };
+
+        assert_eq!(
+            interrupt.process_interrupt(&mut pin).await.unwrap(),
+            [event, IntEventBus1::new_zero()]
+        );
+        assert_eq!(pending_clear(&controller, 0), IntEventBus1::new_zero());
+        assert_eq!(state.lock().unwrap().clear_submissions, 1);
+        assert_eq!(
+            controller.interrupt_waker.try_take(),
+            Some([event, IntEventBus1::new_zero()])
+        );
+    }
+
+    #[tokio::test]
+    async fn test_tfuq_recovers_output_after_lost_completion_notification() {
+        let mut command_data = [0u8; REG_DATA1_LEN];
+        command_data[0] = ReturnValue::Success as u8;
+        let output = command_data.get_mut(1..=TFUQ_RETURN_LEN).unwrap();
+        output[7] = TfuqBlockStatus::DataValidAndAuthentic as u8;
+
+        let transactions = [
+            create_register_write(PORT0_ADDR0, REG_DATA1, [0x01, 0x00]),
+            create_register_write(PORT0_ADDR0, 0x08, (Command::Tfuq as u32).to_le_bytes()),
+            create_register_read(PORT0_ADDR0, 0x08, (Command::Success as u32).to_le_bytes()),
+            create_register_read(PORT0_ADDR0, REG_DATA1, command_data),
+        ];
+        let mut controller: Controller<NoopRawMutex, Mock> =
+            Controller::new_tps66994(Mock::new(&transactions), ADDR0).unwrap();
+        let (mut pd, _interrupt) = controller.make_parts();
+        let mut delay = Delay {};
+
+        assert_eq!(
+            pd.fw_update_validate_stream(&mut delay, 0).await.unwrap(),
+            TfuqBlockStatus::DataValidAndAuthentic
+        );
+        pd.lock_inner().await.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_timeout_fallback_preserves_rejected_semantics() {
+        let mut command_data = [0u8; REG_DATA1_LEN];
+        command_data[0] = ReturnValue::Rejected as u8;
+        let transactions = [
+            create_register_write(PORT0_ADDR0, 0x08, (Command::Drst as u32).to_le_bytes()),
+            create_register_read(PORT0_ADDR0, 0x08, (Command::Success as u32).to_le_bytes()),
+            create_register_read(PORT0_ADDR0, REG_DATA1, command_data),
+        ];
+        let mut controller: Controller<NoopRawMutex, Mock> =
+            Controller::new_tps66994(Mock::new(&transactions), ADDR0).unwrap();
+        let (mut pd, _interrupt) = controller.make_parts();
+
+        assert_eq!(
+            pd.execute_command(PORT0, Command::Drst, None, None).await,
+            Err(Error::Pd(PdError::Rejected))
+        );
+        pd.lock_inner().await.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_timeout_fallback_keeps_incomplete_result_as_busy() {
+        let transactions = [
+            create_register_write(PORT0_ADDR0, 0x08, (Command::Drst as u32).to_le_bytes()),
+            create_register_read(PORT0_ADDR0, 0x08, (Command::Drst as u32).to_le_bytes()),
+        ];
+        let mut controller: Controller<NoopRawMutex, Mock> =
+            Controller::new_tps66994(Mock::new(&transactions), ADDR0).unwrap();
+        let (mut pd, _interrupt) = controller.make_parts();
+
+        assert_eq!(
+            pd.execute_command(PORT0, Command::Drst, None, None).await,
+            Err(Error::Pd(PdError::Busy))
+        );
+        pd.lock_inner().await.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_timeout_fallback_rejects_malformed_result_without_overwriting_output() {
+        let mut command_data = [0u8; REG_DATA1_LEN];
+        command_data[0] = 0x02;
+        let transactions = [
+            create_register_write(PORT0_ADDR0, 0x08, (Command::Drst as u32).to_le_bytes()),
+            create_register_read(PORT0_ADDR0, 0x08, (Command::Success as u32).to_le_bytes()),
+            create_register_read(PORT0_ADDR0, REG_DATA1, command_data),
+        ];
+        let mut controller: Controller<NoopRawMutex, Mock> =
+            Controller::new_tps66994(Mock::new(&transactions), ADDR0).unwrap();
+        let (mut pd, _interrupt) = controller.make_parts();
+        let mut output = [0xA5; 4];
+
+        assert_eq!(
+            pd.execute_command(PORT0, Command::Drst, None, Some(&mut output)).await,
+            Err(Error::Pd(PdError::InvalidParams))
+        );
+        assert_eq!(output, [0xA5; 4]);
+        pd.lock_inner().await.bus.done();
+    }
 
     /// Tests `wait_interrupt_any` with a mask for both ports.
     #[tokio::test]

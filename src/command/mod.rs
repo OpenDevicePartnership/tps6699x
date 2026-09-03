@@ -210,7 +210,8 @@ impl Command {
         match self {
             Command::Tfus => TFUS_DELAY_MS + 100,
             Command::Tfui | Command::Tfue | Command::Tfud | Command::Tfuq => 200, // docs say 100ms, but 200ms is more reliable
-            Command::Gaid | Command::Tfuc => RESET_DELAY_MS + 100,
+            Command::Gaid => RESET_DELAY_MS + 100,
+            Command::Tfuc => RESET_DELAY_MS + 500,
             Command::Srdy | Command::Sryr => 250, // determined by experimentation
             Command::Trig => 500,                 // determined by experimentation
             Command::Drst => 100,                 // PD spec says 24/27/30 ms, round up
@@ -620,6 +621,12 @@ mod test {
             },
             [0xAC, 0xAC],
         );
+    }
+
+    #[test]
+    fn test_reset_command_timeout_slack() {
+        assert_eq!(Command::Gaid.timeout_ms(), RESET_DELAY_MS + 100);
+        assert_eq!(Command::Tfuc.timeout_ms(), RESET_DELAY_MS + 500);
     }
 
     #[test]
