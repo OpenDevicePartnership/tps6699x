@@ -103,11 +103,17 @@ pub struct Tps6699x<B: I2c> {
     /// I2C addresses for ports
     addr: [u8; MAX_SUPPORTED_PORTS],
     num_ports: usize,
+    pending_interrupt_clears: [registers::field_sets::IntEventBus1; MAX_SUPPORTED_PORTS],
 }
 
 impl<B: I2c> Tps6699x<B> {
     pub(super) fn new(bus: B, addr: [u8; MAX_SUPPORTED_PORTS], num_ports: usize) -> Self {
-        Self { bus, addr, num_ports }
+        Self {
+            bus,
+            addr,
+            num_ports,
+            pending_interrupt_clears: [registers::field_sets::IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS],
+        }
     }
 
     pub fn new_tps66993(bus: B, addr: u8) -> Self {
@@ -137,8 +143,11 @@ impl<B: I2c> Tps6699x<B> {
         })
     }
 
-    /// Clear interrupts on a port, returns asserted interrupts
-    pub async fn clear_interrupt(
+    /// Read interrupts on a port and record the bits that still need to be cleared.
+    ///
+    /// Bits already pending a clear are omitted so a retry cannot publish the same
+    /// hardware event twice.
+    pub async fn read_interrupt(
         &mut self,
         port: LocalPortId,
     ) -> Result<registers::field_sets::IntEventBus1, Error<B::Error>> {
@@ -146,12 +155,51 @@ impl<B: I2c> Tps6699x<B> {
         let mut registers = p.into_registers();
 
         let flags = registers.int_event_bus_1().read_async().await?;
-        // Clear interrupt if anything is set
-        if flags != registers::field_sets::IntEventBus1::new_zero() {
-            registers.int_clear_bus_1().write_async(|r| *r = flags).await?;
+        let pending = self
+            .pending_interrupt_clears
+            .get_mut(port.0 as usize)
+            .ok_or(PdError::InvalidPort)?;
+        let unpublished = flags & !*pending;
+        *pending |= flags;
+
+        Ok(unpublished)
+    }
+
+    /// Clear all interrupt bits that were previously read on a port.
+    ///
+    /// The pending bits are retained until the W1C write completes, making a
+    /// failed or cancelled clear independently retryable.
+    pub async fn clear_pending_interrupts(&mut self, port: LocalPortId) -> Result<(), Error<B::Error>> {
+        let flags = *self
+            .pending_interrupt_clears
+            .get(port.0 as usize)
+            .ok_or(PdError::InvalidPort)?;
+        if flags == registers::field_sets::IntEventBus1::new_zero() {
+            return Ok(());
         }
 
-        Ok(flags)
+        self.borrow_port(port)?
+            .into_registers()
+            .int_clear_bus_1()
+            .write_async(|r| *r = flags)
+            .await?;
+
+        let pending = self
+            .pending_interrupt_clears
+            .get_mut(port.0 as usize)
+            .ok_or(PdError::InvalidPort)?;
+        *pending &= !flags;
+
+        Ok(())
+    }
+
+    /// Whether a port has interrupt bits waiting for a W1C retry.
+    pub fn has_pending_interrupt_clear(&self, port: LocalPortId) -> Result<bool, Error<B::Error>> {
+        Ok(*self
+            .pending_interrupt_clears
+            .get(port.0 as usize)
+            .ok_or(PdError::InvalidPort)?
+            != registers::field_sets::IntEventBus1::new_zero())
     }
 
     /// Modify interrupt mask
@@ -972,7 +1020,7 @@ mod test {
         test_rw_ports(&mut tps6699x, PORT1, PORT1_ADDR1).await;
     }
 
-    async fn run_clear_interrupt(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
+    async fn run_read_and_clear_interrupt(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
         use registers::field_sets::IntEventBus1;
 
         // Create a fully asserted interrupt register
@@ -986,17 +1034,20 @@ mod test {
         transactions.push(create_register_write(expected_addr, 0x18, int));
         tps6699x.bus.update_expectations(&transactions);
 
-        assert_eq!(tps6699x.clear_interrupt(port).await.unwrap(), int);
+        assert_eq!(tps6699x.read_interrupt(port).await.unwrap(), int);
+        assert!(tps6699x.has_pending_interrupt_clear(port).unwrap());
+        tps6699x.clear_pending_interrupts(port).await.unwrap();
+        assert!(!tps6699x.has_pending_interrupt_clear(port).unwrap());
         tps6699x.bus.done();
     }
 
     #[tokio::test]
-    async fn test_clear_interrupt() {
+    async fn test_read_and_clear_interrupt() {
         let mock = Mock::new(&[]);
         let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
 
-        run_clear_interrupt(&mut tps6699x, PORT0, PORT0_ADDR0).await;
-        run_clear_interrupt(&mut tps6699x, PORT1, PORT1_ADDR0).await;
+        run_read_and_clear_interrupt(&mut tps6699x, PORT0, PORT0_ADDR0).await;
+        run_read_and_clear_interrupt(&mut tps6699x, PORT1, PORT1_ADDR0).await;
     }
 
     async fn run_get_port_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {

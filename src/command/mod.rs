@@ -210,7 +210,8 @@ impl Command {
         match self {
             Command::Tfus => TFUS_DELAY_MS + 100,
             Command::Tfui | Command::Tfue | Command::Tfud | Command::Tfuq => 200, // docs say 100ms, but 200ms is more reliable
-            Command::Gaid | Command::Tfuc => RESET_DELAY_MS + 100,
+            Command::Gaid => RESET_DELAY_MS + 100,
+            Command::Tfuc => RESET_DELAY_MS + TFUC_VERIFICATION_SLACK_MS,
             Command::Srdy | Command::Sryr => 250, // determined by experimentation
             Command::Trig => 500,                 // determined by experimentation
             Command::Drst => 100,                 // PD spec says 24/27/30 ms, round up
@@ -329,6 +330,8 @@ impl Into<Result<(), PdError>> for ReturnValue {
 
 /// Delay to wait for the device to restart
 pub(crate) const RESET_DELAY_MS: u32 = 1600;
+/// Time reserved after the TFUc reset delay to read and verify the application mode.
+pub(crate) const TFUC_VERIFICATION_SLACK_MS: u32 = 500;
 /// Length of arguments for the reset command
 pub(crate) const RESET_ARGS_LEN: usize = 2;
 /// Constant to enable a feature in the command args
@@ -620,6 +623,13 @@ mod test {
             },
             [0xAC, 0xAC],
         );
+    }
+
+    #[test]
+    fn test_tfuc_timeout_reserves_independent_verification_slack() {
+        assert_eq!(Command::Tfuc.timeout_ms(), RESET_DELAY_MS + TFUC_VERIFICATION_SLACK_MS);
+        assert_eq!(TFUC_VERIFICATION_SLACK_MS, 500);
+        assert_eq!(Command::Gaid.timeout_ms(), RESET_DELAY_MS + 100);
     }
 
     #[test]
