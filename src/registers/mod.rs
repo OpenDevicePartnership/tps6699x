@@ -87,7 +87,7 @@ impl TryFrom<PlugMode> for ConnectionState {
 
     fn try_from(value: PlugMode) -> Result<Self, Self::Error> {
         match value {
-            PlugMode::Debug => Ok(ConnectionState::DebugAccessory),
+            PlugMode::DebugRdRd | PlugMode::DebugRpRp => Ok(ConnectionState::DebugAccessory),
             PlugMode::Audio => Ok(ConnectionState::AudioAccessory),
             PlugMode::Connected | PlugMode::ConnectedNoRa => Ok(ConnectionState::Attached),
             _ => Err(PdError::InvalidParams),
@@ -165,7 +165,10 @@ mod tests {
 
     #[test]
     fn test_convert_plug_mode_to_connection_state() {
-        let state: ConnectionState = PlugMode::Debug.try_into().unwrap();
+        let state: ConnectionState = PlugMode::DebugRdRd.try_into().unwrap();
+        assert!(matches!(state, ConnectionState::DebugAccessory));
+
+        let state: ConnectionState = PlugMode::DebugRpRp.try_into().unwrap();
         assert!(matches!(state, ConnectionState::DebugAccessory));
 
         let state: ConnectionState = PlugMode::Audio.try_into().unwrap();
