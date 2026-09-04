@@ -909,8 +909,9 @@ impl<'a, M: RawMutex, B: I2c> Interrupt<'a, M, B> {
                     _ => true,
                 };
 
+                const I2C_TIMEOUT: Duration = Duration::from_millis(100);
                 if interrupt_asserted {
-                    match with_timeout(Duration::from_millis(100), inner.read_interrupt(port_id)).await {
+                    match with_timeout(I2C_TIMEOUT, inner.read_interrupt(port_id)).await {
                         Ok(Ok(event)) => {
                             *flag |= event;
                             // Publish before the destructive W1C write. No await may be
@@ -929,7 +930,7 @@ impl<'a, M: RawMutex, B: I2c> Interrupt<'a, M, B> {
                     continue;
                 }
 
-                match with_timeout(Duration::from_millis(100), inner.clear_pending_interrupts(port_id)).await {
+                match with_timeout(I2C_TIMEOUT, inner.clear_pending_interrupts(port_id)).await {
                     Ok(res) => match res {
                         Ok(()) => {}
                         Err(_e) => {
