@@ -101,8 +101,10 @@ pub mod controller {
                 .unwrap_or([IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS]);
             if let Some(port_flags) = flags.get_mut(port.0 as usize) {
                 *port_flags |= event;
-                self.interrupt_waker.signal(flags);
             }
+
+            // always put the flags back, even if the port isn't a valid port index
+            self.interrupt_waker.signal(flags);
         }
     }
 }
@@ -1172,6 +1174,18 @@ mod test {
             output_data.copy_from_slice(output);
         }
         data
+    }
+
+    #[test]
+    fn test_interrupt_publish_invalid_port_preserves_pending_flags() {
+        let mut controller: Controller<NoopRawMutex, _> = Controller::new_tps66994(Mock::new(&[]), ADDR0).unwrap();
+        let pending = [interrupt_event(), IntEventBus1::new_zero()];
+        controller.interrupt_waker.signal(pending);
+
+        controller.publish_interrupt(LocalPortId(MAX_SUPPORTED_PORTS as u8), interrupt_event());
+
+        assert_eq!(controller.interrupt_waker.try_take(), Some(pending));
+        controller.inner.get_mut().bus.done();
     }
 
     #[tokio::test]
