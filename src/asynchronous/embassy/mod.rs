@@ -351,11 +351,7 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
             error!("Command {:#?} timed out", cmd);
             // Reconcile a completion that raced the software timeout.
             let mut inner = self.lock_inner().await;
-            match inner.read_command_result(port, outdata, cmd.has_return_value()).await? {
-                ReturnValue::Success => Ok(ReturnValue::Success),
-                ReturnValue::Rejected => PdError::Rejected.into(),
-                _ => PdError::Timeout.into(),
-            }
+            inner.read_command_result(port, outdata, cmd.has_return_value()).await
         }
     }
 
@@ -1270,7 +1266,7 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_command_timeout_preserves_rejected_result() {
+    async fn test_command_timeout_preserves_rejected_return_value() {
         let transactions = [
             create_register_write(PORT0_ADDR0, 0x08, (Command::Tfuq as u32).to_le_bytes()),
             create_register_read(PORT0_ADDR0, 0x08, (Command::Success as u32).to_le_bytes()),
@@ -1287,13 +1283,13 @@ mod test {
         assert_eq!(
             pd.execute_command_with_timeout(Duration::from_millis(1), PORT0, Command::Tfuq, None, None)
                 .await,
-            Err(Error::Pd(PdError::Rejected))
+            Ok(ReturnValue::Rejected)
         );
         pd.lock_inner().await.bus.done();
     }
 
     #[tokio::test]
-    async fn test_command_timeout_reports_timeout_busy_malformed_and_bus_errors() {
+    async fn test_command_timeout_preserves_abort_and_reports_busy_malformed_and_bus_errors() {
         let transactions = [
             create_register_write(PORT0_ADDR0, 0x08, (Command::Tfuq as u32).to_le_bytes()),
             create_register_read(PORT0_ADDR0, 0x08, (Command::Success as u32).to_le_bytes()),
@@ -1310,7 +1306,7 @@ mod test {
         assert_eq!(
             pd.execute_command_with_timeout(Duration::from_millis(1), PORT0, Command::Tfuq, None, None)
                 .await,
-            Err(Error::Pd(PdError::Timeout))
+            Ok(ReturnValue::Abort)
         );
         pd.lock_inner().await.bus.done();
 
