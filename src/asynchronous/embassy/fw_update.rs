@@ -124,10 +124,11 @@ impl<M: RawMutex, B: I2c> UpdateTarget for Tps6699x<'_, M, B> {
         &mut self,
         delay: &mut impl embedded_hal_async::delay::DelayNs,
     ) -> Result<(), Error<Self::BusError>> {
-        let result = {
+        let result = with_timeout(Command::Tfuc.timeout(), async {
             let mut inner = self.lock_inner().await;
-            with_timeout(Command::Tfuc.timeout(), inner.execute_tfuc(delay)).await
-        };
+            inner.execute_tfuc(delay).await
+        })
+        .await;
 
         if let Ok(result) = result {
             result

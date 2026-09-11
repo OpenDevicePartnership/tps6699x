@@ -211,7 +211,7 @@ impl Command {
             Command::Tfus => TFUS_DELAY_MS + 100,
             Command::Tfui | Command::Tfue | Command::Tfud | Command::Tfuq => 200, // docs say 100ms, but 200ms is more reliable
             Command::Gaid => RESET_DELAY_MS + 100,
-            Command::Tfuc => RESET_DELAY_MS + TFUC_VERIFICATION_SLACK_MS,
+            Command::Tfuc => TFUC_APP_VERIFY_WINDOW_MS + TFUC_TIMEOUT_MARGIN_MS,
             Command::Srdy | Command::Sryr => 250, // determined by experimentation
             Command::Trig => 500,                 // determined by experimentation
             Command::Drst => 100,                 // PD spec says 24/27/30 ms, round up
@@ -330,8 +330,12 @@ impl Into<Result<(), PdError>> for ReturnValue {
 
 /// Delay to wait for the device to restart
 pub(crate) const RESET_DELAY_MS: u32 = 1600;
-/// Time reserved after the TFUc reset delay to read and verify the application mode.
-pub(crate) const TFUC_VERIFICATION_SLACK_MS: u32 = 500;
+/// Total time after issuing TFUc to wait for the controller to enter an application mode.
+pub(crate) const TFUC_APP_VERIFY_WINDOW_MS: u32 = 2500;
+/// Delay between TFUc application-mode verification attempts.
+pub(crate) const TFUC_MODE_POLL_INTERVAL_MS: u32 = 25;
+/// Independent margin for TFUc mutex, I2C, and scheduling overhead.
+pub(crate) const TFUC_TIMEOUT_MARGIN_MS: u32 = 500;
 /// Length of arguments for the reset command
 pub(crate) const RESET_ARGS_LEN: usize = 2;
 /// Constant to enable a feature in the command args
@@ -626,9 +630,19 @@ mod test {
     }
 
     #[test]
-    fn test_tfuc_timeout_reserves_independent_verification_slack() {
-        assert_eq!(Command::Tfuc.timeout_ms(), RESET_DELAY_MS + TFUC_VERIFICATION_SLACK_MS);
-        assert_eq!(TFUC_VERIFICATION_SLACK_MS, 500);
+    fn test_tfuc_timeout_covers_verification_window_and_margin() {
+        assert_eq!(
+            Command::Tfuc.timeout_ms(),
+            TFUC_APP_VERIFY_WINDOW_MS + TFUC_TIMEOUT_MARGIN_MS
+        );
+        assert_eq!(Command::Tfuc.timeout_ms(), 3000);
+        assert_eq!(
+            Command::Tfuc.timeout_ms() - TFUC_APP_VERIFY_WINDOW_MS,
+            TFUC_TIMEOUT_MARGIN_MS
+        );
+        assert_eq!(TFUC_APP_VERIFY_WINDOW_MS, 2500);
+        assert_eq!(TFUC_MODE_POLL_INTERVAL_MS, 25);
+        assert_eq!(TFUC_TIMEOUT_MARGIN_MS, 500);
         assert_eq!(Command::Gaid.timeout_ms(), RESET_DELAY_MS + 100);
     }
 

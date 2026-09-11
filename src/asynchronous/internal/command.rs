@@ -157,20 +157,33 @@ impl<B: I2c> Tps6699x<B> {
 
         delay.delay_ms(RESET_DELAY_MS).await;
 
-        // Confirm we're in the correct mode
-        let mode = self.get_mode().await?;
-        if mode != Mode::App0 && mode != Mode::App1 {
-            error!("Failed to enter normal mode, mode: {:?}", mode);
-            return Err(PdError::InvalidMode.into());
+        let mut elapsed_ms = RESET_DELAY_MS;
+        loop {
+            let mode = self.get_mode().await?;
+            match mode {
+                Mode::App0 | Mode::App1 => return Ok(()),
+                Mode::Boot if elapsed_ms < TFUC_APP_VERIFY_WINDOW_MS => {
+                    let poll_delay_ms = TFUC_MODE_POLL_INTERVAL_MS.min(TFUC_APP_VERIFY_WINDOW_MS - elapsed_ms);
+                    delay.delay_ms(poll_delay_ms).await;
+                    elapsed_ms += poll_delay_ms;
+                }
+                Mode::Boot => {
+                    error!("Timed out waiting for normal mode, last mode: {:?}", mode);
+                    return Err(PdError::Timeout.into());
+                }
+                _ => {
+                    error!("Failed to enter normal mode, mode: {:?}", mode);
+                    return Err(PdError::InvalidMode.into());
+                }
+            }
         }
-
-        Ok(())
     }
 }
 
 #[cfg(test)]
 mod test {
-    use embedded_hal_mock::eh1::i2c::Mock;
+    use embedded_hal::i2c::ErrorKind;
+    use embedded_hal_mock::eh1::i2c::{Mock, Transaction};
     use regs::REG_DATA1;
 
     use crate::asynchronous::internal::Tps6699x;
@@ -184,6 +197,39 @@ mod test {
 
     /// Value used for generic command testing, no particular significance
     const TEST_CMD_DATA: u64 = 0x12345678abcdef;
+
+    #[derive(Default)]
+    struct RecordingDelay {
+        delays_ns: Vec<u32>,
+    }
+
+    impl DelayNs for RecordingDelay {
+        async fn delay_ns(&mut self, ns: u32) {
+            self.delays_ns.push(ns);
+        }
+    }
+
+    impl RecordingDelay {
+        fn total_delay_ms(&self) -> u64 {
+            self.delays_ns.iter().map(|&ns| u64::from(ns)).sum::<u64>() / 1_000_000
+        }
+    }
+
+    fn tfuc_transactions(modes: &[Mode]) -> Vec<Transaction> {
+        let mut transactions = Vec::new();
+        transactions.push(create_register_write(PORT0_ADDR0, REG_DATA1, [0, RESET_FEATURE_ENABLE]));
+        transactions.push(create_register_write(
+            PORT0_ADDR0,
+            0x08,
+            (Command::Tfuc as u32).to_le_bytes(),
+        ));
+        transactions.extend(
+            modes
+                .iter()
+                .map(|&mode| create_register_read(PORT0_ADDR0, 0x03, (mode as u32).to_le_bytes())),
+        );
+        transactions
+    }
 
     async fn run_send_command<const N: usize>(
         tps6699x: &mut Tps6699x<Mock>,
@@ -292,25 +338,119 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_execute_tfuc() {
+    async fn test_execute_tfuc_immediate_app_success() {
         let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR0);
-        let mut delay = Delay {};
-        let mut transactions = Vec::new();
+        let mut delay = RecordingDelay::default();
+        let transactions = tfuc_transactions(&[Mode::App0]);
 
-        transactions.push(create_register_write(PORT0_ADDR0, REG_DATA1, [0, RESET_FEATURE_ENABLE]));
-        transactions.push(create_register_write(
-            PORT0_ADDR0,
-            0x08,
-            (Command::Tfuc as u32).to_le_bytes(),
-        ));
-        transactions.push(create_register_read(
-            PORT0_ADDR0,
-            0x03,
-            (Mode::App0 as u32).to_le_bytes(),
-        ));
         tps6699x.bus.update_expectations(&transactions);
 
         tps6699x.execute_tfuc(&mut delay).await.unwrap();
+        assert_eq!(delay.total_delay_ms(), u64::from(RESET_DELAY_MS));
+        assert_eq!(delay.delays_ns.len(), 1);
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_execute_tfuc_boot_then_app_success() {
+        let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR0);
+        let mut delay = RecordingDelay::default();
+        let transactions = tfuc_transactions(&[Mode::Boot, Mode::App1]);
+
+        tps6699x.bus.update_expectations(&transactions);
+
+        tps6699x.execute_tfuc(&mut delay).await.unwrap();
+        assert_eq!(
+            delay.total_delay_ms(),
+            u64::from(RESET_DELAY_MS + TFUC_MODE_POLL_INTERVAL_MS)
+        );
+        assert_eq!(
+            delay.delays_ns,
+            [RESET_DELAY_MS * 1_000_000, TFUC_MODE_POLL_INTERVAL_MS * 1_000_000]
+        );
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_execute_tfuc_repeated_boot_times_out_at_verification_deadline() {
+        let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR0);
+        let mut delay = RecordingDelay::default();
+        let poll_count = (TFUC_APP_VERIFY_WINDOW_MS - RESET_DELAY_MS) / TFUC_MODE_POLL_INTERVAL_MS;
+        let modes = std::vec![Mode::Boot; poll_count as usize + 1];
+        let transactions = tfuc_transactions(&modes);
+
+        tps6699x.bus.update_expectations(&transactions);
+
+        assert_eq!(
+            tps6699x.execute_tfuc(&mut delay).await,
+            Err(Error::Pd(PdError::Timeout))
+        );
+        assert_eq!(delay.total_delay_ms(), u64::from(TFUC_APP_VERIFY_WINDOW_MS));
+        assert_eq!(delay.delays_ns.len(), poll_count as usize + 1);
+        assert!(delay
+            .delays_ns
+            .iter()
+            .skip(1)
+            .all(|&ns| ns == TFUC_MODE_POLL_INTERVAL_MS * 1_000_000));
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_execute_tfuc_accepts_app_at_verification_deadline() {
+        let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR0);
+        let mut delay = RecordingDelay::default();
+        let poll_count = (TFUC_APP_VERIFY_WINDOW_MS - RESET_DELAY_MS) / TFUC_MODE_POLL_INTERVAL_MS;
+        let mut modes = std::vec![Mode::Boot; poll_count as usize];
+        modes.push(Mode::App1);
+        let transactions = tfuc_transactions(&modes);
+
+        tps6699x.bus.update_expectations(&transactions);
+
+        tps6699x.execute_tfuc(&mut delay).await.unwrap();
+        assert_eq!(delay.total_delay_ms(), u64::from(TFUC_APP_VERIFY_WINDOW_MS));
+        assert_eq!(delay.delays_ns.len(), poll_count as usize + 1);
+        assert!(delay
+            .delays_ns
+            .iter()
+            .skip(1)
+            .all(|&ns| ns == TFUC_MODE_POLL_INTERVAL_MS * 1_000_000));
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_execute_tfuc_unexpected_mode_fails_immediately() {
+        let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR0);
+        let mut delay = RecordingDelay::default();
+        let transactions = tfuc_transactions(&[Mode::F211]);
+
+        tps6699x.bus.update_expectations(&transactions);
+
+        assert_eq!(
+            tps6699x.execute_tfuc(&mut delay).await,
+            Err(Error::Pd(PdError::InvalidMode))
+        );
+        assert_eq!(delay.total_delay_ms(), u64::from(RESET_DELAY_MS));
+        assert_eq!(delay.delays_ns.len(), 1);
+        tps6699x.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_execute_tfuc_propagates_mode_read_bus_error() {
+        let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&[]), ADDR0);
+        let mut delay = RecordingDelay::default();
+        let mut transactions = tfuc_transactions(&[]);
+        transactions.push(
+            create_register_read(PORT0_ADDR0, 0x03, (Mode::App0 as u32).to_le_bytes()).with_error(ErrorKind::Other),
+        );
+
+        tps6699x.bus.update_expectations(&transactions);
+
+        assert_eq!(
+            tps6699x.execute_tfuc(&mut delay).await,
+            Err(Error::Bus(ErrorKind::Other))
+        );
+        assert_eq!(delay.total_delay_ms(), u64::from(RESET_DELAY_MS));
+        assert_eq!(delay.delays_ns.len(), 1);
         tps6699x.bus.done();
     }
 
