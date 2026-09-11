@@ -384,7 +384,7 @@ dependencies = [
 [[package]]
 name = "embedded-services"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-services#3c5741370d3aac8a4e7ac57fbbca138f4bfafdd5"
+source = "git+https://github.com/OpenDevicePartnership/embedded-services#d57a2ade63e9bc2e328f4e0fd03f14de160575d6"
 dependencies = [
  "bitfield 0.17.0",
  "cortex-m",
@@ -425,7 +425,7 @@ dependencies = [
 [[package]]
 name = "espi-device"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/haf-ec-service#0c865f19005d8fda5902725c5d12890ac932fcf5"
+source = "git+https://github.com/OpenDevicePartnership/haf-ec-service#a0748ef149c4518e057ee71e80035b6a2324a750"
 dependencies = [
  "bit-register 0.1.0 (git+https://github.com/OpenDevicePartnership/odp-utilities?tag=v0.1.0)",
  "bitflags 2.9.4",
@@ -450,7 +450,7 @@ checksum = "c39754e157331b013978ec91992bde1ac089843443c49cbc7f46150b0fad0893"
 [[package]]
 name = "fw-update-interface"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-services#3c5741370d3aac8a4e7ac57fbbca138f4bfafdd5"
+source = "git+https://github.com/OpenDevicePartnership/embedded-services#d57a2ade63e9bc2e328f4e0fd03f14de160575d6"
 dependencies = [
  "defmt 0.3.100",
  "embedded-services",
@@ -515,7 +515,7 @@ checksum = "34080505efa8e45a4b816c349525ebe327ceaa8559756f0356cba97ef3bf7432"
 [[package]]
 name = "mctp-rs"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-services#3c5741370d3aac8a4e7ac57fbbca138f4bfafdd5"
+source = "git+https://github.com/OpenDevicePartnership/embedded-services#d57a2ade63e9bc2e328f4e0fd03f14de160575d6"
 dependencies = [
  "bit-register 0.1.0 (git+https://github.com/OpenDevicePartnership/odp-utilities)",
  "defmt 0.3.100",
@@ -645,7 +645,7 @@ checksum = "c33a9471896f1c69cecef8d20cbe2f7accd12527ce60845ff44c153bb2a21b49"
 [[package]]
 name = "power-policy-interface"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-services#3c5741370d3aac8a4e7ac57fbbca138f4bfafdd5"
+source = "git+https://github.com/OpenDevicePartnership/embedded-services#d57a2ade63e9bc2e328f4e0fd03f14de160575d6"
 dependencies = [
  "defmt 0.3.100",
  "embassy-sync",
@@ -890,7 +890,7 @@ dependencies = [
 [[package]]
 name = "type-c-interface"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-services#3c5741370d3aac8a4e7ac57fbbca138f4bfafdd5"
+source = "git+https://github.com/OpenDevicePartnership/embedded-services#d57a2ade63e9bc2e328f4e0fd03f14de160575d6"
 dependencies = [
  "bitfield 0.17.0",
  "defmt 0.3.100",
@@ -903,7 +903,7 @@ dependencies = [
 [[package]]
 name = "type-c-service"
 version = "0.1.0"
-source = "git+https://github.com/OpenDevicePartnership/embedded-services#3c5741370d3aac8a4e7ac57fbbca138f4bfafdd5"
+source = "git+https://github.com/OpenDevicePartnership/embedded-services#d57a2ade63e9bc2e328f4e0fd03f14de160575d6"
 dependencies = [
  "defmt 0.3.100",
  "embassy-futures",
