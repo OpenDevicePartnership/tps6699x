@@ -211,7 +211,7 @@ impl Command {
             Command::Tfus => TFUS_DELAY_MS + 100,
             Command::Tfui | Command::Tfue | Command::Tfud | Command::Tfuq => 200, // docs say 100ms, but 200ms is more reliable
             Command::Gaid => RESET_DELAY_MS + 100,
-            Command::Tfuc => RESET_DELAY_MS + TFUC_VERIFICATION_SLACK_MS,
+            Command::Tfuc => 2 * RESET_DELAY_MS + TFUC_VERIFICATION_SLACK_MS,
             Command::Srdy | Command::Sryr => 250, // determined by experimentation
             Command::Trig => 500,                 // determined by experimentation
             Command::Drst => 100,                 // PD spec says 24/27/30 ms, round up
