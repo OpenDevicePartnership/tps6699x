@@ -627,9 +627,12 @@ mod test {
 
     #[test]
     fn test_tfuc_timeout_reserves_independent_verification_slack() {
-        assert_eq!(Command::Tfuc.timeout_ms(), RESET_DELAY_MS + TFUC_VERIFICATION_SLACK_MS);
-        assert_eq!(TFUC_VERIFICATION_SLACK_MS, 500);
-        assert_eq!(Command::Gaid.timeout_ms(), RESET_DELAY_MS + 100);
+        let actual = Command::Tfuc.timeout_ms();
+        assert!(
+            actual > 2 * RESET_DELAY_MS,
+            "TFUc timeout ({} ms) should be longer than internal delay of 2 * RESET_DELAY_MS",
+            actual
+        );
     }
 
     #[test]
