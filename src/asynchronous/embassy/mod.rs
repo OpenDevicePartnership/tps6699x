@@ -920,7 +920,7 @@ impl<'a, M: RawMutex, B: I2c> Interrupt<'a, M, B> {
                         }
                         Ok(Err(_e)) => {}
                         Err(_) => {
-                            error!("{:?}: read_interrupt timeout", port_id);
+                            warn!("{:?}: read_interrupt timeout", port_id);
                         }
                     }
                 }
