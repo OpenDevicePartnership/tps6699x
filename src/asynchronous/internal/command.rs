@@ -155,7 +155,7 @@ impl<B: I2c> Tps6699x<B> {
         let port = LocalPortId(0);
         self.send_command(port, Command::Tfuc, Some(&arg_bytes)).await?;
 
-        delay.delay_ms(RESET_DELAY_MS).await;
+        delay.delay_ms(2 * RESET_DELAY_MS).await;
 
         // Confirm we're in the correct mode
         let mode = self.get_mode().await?;
