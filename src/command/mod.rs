@@ -209,7 +209,8 @@ impl Command {
     pub const fn timeout_ms(self) -> u32 {
         match self {
             Command::Tfus => TFUS_DELAY_MS + 100,
-            Command::Tfui | Command::Tfue | Command::Tfud | Command::Tfuq => 200, // docs say 100ms, but 200ms is more reliable
+            Command::Tfuq => TFUQ_TIMEOUT_MS,
+            Command::Tfui | Command::Tfue | Command::Tfud => 200, // docs say 100ms, but 200ms is more reliable
             Command::Gaid => RESET_DELAY_MS + 100,
             Command::Tfuc => 2 * RESET_DELAY_MS + TFUC_VERIFICATION_SLACK_MS,
             Command::Srdy | Command::Sryr => 250, // determined by experimentation
@@ -357,6 +358,8 @@ impl Encode for ResetArgs {
 
 /// Delay for completion of TFUs command
 pub(crate) const TFUS_DELAY_MS: u32 = 500;
+/// Timeout for the TFUq command.
+pub(crate) const TFUQ_TIMEOUT_MS: u32 = 400;
 /// Length of TFUi arguments
 #[allow(dead_code)]
 pub(crate) const TFUI_ARGS_LEN: usize = 8;
