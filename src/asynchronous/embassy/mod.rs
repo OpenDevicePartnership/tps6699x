@@ -39,22 +39,28 @@ pub mod controller {
         pub interrupt_processor_config: crate::asynchronous::embassy::interrupt::Config,
     }
 
+    /// Per-port state
+    pub struct PerPort<M: RawMutex> {
+        /// Command completion signals
+        pub(super) command_complete: Signal<M, ()>,
+        /// Current interrupt state
+        pub(super) interrupts_enabled: AtomicBool,
+        /// Most recent command was successfully sent to the controller
+        pub(super) last_command_sent: AtomicBool,
+    }
+
     /// Controller struct. This struct is meant to be created and then immediately broken into its parts
     pub struct Controller<M: RawMutex, B: I2c> {
         /// Config
         pub(super) config: Config,
         /// Low-level TPS6699x driver
         pub(super) inner: Mutex<M, internal::Tps6699x<B>>,
-        /// Command completion signals
-        pub(super) command_complete: [Signal<M, ()>; MAX_SUPPORTED_PORTS],
         /// Signal for awaiting an interrupt
         pub(super) interrupt_waker: Signal<M, [IntEventBus1; MAX_SUPPORTED_PORTS]>,
-        /// Current interrupt state
-        pub(super) interrupts_enabled: [AtomicBool; MAX_SUPPORTED_PORTS],
         /// Number of active ports
         pub(super) num_ports: usize,
-        /// Most recent command was successfully sent to the controller
-        pub(super) last_command_sent: [AtomicBool; MAX_SUPPORTED_PORTS],
+        /// Per-port state
+        pub(super) per_port: [PerPort<M>; MAX_SUPPORTED_PORTS],
     }
 
     impl<M: RawMutex, B: I2c> Controller<M, B> {
@@ -69,9 +75,13 @@ pub mod controller {
                 config,
                 inner: Mutex::new(internal::Tps6699x::new(bus, addr, num_ports)),
                 interrupt_waker: Signal::new(),
-                command_complete: [const { Signal::new() }; MAX_SUPPORTED_PORTS],
-                interrupts_enabled: [const { AtomicBool::new(true) }; MAX_SUPPORTED_PORTS],
-                last_command_sent: [const { AtomicBool::new(false) }; MAX_SUPPORTED_PORTS],
+                per_port: [const {
+                    PerPort {
+                        command_complete: Signal::new(),
+                        interrupts_enabled: AtomicBool::new(true),
+                        last_command_sent: AtomicBool::new(false),
+                    }
+                }; MAX_SUPPORTED_PORTS],
                 num_ports,
             })
         }
@@ -102,7 +112,7 @@ pub mod controller {
 
         /// Enable or disable interrupts for the given ports
         pub(super) fn enable_interrupts(&self, enabled: [bool; MAX_SUPPORTED_PORTS]) {
-            for (enabled, s) in zip(enabled.iter(), self.interrupts_enabled.iter()) {
+            for (enabled, s) in zip(enabled.iter(), self.per_port.iter().map(|p| &p.interrupts_enabled)) {
                 s.store(*enabled, core::sync::atomic::Ordering::SeqCst);
             }
         }
@@ -110,7 +120,10 @@ pub mod controller {
         /// Returns current interrupt state
         pub(super) fn interrupts_enabled(&self) -> [bool; MAX_SUPPORTED_PORTS] {
             let mut interrupts_enabled = [false; MAX_SUPPORTED_PORTS];
-            for (copy, enabled) in zip(interrupts_enabled.iter_mut(), self.interrupts_enabled.iter()) {
+            for (copy, enabled) in zip(
+                interrupts_enabled.iter_mut(),
+                self.per_port.iter().map(|p| &p.interrupts_enabled),
+            ) {
                 *copy = enabled.load(core::sync::atomic::Ordering::SeqCst);
             }
 
@@ -302,24 +315,25 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
             return Err(Error::Pd(PdError::InvalidPort));
         }
 
-        let command_complete = self
+        let command_complete = &self
             .controller
-            .command_complete
+            .per_port
             .get(port.0 as usize)
-            .ok_or(Error::Pd(PdError::InvalidPort))?;
+            .ok_or(Error::Pd(PdError::InvalidPort))?
+            .command_complete;
+        let last_command_sent = &self
+            .controller
+            .per_port
+            .get(port.0 as usize)
+            .ok_or(Error::Pd(PdError::InvalidPort))?
+            .last_command_sent;
         command_complete.reset();
-        self.controller
-            .last_command_sent
-            .get(port.0 as usize)
-            .map(|v| v.store(false, Ordering::SeqCst));
+        last_command_sent.store(false, Ordering::SeqCst);
         {
             let mut inner = self.lock_inner().await;
             inner.send_command(port, cmd, indata).await?;
         }
-        self.controller
-            .last_command_sent
-            .get(port.0 as usize)
-            .map(|v| v.store(true, Ordering::SeqCst));
+        last_command_sent.store(true, Ordering::SeqCst);
 
         command_complete.wait().await;
         {
@@ -357,9 +371,9 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
             result
         } else if self
             .controller
-            .last_command_sent
+            .per_port
             .get(port.0 as usize)
-            .map(|v| v.load(Ordering::SeqCst))
+            .map(|v| v.last_command_sent.load(Ordering::SeqCst))
             .unwrap_or(false)
         {
             // Reconcile a completion that raced the software timeout.

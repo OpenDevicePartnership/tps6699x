@@ -49,7 +49,7 @@ impl<'a, M: RawMutex, B: I2c> InterruptProcessor<'a, M, B> {
         for (port, (interrupt_enabled, flag, command_complete)) in izip!(
             interrupts_enabled.iter(),
             flags.iter_mut(),
-            self.controller.command_complete.iter()
+            self.controller.per_port.iter().map(|p| &p.command_complete)
         )
         .take(self.controller.num_ports)
         .enumerate()
