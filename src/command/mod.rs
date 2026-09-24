@@ -805,6 +805,10 @@ mod test {
     fn test_tfuc_timeout_reserves_independent_verification_slack() {
         let actual = Command::Tfuc.timeout_ms();
         assert!(
+            TFUC_VERIFICATION_SLACK_MS > 0,
+            "TFUC verification slack must be positive"
+        );
+        assert!(
             actual > 2 * RESET_DELAY_MS,
             "TFUc timeout ({} ms) should be longer than internal delay of 2 * RESET_DELAY_MS",
             actual
