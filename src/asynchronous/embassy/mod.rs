@@ -1,7 +1,7 @@
 //! This module contains a high-level API uses embassy synchronization types
 use core::future::Future;
 use core::iter::zip;
-use core::sync::atomic::AtomicBool;
+use core::sync::atomic::{AtomicBool, Ordering};
 
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use embassy_sync::mutex::{Mutex, MutexGuard};
@@ -53,6 +53,8 @@ pub mod controller {
         pub(super) interrupts_enabled: [AtomicBool; MAX_SUPPORTED_PORTS],
         /// Number of active ports
         pub(super) num_ports: usize,
+        /// Most recent command was successfully sent to the controller
+        pub(super) last_command_sent: [AtomicBool; MAX_SUPPORTED_PORTS],
     }
 
     impl<M: RawMutex, B: I2c> Controller<M, B> {
@@ -69,6 +71,7 @@ pub mod controller {
                 interrupt_waker: Signal::new(),
                 command_complete: [const { Signal::new() }; MAX_SUPPORTED_PORTS],
                 interrupts_enabled: [const { AtomicBool::new(true) }; MAX_SUPPORTED_PORTS],
+                last_command_sent: [const { AtomicBool::new(false) }; MAX_SUPPORTED_PORTS],
                 num_ports,
             })
         }
@@ -305,10 +308,18 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
             .get(port.0 as usize)
             .ok_or(Error::Pd(PdError::InvalidPort))?;
         command_complete.reset();
+        self.controller
+            .last_command_sent
+            .get(port.0 as usize)
+            .map(|v| v.store(false, Ordering::SeqCst));
         {
             let mut inner = self.lock_inner().await;
             inner.send_command(port, cmd, indata).await?;
         }
+        self.controller
+            .last_command_sent
+            .get(port.0 as usize)
+            .map(|v| v.store(true, Ordering::SeqCst));
 
         command_complete.wait().await;
         {
@@ -344,11 +355,20 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         .await;
         if let Ok(result) = result {
             result
-        } else {
-            error!("Command {:#?} timed out", cmd);
+        } else if self
+            .controller
+            .last_command_sent
+            .get(port.0 as usize)
+            .map(|v| v.load(Ordering::SeqCst))
+            .unwrap_or(false)
+        {
             // Reconcile a completion that raced the software timeout.
+            error!("Command {:#?} timed out", cmd);
             let mut inner = self.lock_inner().await;
             inner.read_command_result(port, outdata, cmd.has_return_value()).await
+        } else {
+            // The command was never sent so there is no completion to reconcile.
+            Err(Error::Pd(PdError::Timeout))
         }
     }
 
@@ -988,5 +1008,59 @@ mod test {
             Err(Error::Bus(ErrorKind::Other))
         );
         pd.lock_inner().await.bus.done();
+    }
+
+    /// A mock implementation that can block indefinitely.
+    pub struct BlockingMock {
+        pub inner: Mock,
+        block_duration: Option<Duration>,
+    }
+
+    impl BlockingMock {
+        /// Creates a new `BlockingMock` wrapping the given `Mock`.
+        pub fn new(mock: Mock) -> Self {
+            Self {
+                inner: mock,
+                block_duration: None,
+            }
+        }
+
+        pub fn set_block_duration(&mut self, duration: Duration) {
+            self.block_duration = Some(duration);
+        }
+    }
+
+    impl embedded_hal::i2c::ErrorType for BlockingMock {
+        type Error = ErrorKind;
+    }
+
+    impl embedded_hal_async::i2c::I2c<embedded_hal_async::i2c::SevenBitAddress> for BlockingMock {
+        async fn transaction(
+            &mut self,
+            address: u8,
+            operations: &mut [embedded_hal::i2c::Operation<'_>],
+        ) -> Result<(), Self::Error> {
+            if let Some(duration) = self.block_duration.take() {
+                Timer::after(duration).await;
+            }
+            self.inner.transaction(address, operations).await
+        }
+    }
+
+    // Test that a command send timeout doesn't hit the reconciliation logic.
+    #[tokio::test]
+    async fn test_command_timeout_handles_send_timeout() {
+        let mut bus = BlockingMock::new(Mock::new(&[]));
+        bus.set_block_duration(Duration::from_millis(200));
+
+        let mut controller: Controller<NoopRawMutex, _> =
+            Controller::new_tps66993(bus, Default::default(), PORT0_ADDR0).unwrap();
+        let (mut pd, _interrupt, _receiver) = controller.make_parts();
+        assert_eq!(
+            pd.execute_command_with_timeout(Duration::from_millis(100), PORT0, Command::Gaid, None, None)
+                .await,
+            Err(Error::Pd(PdError::Timeout))
+        );
+        pd.lock_inner().await.bus.inner.done();
     }
 }
