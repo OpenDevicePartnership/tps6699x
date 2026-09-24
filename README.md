@@ -13,5 +13,5 @@ $ device-driver-cli --manifest device.yaml --device-name Registers -o src/regist
 ## Integration with Other ODP crates
 This crate provides implementations for traits defined in the `embedded-services` crate, gated behind these features:
 * `odp-embedded-services` for core PD trait implementations.
-* `odp-type-c-service` for code related to the ODP implementation of the type-C service.
+* `odp-tcpm-service` for code related to the ODP implementation of the type-C service.
 * `odp-fw-update-interface` for trait implementations for the fw-update-interface traits.

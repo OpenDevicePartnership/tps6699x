@@ -53,13 +53,13 @@ embedded-cfu-protocol = { git = "https://github.com/OpenDevicePartnership/embedd
 embedded-services = { git = "https://github.com/OpenDevicePartnership/embedded-services", optional = true, features = [
     "defmt",
 ] }
-type-c-interface = { git = "https://github.com/OpenDevicePartnership/embedded-services", optional = true, features = [
+tcpm-interface = { git = "https://github.com/OpenDevicePartnership/embedded-services", optional = true, features = [
     "defmt",
 ] }
 fw-update-interface = { git = "https://github.com/OpenDevicePartnership/embedded-services", optional = true, features = [
     "defmt",
 ] }
-type-c-service = { git = "https://github.com/OpenDevicePartnership/embedded-services", optional = true, features = [
+tcpm-service = { git = "https://github.com/OpenDevicePartnership/embedded-services", optional = true, features = [
     "defmt",
 ] }
 power-policy-interface = { git = "https://github.com/OpenDevicePartnership/embedded-services", optional = true, features = [
@@ -76,14 +76,14 @@ cfu-service = { git = "https://github.com/OpenDevicePartnership/embedded-service
 default = []
 odp = [
     "dep:embedded-services",
-    "dep:type-c-interface",
+    "dep:tcpm-interface",
     "dep:fw-update-interface",
-    "dep:type-c-service",
+    "dep:tcpm-service",
     "dep:power-policy-interface",
     "dep:power-policy-service",
     "dep:cfu-service",
     "dep:embedded-cfu-protocol",
-    "tps6699x/odp-type-c-service",
+    "tps6699x/odp-tcpm-service",
     "tps6699x/odp-fw-update-interface",
 ]
 

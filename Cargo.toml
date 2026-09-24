@@ -32,9 +32,9 @@ pack1 = { version = "1.1.0", features = ["bytemuck"] }
 heapless = { version = "0.9.2", optional = true }
 itertools = { version = "0.14.0", default-features = false }
 embedded-services = { git = "https://github.com/OpenDevicePartnership/embedded-services", optional = true }
-type-c-interface = { git = "https://github.com/OpenDevicePartnership/embedded-services", optional = true }
+tcpm-interface = { git = "https://github.com/OpenDevicePartnership/embedded-services", optional = true }
 fw-update-interface = { git = "https://github.com/OpenDevicePartnership/embedded-services", optional = true }
-type-c-service = { git = "https://github.com/OpenDevicePartnership/embedded-services", optional = true }
+tcpm-service = { git = "https://github.com/OpenDevicePartnership/embedded-services", optional = true }
 power-policy-interface = { git = "https://github.com/OpenDevicePartnership/embedded-services", optional = true }
 
 [features]
@@ -47,9 +47,9 @@ defmt = [
     "embassy-time?/defmt-timestamp-uptime",
     "embedded-usb-pd/defmt",
     "embedded-services?/defmt",
-    "type-c-interface?/defmt",
+    "tcpm-interface?/defmt",
     "fw-update-interface?/defmt",
-    "type-c-service?/defmt",
+    "tcpm-service?/defmt",
 ]
 embassy = ["dep:embassy-sync", "dep:embassy-time", "dep:heapless"]
 log = ["dep:log"]
@@ -58,14 +58,14 @@ log = ["dep:log"]
 odp-embedded-services = [
     "embassy",
     "dep:bitflags",
-    "dep:type-c-interface",
+    "dep:tcpm-interface",
     "dep:embedded-services",
     "dep:power-policy-interface",
 ]
 # Enable fw-update-interface implementations
 odp-fw-update-interface = ["odp-embedded-services", "dep:fw-update-interface"]
-# Enable type-c-service implementations
-odp-type-c-service = ["odp-embedded-services", "dep:type-c-service"]
+# Enable tcpm-service implementations
+odp-tcpm-service = ["odp-embedded-services", "dep:tcpm-service"]
 
 [dev-dependencies]
 critical-section = { version = "1.1", features = ["std"] }

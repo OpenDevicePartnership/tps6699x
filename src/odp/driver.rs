@@ -14,21 +14,21 @@ use embedded_usb_pd::type_c::Current as TypecCurrent;
 use embedded_usb_pd::ucsi::v1_2::lpm;
 use embedded_usb_pd::{DataRole, Error, LocalPortId, PdError, PlugOrientation, PowerRole};
 use heapless::Vec;
-use type_c_interface::control::dp::{DpConfig, DpPinConfig, DpStatus};
-use type_c_interface::control::pd::{
+use tcpm_interface::control::dp::{DpConfig, DpPinConfig, DpStatus};
+use tcpm_interface::control::pd::{
     PdSinkInfo, PdSourceInfo, PdStateMachineConfig, PortStatus, SinkContract, SourceContract,
 };
-use type_c_interface::control::power::SystemPowerState;
-use type_c_interface::control::retimer::RetimerFwUpdateState;
-use type_c_interface::control::svid::DiscoveredSvids;
-use type_c_interface::control::tbt::TbtConfig;
-use type_c_interface::control::type_c::TypeCStateMachineState;
-use type_c_interface::control::usb::UsbControlConfig;
-use type_c_interface::control::vdm::{ATTN_VDM_LEN, AttnVdm, OtherVdm, SendVdm};
-use type_c_interface::controller::Controller;
-use type_c_interface::controller::pd::Pd;
-use type_c_interface::controller::retimer::Retimer;
-use type_c_interface::util::{power_capability_from_current, power_capability_try_from_contract};
+use tcpm_interface::control::power::SystemPowerState;
+use tcpm_interface::control::retimer::RetimerFwUpdateState;
+use tcpm_interface::control::svid::DiscoveredSvids;
+use tcpm_interface::control::tbt::TbtConfig;
+use tcpm_interface::control::type_c::TypeCStateMachineState;
+use tcpm_interface::control::usb::UsbControlConfig;
+use tcpm_interface::control::vdm::{ATTN_VDM_LEN, AttnVdm, OtherVdm, SendVdm};
+use tcpm_interface::controller::Controller;
+use tcpm_interface::controller::pd::Pd;
+use tcpm_interface::controller::retimer::Retimer;
+use tcpm_interface::util::{power_capability_from_current, power_capability_try_from_contract};
 
 use crate::asynchronous::embassy as tps6699x_drv;
 use crate::asynchronous::fw_update::BorrowedUpdaterInProgress;
@@ -767,7 +767,7 @@ impl<M: RawMutex, B: I2c> Retimer for Tps6699x<'_, M, B> {
     }
 }
 
-impl<M: RawMutex, B: I2c> type_c_interface::controller::pd::StateMachine for Tps6699x<'_, M, B> {
+impl<M: RawMutex, B: I2c> tcpm_interface::controller::pd::StateMachine for Tps6699x<'_, M, B> {
     async fn set_pd_state_machine_config(
         &mut self,
         port: LocalPortId,
@@ -785,7 +785,7 @@ impl<M: RawMutex, B: I2c> type_c_interface::controller::pd::StateMachine for Tps
     }
 }
 
-impl<M: RawMutex, B: I2c> type_c_interface::controller::type_c::StateMachine for Tps6699x<'_, M, B> {
+impl<M: RawMutex, B: I2c> tcpm_interface::controller::type_c::StateMachine for Tps6699x<'_, M, B> {
     async fn set_type_c_state_machine_config(
         &mut self,
         port: LocalPortId,
@@ -808,7 +808,7 @@ impl<M: RawMutex, B: I2c> type_c_interface::controller::type_c::StateMachine for
     }
 }
 
-impl<M: RawMutex, B: I2c> type_c_interface::ucsi::Lpm for Tps6699x<'_, M, B> {
+impl<M: RawMutex, B: I2c> tcpm_interface::ucsi::Lpm for Tps6699x<'_, M, B> {
     async fn execute_lpm_command(&mut self, command: lpm::LocalCommand) -> Result<Option<lpm::ResponseData>, PdError> {
         self.guard_no_fw_update_active()?;
         self.tps6699x
@@ -818,7 +818,7 @@ impl<M: RawMutex, B: I2c> type_c_interface::ucsi::Lpm for Tps6699x<'_, M, B> {
     }
 }
 
-impl<M: RawMutex, B: I2c> type_c_interface::controller::electrical_disconnect::ElectricalDisconnect
+impl<M: RawMutex, B: I2c> tcpm_interface::controller::electrical_disconnect::ElectricalDisconnect
     for Tps6699x<'_, M, B>
 {
     async fn execute_electrical_disconnect(
@@ -843,7 +843,7 @@ impl<M: RawMutex, B: I2c> type_c_interface::controller::electrical_disconnect::E
     }
 }
 
-impl<M: RawMutex, B: I2c> type_c_interface::controller::power::SystemPowerStateStatus for Tps6699x<'_, M, B> {
+impl<M: RawMutex, B: I2c> tcpm_interface::controller::power::SystemPowerStateStatus for Tps6699x<'_, M, B> {
     async fn set_system_power_state_status(
         &mut self,
         port: LocalPortId,
@@ -867,7 +867,7 @@ impl<M: RawMutex, B: I2c> type_c_interface::controller::power::SystemPowerStateS
     }
 }
 
-impl<M: RawMutex, B: I2c> type_c_interface::controller::max_sink_voltage::MaxSinkVoltage for Tps6699x<'_, M, B> {
+impl<M: RawMutex, B: I2c> tcpm_interface::controller::max_sink_voltage::MaxSinkVoltage for Tps6699x<'_, M, B> {
     async fn set_max_sink_voltage(&mut self, port: LocalPortId, voltage_mv: Option<u16>) -> Result<(), PdError> {
         self.guard_no_fw_update_active()?;
         self.tps6699x

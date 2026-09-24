@@ -2,13 +2,13 @@ use core::iter::zip;
 
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use embedded_hal_async::i2c::I2c;
-use type_c_interface::port::event::PortEventBitfield;
+use tcpm_interface::port::event::PortEventBitfield;
 
 use crate::asynchronous::embassy::interrupt;
 use crate::registers::field_sets::IntEventBus1;
 use crate::{MAX_SUPPORTED_PORTS, debug};
 
-impl<'a, M: RawMutex, BUS: I2c> type_c_service::controller::event_receiver::InterruptReceiver<MAX_SUPPORTED_PORTS>
+impl<'a, M: RawMutex, BUS: I2c> tcpm_service::controller::event_receiver::InterruptReceiver<MAX_SUPPORTED_PORTS>
     for interrupt::InterruptReceiver<'a, M, BUS>
 {
     async fn wait_interrupt(&mut self) -> [PortEventBitfield; MAX_SUPPORTED_PORTS] {

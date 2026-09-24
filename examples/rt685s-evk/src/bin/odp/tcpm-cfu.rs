@@ -27,17 +27,17 @@ use power_policy_interface::psu;
 use power_policy_service::psu::PsuEventReceivers;
 use power_policy_service::service::registration::ArrayRegistration;
 use static_cell::StaticCell;
-use tps6699x::odp::driver as tps6699x_drv;
-use type_c_interface::port::event::PortEventBitfield;
-use type_c_service::controller::event_receiver::{
+use tcpm_interface::port::event::PortEventBitfield;
+use tcpm_service::controller::event_receiver::{
     EventReceiver as PortEventReceiver, InterruptReceiver as _, PortEventSplitter,
 };
-use type_c_service::controller::macros::PortComponents;
-use type_c_service::controller::state::SharedState as PortSharedState;
-use type_c_service::controller::Port;
-use type_c_service::define_controller_port_static_cell_channel;
-use type_c_service::service::registration::PortData;
-use type_c_service::service::Service;
+use tcpm_service::controller::macros::PortComponents;
+use tcpm_service::controller::state::SharedState as PortSharedState;
+use tcpm_service::controller::Port;
+use tcpm_service::define_controller_port_static_cell_channel;
+use tcpm_service::service::registration::PortData;
+use tcpm_service::service::Service;
+use tps6699x::odp::driver as tps6699x_drv;
 
 extern crate tps6699x_examples_rt685s_evk;
 
@@ -63,11 +63,11 @@ type PortType = Mutex<
         'static,
         Tps6699xMutex<'static>,
         PortSharedStateType,
-        type_c_interface::port::event::NonBlockingSenderNotifier<
-            DynamicSender<'static, type_c_interface::service::event::PortEventData>,
+        tcpm_interface::port::event::NonBlockingSenderNotifier<
+            DynamicSender<'static, tcpm_interface::service::event::PortEventData>,
         >,
         PowerNotifier<'static>,
-        DynamicSender<'static, type_c_service::controller::event::Loopback>,
+        DynamicSender<'static, tcpm_service::controller::event::Loopback>,
     >,
 >;
 type ChargerType = power_policy_interface::charger::mock::ChargerType;
@@ -100,8 +100,8 @@ type PowerPolicyServiceType = Mutex<
 >;
 
 const PORT_COUNT: usize = 2;
-type PortReceiverType = DynamicReceiver<'static, type_c_interface::service::event::PortEventData>;
-type TypeCServiceEventReceiverType = type_c_service::service::event_receiver::ArrayEventReceiver<
+type PortReceiverType = DynamicReceiver<'static, tcpm_interface::service::event::PortEventData>;
+type TypeCServiceEventReceiverType = tcpm_service::service::event_receiver::ArrayEventReceiver<
     'static,
     PORT_COUNT,
     PortType,
@@ -110,20 +110,15 @@ type TypeCServiceEventReceiverType = type_c_service::service::event_receiver::Ar
 >;
 
 type TypeCServiceNotifierType =
-    type_c_interface::service::event::NonBlockingSenderNotifier<'static, PortType, NoopSender>;
-type TypeCRegistrationType = type_c_service::service::registration::ArrayRegistration<
-    'static,
-    PortType,
-    PORT_COUNT,
-    TypeCServiceNotifierType,
-    1,
->;
-type TypeCServiceType = type_c_service::service::Service<'static, TypeCRegistrationType>;
+    tcpm_interface::service::event::NonBlockingSenderNotifier<'static, PortType, NoopSender>;
+type TypeCRegistrationType =
+    tcpm_service::service::registration::ArrayRegistration<'static, PortType, PORT_COUNT, TypeCServiceNotifierType, 1>;
+type TypeCServiceType = tcpm_service::service::Service<'static, TypeCRegistrationType>;
 type PortEventReceiverType = PortEventReceiver<
     'static,
     PortSharedStateType,
     DynamicReceiver<'static, PortEventBitfield>,
-    DynamicReceiver<'static, type_c_service::controller::event::Loopback>,
+    DynamicReceiver<'static, tcpm_service::controller::event::Loopback>,
 >;
 
 type CfuUpdaterSharedStateType = Mutex<GlobalRawMutex, cfu_service::basic::state::SharedState>;
@@ -263,11 +258,11 @@ async fn power_policy_task(
 }
 
 #[embassy_executor::task]
-async fn type_c_service_task(
+async fn tcpm_service_task(
     service: &'static Mutex<GlobalRawMutex, TypeCServiceType>,
     event_receiver: TypeCServiceEventReceiverType,
 ) {
-    type_c_service::task::task(service, event_receiver).await;
+    tcpm_service::task::task(service, event_receiver).await;
 }
 
 #[embassy_executor::main]
@@ -386,8 +381,8 @@ async fn main(spawner: Spawner) {
         power_policy_service::service::config::Config::default(),
     )));
 
-    static TYPE_C_SERVICE: StaticCell<Mutex<GlobalRawMutex, TypeCServiceType>> = StaticCell::new();
-    let type_c_service = TYPE_C_SERVICE.init(Mutex::new(Service::new(
+    static TCPM_SERVICE: StaticCell<Mutex<GlobalRawMutex, TypeCServiceType>> = StaticCell::new();
+    let tcpm_service = TCPM_SERVICE.init(Mutex::new(Service::new(
         Default::default(),
         TypeCRegistrationType {
             ports: [port0, port1],
@@ -405,8 +400,8 @@ async fn main(spawner: Spawner) {
 
     info!("Spawning type-c service task");
     spawner.spawn(
-        type_c_service_task(
-            type_c_service,
+        tcpm_service_task(
+            tcpm_service,
             TypeCServiceEventReceiverType::new(
                 [port0, port1],
                 [type_c_receiver0, type_c_receiver1],
