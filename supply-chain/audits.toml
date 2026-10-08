@@ -5488,14 +5488,14 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patin
 
 [[trusted.dd-manifest-tree]]
 criteria = "safe-to-deploy"
-user-id = 85562
+user-id = 85562 # Dion Dokter (diondokter)
 start = "2024-11-10"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.dd-manifest-tree]]
 criteria = "safe-to-deploy"
-user-id = 85562
+user-id = 85562 # Dion Dokter (diondokter)
 start = "2024-11-10"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
@@ -5509,42 +5509,42 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patin
 
 [[trusted.device-driver]]
 criteria = "safe-to-deploy"
-user-id = 85562
+user-id = 85562 # Dion Dokter (diondokter)
 start = "2020-09-28"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.device-driver]]
 criteria = "safe-to-deploy"
-user-id = 85562
+user-id = 85562 # Dion Dokter (diondokter)
 start = "2020-09-28"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.device-driver-generation]]
 criteria = "safe-to-deploy"
-user-id = 85562
+user-id = 85562 # Dion Dokter (diondokter)
 start = "2024-01-07"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.device-driver-generation]]
 criteria = "safe-to-deploy"
-user-id = 85562
+user-id = 85562 # Dion Dokter (diondokter)
 start = "2024-01-07"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.device-driver-macros]]
 criteria = "safe-to-deploy"
-user-id = 85562
+user-id = 85562 # Dion Dokter (diondokter)
 start = "2024-01-07"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/INA4230/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.device-driver-macros]]
 criteria = "safe-to-deploy"
-user-id = 85562
+user-id = 85562 # Dion Dokter (diondokter)
 start = "2024-01-07"
 end = "2027-03-13"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq25723/refs/heads/main/supply-chain/audits.toml"

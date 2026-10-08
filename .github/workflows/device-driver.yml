@@ -22,9 +22,9 @@ jobs:
         uses: baptiste0928/cargo-install@v3
         with:
           crate: device-driver-cli
-          version: 1.0.9
+          version: 2.1.1
       - name: Generate files
-        run: device-driver-cli --manifest device.yaml --device-name Registers -o ci_gen_registers.rs
+        run: ddc build rust -s device.ddsl -o ci_gen_registers.rs --rust-defmt-feature=defmt
       - name: Check that the files are the exact same
         uses: LouisBrunner/diff-action@v2.0.0
         with:

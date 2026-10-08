@@ -1,5 +1,5 @@
 //! Asynchronous, low-level TPS6699x driver. This module provides a low-level interface
-use device_driver::AsyncRegisterInterface;
+use device_driver::{AsyncRegisterInterface, Fieldset, FieldsetMetadata};
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::pdinfo::AltMode;
 use embedded_usb_pd::pdo::{self, sink, source};
@@ -24,16 +24,18 @@ impl<'a, B: I2c> Port<'a, B> {
     }
 }
 
-impl<B: I2c> device_driver::AsyncRegisterInterface for Port<'_, B> {
+impl<B: I2c> device_driver::RegisterInterfaceBase for Port<'_, B> {
     type Error = Error<B::Error>;
 
     type AddressType = u8;
+}
 
+impl<B: I2c> device_driver::AsyncRegisterInterface for Port<'_, B> {
     async fn write_register(
         &mut self,
         address: Self::AddressType,
-        _size_bits: u32,
-        data: &[u8],
+        data: &mut [u8],
+        _metadata: &device_driver::FieldsetMetadata,
     ) -> Result<(), Self::Error> {
         // Sized to accommodate up to 255 bytes of data
         let mut buf = [0u8; 257];
@@ -59,8 +61,8 @@ impl<B: I2c> device_driver::AsyncRegisterInterface for Port<'_, B> {
     async fn read_register(
         &mut self,
         address: Self::AddressType,
-        _size_bits: u32,
         data: &mut [u8],
+        _metadata: &device_driver::FieldsetMetadata,
     ) -> Result<(), Self::Error> {
         // Sized to accommodate length byte + up to 255 bytes of data
         let mut buf = [0u8; 256];
@@ -103,7 +105,7 @@ pub struct Tps6699x<B: I2c> {
     /// I2C addresses for ports
     addr: [u8; MAX_SUPPORTED_PORTS],
     num_ports: usize,
-    pending_interrupt_clears: [registers::field_sets::IntEventBus1; MAX_SUPPORTED_PORTS],
+    pending_interrupt_clears: [registers::IntEventBus1; MAX_SUPPORTED_PORTS],
 }
 
 impl<B: I2c> Tps6699x<B> {
@@ -112,7 +114,7 @@ impl<B: I2c> Tps6699x<B> {
             bus,
             addr,
             num_ports,
-            pending_interrupt_clears: [registers::field_sets::IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS],
+            pending_interrupt_clears: [registers::IntEventBus1::ZERO; MAX_SUPPORTED_PORTS],
         }
     }
 
@@ -147,10 +149,7 @@ impl<B: I2c> Tps6699x<B> {
     ///
     /// Bits already pending a clear are omitted so a retry cannot publish the same
     /// hardware event twice.
-    pub async fn read_interrupt(
-        &mut self,
-        port: LocalPortId,
-    ) -> Result<registers::field_sets::IntEventBus1, Error<B::Error>> {
+    pub async fn read_interrupt(&mut self, port: LocalPortId) -> Result<registers::IntEventBus1, Error<B::Error>> {
         let p = self.borrow_port(port)?;
         let mut registers = p.into_registers();
 
@@ -174,7 +173,7 @@ impl<B: I2c> Tps6699x<B> {
             .pending_interrupt_clears
             .get(port.0 as usize)
             .ok_or(PdError::InvalidPort)?;
-        if flags == registers::field_sets::IntEventBus1::new_zero() {
+        if flags == registers::IntEventBus1::ZERO {
             return Ok(());
         }
 
@@ -199,24 +198,26 @@ impl<B: I2c> Tps6699x<B> {
             .pending_interrupt_clears
             .get(port.0 as usize)
             .ok_or(PdError::InvalidPort)?
-            != registers::field_sets::IntEventBus1::new_zero())
+            != registers::IntEventBus1::ZERO)
     }
 
     /// Modify interrupt mask
     pub async fn modify_interrupt_mask(
         &mut self,
         port: LocalPortId,
-        f: impl FnOnce(&mut registers::field_sets::IntEventBus1) -> registers::field_sets::IntEventBus1,
-    ) -> Result<registers::field_sets::IntEventBus1, Error<B::Error>> {
+        f: impl FnOnce(&mut registers::IntEventBus1) -> registers::IntEventBus1,
+    ) -> Result<registers::IntEventBus1, Error<B::Error>> {
         let port = self.borrow_port(port)?;
         let mut registers = port.into_registers();
-        registers.int_mask_bus_1().modify_async(|r| f(r)).await
+        let mut modified = registers::IntEventBus1::ZERO;
+        registers.int_mask_bus_1().modify_async(|r| modified = f(r)).await?;
+        Ok(modified)
     }
 
     /// Modify interrupt mask on all ports
     pub async fn modify_interrupt_mask_all(
         &mut self,
-        f: impl Fn(&mut registers::field_sets::IntEventBus1) -> registers::field_sets::IntEventBus1,
+        f: impl Fn(&mut registers::IntEventBus1) -> registers::IntEventBus1,
     ) -> Result<(), Error<B::Error>> {
         for port in 0..self.num_ports() {
             let port = LocalPortId(port as u8);
@@ -226,10 +227,7 @@ impl<B: I2c> Tps6699x<B> {
     }
 
     /// Get port status
-    pub async fn get_port_status(
-        &mut self,
-        port: LocalPortId,
-    ) -> Result<registers::field_sets::Status, Error<B::Error>> {
+    pub async fn get_port_status(&mut self, port: LocalPortId) -> Result<registers::Status, Error<B::Error>> {
         self.borrow_port(port)?.into_registers().status().read_async().await
     }
 
@@ -237,7 +235,7 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn get_active_pdo_contract(
         &mut self,
         port: LocalPortId,
-    ) -> Result<registers::field_sets::ActivePdoContract, Error<B::Error>> {
+    ) -> Result<registers::ActivePdoContract, Error<B::Error>> {
         self.borrow_port(port)?
             .into_registers()
             .active_pdo_contract()
@@ -249,7 +247,7 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn get_active_rdo_contract(
         &mut self,
         port: LocalPortId,
-    ) -> Result<registers::field_sets::ActiveRdoContract, Error<B::Error>> {
+    ) -> Result<registers::ActiveRdoContract, Error<B::Error>> {
         self.borrow_port(port)?
             .into_registers()
             .active_rdo_contract()
@@ -264,12 +262,10 @@ impl<B: I2c> Tps6699x<B> {
     ) -> Result<registers::autonegotiate_sink::AutonegotiateSink, Error<B::Error>> {
         let mut buf = [0u8; registers::autonegotiate_sink::LEN];
         self.borrow_port(port)?
-            .into_registers()
-            .interface()
             .read_register(
                 registers::autonegotiate_sink::ADDR,
-                (registers::autonegotiate_sink::LEN * 8) as u32,
                 &mut buf,
+                &FieldsetMetadata::DEFAULT,
             )
             .await?;
 
@@ -282,13 +278,12 @@ impl<B: I2c> Tps6699x<B> {
         port: LocalPortId,
         value: registers::autonegotiate_sink::AutonegotiateSink,
     ) -> Result<(), Error<B::Error>> {
+        let mut buf = *value.as_bytes();
         self.borrow_port(port)?
-            .into_registers()
-            .interface()
             .write_register(
                 registers::autonegotiate_sink::ADDR,
-                (registers::autonegotiate_sink::LEN * 8) as u32,
-                value.as_bytes(),
+                &mut buf,
+                &FieldsetMetadata::DEFAULT,
             )
             .await
     }
@@ -341,7 +336,7 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn get_power_path_status(
         &mut self,
         port: LocalPortId,
-    ) -> Result<registers::field_sets::PowerPathStatus, Error<B::Error>> {
+    ) -> Result<registers::PowerPathStatus, Error<B::Error>> {
         // This is a controller-level command, shouldn't matter which port we use
         self.borrow_port(port)?
             .into_registers()
@@ -351,18 +346,12 @@ impl<B: I2c> Tps6699x<B> {
     }
 
     /// Get PD status
-    pub async fn get_pd_status(
-        &mut self,
-        port: LocalPortId,
-    ) -> Result<registers::field_sets::PdStatus, Error<B::Error>> {
+    pub async fn get_pd_status(&mut self, port: LocalPortId) -> Result<registers::PdStatus, Error<B::Error>> {
         self.borrow_port(port)?.into_registers().pd_status().read_async().await
     }
 
     /// Get port control
-    pub async fn get_port_control(
-        &mut self,
-        port: LocalPortId,
-    ) -> Result<registers::field_sets::PortControl, Error<B::Error>> {
+    pub async fn get_port_control(&mut self, port: LocalPortId) -> Result<registers::PortControl, Error<B::Error>> {
         self.borrow_port(port)?
             .into_registers()
             .port_control()
@@ -374,7 +363,7 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn set_port_control(
         &mut self,
         port: LocalPortId,
-        control: registers::field_sets::PortControl,
+        control: registers::PortControl,
     ) -> Result<(), Error<B::Error>> {
         self.borrow_port(port)?
             .into_registers()
@@ -384,7 +373,7 @@ impl<B: I2c> Tps6699x<B> {
     }
 
     /// Get global system config
-    pub async fn get_system_config(&mut self) -> Result<registers::field_sets::SystemConfig, Error<B::Error>> {
+    pub async fn get_system_config(&mut self) -> Result<registers::SystemConfig, Error<B::Error>> {
         // This is a controller-level command, shouldn't matter which port we use
         self.borrow_port(PORT0)?
             .into_registers()
@@ -394,10 +383,7 @@ impl<B: I2c> Tps6699x<B> {
     }
 
     /// Set global system config
-    pub async fn set_system_config(
-        &mut self,
-        config: registers::field_sets::SystemConfig,
-    ) -> Result<(), Error<B::Error>> {
+    pub async fn set_system_config(&mut self, config: registers::SystemConfig) -> Result<(), Error<B::Error>> {
         // This is a controller-level command, shouldn't matter which port we use
         self.borrow_port(PORT0)?
             .into_registers()
@@ -429,13 +415,7 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn get_boot_flags(&mut self) -> Result<registers::boot_flags::BootFlags, Error<B::Error>> {
         let mut buf = [0u8; registers::boot_flags::LEN];
         self.borrow_port(PORT0)?
-            .into_registers()
-            .interface()
-            .read_register(
-                registers::boot_flags::ADDR,
-                (registers::boot_flags::LEN * 8) as u32,
-                &mut buf,
-            )
+            .read_register(registers::boot_flags::ADDR, &mut buf, &FieldsetMetadata::DEFAULT)
             .await?;
 
         Ok(registers::boot_flags::BootFlagsRaw(buf))
@@ -448,13 +428,7 @@ impl<B: I2c> Tps6699x<B> {
     ) -> Result<registers::dp_status::DpStatus, Error<B::Error>> {
         let mut buf = [0u8; registers::dp_status::LEN];
         self.borrow_port(port)?
-            .into_registers()
-            .interface()
-            .read_register(
-                registers::dp_status::ADDR,
-                (registers::dp_status::LEN * 8) as u32,
-                &mut buf,
-            )
+            .read_register(registers::dp_status::ADDR, &mut buf, &FieldsetMetadata::DEFAULT)
             .await?;
 
         Ok(registers::dp_status::DpStatusRaw(buf))
@@ -464,7 +438,7 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn get_intel_vid_status(
         &mut self,
         port: LocalPortId,
-    ) -> Result<registers::field_sets::IntelVidStatus, Error<B::Error>> {
+    ) -> Result<registers::IntelVidStatus, Error<B::Error>> {
         self.borrow_port(port)?
             .into_registers()
             .intel_vid_status()
@@ -473,10 +447,7 @@ impl<B: I2c> Tps6699x<B> {
     }
 
     /// Get USB status
-    pub async fn get_usb_status(
-        &mut self,
-        port: LocalPortId,
-    ) -> Result<registers::field_sets::UsbStatus, Error<B::Error>> {
+    pub async fn get_usb_status(&mut self, port: LocalPortId) -> Result<registers::UsbStatus, Error<B::Error>> {
         self.borrow_port(port)?.into_registers().usb_status().read_async().await
     }
 
@@ -484,7 +455,7 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn get_user_vid_status(
         &mut self,
         port: LocalPortId,
-    ) -> Result<registers::field_sets::UserVidStatus, Error<B::Error>> {
+    ) -> Result<registers::UserVidStatus, Error<B::Error>> {
         self.borrow_port(port)?
             .into_registers()
             .user_vid_status()
@@ -511,10 +482,7 @@ impl<B: I2c> Tps6699x<B> {
     }
 
     /// Get DP config
-    pub async fn get_dp_config(
-        &mut self,
-        port: LocalPortId,
-    ) -> Result<registers::field_sets::DpConfig, Error<B::Error>> {
+    pub async fn get_dp_config(&mut self, port: LocalPortId) -> Result<registers::DpConfig, Error<B::Error>> {
         self.borrow_port(port)?.into_registers().dp_config().read_async().await
     }
 
@@ -522,7 +490,7 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn set_dp_config(
         &mut self,
         port: LocalPortId,
-        config: registers::field_sets::DpConfig,
+        config: registers::DpConfig,
     ) -> Result<(), Error<B::Error>> {
         self.borrow_port(port)?
             .into_registers()
@@ -535,18 +503,17 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn modify_dp_config(
         &mut self,
         port: LocalPortId,
-        f: impl FnOnce(&mut registers::field_sets::DpConfig) -> registers::field_sets::DpConfig,
-    ) -> Result<registers::field_sets::DpConfig, Error<B::Error>> {
+        f: impl FnOnce(&mut registers::DpConfig) -> registers::DpConfig,
+    ) -> Result<registers::DpConfig, Error<B::Error>> {
         let port = self.borrow_port(port)?;
         let mut registers = port.into_registers();
-        registers.dp_config().modify_async(|r| f(r)).await
+        let mut modified = registers::DpConfig::ZERO;
+        registers.dp_config().modify_async(|r| modified = f(r)).await?;
+        Ok(modified)
     }
 
     /// Get Tbt config
-    pub async fn get_tbt_config(
-        &mut self,
-        port: LocalPortId,
-    ) -> Result<registers::field_sets::TbtConfig, Error<B::Error>> {
+    pub async fn get_tbt_config(&mut self, port: LocalPortId) -> Result<registers::TbtConfig, Error<B::Error>> {
         self.borrow_port(port)?.into_registers().tbt_config().read_async().await
     }
 
@@ -554,7 +521,7 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn set_tbt_config(
         &mut self,
         port: LocalPortId,
-        config: registers::field_sets::TbtConfig,
+        config: registers::TbtConfig,
     ) -> Result<(), Error<B::Error>> {
         self.borrow_port(port)?
             .into_registers()
@@ -567,11 +534,13 @@ impl<B: I2c> Tps6699x<B> {
     pub async fn modify_tbt_config(
         &mut self,
         port: LocalPortId,
-        f: impl FnOnce(&mut registers::field_sets::TbtConfig) -> registers::field_sets::TbtConfig,
-    ) -> Result<registers::field_sets::TbtConfig, Error<B::Error>> {
+        f: impl FnOnce(&mut registers::TbtConfig) -> registers::TbtConfig,
+    ) -> Result<registers::TbtConfig, Error<B::Error>> {
         let port = self.borrow_port(port)?;
         let mut registers = port.into_registers();
-        registers.tbt_config().modify_async(|r| f(r)).await
+        let mut modified = registers::TbtConfig::ZERO;
+        registers.tbt_config().modify_async(|r| modified = f(r)).await?;
+        Ok(modified)
     }
 
     /// Set unconstrained power on a port
@@ -588,13 +557,7 @@ impl<B: I2c> Tps6699x<B> {
     ) -> Result<registers::port_config::PortConfig, Error<B::Error>> {
         let mut buf = [0u8; registers::port_config::LEN];
         self.borrow_port(port)?
-            .into_registers()
-            .interface()
-            .read_register(
-                registers::port_config::ADDR,
-                (registers::port_config::LEN * 8) as u32,
-                &mut buf,
-            )
+            .read_register(registers::port_config::ADDR, &mut buf, &FieldsetMetadata::DEFAULT)
             .await?;
         Ok(buf.into())
     }
@@ -605,24 +568,16 @@ impl<B: I2c> Tps6699x<B> {
         port: LocalPortId,
         config: registers::port_config::PortConfig,
     ) -> Result<(), Error<B::Error>> {
+        let mut buf = *config.as_bytes();
         self.borrow_port(port)?
-            .into_registers()
-            .interface()
-            .write_register(
-                registers::port_config::ADDR,
-                (registers::port_config::LEN * 8) as u32,
-                config.as_bytes(),
-            )
+            .write_register(registers::port_config::ADDR, &mut buf, &FieldsetMetadata::DEFAULT)
             .await
     }
 
     /// Get Sx App Config register (`0x20`).
     ///
     /// This register contains the current system power state.
-    pub async fn get_sx_app_config(
-        &mut self,
-        port: LocalPortId,
-    ) -> Result<registers::field_sets::SxAppConfig, Error<B::Error>> {
+    pub async fn get_sx_app_config(&mut self, port: LocalPortId) -> Result<registers::SxAppConfig, Error<B::Error>> {
         self.borrow_port(port)?
             .into_registers()
             .sx_app_config()
@@ -653,28 +608,19 @@ impl<B: I2c> Tps6699x<B> {
     ) -> Result<registers::discovered_svids::DiscoveredSvids, Error<B::Error>> {
         let mut buf = [0u8; registers::discovered_svids::LEN];
         self.borrow_port(port)?
-            .into_registers()
-            .interface()
-            .read_register(
-                registers::discovered_svids::ADDR,
-                (registers::discovered_svids::LEN * 8) as u32,
-                &mut buf,
-            )
+            .read_register(registers::discovered_svids::ADDR, &mut buf, &FieldsetMetadata::DEFAULT)
             .await?;
 
         Ok(buf.into())
     }
 
     /// Get Rx ADO
-    pub async fn get_rx_ado(&mut self, port: LocalPortId) -> Result<registers::field_sets::RxAdo, Error<B::Error>> {
+    pub async fn get_rx_ado(&mut self, port: LocalPortId) -> Result<registers::RxAdo, Error<B::Error>> {
         self.borrow_port(port)?.into_registers().rx_ado().read_async().await
     }
 
     /// Get Rx attention Vdm
-    pub async fn get_rx_attn_vdm(
-        &mut self,
-        port: LocalPortId,
-    ) -> Result<registers::field_sets::RxAttnVdm, Error<B::Error>> {
+    pub async fn get_rx_attn_vdm(&mut self, port: LocalPortId) -> Result<registers::RxAttnVdm, Error<B::Error>> {
         self.borrow_port(port)?
             .into_registers()
             .rx_attn_vdm()
@@ -689,13 +635,7 @@ impl<B: I2c> Tps6699x<B> {
     ) -> Result<registers::rx_other_vdm::RxOtherVdm, Error<B::Error>> {
         let mut buf = [0u8; registers::rx_other_vdm::LEN];
         self.borrow_port(port)?
-            .into_registers()
-            .interface()
-            .read_register(
-                registers::rx_other_vdm::ADDR,
-                (registers::rx_other_vdm::LEN * 8) as u32,
-                &mut buf,
-            )
+            .read_register(registers::rx_other_vdm::ADDR, &mut buf, &FieldsetMetadata::DEFAULT)
             .await?;
         Ok(buf.into())
     }
@@ -710,23 +650,12 @@ impl<B: I2c> Tps6699x<B> {
         out_spr_pdos: &mut [T],
         out_epr_pdos: &mut [T],
     ) -> Result<(usize, usize), DeviceError<B::Error, RxCapsError>> {
-        // Clamp to the maximum number of PDOs
-        let num_pdos = if !out_epr_pdos.is_empty() {
-            EPR_PDO_START_INDEX + out_epr_pdos.len()
-        } else {
-            // SPR PDOs start at index 0
-            out_spr_pdos.len()
-        }
-        .min(registers::rx_caps::TOTAL_PDOS);
-
-        // 4 bytes for each PDO
-        let read_size = registers::rx_caps::HEADER_LEN + 4 * num_pdos;
+        // The whole register is always read; the controller reports its own length and the
+        // interface derives the transfer size from the buffer.
         let mut buf = [0u8; registers::rx_caps::LEN];
         self.borrow_port(port)
             .map_err(DeviceError::from)?
-            .into_registers()
-            .interface()
-            .read_register(register, (read_size * 8) as u32, &mut buf)
+            .read_register(register, &mut buf, &FieldsetMetadata::DEFAULT)
             .await?;
 
         let rx_caps = registers::rx_caps::RxCaps::<T>::try_from(buf).map_err(DeviceError::Other)?;
@@ -781,13 +710,7 @@ impl<B: I2c> Tps6699x<B> {
     ) -> Result<registers::tx_identity::TxIdentity, Error<B::Error>> {
         let mut buf = [0u8; registers::tx_identity::LEN];
         self.borrow_port(port)?
-            .into_registers()
-            .interface()
-            .read_register(
-                registers::tx_identity::ADDR,
-                (registers::tx_identity::LEN * 8) as u32,
-                &mut buf,
-            )
+            .read_register(registers::tx_identity::ADDR, &mut buf, &FieldsetMetadata::DEFAULT)
             .await?;
         Ok(buf.into())
     }
@@ -798,14 +721,9 @@ impl<B: I2c> Tps6699x<B> {
         port: LocalPortId,
         value: registers::tx_identity::TxIdentity,
     ) -> Result<(), Error<B::Error>> {
+        let mut buf = *value.as_bytes();
         self.borrow_port(port)?
-            .into_registers()
-            .interface()
-            .write_register(
-                registers::tx_identity::ADDR,
-                (registers::tx_identity::LEN * 8) as u32,
-                value.as_bytes(),
-            )
+            .write_register(registers::tx_identity::ADDR, &mut buf, &FieldsetMetadata::DEFAULT)
             .await
     }
 
@@ -828,12 +746,10 @@ impl<B: I2c> Tps6699x<B> {
     ) -> Result<registers::received_sop_identity_data::ReceivedSopIdentityData, Error<B::Error>> {
         let mut buf = [0u8; registers::received_sop_identity_data::LEN];
         self.borrow_port(port)?
-            .into_registers()
-            .interface()
             .read_register(
                 registers::received_sop_identity_data::ADDR,
-                (registers::received_sop_identity_data::LEN * 8) as u32,
                 &mut buf,
+                &FieldsetMetadata::DEFAULT,
             )
             .await?;
         Ok(buf.into())
@@ -846,12 +762,10 @@ impl<B: I2c> Tps6699x<B> {
     ) -> Result<registers::received_sop_prime_identity_data::ReceivedSopPrimeIdentityData, Error<B::Error>> {
         let mut buf = [0u8; registers::received_sop_prime_identity_data::LEN];
         self.borrow_port(port)?
-            .into_registers()
-            .interface()
             .read_register(
                 registers::received_sop_prime_identity_data::ADDR,
-                (registers::received_sop_prime_identity_data::LEN * 8) as u32,
                 &mut buf,
+                &FieldsetMetadata::DEFAULT,
             )
             .await?;
         Ok(buf.into())
@@ -896,8 +810,7 @@ mod test {
 
         let mut port = tps6699x.borrow_port(port_id)?;
         let mut result = [0; N];
-        port.read_register(reg, (expected.len() * 8) as u32, &mut result)
-            .await?;
+        port.read_register(reg, &mut result, &FieldsetMetadata::DEFAULT).await?;
         tps6699x.bus.done();
 
         Ok(())
@@ -923,7 +836,7 @@ mod test {
 
         let mut port = tps6699x.borrow_port(port_id)?;
         let mut result = std::vec![0; N + 1];
-        let r = port.read_register(reg, (expected.len() * 8) as u32, &mut result).await;
+        let r = port.read_register(reg, &mut result, &FieldsetMetadata::DEFAULT).await;
         tps6699x.bus.done();
         r
     }
@@ -948,8 +861,7 @@ mod test {
 
         let mut port = tps6699x.borrow_port(port_id)?;
         let mut result = std::vec![0; N + 1];
-        port.read_register(reg, (expected.len() * 8) as u32, &mut result)
-            .await?;
+        port.read_register(reg, &mut result, &FieldsetMetadata::DEFAULT).await?;
         tps6699x.bus.done();
 
         Ok(())
@@ -967,7 +879,8 @@ mod test {
             .update_expectations(&[create_register_write(expected_addr, reg, expected)]);
 
         let mut port = tps6699x.borrow_port(port_id)?;
-        port.write_register(reg, (expected.len() * 8) as u32, &expected).await?;
+        let mut data = expected;
+        port.write_register(reg, &mut data, &FieldsetMetadata::DEFAULT).await?;
         tps6699x.bus.done();
 
         Ok(())
@@ -1021,10 +934,10 @@ mod test {
     }
 
     async fn run_read_and_clear_interrupt(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::IntEventBus1;
+        use registers::IntEventBus1;
 
         // Create a fully asserted interrupt register
-        let int = !IntEventBus1::new_zero();
+        let int = !IntEventBus1::ZERO;
         let mut transactions = Vec::new();
 
         // Read the interrupt register
@@ -1051,15 +964,15 @@ mod test {
     }
 
     async fn run_get_port_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::Status;
+        use registers::Status;
 
         let mut transactions = Vec::new();
         // Read status register
-        transactions.push(create_register_read(expected_addr, 0x1A, Status::new_zero()));
+        transactions.push(create_register_read(expected_addr, 0x1A, Status::ZERO));
         tps6699x.bus.update_expectations(&transactions);
 
         let status = tps6699x.get_port_status(port).await.unwrap();
-        assert_eq!(status, Status::new_zero());
+        assert_eq!(status, Status::ZERO);
         tps6699x.bus.done();
     }
 
@@ -1073,15 +986,15 @@ mod test {
     }
 
     async fn run_get_active_pdo_contract(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::ActivePdoContract;
+        use registers::ActivePdoContract;
 
         let mut transactions = Vec::new();
         // Read status register
-        transactions.push(create_register_read(expected_addr, 0x34, ActivePdoContract::new_zero()));
+        transactions.push(create_register_read(expected_addr, 0x34, ActivePdoContract::ZERO));
         tps6699x.bus.update_expectations(&transactions);
 
         let active_pdo_contract = tps6699x.get_active_pdo_contract(port).await.unwrap();
-        assert_eq!(active_pdo_contract, ActivePdoContract::new_zero());
+        assert_eq!(active_pdo_contract, ActivePdoContract::ZERO);
         tps6699x.bus.done();
     }
 
@@ -1095,15 +1008,15 @@ mod test {
     }
 
     async fn run_get_active_rdo_contract(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::ActiveRdoContract;
+        use registers::ActiveRdoContract;
 
         let mut transactions = Vec::new();
         // Read status register
-        transactions.push(create_register_read(expected_addr, 0x35, ActiveRdoContract::new_zero()));
+        transactions.push(create_register_read(expected_addr, 0x35, ActiveRdoContract::ZERO));
         tps6699x.bus.update_expectations(&transactions);
 
         let active_rdo_contract = tps6699x.get_active_rdo_contract(port).await.unwrap();
-        assert_eq!(active_rdo_contract, ActiveRdoContract::new_zero());
+        assert_eq!(active_rdo_contract, ActiveRdoContract::ZERO);
         tps6699x.bus.done();
     }
 
@@ -1216,9 +1129,9 @@ mod test {
     }
 
     async fn run_modify_interrupt_mask(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::IntEventBus1;
+        use registers::IntEventBus1;
 
-        let initial = IntEventBus1::new_zero();
+        let initial = IntEventBus1::ZERO;
         let mut expected = initial;
         expected.set_plug_event(true);
 
@@ -1250,12 +1163,12 @@ mod test {
 
     #[tokio::test]
     async fn test_modify_interrupt_mask_all() {
-        use registers::field_sets::IntEventBus1;
+        use registers::IntEventBus1;
 
         let mock = Mock::new(&[]);
         let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
 
-        let initial = IntEventBus1::new_zero();
+        let initial = IntEventBus1::ZERO;
         let mut expected = initial;
         expected.set_plug_event(true);
 
@@ -1324,14 +1237,14 @@ mod test {
     }
 
     async fn run_get_power_path_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::PowerPathStatus;
+        use registers::PowerPathStatus;
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_read(expected_addr, 0x26, PowerPathStatus::new_zero())]);
+            .update_expectations(&[create_register_read(expected_addr, 0x26, PowerPathStatus::ZERO)]);
 
         let result = tps6699x.get_power_path_status(port).await.unwrap();
-        assert_eq!(result, PowerPathStatus::new_zero());
+        assert_eq!(result, PowerPathStatus::ZERO);
         tps6699x.bus.done();
     }
 
@@ -1345,14 +1258,14 @@ mod test {
     }
 
     async fn run_get_pd_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::PdStatus;
+        use registers::PdStatus;
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_read(expected_addr, 0x40, PdStatus::new_zero())]);
+            .update_expectations(&[create_register_read(expected_addr, 0x40, PdStatus::ZERO)]);
 
         let result = tps6699x.get_pd_status(port).await.unwrap();
-        assert_eq!(result, PdStatus::new_zero());
+        assert_eq!(result, PdStatus::ZERO);
         tps6699x.bus.done();
     }
 
@@ -1366,25 +1279,25 @@ mod test {
     }
 
     async fn run_get_port_control(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::PortControl;
+        use registers::PortControl;
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_read(expected_addr, 0x29, PortControl::new_zero())]);
+            .update_expectations(&[create_register_read(expected_addr, 0x29, PortControl::ZERO)]);
 
         let result = tps6699x.get_port_control(port).await.unwrap();
-        assert_eq!(result, PortControl::new_zero());
+        assert_eq!(result, PortControl::ZERO);
         tps6699x.bus.done();
     }
 
     async fn run_set_port_control(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::PortControl;
+        use registers::PortControl;
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_write(expected_addr, 0x29, PortControl::new_zero())]);
+            .update_expectations(&[create_register_write(expected_addr, 0x29, PortControl::ZERO)]);
 
-        tps6699x.set_port_control(port, PortControl::new_zero()).await.unwrap();
+        tps6699x.set_port_control(port, PortControl::ZERO).await.unwrap();
         tps6699x.bus.done();
     }
 
@@ -1408,30 +1321,30 @@ mod test {
 
     #[tokio::test]
     async fn test_get_system_config() {
-        use registers::field_sets::SystemConfig;
+        use registers::SystemConfig;
         let mock = Mock::new(&[]);
         let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_read(PORT0_ADDR0, 0x27, SystemConfig::new_zero())]);
+            .update_expectations(&[create_register_read(PORT0_ADDR0, 0x27, SystemConfig::ZERO)]);
 
         let result = tps6699x.get_system_config().await.unwrap();
-        assert_eq!(result, SystemConfig::new_zero());
+        assert_eq!(result, SystemConfig::ZERO);
         tps6699x.bus.done();
     }
 
     #[tokio::test]
     async fn test_set_system_config() {
-        use registers::field_sets::SystemConfig;
+        use registers::SystemConfig;
         let mock = Mock::new(&[]);
         let mut tps6699x: Tps6699x<Mock> = Tps6699x::new_tps66994(mock, ADDR0);
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_write(PORT0_ADDR0, 0x27, SystemConfig::new_zero())]);
+            .update_expectations(&[create_register_write(PORT0_ADDR0, 0x27, SystemConfig::ZERO)]);
 
-        tps6699x.set_system_config(SystemConfig::new_zero()).await.unwrap();
+        tps6699x.set_system_config(SystemConfig::ZERO).await.unwrap();
         tps6699x.bus.done();
     }
 
@@ -1475,14 +1388,14 @@ mod test {
     }
 
     async fn run_get_intel_vid_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::IntelVidStatus;
+        use registers::IntelVidStatus;
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_read(expected_addr, 0x59, IntelVidStatus::new_zero())]);
+            .update_expectations(&[create_register_read(expected_addr, 0x59, IntelVidStatus::ZERO)]);
 
         let result = tps6699x.get_intel_vid_status(port).await.unwrap();
-        assert_eq!(result, IntelVidStatus::new_zero());
+        assert_eq!(result, IntelVidStatus::ZERO);
         tps6699x.bus.done();
     }
 
@@ -1496,14 +1409,14 @@ mod test {
     }
 
     async fn run_get_usb_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::UsbStatus;
+        use registers::UsbStatus;
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_read(expected_addr, 0x24, UsbStatus::new_zero())]);
+            .update_expectations(&[create_register_read(expected_addr, 0x24, UsbStatus::ZERO)]);
 
         let result = tps6699x.get_usb_status(port).await.unwrap();
-        assert_eq!(result, UsbStatus::new_zero());
+        assert_eq!(result, UsbStatus::ZERO);
         tps6699x.bus.done();
     }
 
@@ -1517,14 +1430,14 @@ mod test {
     }
 
     async fn run_get_user_vid_status(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::UserVidStatus;
+        use registers::UserVidStatus;
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_read(expected_addr, 0x57, UserVidStatus::new_zero())]);
+            .update_expectations(&[create_register_read(expected_addr, 0x57, UserVidStatus::ZERO)]);
 
         let result = tps6699x.get_user_vid_status(port).await.unwrap();
-        assert_eq!(result, UserVidStatus::new_zero());
+        assert_eq!(result, UserVidStatus::ZERO);
         tps6699x.bus.done();
     }
 
@@ -1538,32 +1451,32 @@ mod test {
     }
 
     async fn run_get_dp_config(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::DpConfig;
+        use registers::DpConfig;
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_read(expected_addr, 0x51, DpConfig::new_zero())]);
+            .update_expectations(&[create_register_read(expected_addr, 0x51, DpConfig::ZERO)]);
 
         let result = tps6699x.get_dp_config(port).await.unwrap();
-        assert_eq!(result, DpConfig::new_zero());
+        assert_eq!(result, DpConfig::ZERO);
         tps6699x.bus.done();
     }
 
     async fn run_set_dp_config(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::DpConfig;
+        use registers::DpConfig;
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_write(expected_addr, 0x51, DpConfig::new_zero())]);
+            .update_expectations(&[create_register_write(expected_addr, 0x51, DpConfig::ZERO)]);
 
-        tps6699x.set_dp_config(port, DpConfig::new_zero()).await.unwrap();
+        tps6699x.set_dp_config(port, DpConfig::ZERO).await.unwrap();
         tps6699x.bus.done();
     }
 
     async fn run_modify_dp_config(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::DpConfig;
+        use registers::DpConfig;
 
-        let initial = DpConfig::new_zero();
+        let initial = DpConfig::ZERO;
         let mut expected = initial;
         expected.set_enable_dp_svid(true);
 
@@ -1612,32 +1525,32 @@ mod test {
     }
 
     async fn run_get_tbt_config(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::TbtConfig;
+        use registers::TbtConfig;
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_read(expected_addr, 0x52, TbtConfig::new_zero())]);
+            .update_expectations(&[create_register_read(expected_addr, 0x52, TbtConfig::ZERO)]);
 
         let result = tps6699x.get_tbt_config(port).await.unwrap();
-        assert_eq!(result, TbtConfig::new_zero());
+        assert_eq!(result, TbtConfig::ZERO);
         tps6699x.bus.done();
     }
 
     async fn run_set_tbt_config(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::TbtConfig;
+        use registers::TbtConfig;
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_write(expected_addr, 0x52, TbtConfig::new_zero())]);
+            .update_expectations(&[create_register_write(expected_addr, 0x52, TbtConfig::ZERO)]);
 
-        tps6699x.set_tbt_config(port, TbtConfig::new_zero()).await.unwrap();
+        tps6699x.set_tbt_config(port, TbtConfig::ZERO).await.unwrap();
         tps6699x.bus.done();
     }
 
     async fn run_modify_tbt_config(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::TbtConfig;
+        use registers::TbtConfig;
 
-        let initial = TbtConfig::new_zero();
+        let initial = TbtConfig::ZERO;
         let mut expected = initial;
         expected.set_tbt_vid_en(true);
 
@@ -1729,14 +1642,14 @@ mod test {
     }
 
     async fn run_get_rx_ado(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::RxAdo;
+        use registers::RxAdo;
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_read(expected_addr, 0x74, RxAdo::new_zero())]);
+            .update_expectations(&[create_register_read(expected_addr, 0x74, RxAdo::ZERO)]);
 
         let result = tps6699x.get_rx_ado(port).await.unwrap();
-        assert_eq!(result, RxAdo::new_zero());
+        assert_eq!(result, RxAdo::ZERO);
         tps6699x.bus.done();
     }
 
@@ -1750,14 +1663,14 @@ mod test {
     }
 
     async fn run_get_rx_attn_vdm(tps6699x: &mut Tps6699x<Mock>, port: LocalPortId, expected_addr: u8) {
-        use registers::field_sets::RxAttnVdm;
+        use registers::RxAttnVdm;
 
         tps6699x
             .bus
-            .update_expectations(&[create_register_read(expected_addr, 0x60, RxAttnVdm::new_zero())]);
+            .update_expectations(&[create_register_read(expected_addr, 0x60, RxAttnVdm::ZERO)]);
 
         let result = tps6699x.get_rx_attn_vdm(port).await.unwrap();
-        assert_eq!(result, RxAttnVdm::new_zero());
+        assert_eq!(result, RxAttnVdm::ZERO);
         tps6699x.bus.done();
     }
 

@@ -1,0 +1,929 @@
+device Registers {
+    default-byte-order: LE,
+    register-address-type: u8,
+    word-boundaries: "_:-: :bB:A1:1A:1a:a1:AAa",
+    default-access: RW,
+
+    /// Controller operation mode
+    register Mode {
+        address: 0x03,
+        reset: 0x0,
+        access: RO,
+        fields: fieldset _ {
+            size-bytes: 4,
+        
+            /// Controller operation mode
+            field Mode 31:0,
+        },
+    },
+    /// Customer use
+    register CustomerUse {
+        address: 0x06,
+        reset: 0x0,
+        fields: fieldset _ {
+            size-bytes: 8,
+        
+            /// Controller operation mode
+            field CustomerUse 63:0,
+        },
+    },
+    /// Command 1 register
+    register Cmd1 {
+        address: 0x08,
+        reset: 0x0,
+        fields: fieldset _ {
+            size-bytes: 4,
+        
+            /// Command value
+            field Command 31:0,
+        },
+    },
+    /// Boot FW version
+    register Version {
+        address: 0x0F,
+        reset: 0x0,
+        access: RO,
+        fields: fieldset _ {
+            size-bytes: 4,
+        
+            /// Boot FW version
+            field Version 31:0,
+        },
+    },
+    /// Asserted interrupts for I2C1
+    register IntEventBus1 {
+        address: 0x14,
+        reset: 0x02000008,
+        access: RO,
+        fields: fieldset _ {
+            size-bytes: 11,
+        
+            /// A PD hard reset has been performed
+            field HardReset 1,
+            /// A plug has been inserted or removed
+            field PlugEvent 3,
+            /// Power swap completed
+            field PowerSwapCompleted 4,
+            /// Data swap completed
+            field DataSwapCompleted 5,
+            /// Fast role swap completed
+            field FastRoleSwapCompleted 6,
+            /// Source capabilities updated
+            field SourceCapUpdated 7,
+            /// Asserts under an implicit contract or an explicit contract when PS_RDY has been received
+            field SinkReady 8,
+            /// Overcurrent
+            field Overcurrent 9,
+            /// Attention received
+            field AttentionReceived 10,
+            /// VDM received
+            field VDMReceived 11,
+            /// New contract as consumer
+            field NewConsumerContract 12,
+            /// New contract as provider
+            field NewProviderContract 13,
+            /// Source capabilities received
+            field SourceCapsReceived 14,
+            /// Sink capabilities received
+            field SinkCapsReceived 15,
+            /// Power swap requested
+            field PowerSwapRequested 17,
+            /// Data swap requested
+            field DataSwapRequested 18,
+            /// USB host present
+            field UsbHostPresent 20,
+            /// Set when USB host status transitions to anything other than present
+            field UsbHostNotPresent 21,
+            /// Power path status register changed
+            field PowerPathSwitchChanged 23,
+            /// Data status register changed
+            field DataStatusUpdated 25,
+            /// Status register changed
+            field StatusUpdated 26,
+            /// PD status register changed
+            field PdStatusUpdated 27,
+            /// Command 1 completed
+            field Cmd1Completed 30,
+            /// Command 2 completed
+            field Cmd2Completed 31,
+            /// Device lacks PD or has incompatible PD version
+            field DeviceIncompatible 32,
+            /// Source cannot supply requested voltage or current
+            field CannotSource 33,
+            /// Source can supply requested voltage or current later
+            field CanSourceLater 34,
+            /// Voltage or current exceeded
+            field PowerEventError 35,
+            /// Device did not response to get caps message
+            field NoCapsResponse 36,
+            /// Unexpected message received from partner
+            field ProtocolError 38,
+            /// Sink transition completed
+            field SinkTransitionCompleted 42,
+            /// Plug connected but not debounced
+            field PlugEarlyNotification 43,
+            /// Prochot asserted
+            field ProchotNotification 44,
+            /// Source cannot produce negociated voltage or current
+            field SourceCannotProvide 46,
+            /// Alternate mode entry failed
+            field AmEntryFail 48,
+            /// Alternate mode entered
+            field AmEntered 49,
+            /// Discover modes process completed
+            field DiscoverModeCompleted 51,
+            /// Exit mode process completed
+            field ExitModeCompleted 52,
+            /// Data reset process started
+            field DataResetStarted 53,
+            /// USB status updated
+            field UsbStatusUpdated 54,
+            /// Connection manager updated
+            field ConnectionManagerUpdated 55,
+            /// User VID alternate mode entered
+            field UsvidModeEntered 56,
+            /// User VID alternate mode entered
+            field UsvidModeExited 57,
+            /// User VID SVDM attention received
+            field UsvidAttentionVdmReceived 58,
+            /// User VID SVDM non-attention or unstructured VDM received
+            field UsvidOtherVdmReceived 59,
+            /// External DCDC event
+            field ExternalDcDcEvent 61,
+            /// DP SID status register changed
+            field DpSidStatusUpdated 62,
+            /// Intel VID status register changed
+            field IntelVidStatusUpdated 63,
+            /// PD3 status register changed
+            field Pd3StatusUpdated 64,
+            /// TX memory buffer empty
+            field TxMemoryBufferEmpty 65,
+            /// Buffer for mbrd command received and ready
+            field MbrdBufferReady 66,
+            /// SOC ack timeout
+            field SocAckTimeout 70,
+            /// Not supported PD message received
+            field NotSupportedReceived 71,
+            /// Error configuring the crossbar mux
+            field CrossbarError 72,
+            /// Mailbox updated
+            field MailboxUpdated 73,
+            /// I2C error communicating with external bus
+            field BusError 74,
+            /// External DCDC status changed
+            field ExternalDcDcStatusChanged 75,
+            /// Fast role swap signal received
+            field FrsSignalReceived 76,
+            /// Chunk response received
+            field ChunkResponseReceived 77,
+            /// Chunk request received
+            field ChunkRequestReceived 78,
+            /// Alert message received
+            field AlertMessageReceived 79,
+            /// Patch loaded to device
+            field PatchLoaded 80,
+            /// Ready for F211 image
+            field ReadyF211 81,
+            /// Boot error
+            field BootError 84,
+            /// Ready for data block
+            field ReadyForDataBlock 85,
+        },
+    },
+    /// Masked interrupts for I2C1
+    register IntMaskBus1 {
+        address: 0x16,
+        reset: 0x0F000000CD30380A,
+        fields: IntEventBus1,
+    },
+    /// Set Sx App Config - system power state for application configuration
+    register SxAppConfig {
+        address: 0x20,
+        reset: 0x0,
+        fields: fieldset _ {
+            size-bytes: 2,
+        
+            /// Current system power state
+            field SleepState 2:0 -> _ as enum SystemPowerState {
+                S0: 0,
+                S3: 1,
+                S4: 2,
+                S5: 3,
+                S0ix: 4,
+                Reserved: catch-all _,
+            },
+        },
+    },
+    /// Interrupt clear for I2C1
+    register IntClearBus1 {
+        address: 0x18,
+        reset: 0x0,
+        fields: IntEventBus1,
+    },
+    /// Port status
+    register Status {
+        address: 0x1A,
+        reset: 0x0,
+        access: RO,
+        fields: fieldset _ {
+            size-bytes: 5,
+        
+            /// Plug present
+            field PlugPresent 0,
+            /// Connection state
+            field ConnectionState 3:1 -> _ as enum PlugMode {
+                NotConnected: 0,
+                Disabled: 1,
+                Audio: 2,
+                DebugRdRd: 3,
+                RaDetected: 4,
+                DebugRpRp: 5,
+                ConnectedNoRa: 6,
+                Connected: 7,
+            },
+            /// Connector oreintation, 0 for normal, 1 for flipped
+            field PlugOrientation 4,
+            /// PD role, 0 for sink, 1 for source
+            field PortRole 5,
+            /// Data role, 0 for UFP, 1 for DFP
+            field DataRole 6,
+            /// Is EPR mode active
+            field ErpMode 7,
+            /// Vbus status
+            field VbusStatus 21:20 -> _ as enum VbusMode {
+                AtVsafe0: 0,
+                Atvsafe5: 1,
+                Normal: 2,
+                Other: 3,
+            },
+            /// USB host mode
+            field UsbHost 23:22 -> _ as enum UsbHostMode {
+                NoHost: 0,
+                AttachedNoData: 1,
+                AttachedNoPd: 2,
+                HostPresent: 3,
+            },
+            /// Legacy mode stotus
+            field Legacy 25:24 -> _ as enum LegacyMode {
+                NoLegacy: 0,
+                LegacySink: 1,
+                LegacySource: 2,
+                LegacySinkDeadBattery: 3,
+            },
+            /// If a BIST is in progress
+            field BistInProgress 27,
+            /// Set when the SOC acknolwedgement has timed out
+            field SocAckTimeout 30,
+            /// Alternate mode entry status
+            field AmStatus 33:32 -> _ as enum AmStatus {
+                NoneAttempted: 0,
+                EntrySuccessful: 1,
+                EntryFailed: 2,
+                PartialSuccess: 3,
+            },
+        },
+    },
+    /// Power path status
+    register UsbStatus {
+        address: 0x24,
+        reset: 0x0,
+        access: RO,
+        fields: fieldset _ {
+            size-bytes: 9,
+        
+            /// Enter USB4 mode status
+            field EudoSopSentStatus 1:0 -> _ as enum EudoSopSentStatus {
+                NoEnterUsb: 0,
+                EnterUsbTimeout: 1,
+                EnterUsbFailure: 2,
+                SuccessfulEnterUsb: 3,
+            },
+            /// USB4 plug mode requirement
+            field Usb4RequiredPlugMode 3:2 -> _ as enum Usb4RequiredPlugMode {
+                None: 0,
+                Reserved: 1,
+                USB4: 2,
+                TBT3: 3,
+            },
+            /// USB4 mode active on plug
+            field UsbModeActiveOnPlug 4,
+            /// vPro mode error. This bit is asserted ifa n error occurred while trying to enter the vPro mode.
+            field VproEntryFailed 5,
+            /// USB re-entry is needed
+            field UsbReentryNeeded 6,
+            /// Enter_USB Data Object (EUDO)
+            field EnterUsbDataObject 39:8,
+            /// vPro mode VDO.
+            field TbtEnterModeVdo 71:40,
+        },
+    },
+    /// Power path status
+    register PowerPathStatus {
+        address: 0x26,
+        reset: 0x0,
+        access: RO,
+        fields: fieldset _ {
+            size-bytes: 5,
+        
+            /// PA Vconn switch status
+            field PaVconnSw 1:0 -> _ as enum PpVconnSw {
+                Disabled: 0,
+                DisabledFault: 1,
+                Cc1: 2,
+                Cc2: 3,
+            },
+            /// PA Vconn switch status
+            field PbVconnSw 3:2 -> _ as PpVconnSw,
+            /// PA int vbus switch status
+            field PaIntVbusSw 8:6 -> _ as enum PpIntVbusSw {
+                Disabled: 0,
+                DisabledFault: 1,
+                EnabledOutput: 2,
+                Unknown: catch-all _,
+            },
+            /// PB int vbus switch status
+            field PbIntVbusSw 11:9 -> _ as PpIntVbusSw,
+            /// PA ext vbus switch status
+            field PaExtVbusSw 14:12 -> _ as enum PpExtVbusSw {
+                Disabled: 0,
+                DisabledFault: 1,
+                EnabledInput: 3,
+                Unknown: catch-all _,
+            },
+            /// PB ext vbus switch status
+            field PbExtVbusSw 17:15 -> _ as PpExtVbusSw,
+            /// PA int vbus overcurrent
+            field PaIntVbusOc 28,
+            /// PB int vbus overcurrent
+            field PbIntVbusOc 29,
+            /// PA vconn overcurrent
+            field PaVconnOc 34,
+            /// PB vconn overcurrent
+            field PbVconnOc 35,
+            /// How the PD controller is powered
+            field PowerSource 39:38 -> _ as enum PpPowerSource {
+                Vin: 1,
+                Vbus: 2,
+                Unknown: catch-all _,
+            },
+        },
+    },
+    /// Global system configuration
+    register SystemConfig {
+        address: 0x27,
+        reset: 0x10198C338905,
+        fields: fieldset _ {
+            size-bytes: 15,
+        
+            /// Enable PA VCONN
+            field PaVconnConfig 0,
+            /// Enable PB VCONN
+            field PbVconnConfig 2,
+            /// PA PP5V VBUS configuration
+            field PaPp5vVbusSwConfig 10:8 -> _ as enum VbusSwConfig {
+                Disabled: 0,
+                Source: 1,
+                Reserved: catch-all _,
+            },
+            /// PB PP5V VBUS configuration
+            field PbPp5vVbusSwConfig 13:11 -> _ as VbusSwConfig,
+            /// PP_5V ILIM configuration
+            field IlimOverShoot 15:14 -> _ as enum IlimOverShoot {
+                NoOvershoot: 0,
+                Overshoot100ma: 1,
+                Overshoot200ma: 2,
+                Reserved: catch-all _,
+            },
+            /// PA PPEXT configuration
+            field PaPpextVbusSwConfig 18:16 -> _ as enum PpextVbusSwConfig {
+                Unused: 0,
+                Source: 1,
+                Sink: 2,
+                SinkWaitSrdyNonDeadBattery: 3,
+                BiDirectional: 4,
+                BiDirectionalWaitSrdy: 5,
+                SinkWaitSrdy: 6,
+                BiDirectionalPpextDisabled: 7,
+            },
+            /// PB PPEXT configuration
+            field PbPpextVbusSwConfig 21:19 -> _ as PpextVbusSwConfig,
+            /// Threshold used for RCP on PP_EXT
+            field RcpThreshold 23:22 -> _ as enum RcpThreshold {
+                Threshold6mv: 0,
+                Threshold8mv: 1,
+                Threshold10mv: 2,
+                Threshold12mv: 3,
+            },
+            /// Automatic sink-path coordination, true for highest power, false for no sink management
+            field MultiPortSinkPolicyHighestPower 24,
+            /// Type of TBT controller
+            field TbtControllerType 28:26 -> _ as enum TbtControllerType {
+                Default: 0,
+                Ar: 1,
+                Tr: 2,
+                Icl: 3,
+                Gr: 4,
+                Br: 5,
+                Reserved: catch-all _,
+            },
+            /// Enable bit for simple UFP policy manager
+            field EnableOneUfpPolicy 29,
+            /// Enable bit for simple source power management
+            field EnableSpm 30,
+            /// Delay configuration for MultiPortSinkPolicy
+            field MultiPortSinkNonOverlapTime 32:31 -> _ as enum MultiPortSinkNonOverlapTime {
+                Delay1ms: 0,
+                Delay5ms: 1,
+                Delay10ms: 2,
+                Delay15ms: 3,
+            },
+            /// Enables I2C Multi Controller mode
+            field EnableI2cMultiControllerMode 33,
+            /// I2C bus timeout
+            field I2cTimeout 36:34 -> _ as enum I2cTimeout {
+                Timeout25ms: 0,
+                Timeout50ms: 1,
+                Timeout75ms: 2,
+                Timeout100ms: 3,
+                Timeout125ms: 4,
+                Timeout150ms: 5,
+                Timeout175ms: 6,
+                Timeout1000ms: 7,
+            },
+            /// EEPROM updates not allowed if this bit asserted
+            field DisableEepromUpdates 37,
+            /// Enable only port A
+            field EmulateSinglePort 38,
+            /// SPM minimum current advertisement, true for 1.5 A, false for USB default
+            field MinimumCurrentAdvertisement1A5 39,
+            /// Value for USB default current
+            field UsbDefaultCurrent 44:43 -> _ as enum UsbDefaultCurrent {
+                UsbDefault: 0,
+                Current900ma: 1,
+                Current150ma: 2,
+                Reserved: catch-all _,
+            },
+            /// EPR supported as source
+            field EprSupportedAsSource 45,
+            /// EPR supported as sink
+            field EprSupportedAsSink 46,
+            /// Enable AM entry/exit on low-power mode exit/entry
+            field EnableLowPowerModeAmEntryExit 47,
+            /// Enable crossbar polling mode
+            field CrossbarPollingMode 54,
+            /// Enable crossbar type 1 extended write
+            field CrossbarConfigType1Extended 55,
+            /// External DCDC Status Polling Interval
+            field ExternalDcdcStatusPollingInterval 63:56,
+            /// Target address for Port 1 on I2C2s
+            field Port1I2c2TargetAddress 71:64,
+            /// Target address for Port 2 on I2C2s
+            field Port2I2c2TargetAddress 79:72,
+            /// Halts setting up external DCDC configuration until 5V power is present from the system
+            field VsysPreventsHighPower 80,
+            /// Stalls the PD in PTCH mode until Vsys is present
+            field WaitForVin3v3 81,
+            /// Stalls the PD in PTCH mode until a power connection is made that meets the needed conditions
+            field WaitForMinimumPower 82,
+            /// On detecting VIN_3V3, auto clear the dead battery flag and reset the connection on the source port to update PD contract negotiated when the battery was dead
+            field AutoClrDeadBatteryFlagAndResetOnVin3v3 86,
+            /// Source Policy Mode
+            field SourcePolicyMode 104:103,
+        },
+    },
+    /// Port control
+    register PortControl {
+        address: 0x29,
+        reset: 0x06000041C311,
+        fields: fieldset _ {
+            size-bytes: 8,
+        
+            /// Type-C current limit
+            field TypecCurrent 1:0 -> _ as enum TypecCurrent {
+                UsbDefault: 0,
+                Current1A5: 1,
+                Current3A0: 2,
+                Reserved: catch-all _,
+            },
+            /// Process swap to sink
+            field ProcessSwapToSink 4,
+            /// Initiate swap to sink
+            field InitiateSwapToSink 5,
+            /// Process swap to source
+            field ProcessSwapToSource 6,
+            /// Initiate swap to source
+            field InitiateSwapToSource 7,
+            /// Automatically initiate alert messaging
+            field AutoAlertEnable 8,
+            /// Automatically return PPS_Status
+            field AutoPpsStatusEnable 10,
+            /// Enable retimer firmware update
+            field RetimerFwUpdate 11,
+            /// Process swap to UFP
+            field ProcessSwapToUfp 12,
+            /// Initiate swap to UFP
+            field InitiateSwapToUfp 13,
+            /// Process swap to DFP
+            field ProcessSwapToDfp 14,
+            /// Initiate swap to DFP
+            field InitiateSwapToDfp 15,
+            /// Automatically issue discover identity VDMs to appropriate SOPs
+            field AutomaticIdRequest 16,
+            /// Allow host to manage alt mode process
+            field AmIntrusiveMode 17,
+            /// Force USB3 Gen1 mode
+            field ForceUsb3Gen1 18,
+            /// External power present
+            field UnconstrainedPower 19,
+            /// Enable current monitor using onboard ADC
+            field EnableCurrentMonitor 20,
+            /// Disable PP3/4 switches automatically
+            field SinkControl 21,
+            /// Enable fast role swap
+            field FrSwapEnabled 22,
+            /// Disable USB data
+            field UsbDisable 29,
+            /// Vconn current limit
+            field VconnCurrentLimit 44:43 -> _ as enum VconnCurrentLimit {
+                Current410ma: 0,
+                Current590ma: 1,
+                Other: catch-all _,
+            },
+            /// SBU Channel Control
+            field ActiveDbgChannel 46:45 -> _ as enum ActiveDbgChannel {
+                Dbg: 0,
+                SbRxTx: 1,
+                Aux: 2,
+                Open: 3,
+            },
+        },
+    },
+    /// Active PDO contract
+    register ActivePdoContract {
+        address: 0x34,
+        reset: 0x0,
+        access: RO,
+        fields: fieldset _ {
+            size-bytes: 6,
+        
+            /// Active PDO
+            field ActivePdo 31:0,
+            /// Bits 20-29 of the first PDO
+            field FirstPdoControl 41:32,
+        },
+    },
+    /// Active PDO contract
+    register ActiveRdoContract {
+        address: 0x35,
+        reset: 0x0,
+        access: RO,
+        fields: fieldset _ {
+            size-bytes: 16,
+        
+            /// Active RDO
+            field ActiveRdo 31:0,
+            /// Source EPR mode data object
+            field SourceEprModeDo 63:32,
+            /// Sink EPR mode data object
+            field SinkEprModeDo 95:64,
+            /// Accepted active RDO contract
+            field AcceptedActiveRdo 127:96,
+        },
+    },
+    /// PD status
+    register PdStatus {
+        address: 0x40,
+        reset: 0x0,
+        access: RO,
+        fields: fieldset _ {
+            size-bytes: 4,
+        
+            /// CC pull up value
+            field CcPullUp 3:2 -> _ as enum PdCcPullUp {
+                NoPull: 0,
+                UsbDefault: 1,
+                Current1A5: 2,
+                Current3A0: 3,
+            },
+            /// Port type
+            field PortType 5:4 -> _ as enum PdPortType {
+                SinkSource: 0,
+                Sink: 1,
+                Source: 2,
+                SourceSink: 3,
+            },
+            /// Present role
+            field IsSource 6,
+            /// Soft reset details
+            field SoftResetDetails 12:8 -> _ as enum PdSoftResetDetails {
+                NoSoftReset: 0,
+                SoftResetReceived: 1,
+                InvalidSourceCapabilities: 4,
+                MessageRetriesExhausted: 5,
+                UnexpectedAcceptMessage: 6,
+                UnexpectedControlMessage: 7,
+                UnexpectedGetSinkCapMessage: 8,
+                UnexpectedGetSourceCapMessage: 9,
+                UnexpectedGotoMinMessage: 10,
+                UnexpectedPsrdyMessage: 11,
+                UnexpectedPingMessage: 12,
+                UnexpectedRejectMessage: 13,
+                UnexpectedRequestMessage: 14,
+                UnexpectedSinkCapabilitiesMessage: 15,
+                UnexpectedSourceCapabilitiesMessage: 16,
+                UnexpectedSwapMessage: 17,
+                UnexpectedWaitCapabilitiesMessage: 18,
+                UnknownControlMessage: 19,
+                UnknownDataMessage: 20,
+                InitializeSopController: 21,
+                InitializeSopPrimeController: 22,
+                UnexpectedExtendedMessage: 23,
+                UnknownExtendedMessage: 24,
+                UnexpectedDataMessage: 25,
+                UnexpectedNotSupportedMessage: 26,
+                UnexpectedGetStatusMessage: 27,
+                Reserved: catch-all _,
+            },
+            /// Soft reset details
+            field HardResetDetails 21:16 -> _ as enum PdHardResetDetails {
+                ResetValueNoHardReset: 0,
+                ReceivedFromPortPartner: 1,
+                RequestedByHost: 2,
+                InvalidDrSwapRequest: 3,
+                DischargeFailed: 4,
+                NoResponseTimeout: 5,
+                SendSoftReset: 6,
+                SinkSelectCapability: 7,
+                SinkTransitionSink: 8,
+                SinkWaitForCapabilities: 9,
+                SoftReset: 10,
+                SourceOnTimeout: 11,
+                SourceCapabilityResponse: 12,
+                SourceSendCapabilities: 13,
+                SourcingFault: 14,
+                UnableToSource: 15,
+                FrsFailure: 16,
+                UnexpectedMessage: 17,
+                VconnRecoverySequenceFailure: 18,
+                Reserved: catch-all _,
+            },
+            /// Soft reset details
+            field ErrorRecoveryDetails 27:22 -> _ as enum PdErrorRecoveryDetails {
+                NoErrorRecovery: 0,
+                OverTemperatureShutdown: 1,
+                Pp5VLow: 2,
+                FaultInputGpioAsserted: 3,
+                OverVoltageOnPxVbus: 4,
+                IlimOnPp5V: 6,
+                IlimOnPpCable: 7,
+                OvpOnCcDetected: 8,
+                BackToNormalSystemPowerState: 9,
+                InvalidDrSwap: 16,
+                PrSwapNoGoodCRC: 17,
+                FrSwapNoGoodCRC: 18,
+                NoResponseTimeout: 21,
+                PrSwapSourceOffTimer: 22,
+                PrSwapSourceOnTimer: 23,
+                FrSwapSourceOnTimer: 24,
+                FrSwapTypeCSourceFailed: 25,
+                FrSwapSenderResponseTimer: 26,
+                FrSwapSourceOffTimer: 27,
+                PolicyEngineErrorAttached: 28,
+                PortConfig: 32,
+                ErrorWithDataControl: 33,
+                SwappingErrorDeadBattery: 34,
+                HostUpdatedGlobalSystemConfig: 35,
+                HostIssuedGaid: 36,
+                HostIssuedDisc: 38,
+                HostIssuedResetUcsi: 39,
+                ErrorAttached: 48,
+                VconnFailedToDischarge: 49,
+                SystemPowerState: 50,
+                HostDataControlUsbDisable: 51,
+                SpmClientPortDisableChanged: 52,
+                GpioEventTypecDisable: 53,
+                CrOvp: 54,
+                SbcOvp: 55,
+                SbcRxOvp: 56,
+                Reserved: catch-all _,
+            },
+            /// Data reset details
+            field DataResetDetails 30:28 -> _ as enum PdDataResetDetails {
+                NoDataReset: 0,
+                ReceivedFromPortPartner: 1,
+                RequestedByHostDrst: 2,
+                RequestedByHostDataControl: 3,
+                ExitUsb4FollowingDrSwap: 4,
+                Reserved: catch-all _,
+            },
+        },
+    },
+    /// Display Port Configuration
+    register DpConfig {
+        address: 0x51,
+        reset: 0x010100001C0603,
+        fields: fieldset _ {
+            size-bytes: 10,
+        
+            /// Assert this bit to enable DisplayPort SVID.
+            field EnableDpSvid 0,
+            /// Assert this bit to enable DisplayPort Alternate mode.
+            field EnableDpMode 1,
+            /// Display port capabilities
+            field DpPortCapability 9:8 -> _ as enum DpPortCapability {
+                Reserved: 0,
+                UfpD: 1,
+                DfpD: 2,
+                Reserved2: 3,
+            },
+            /// Signaling for transport of DisplayPort protocol.
+            field DpTransportSignalling 13:10 -> _ as enum DpTransportSignalling {
+                Usb: 0,
+                Dp: 1,
+                Reserved: catch-all _,
+            },
+            /// USB data path support.
+            field UsbDataPath 15 -> _ as enum DpUsbDataPath {
+                MayBeRequired: 0,
+                NotRequired: 1,
+            },
+            /// DFP_D Pin Assignments Supported. Each bit corresponds to an allowed pin assignment. Multiple pin assignments may be allowed.
+            field DfpdPinAssignment 23:16,
+            /// UFP_D Pin Assignments Supported. Each bit corresponds to an allowed pin assignment. Multiple pin assignments may be allowed.
+            field UfpdPinAssignment 31:24,
+            /// Assert this bit if multi-function is preferred.
+            field MultiFunctionPreferred 32,
+            /// This field indicates the status of the connection.
+            field DfpdUfpdConnectionStatus 36:35 -> _ as enum DfpdUfpdConnected {
+                Neither: 0,
+                DfpD: 1,
+                UfpD: 2,
+                Both: 3,
+            },
+            /// DP VDO Version
+            field DpVdoVersion 38:37 -> _ as enum DpVdoVersion {
+                DpV20: 0,
+                DpV21: 1,
+                Reserved: catch-all _,
+            },
+            /// Assert this bit to enable auto-entry.
+            field DpModeAutoEntryAllowed 40,
+            /// Port Capability
+            field PortCapability 49:48 -> _ as enum PortCapability {
+                Reserved: 0,
+                DpSink: 1,
+                DpSource: 2,
+                BothDpSourceAndSink: 3,
+            },
+            /// Transport Signalling
+            field TransportSignalling 53:50,
+            /// Receptacle Indication.
+            field ReceptacleIndication 54 -> _ as enum ReceptacleIndication {
+                Plug: 0,
+                Receptacle: 1,
+            },
+            /// USB2 signaling requirement on A6 - A7 or B6 - B7 (D+/D-) while in DP configuration.
+            field Usb2SignallingNotUsed 55 -> _ as enum Usb2SignalingNotUsed {
+                MayBeRequired: 0,
+                NotNeededOnA6A7: 1,
+            },
+            /// DP Source DevicePinAssignments Supported
+            field DpSourceDevicePinAssignmentsSupported 63:56,
+            /// DP Sink DevicePinAssignments Supported
+            field DpSinkDevicePinAssignmentsSupported 71:64,
+            /// UHBR13
+            field Uhbr13 74,
+            /// ActiveComponent
+            field ActiveComponent 77:76 -> _ as enum ActiveComponent {
+                Passive: 0,
+                Retimer: 1,
+                Redriver: 2,
+                Optical: 3,
+            },
+            /// DPAM version
+            field DpamVersion 79:78 -> _ as enum DpamVersion {
+                Version2OrEarlier: 0,
+                Version2p1OrHigher: 1,
+                Reserved: catch-all _,
+            },
+        },
+    },
+    register TbtConfig {
+        address: 0x52,
+        reset: 0x0,
+        fields: fieldset _ {
+            size-bytes: 8,
+        
+            /// Assert this bit to enable Thunderbolt VID.
+            field TbtVidEn 0,
+            /// Assert this bit to enable TBT mode.
+            field TbtModeEn 1,
+            /// Advertise 900mA Implicit Contract.
+            field Advertise900maImplicitContract 2,
+            /// Delay for the Controller I2C commands at power on.
+            field I2C3PowerOnDelay 6:3,
+            /// Enable PL4 Handling.
+            field PL4HandlingEn 7,
+            /// Configuration for non-responsive Cable Plug.
+            field TBTEmarkerOverride 9,
+            /// Power required for TBT mode entry.
+            field ANMinPowerRequired 10,
+            /// Assert this bit when there is a second TBT retimer on this port.
+            field DualTbtRetimerPresent 12,
+            /// Assert this bit when there is a TBT retimer on this port.
+            field TbtRetimerPresent 13,
+            /// This bit controls how HPD events are configured.
+            field DataStatusHPDEvents 14,
+            /// Assert this bit causes the PD controller to place an attached Intel Retimer into compliance mode.
+            field RetimerComplianceSupport 15,
+            /// Legacy TBT Adapter.
+            field LegacyTbtAdapter 16,
+            /// Assert this bit to enable TBT auto-entry.
+            field TbtAutoEntryAllowed 49,
+            /// USB data path support.
+            field UsbDataPath 54 -> _ as enum TbtUsbDataPath {
+                MayBeRequired: 0,
+                NotRequired: 1,
+            },
+            /// Configurable delay for BR.
+            field SourceVCONNDelay 62:56,
+        },
+    },
+    register UserVidStatus {
+        address: 0x57,
+        reset: 0x0,
+        access: RO,
+        fields: fieldset _ {
+            size-bytes: 2,
+        
+            /// Asserted when a User VID has been detected.
+            field UsvidDetected 0,
+            /// Asserted when a User VID is active.
+            field UsvidActive 1,
+            /// Error code
+            field UsvidErrorCode 4:2,
+            /// Asserted when Mode1 has been entered
+            field Mode1 9,
+            /// Asserted when Mode2 has been entered
+            field Mode2 10,
+            /// Asserted when Mode3 has been entered
+            field Mode3 11,
+            /// Asserted when Mode4 has been entered
+            field Mode4 12,
+        },
+    },
+    /// Intel VID status
+    register IntelVidStatus {
+        address: 0x59,
+        reset: 0x0,
+        access: RO,
+        fields: fieldset _ {
+            size-bytes: 11,
+        
+            /// Indicates if Intel VID is detected.
+            field IntelVidDetected 0,
+            /// Indicates if TBT Mode is active.
+            field TbtModeActive 1,
+            /// Retimer in TBT state and ready for FW update
+            field ForcedTbtMode 2,
+            /// Attention message contents
+            field TbtAttentionData 38:8,
+            /// Data for TBT Enter mode message
+            field TbtEnterModeData 55:40,
+            /// Data for Discover Modes response
+            field TbtModeDataRxSop 71:56,
+            /// Data for Discover Modes (SOP')
+            field TbtModeDataRxSopPrime 87:72,
+        },
+    },
+    /// Received User SVID Attention VDM
+    register RxAttnVdm {
+        address: 0x60,
+        reset: 0x0,
+        access: RO,
+        fields: fieldset _ {
+            size-bytes: 9,
+        
+            /// Number of valid Vdos received
+            field NumOfValidVdos 2:0,
+            /// Increments by one every time this register is updated
+            field SeqNum 7:5,
+            /// VDM header, Rx Vdm data object 1
+            field VdmHeader 39:8,
+            /// VDM data object, Rx Vdm data object 2
+            field Vdo 71:40,
+        },
+    },
+    /// Received ADO
+    register RxAdo {
+        address: 0x74,
+        reset: 0x0,
+        access: RO,
+        fields: fieldset _ {
+            size-bytes: 4,
+        
+            /// ADO
+            field Ado 31:0,
+        },
+    },
+}

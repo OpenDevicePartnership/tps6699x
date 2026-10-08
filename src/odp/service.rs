@@ -1,11 +1,12 @@
 use core::iter::zip;
 
+use device_driver::Fieldset;
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use embedded_hal_async::i2c::I2c;
 use tcpm_interface::port::event::PortEventBitfield;
 
 use crate::asynchronous::embassy::interrupt;
-use crate::registers::field_sets::IntEventBus1;
+use crate::registers::IntEventBus1;
 use crate::{MAX_SUPPORTED_PORTS, debug};
 
 impl<'a, M: RawMutex, BUS: I2c> tcpm_service::controller::event_receiver::InterruptReceiver<MAX_SUPPORTED_PORTS>
@@ -15,7 +16,7 @@ impl<'a, M: RawMutex, BUS: I2c> tcpm_service::controller::event_receiver::Interr
         let interrupts = self.wait_any(false).await;
         let mut port_events = [PortEventBitfield::none(); MAX_SUPPORTED_PORTS];
         for (interrupt, event) in zip(interrupts.iter(), port_events.iter_mut()) {
-            if *interrupt == IntEventBus1::new_zero() {
+            if *interrupt == IntEventBus1::ZERO {
                 continue;
             }
 

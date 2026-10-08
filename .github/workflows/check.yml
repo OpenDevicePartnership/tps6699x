@@ -138,7 +138,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        msrv: ["1.88"] # We're relying on namespaced-features, which
+        msrv: ["1.94"] # We're relying on namespaced-features, which
                        # was released in 1.60
                        #
                        # We also depend on `fixed' which requires rust
@@ -151,6 +151,7 @@ jobs:
                        # collapse_debuginfo
                        # bincode requires 1.85
                        # as_chunks_mut requires 1.88
+                       # device-driver 2.1 requires 1.94
     name: ubuntu / ${{ matrix.msrv }}
     steps:
       - uses: actions/checkout@v4

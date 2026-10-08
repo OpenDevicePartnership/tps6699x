@@ -1,7 +1,8 @@
+/// Re-exported so callers can use the fieldset constants (such as
+/// [`Fieldset::ZERO`]) without depending on `device-driver` directly.
+pub use device_driver::Fieldset;
 use embedded_usb_pd::type_c::ConnectionState;
 use embedded_usb_pd::{PdError, type_c};
-
-use crate::Mode;
 
 pub mod autonegotiate_sink;
 pub mod boot_flags;
@@ -14,7 +15,7 @@ pub mod rx_caps;
 pub mod rx_other_vdm;
 pub mod tx_identity;
 
-// Generated register definitions from device.yaml
+// Generated register definitions from device.ddsl
 // Skip format checking for generated code
 #[rustfmt::skip]
 #[allow(clippy::unreachable)]
@@ -95,22 +96,22 @@ impl TryFrom<PlugMode> for ConnectionState {
     }
 }
 
-impl From<Mode> for &str {
-    fn from(value: Mode) -> Self {
+impl From<crate::Mode> for &str {
+    fn from(value: crate::Mode) -> Self {
         match value {
-            Mode::Boot => "BOOT",
-            Mode::F211 => "F211",
-            Mode::App0 => "APP0",
-            Mode::App1 => "APP1",
-            Mode::Wtpr => "WTPR",
+            crate::Mode::Boot => "BOOT",
+            crate::Mode::F211 => "F211",
+            crate::Mode::App0 => "APP0",
+            crate::Mode::App1 => "APP1",
+            crate::Mode::Wtpr => "WTPR",
         }
     }
 }
 
-impl field_sets::IntEventBus1 {
+impl IntEventBus1 {
     /// Create an IntEventBus1 with all bits set to 1
     pub fn all() -> Self {
-        field_sets::IntEventBus1::from([0xFF; 11])
+        IntEventBus1::from([0xFF; 11])
     }
 }
 

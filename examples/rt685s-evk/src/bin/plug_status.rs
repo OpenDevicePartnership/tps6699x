@@ -14,7 +14,7 @@ use embassy_sync::mutex::Mutex;
 use embedded_usb_pd::LocalPortId;
 use static_cell::StaticCell;
 use tps6699x::asynchronous::embassy as pd_controller;
-use tps6699x::registers::field_sets::IntEventBus1;
+use tps6699x::registers::{Fieldset, IntEventBus1};
 use tps6699x::{ADDR0, MAX_SUPPORTED_PORTS};
 use {defmt_rtt as _, panic_probe as _};
 
@@ -54,14 +54,14 @@ async fn main(spawner: Spawner) {
     spawner.spawn(interrupt_task(int_in, interrupt_processor).unwrap());
 
     loop {
-        let mut plug_event_mask = IntEventBus1::new_zero();
+        let mut plug_event_mask = IntEventBus1::ZERO;
         plug_event_mask.set_plug_event(true);
         let flags = interrupt_receiver
             .wait_any_masked(false, [plug_event_mask; MAX_SUPPORTED_PORTS])
             .await;
 
         for (i, flag) in flags.iter().enumerate().take(pd.num_ports()) {
-            if *flag == IntEventBus1::new_zero() {
+            if *flag == IntEventBus1::ZERO {
                 continue;
             }
 

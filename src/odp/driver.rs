@@ -62,7 +62,7 @@ pub enum UsbControlMethod {
     #[default]
     TxIdentity,
 
-    /// Set USB capabilities through [`crate::registers::field_sets::DpConfig`].
+    /// Set USB capabilities through [`crate::registers::DpConfig`].
     ///
     /// This method ignores USB4, only controlling USB2 and USB3. It can only set
     /// USB2 and USB3 together, not independently, therefore it will disable both
@@ -70,7 +70,7 @@ pub enum UsbControlMethod {
     /// is false.
     DpConfig,
 
-    /// Set USB capabilities through [`crate::registers::field_sets::TbtConfig`].
+    /// Set USB capabilities through [`crate::registers::TbtConfig`].
     TbtConfig,
 }
 

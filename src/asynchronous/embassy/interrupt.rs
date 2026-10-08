@@ -1,6 +1,7 @@
 //! Interrupt related code.
 use core::array::from_fn;
 
+use device_driver::Fieldset;
 use embassy_sync::blocking_mutex::raw::RawMutex;
 use embassy_time::{Duration, with_timeout};
 use embedded_hal::digital::InputPin;
@@ -9,7 +10,7 @@ use embedded_usb_pd::{Error, LocalPortId, PdError};
 use itertools::izip;
 
 use crate::asynchronous::embassy::controller::Controller;
-use crate::registers::field_sets::IntEventBus1;
+use crate::registers::IntEventBus1;
 use crate::{MAX_SUPPORTED_PORTS, error, trace, warn};
 
 /// Configuration for [`InterruptProcessor`]
@@ -38,7 +39,7 @@ impl<'a, M: RawMutex, B: I2c> InterruptProcessor<'a, M, B> {
         int: &mut impl InputPin,
     ) -> Result<[IntEventBus1; MAX_SUPPORTED_PORTS], Error<B::Error>> {
         let i2c_timeout = self.controller.config.interrupt_processor_config.interrupt_timeout;
-        let mut flags = [IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS];
+        let mut flags = [IntEventBus1::ZERO; MAX_SUPPORTED_PORTS];
 
         let interrupts_enabled = self.controller.interrupts_enabled();
         let mut inner = self.controller.inner.lock().await;
@@ -155,7 +156,7 @@ impl<'a, M: RawMutex, B: I2c> AccumulatedFlagsAny<'a, M, B> {
     fn new(controller: &'a Controller<M, B>, masks: [IntEventBus1; MAX_SUPPORTED_PORTS]) -> Self {
         AccumulatedFlagsAny {
             controller,
-            accumulated_flags: [IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS],
+            accumulated_flags: [IntEventBus1::ZERO; MAX_SUPPORTED_PORTS],
             masks,
         }
     }
@@ -168,7 +169,7 @@ impl<'a, M: RawMutex, B: I2c> AccumulatedFlagsAny<'a, M, B> {
         for (&flags, &mask, accumulated) in izip!(flags.iter(), self.masks.iter(), self.accumulated_flags.iter_mut(),) {
             *accumulated |= flags;
             let consumed_flags = flags & mask;
-            if consumed_flags != IntEventBus1::new_zero() {
+            if consumed_flags != IntEventBus1::ZERO {
                 done = true;
             }
         }
@@ -199,7 +200,7 @@ impl<M: RawMutex, B: I2c> Drop for AccumulatedFlagsAny<'_, M, B> {
             .controller
             .interrupt_waker
             .try_take()
-            .unwrap_or([IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS]);
+            .unwrap_or([IntEventBus1::ZERO; MAX_SUPPORTED_PORTS]);
         // Panic safety: `unhandled`, `accumulated_flags`, and `mask` are all of size MAX_SUPPORTED_PORTS
         // so this will never index out of bounds
         let unhandled = from_fn(
@@ -208,7 +209,7 @@ impl<M: RawMutex, B: I2c> Drop for AccumulatedFlagsAny<'_, M, B> {
         );
 
         // Put back any unhandled interrupt flags for future processing
-        if unhandled.iter().any(|&f| f != IntEventBus1::new_zero()) {
+        if unhandled.iter().any(|&f| f != IntEventBus1::ZERO) {
             // If there are unhandled flags, signal them for future processing
             trace!("Signaling unhandled interrupt flags: {:?}", unhandled);
             self.controller.interrupt_waker.signal(unhandled);
@@ -240,9 +241,9 @@ impl<'a, M: RawMutex, B: I2c> InterruptReceiver<'a, M, B> {
     ) -> [IntEventBus1; MAX_SUPPORTED_PORTS] {
         // No interrupts set, return immediately because there is nothing to wait for
         // Also log a warning because this likely isn't what the user intended
-        if mask == [IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS] {
+        if mask == [IntEventBus1::ZERO; MAX_SUPPORTED_PORTS] {
             warn!("Interrupt masks are empty, returning immediately");
-            return [IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS];
+            return [IntEventBus1::ZERO; MAX_SUPPORTED_PORTS];
         }
 
         if clear_current {
@@ -376,7 +377,7 @@ mod test {
     }
 
     fn interrupt_event() -> IntEventBus1 {
-        let mut event = IntEventBus1::new_zero();
+        let mut event = IntEventBus1::ZERO;
         event.set_plug_event(true);
         event.set_new_consumer_contract(true);
         event.set_cmd_1_completed(true);
@@ -387,7 +388,7 @@ mod test {
     fn test_interrupt_publish_invalid_port_preserves_pending_flags() {
         let mut controller: Controller<NoopRawMutex, _> =
             Controller::new_tps66994(Mock::new(&[]), Default::default(), ADDR0).unwrap();
-        let pending = [interrupt_event(), IntEventBus1::new_zero()];
+        let pending = [interrupt_event(), IntEventBus1::ZERO];
         controller.interrupt_waker.signal(pending);
 
         controller.publish_interrupt(LocalPortId(MAX_SUPPORTED_PORTS as u8), interrupt_event());
@@ -410,7 +411,7 @@ mod test {
             Err(TimeoutError)
         );
 
-        let pending = [event, IntEventBus1::new_zero()];
+        let pending = [event, IntEventBus1::ZERO];
         assert_eq!(interrupt.controller.interrupt_waker.try_take(), Some(pending));
         interrupt.controller.interrupt_waker.signal(pending);
         {
@@ -422,7 +423,7 @@ mod test {
 
         assert_eq!(
             interrupt.process_interrupt(&mut int).await.unwrap(),
-            [IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS]
+            [IntEventBus1::ZERO; MAX_SUPPORTED_PORTS]
         );
         assert_eq!(interrupt.controller.interrupt_waker.try_take(), Some(pending));
         let inner = interrupt.controller.inner.lock().await;
@@ -442,7 +443,7 @@ mod test {
 
         assert_eq!(
             interrupt.process_interrupt(&mut int).await.unwrap(),
-            [event, IntEventBus1::new_zero()]
+            [event, IntEventBus1::ZERO]
         );
         {
             let inner = interrupt.controller.inner.lock().await;
@@ -451,11 +452,11 @@ mod test {
 
         assert_eq!(
             interrupt.process_interrupt(&mut int).await.unwrap(),
-            [IntEventBus1::new_zero(); MAX_SUPPORTED_PORTS]
+            [IntEventBus1::ZERO; MAX_SUPPORTED_PORTS]
         );
         assert_eq!(
             interrupt.controller.interrupt_waker.try_take(),
-            Some([event, IntEventBus1::new_zero()])
+            Some([event, IntEventBus1::ZERO])
         );
         let inner = interrupt.controller.inner.lock().await;
         assert!(!inner.has_pending_interrupt_clear(PORT0).unwrap());
@@ -470,32 +471,32 @@ mod test {
         let controller = CONTROLLER.init(Controller::new_tps66994(Mock::new(&[]), Default::default(), ADDR0).unwrap());
         let (pd, _processor, mut receiver) = controller.make_parts();
 
-        let mut port0 = IntEventBus1::new_zero();
+        let mut port0 = IntEventBus1::ZERO;
         port0.set_new_consumer_contract(true);
         port0.set_sink_ready(true);
         port0.set_cmd_1_completed(true);
 
-        let mut port1 = IntEventBus1::new_zero();
+        let mut port1 = IntEventBus1::ZERO;
         port1.set_plug_event(true);
         port1.set_alert_message_received(true);
 
         pd.controller.interrupt_waker.signal([port0, port1]);
 
-        let mut mask0 = IntEventBus1::new_zero();
+        let mut mask0 = IntEventBus1::ZERO;
         mask0.set_cmd_1_completed(true);
 
-        let mut mask1 = IntEventBus1::new_zero();
+        let mut mask1 = IntEventBus1::ZERO;
         mask1.set_plug_event(true);
         mask1.set_alert_message_received(true);
 
         let flags = receiver.wait_any_masked(false, [mask0, mask1]).await;
         assert_eq!(flags, [mask0, mask1]);
 
-        let mut unhandled0 = IntEventBus1::new_zero();
+        let mut unhandled0 = IntEventBus1::ZERO;
         unhandled0.set_new_consumer_contract(true);
         unhandled0.set_sink_ready(true);
 
-        let unhandled1 = IntEventBus1::new_zero();
+        let unhandled1 = IntEventBus1::ZERO;
 
         // Should already be signaled
         assert_eq!(
@@ -511,26 +512,26 @@ mod test {
         let controller = CONTROLLER.init(Controller::new_tps66994(Mock::new(&[]), Default::default(), ADDR0).unwrap());
         let (pd, _processor, mut receiver) = controller.make_parts();
 
-        let mut port0 = IntEventBus1::new_zero();
+        let mut port0 = IntEventBus1::ZERO;
         port0.set_new_consumer_contract(true);
         port0.set_sink_ready(true);
         port0.set_cmd_1_completed(true);
 
-        let mut port1 = IntEventBus1::new_zero();
+        let mut port1 = IntEventBus1::ZERO;
         port1.set_plug_event(true);
         port1.set_alert_message_received(true);
 
         pd.controller.interrupt_waker.signal([port0, port1]);
 
-        let mut mask0 = IntEventBus1::new_zero();
+        let mut mask0 = IntEventBus1::ZERO;
         mask0.set_cmd_1_completed(true);
 
-        let mask1 = IntEventBus1::new_zero();
+        let mask1 = IntEventBus1::ZERO;
 
         let flags = receiver.wait_any_masked(false, [mask0, mask1]).await;
         assert_eq!(flags, [mask0, mask1]);
 
-        let mut unhandled0 = IntEventBus1::new_zero();
+        let mut unhandled0 = IntEventBus1::ZERO;
         unhandled0.set_new_consumer_contract(true);
         unhandled0.set_sink_ready(true);
 
@@ -550,19 +551,19 @@ mod test {
         let controller = CONTROLLER.init(Controller::new_tps66994(Mock::new(&[]), Default::default(), ADDR0).unwrap());
         let (pd, _processor, mut receiver) = controller.make_parts();
 
-        let mut port0 = IntEventBus1::new_zero();
+        let mut port0 = IntEventBus1::ZERO;
         port0.set_new_consumer_contract(true);
         port0.set_sink_ready(true);
         port0.set_cmd_1_completed(true);
 
-        let mut port1 = IntEventBus1::new_zero();
+        let mut port1 = IntEventBus1::ZERO;
         port1.set_plug_event(true);
         port1.set_alert_message_received(true);
 
         pd.controller.interrupt_waker.signal([port0, port1]);
 
-        let mask0 = IntEventBus1::new_zero();
-        let mask1 = IntEventBus1::new_zero();
+        let mask0 = IntEventBus1::ZERO;
+        let mask1 = IntEventBus1::ZERO;
         let flags = receiver.wait_any_masked(false, [mask0, mask1]).await;
         assert_eq!(flags, [mask0, mask1]);
 
@@ -573,11 +574,11 @@ mod test {
     #[tokio::test]
     async fn test_wait_any_masked_timeout() {
         // Port0 mocked pending interrupts
-        let mut port0 = IntEventBus1::new_zero();
+        let mut port0 = IntEventBus1::ZERO;
         port0.set_new_consumer_contract(true);
 
         // Port1 mocked pending interrupts
-        let mut port1 = IntEventBus1::new_zero();
+        let mut port1 = IntEventBus1::ZERO;
         port1.set_plug_event(true);
 
         static CONTROLLER: StaticCell<Controller<NoopRawMutex, Mock>> = StaticCell::new();
@@ -587,10 +588,10 @@ mod test {
         pd.controller.interrupt_waker.signal([port0, port1]);
 
         // The mask doesn't match the pending interrupts, so we should get a timeout
-        let mut mask0 = IntEventBus1::new_zero();
+        let mut mask0 = IntEventBus1::ZERO;
         mask0.set_cmd_1_completed(true);
 
-        let mut mask1 = IntEventBus1::new_zero();
+        let mut mask1 = IntEventBus1::ZERO;
         mask1.set_new_provider_contract(true);
 
         assert_eq!(
@@ -603,10 +604,10 @@ mod test {
         );
 
         // Use all mask to get leftover interrupts
-        let mut leftover0 = IntEventBus1::new_zero();
+        let mut leftover0 = IntEventBus1::ZERO;
         leftover0.set_new_consumer_contract(true);
 
-        let mut leftover1 = IntEventBus1::new_zero();
+        let mut leftover1 = IntEventBus1::ZERO;
         leftover1.set_plug_event(true);
 
         let leftover_flags = with_timeout(
@@ -626,23 +627,23 @@ mod test {
         let controller = CONTROLLER.init(Controller::new_tps66994(Mock::new(&[]), Default::default(), ADDR0).unwrap());
         let (pd, _processor, mut receiver) = controller.make_parts();
 
-        let mut port0 = IntEventBus1::new_zero();
+        let mut port0 = IntEventBus1::ZERO;
         port0.set_new_consumer_contract(true);
         port0.set_sink_ready(true);
         port0.set_cmd_1_completed(true);
 
-        let mut port1 = IntEventBus1::new_zero();
+        let mut port1 = IntEventBus1::ZERO;
         port1.set_plug_event(true);
         port1.set_alert_message_received(true);
 
         pd.controller.interrupt_waker.signal([port0, port1]);
 
-        let mut flags0 = IntEventBus1::new_zero();
+        let mut flags0 = IntEventBus1::ZERO;
         flags0.set_new_consumer_contract(true);
         flags0.set_sink_ready(true);
         flags0.set_cmd_1_completed(true);
 
-        let mut flags1 = IntEventBus1::new_zero();
+        let mut flags1 = IntEventBus1::ZERO;
         flags1.set_plug_event(true);
         flags1.set_alert_message_received(true);
 

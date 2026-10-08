@@ -74,9 +74,7 @@ ignore = [
     #{ id = "RUSTSEC-0000-0000", reason = "you can specify a reason the advisory is ignored" },
     #"a-crate-that-is-yanked@0.1.1", # you can also ignore yanked crate versions if you wish
     #{ crate = "a-crate-that-is-yanked@0.1.1", reason = "you can specify why you are ignoring the yanked crate" },
-    { id = "RUSTSEC-2024-0370", reason = "proc-macro-error is unmaintained, no safe upgrade available, need upstream dependencies to migrate away from it." },
     { id = "RUSTSEC-2025-0141", reason = "bincode is unmaintained. Only used for UCSI serialization, pending an upstream migration in embedded-usb-pd." },
-    { id = "RUSTSEC-2026-0173", reason = "proc-macro-error2 is unmaintained, no safe upgrade available, need upstream dependencies to migrate away from it." },
     { id = "RUSTSEC-2024-0436", reason = "there are no suitable replacements for paste right now; paste has been archived as read-only. It only affects compile time concatenation in macros. We will allow it for now" },
     { id = "RUSTSEC-2026-0110", reason = "bare-metal is deprecated and archived, which cortex-m has a dependency on. Need cortex-m to migrate away from it." },
 ]

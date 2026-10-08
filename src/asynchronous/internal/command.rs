@@ -1,6 +1,6 @@
 //! This module implements functions to access the command register and its associate data register.
 //! The data register is larger than what device_driver can handle so access is done directly through the `AsyncRegisterInterface` trait.
-use device_driver::AsyncRegisterInterface;
+use device_driver::{AsyncRegisterInterface, FieldsetMetadata};
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::i2c::I2c;
 use embedded_usb_pd::{Error, LocalPortId, PdError};
@@ -17,15 +17,17 @@ impl<B: I2c> Tps6699x<B> {
         cmd: Command,
         data: Option<&[u8]>,
     ) -> Result<(), Error<B::Error>> {
-        let mut registers = self.borrow_port(port)?.into_registers();
-
         if let Some(data) = data {
-            registers
-                .interface()
-                .write_register(regs::REG_DATA1, (data.len() * 8) as u32, data)
+            // The interface sends the length as a single byte, so it tops out at 255.
+            let mut buf = [0u8; 256];
+            let buf = buf.get_mut(..data.len()).ok_or(PdError::InvalidParams)?;
+            buf.copy_from_slice(data);
+            self.borrow_port(port)?
+                .write_register(regs::REG_DATA1, buf, &FieldsetMetadata::DEFAULT)
                 .await?;
         }
 
+        let mut registers = self.borrow_port(port)?.into_registers();
         registers.cmd_1().write_async(|r| r.set_command(cmd as u32)).await?;
 
         Ok(())
@@ -84,9 +86,7 @@ impl<B: I2c> Tps6699x<B> {
         // Read and return value and data
         let mut buf = [0u8; regs::REG_DATA1_LEN];
         self.borrow_port(port)?
-            .into_registers()
-            .interface()
-            .read_register(regs::REG_DATA1, (regs::REG_DATA1_LEN * 8) as u32, &mut buf)
+            .read_register(regs::REG_DATA1, &mut buf, &FieldsetMetadata::DEFAULT)
             .await?;
 
         if has_return_value {
