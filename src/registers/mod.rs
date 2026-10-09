@@ -31,11 +31,8 @@ pub mod tx_identity;
 mod generated;
 pub use generated::*;
 
-/// Command data 1 register
-/// This register is 512 bits and exceeds the maximum support by device_driver
-pub const REG_DATA1: u8 = 0x09;
-// Command data 1 register length
-pub const REG_DATA1_LEN: usize = 64;
+/// Command data 1 register length, derived from its generated fieldset.
+pub const REG_DATA1_LEN: usize = core::mem::size_of::<Data1>();
 
 impl TryFrom<TypecCurrent> for type_c::Current {
     type Error = PdError;

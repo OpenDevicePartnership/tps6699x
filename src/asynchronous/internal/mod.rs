@@ -797,6 +797,37 @@ mod test {
         create_register_read(0, 0, [0]);
     }
 
+    #[tokio::test]
+    async fn test_data1_generated_read_write() {
+        let mut expected = [0u8; 64];
+        expected[0] = 0x12;
+        expected[31] = 0x34;
+        expected[63] = 0x56;
+        let transactions = [
+            create_register_write(PORT0_ADDR0, 0x09, expected),
+            create_register_read(PORT0_ADDR0, 0x09, expected),
+        ];
+        let mut tps6699x = Tps6699x::new_tps66994(Mock::new(&transactions), ADDR0);
+        let result = async {
+            let mut registers = tps6699x.borrow_port(PORT0)?.into_registers();
+            registers
+                .data_1()
+                .write_with_zero_async(|data| {
+                    data.set_bytes(0, 0x12);
+                    data.set_bytes(31, 0x34);
+                    data.set_bytes(63, 0x56);
+                })
+                .await?;
+            registers.data_1().read_async().await
+        }
+        .await;
+        assert_eq!(
+            result.map(|data| (data.bytes(0), data.bytes(31), data.bytes(63), <[u8; 64]>::from(data))),
+            Ok((0x12, 0x34, 0x56, expected))
+        );
+        tps6699x.bus.done();
+    }
+
     async fn test_read_port<const N: usize>(
         tps6699x: &mut Tps6699x<Mock>,
         port_id: LocalPortId,

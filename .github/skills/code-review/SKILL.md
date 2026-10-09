@@ -198,16 +198,14 @@ any applicability or verification limits.
 
 - **Generated register code is repetitive or carries scoped allowances.**
   Review the DDSL and generator configuration, not the generator's style.
-- **`REG_DATA1` is hand-written outside the generated mapping.**
-  This is the current implementation, not proof of a generator limit.
-  `device-driver` 2.1.1 supports a 64-byte (512-bit) fieldset, including
-  `field Bytes[64 stride 8] 7:0`. Individual integer fields are limited to
-  64 bits, so a single `field Data 511:0` is rejected. The size-limit
-  comments in `src/registers/mod.rs` and
-  `src/asynchronous/internal/command.rs` are outdated as register-size claims.
-  Do not demand migration merely for style; direct slice access also supports
-  variable-length command payloads, which a fixed-size fieldset does not
-  automatically preserve.
+- **DATA1 command writes use direct slice access.** The 64-byte (512-bit)
+  `Data1` fieldset is generated from `device.ddsl`, with repeated byte fields;
+  individual integer fields are limited to 64 bits. Result reads use the
+  generated `data_1()` operation, and writes obtain their address from that
+  same mapping. Direct writes intentionally preserve variable-length command
+  payloads; replacing them with fixed-size writes would change the wire
+  transaction. `REG_DATA1_LEN` is derived from the generated fieldset size,
+  not a separate manual register definition.
 - **The crate already has Git dependencies on ODP crates.** A new source
   or trust change needs review; unchanged dependencies are not diff findings.
 - **There is no blocking counterpart to an async operation.** Do not invent
