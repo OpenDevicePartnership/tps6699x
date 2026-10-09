@@ -85,6 +85,21 @@ impl<I> Registers<I> {
             || Cmd1::from([0, 0, 0, 0]),
         )
     }
+    /// Command data 1 register
+    ///
+    /// Register operation:
+    /// - Address: `9`
+    /// - Reset value: `0`
+    #[doc(alias = "Data1")]
+    pub fn data_1(
+        &mut self,
+    ) -> ::device_driver::RegisterOperation<'_, Self, Data1, u8, ::device_driver::RW, ()>
+    where
+        I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
+    {
+        let address = self.base_address + 9;
+        ::device_driver::RegisterOperation::new(self, address as u8, Data1::default)
+    }
     /// Boot FW version
     ///
     /// Register operation:
@@ -9558,6 +9573,260 @@ impl core::ops::BitXorAssign for Version {
     }
 }
 impl core::ops::Not for Version {
+    type Output = Self;
+    fn not(mut self) -> Self::Output {
+        for val in self.bits.iter_mut() {
+            *val = !*val;
+        }
+        self
+    }
+}
+#[derive(Copy, Clone, Eq, PartialEq)]
+#[repr(transparent)]
+pub struct Data1 {
+    #[doc(hidden)]
+    /// The internal bits
+    bits: [u8; 64],
+}
+unsafe impl ::device_driver::Fieldset for Data1 {
+    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
+        .with_byte_order(::device_driver::ByteOrder::LE);
+    const ZERO: Self = Self { bits: [0; 64] };
+}
+impl Data1 {
+    /// `7:0` - Read the `bytes` field.
+    ///
+    /// Command payload byte
+    #[doc(alias = "Bytes")]
+    #[must_use]
+    pub fn bytes(&self, index: usize) -> u8 {
+        assert!(index < 64);
+        let start = 0 + index * 8;
+        let end = start + 8 - 1;
+        let raw = unsafe {
+            ::device_driver::ops::load::<
+                u8,
+                ::device_driver::ops::LE,
+            >(&self.bits, start, end)
+        };
+        raw
+    }
+    /// `7:0` - Set the `bytes` field.
+    ///
+    /// Command payload byte
+    #[doc(alias = "Bytes")]
+    pub fn set_bytes(&mut self, index: usize, value: u8) {
+        assert!(index < 64);
+        let start = 0 + index * 8;
+        let end = start + 8 - 1;
+        let raw = value;
+        unsafe {
+            ::device_driver::ops::store::<
+                u8,
+                ::device_driver::ops::LE,
+            >(raw, start, end, &mut self.bits)
+        };
+    }
+}
+impl Default for Data1 {
+    fn default() -> Self {
+        <Self as ::device_driver::Fieldset>::ZERO
+    }
+}
+impl From<[u8; 64]> for Data1 {
+    fn from(bits: [u8; 64]) -> Self {
+        Self { bits }
+    }
+}
+impl From<Data1> for [u8; 64] {
+    fn from(val: Data1) -> Self {
+        val.bits
+    }
+}
+impl core::fmt::Debug for Data1 {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
+        let mut d = f.debug_struct("Data1");
+        d.field("bytes[0]", &self.bytes(0));
+        d.field("bytes[1]", &self.bytes(1));
+        d.field("bytes[2]", &self.bytes(2));
+        d.field("bytes[3]", &self.bytes(3));
+        d.field("bytes[4]", &self.bytes(4));
+        d.field("bytes[5]", &self.bytes(5));
+        d.field("bytes[6]", &self.bytes(6));
+        d.field("bytes[7]", &self.bytes(7));
+        d.field("bytes[8]", &self.bytes(8));
+        d.field("bytes[9]", &self.bytes(9));
+        d.field("bytes[10]", &self.bytes(10));
+        d.field("bytes[11]", &self.bytes(11));
+        d.field("bytes[12]", &self.bytes(12));
+        d.field("bytes[13]", &self.bytes(13));
+        d.field("bytes[14]", &self.bytes(14));
+        d.field("bytes[15]", &self.bytes(15));
+        d.field("bytes[16]", &self.bytes(16));
+        d.field("bytes[17]", &self.bytes(17));
+        d.field("bytes[18]", &self.bytes(18));
+        d.field("bytes[19]", &self.bytes(19));
+        d.field("bytes[20]", &self.bytes(20));
+        d.field("bytes[21]", &self.bytes(21));
+        d.field("bytes[22]", &self.bytes(22));
+        d.field("bytes[23]", &self.bytes(23));
+        d.field("bytes[24]", &self.bytes(24));
+        d.field("bytes[25]", &self.bytes(25));
+        d.field("bytes[26]", &self.bytes(26));
+        d.field("bytes[27]", &self.bytes(27));
+        d.field("bytes[28]", &self.bytes(28));
+        d.field("bytes[29]", &self.bytes(29));
+        d.field("bytes[30]", &self.bytes(30));
+        d.field("bytes[31]", &self.bytes(31));
+        d.field("bytes[32]", &self.bytes(32));
+        d.field("bytes[33]", &self.bytes(33));
+        d.field("bytes[34]", &self.bytes(34));
+        d.field("bytes[35]", &self.bytes(35));
+        d.field("bytes[36]", &self.bytes(36));
+        d.field("bytes[37]", &self.bytes(37));
+        d.field("bytes[38]", &self.bytes(38));
+        d.field("bytes[39]", &self.bytes(39));
+        d.field("bytes[40]", &self.bytes(40));
+        d.field("bytes[41]", &self.bytes(41));
+        d.field("bytes[42]", &self.bytes(42));
+        d.field("bytes[43]", &self.bytes(43));
+        d.field("bytes[44]", &self.bytes(44));
+        d.field("bytes[45]", &self.bytes(45));
+        d.field("bytes[46]", &self.bytes(46));
+        d.field("bytes[47]", &self.bytes(47));
+        d.field("bytes[48]", &self.bytes(48));
+        d.field("bytes[49]", &self.bytes(49));
+        d.field("bytes[50]", &self.bytes(50));
+        d.field("bytes[51]", &self.bytes(51));
+        d.field("bytes[52]", &self.bytes(52));
+        d.field("bytes[53]", &self.bytes(53));
+        d.field("bytes[54]", &self.bytes(54));
+        d.field("bytes[55]", &self.bytes(55));
+        d.field("bytes[56]", &self.bytes(56));
+        d.field("bytes[57]", &self.bytes(57));
+        d.field("bytes[58]", &self.bytes(58));
+        d.field("bytes[59]", &self.bytes(59));
+        d.field("bytes[60]", &self.bytes(60));
+        d.field("bytes[61]", &self.bytes(61));
+        d.field("bytes[62]", &self.bytes(62));
+        d.field("bytes[63]", &self.bytes(63));
+        d.finish()
+    }
+}
+#[cfg(feature = "defmt")]
+impl defmt::Format for Data1 {
+    fn format(&self, f: defmt::Formatter) {
+        defmt::write!(f, "Data1 {{ ");
+        defmt::write!(f, "bytes: {=u8}, [0]", & self.bytes(0));
+        defmt::write!(f, "bytes: {=u8}, [1]", & self.bytes(1));
+        defmt::write!(f, "bytes: {=u8}, [2]", & self.bytes(2));
+        defmt::write!(f, "bytes: {=u8}, [3]", & self.bytes(3));
+        defmt::write!(f, "bytes: {=u8}, [4]", & self.bytes(4));
+        defmt::write!(f, "bytes: {=u8}, [5]", & self.bytes(5));
+        defmt::write!(f, "bytes: {=u8}, [6]", & self.bytes(6));
+        defmt::write!(f, "bytes: {=u8}, [7]", & self.bytes(7));
+        defmt::write!(f, "bytes: {=u8}, [8]", & self.bytes(8));
+        defmt::write!(f, "bytes: {=u8}, [9]", & self.bytes(9));
+        defmt::write!(f, "bytes: {=u8}, [10]", & self.bytes(10));
+        defmt::write!(f, "bytes: {=u8}, [11]", & self.bytes(11));
+        defmt::write!(f, "bytes: {=u8}, [12]", & self.bytes(12));
+        defmt::write!(f, "bytes: {=u8}, [13]", & self.bytes(13));
+        defmt::write!(f, "bytes: {=u8}, [14]", & self.bytes(14));
+        defmt::write!(f, "bytes: {=u8}, [15]", & self.bytes(15));
+        defmt::write!(f, "bytes: {=u8}, [16]", & self.bytes(16));
+        defmt::write!(f, "bytes: {=u8}, [17]", & self.bytes(17));
+        defmt::write!(f, "bytes: {=u8}, [18]", & self.bytes(18));
+        defmt::write!(f, "bytes: {=u8}, [19]", & self.bytes(19));
+        defmt::write!(f, "bytes: {=u8}, [20]", & self.bytes(20));
+        defmt::write!(f, "bytes: {=u8}, [21]", & self.bytes(21));
+        defmt::write!(f, "bytes: {=u8}, [22]", & self.bytes(22));
+        defmt::write!(f, "bytes: {=u8}, [23]", & self.bytes(23));
+        defmt::write!(f, "bytes: {=u8}, [24]", & self.bytes(24));
+        defmt::write!(f, "bytes: {=u8}, [25]", & self.bytes(25));
+        defmt::write!(f, "bytes: {=u8}, [26]", & self.bytes(26));
+        defmt::write!(f, "bytes: {=u8}, [27]", & self.bytes(27));
+        defmt::write!(f, "bytes: {=u8}, [28]", & self.bytes(28));
+        defmt::write!(f, "bytes: {=u8}, [29]", & self.bytes(29));
+        defmt::write!(f, "bytes: {=u8}, [30]", & self.bytes(30));
+        defmt::write!(f, "bytes: {=u8}, [31]", & self.bytes(31));
+        defmt::write!(f, "bytes: {=u8}, [32]", & self.bytes(32));
+        defmt::write!(f, "bytes: {=u8}, [33]", & self.bytes(33));
+        defmt::write!(f, "bytes: {=u8}, [34]", & self.bytes(34));
+        defmt::write!(f, "bytes: {=u8}, [35]", & self.bytes(35));
+        defmt::write!(f, "bytes: {=u8}, [36]", & self.bytes(36));
+        defmt::write!(f, "bytes: {=u8}, [37]", & self.bytes(37));
+        defmt::write!(f, "bytes: {=u8}, [38]", & self.bytes(38));
+        defmt::write!(f, "bytes: {=u8}, [39]", & self.bytes(39));
+        defmt::write!(f, "bytes: {=u8}, [40]", & self.bytes(40));
+        defmt::write!(f, "bytes: {=u8}, [41]", & self.bytes(41));
+        defmt::write!(f, "bytes: {=u8}, [42]", & self.bytes(42));
+        defmt::write!(f, "bytes: {=u8}, [43]", & self.bytes(43));
+        defmt::write!(f, "bytes: {=u8}, [44]", & self.bytes(44));
+        defmt::write!(f, "bytes: {=u8}, [45]", & self.bytes(45));
+        defmt::write!(f, "bytes: {=u8}, [46]", & self.bytes(46));
+        defmt::write!(f, "bytes: {=u8}, [47]", & self.bytes(47));
+        defmt::write!(f, "bytes: {=u8}, [48]", & self.bytes(48));
+        defmt::write!(f, "bytes: {=u8}, [49]", & self.bytes(49));
+        defmt::write!(f, "bytes: {=u8}, [50]", & self.bytes(50));
+        defmt::write!(f, "bytes: {=u8}, [51]", & self.bytes(51));
+        defmt::write!(f, "bytes: {=u8}, [52]", & self.bytes(52));
+        defmt::write!(f, "bytes: {=u8}, [53]", & self.bytes(53));
+        defmt::write!(f, "bytes: {=u8}, [54]", & self.bytes(54));
+        defmt::write!(f, "bytes: {=u8}, [55]", & self.bytes(55));
+        defmt::write!(f, "bytes: {=u8}, [56]", & self.bytes(56));
+        defmt::write!(f, "bytes: {=u8}, [57]", & self.bytes(57));
+        defmt::write!(f, "bytes: {=u8}, [58]", & self.bytes(58));
+        defmt::write!(f, "bytes: {=u8}, [59]", & self.bytes(59));
+        defmt::write!(f, "bytes: {=u8}, [60]", & self.bytes(60));
+        defmt::write!(f, "bytes: {=u8}, [61]", & self.bytes(61));
+        defmt::write!(f, "bytes: {=u8}, [62]", & self.bytes(62));
+        defmt::write!(f, "bytes: {=u8}, [63]", & self.bytes(63));
+        defmt::write!(f, "}}");
+    }
+}
+impl core::ops::BitAnd for Data1 {
+    type Output = Self;
+    fn bitand(mut self, rhs: Self) -> Self::Output {
+        self &= rhs;
+        self
+    }
+}
+impl core::ops::BitAndAssign for Data1 {
+    fn bitand_assign(&mut self, rhs: Self) {
+        for (l, r) in self.bits.iter_mut().zip(&rhs.bits) {
+            *l &= *r;
+        }
+    }
+}
+impl core::ops::BitOr for Data1 {
+    type Output = Self;
+    fn bitor(mut self, rhs: Self) -> Self::Output {
+        self |= rhs;
+        self
+    }
+}
+impl core::ops::BitOrAssign for Data1 {
+    fn bitor_assign(&mut self, rhs: Self) {
+        for (l, r) in self.bits.iter_mut().zip(&rhs.bits) {
+            *l |= *r;
+        }
+    }
+}
+impl core::ops::BitXor for Data1 {
+    type Output = Self;
+    fn bitxor(mut self, rhs: Self) -> Self::Output {
+        self ^= rhs;
+        self
+    }
+}
+impl core::ops::BitXorAssign for Data1 {
+    fn bitxor_assign(&mut self, rhs: Self) {
+        for (l, r) in self.bits.iter_mut().zip(&rhs.bits) {
+            *l ^= *r;
+        }
+    }
+}
+impl core::ops::Not for Data1 {
     type Output = Self;
     fn not(mut self) -> Self::Output {
         for val in self.bits.iter_mut() {

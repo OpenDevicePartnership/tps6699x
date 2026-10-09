@@ -884,7 +884,7 @@ mod test {
             create_register_read(PORT0_ADDR0, 0x08, (Command::Success as u32).to_le_bytes()),
             create_register_read(
                 PORT0_ADDR0,
-                registers::REG_DATA1,
+                0x09,
                 command_result_data(ReturnValue::Success as u8, &expected_output),
             ),
         ];
@@ -907,11 +907,7 @@ mod test {
         let transactions = [
             create_register_write(PORT0_ADDR0, 0x08, (Command::Tfuq as u32).to_le_bytes()),
             create_register_read(PORT0_ADDR0, 0x08, (Command::Success as u32).to_le_bytes()),
-            create_register_read(
-                PORT0_ADDR0,
-                registers::REG_DATA1,
-                command_result_data(ReturnValue::Rejected as u8, &[]),
-            ),
+            create_register_read(PORT0_ADDR0, 0x09, command_result_data(ReturnValue::Rejected as u8, &[])),
         ];
         let mut controller: Controller<NoopRawMutex, _> =
             Controller::new_tps66993(Mock::new(&transactions), Default::default(), PORT0_ADDR0).unwrap();
@@ -930,11 +926,7 @@ mod test {
         let transactions = [
             create_register_write(PORT0_ADDR0, 0x08, (Command::Tfuq as u32).to_le_bytes()),
             create_register_read(PORT0_ADDR0, 0x08, (Command::Success as u32).to_le_bytes()),
-            create_register_read(
-                PORT0_ADDR0,
-                registers::REG_DATA1,
-                command_result_data(ReturnValue::Abort as u8, &[]),
-            ),
+            create_register_read(PORT0_ADDR0, 0x09, command_result_data(ReturnValue::Abort as u8, &[])),
         ];
         let mut controller: Controller<NoopRawMutex, _> =
             Controller::new_tps66993(Mock::new(&transactions), Default::default(), PORT0_ADDR0).unwrap();
@@ -965,7 +957,7 @@ mod test {
         let transactions = [
             create_register_write(PORT0_ADDR0, 0x08, (Command::Tfuq as u32).to_le_bytes()),
             create_register_read(PORT0_ADDR0, 0x08, (Command::Success as u32).to_le_bytes()),
-            create_register_read(PORT0_ADDR0, registers::REG_DATA1, command_result_data(0x02, &[])),
+            create_register_read(PORT0_ADDR0, 0x09, command_result_data(0x02, &[])),
         ];
         let mut controller: Controller<NoopRawMutex, _> =
             Controller::new_tps66993(Mock::new(&transactions), Default::default(), PORT0_ADDR0).unwrap();
