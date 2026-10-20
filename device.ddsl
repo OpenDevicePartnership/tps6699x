@@ -38,6 +38,16 @@ device Registers {
             field Command 31:0,
         },
     },
+    /// Command data 1 register
+    register Data1 {
+        address: 0x09,
+        fields: fieldset _ {
+            size-bytes: 64,
+
+            /// Command payload byte
+            field Bytes[64 stride 8] 7:0,
+        },
+    },
     /// Boot FW version
     register Version {
         address: 0x0F,
