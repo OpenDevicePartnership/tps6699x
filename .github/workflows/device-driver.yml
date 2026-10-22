@@ -11,24 +11,18 @@ name: device-driver-pregen-check
 jobs:
   device-driver-pregen-check:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     name: device-driver-pregen-check
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Install stable
-        uses: dtolnay/rust-toolchain@stable
-      - name: Install device-driver-cli from crates.io
-        uses: baptiste0928/cargo-install@v3
+          persist-credentials: false
+      - name: Check generated device driver
+        uses: tullom/device-driver-pregen-check@v1.2.0
         with:
-          crate: device-driver-cli
-          version: 2.1.1
-      - name: Generate files
-        run: ddc build rust -s device.ddsl -o ci_gen_registers.rs --rust-defmt-feature=defmt
-      - name: Check that the files are the exact same
-        uses: LouisBrunner/diff-action@v2.0.0
-        with:
-          old: ci_gen_registers.rs
-          new: src/registers/generated.rs
-          mode: strict
-          tolerance: same
+          source: device.ddsl
+          generated-file: src/registers/generated.rs
+          cli-version: '2.1.0'
+          rust-toolchain: '1.94.0'
+          rust-defmt-feature: defmt

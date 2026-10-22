@@ -1,11 +1,10 @@
-// This code was generated using device-driver `2.1.1` (),
+// This code was generated using device-driver `2.1.0` (),
 // a tool distributed under MIT OR Apache-2.0 by Dion Dokter <dev@diondokter.nl>
-// 
+//
 // For more information about device-driver, visit the website: https://device-driver.com
 
 /// Root block of the Registers driver
 #[derive(Debug)]
-#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Registers<I> {
     interface: I,
     #[doc(hidden)]
@@ -15,7 +14,10 @@ pub struct Registers<I> {
 impl<I> Registers<I> {
     /// Create a new instance of the device
     pub const fn new(interface: I) -> Self {
-        Self { interface, base_address: 0 }
+        Self {
+            interface,
+            base_address: 0,
+        }
     }
     /// Drop the driver instance and reclaim the interface
     pub fn free(self) -> I {
@@ -27,18 +29,12 @@ impl<I> Registers<I> {
     /// - Address: `3`
     /// - Reset value: `0x0`
     #[doc(alias = "Mode")]
-    pub fn mode(
-        &mut self,
-    ) -> ::device_driver::RegisterOperation<'_, Self, Mode, u8, ::device_driver::RO, ()>
+    pub fn mode(&mut self) -> ::device_driver::RegisterOperation<'_, Self, Mode, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 3;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || Mode::from([0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || Mode::from([0, 0, 0, 0]))
     }
     /// Customer use
     ///
@@ -48,23 +44,12 @@ impl<I> Registers<I> {
     #[doc(alias = "CustomerUse")]
     pub fn customer_use(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        CustomerUse,
-        u8,
-        ::device_driver::RW,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, CustomerUse, u8, ::device_driver::RW, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 6;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || CustomerUse::from([0, 0, 0, 0, 0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || CustomerUse::from([0, 0, 0, 0, 0, 0, 0, 0]))
     }
     /// Command 1 register
     ///
@@ -72,18 +57,12 @@ impl<I> Registers<I> {
     /// - Address: `8`
     /// - Reset value: `0x0`
     #[doc(alias = "Cmd1")]
-    pub fn cmd_1(
-        &mut self,
-    ) -> ::device_driver::RegisterOperation<'_, Self, Cmd1, u8, ::device_driver::RW, ()>
+    pub fn cmd_1(&mut self) -> ::device_driver::RegisterOperation<'_, Self, Cmd1, u8, ::device_driver::RW, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 8;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || Cmd1::from([0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || Cmd1::from([0, 0, 0, 0]))
     }
     /// Boot FW version
     ///
@@ -91,25 +70,12 @@ impl<I> Registers<I> {
     /// - Address: `15`
     /// - Reset value: `0x0`
     #[doc(alias = "Version")]
-    pub fn version(
-        &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        Version,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    pub fn version(&mut self) -> ::device_driver::RegisterOperation<'_, Self, Version, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 15;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || Version::from([0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || Version::from([0, 0, 0, 0]))
     }
     /// Asserted interrupts for I2C1
     ///
@@ -119,23 +85,14 @@ impl<I> Registers<I> {
     #[doc(alias = "IntEventBus1")]
     pub fn int_event_bus_1(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        IntEventBus1,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, IntEventBus1, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 20;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || IntEventBus1::from([8, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            IntEventBus1::from([8, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0])
+        })
     }
     /// Masked interrupts for I2C1
     ///
@@ -145,23 +102,14 @@ impl<I> Registers<I> {
     #[doc(alias = "IntMaskBus1")]
     pub fn int_mask_bus_1(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        IntEventBus1,
-        u8,
-        ::device_driver::RW,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, IntEventBus1, u8, ::device_driver::RW, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 22;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || IntEventBus1::from([10, 56, 48, 205, 0, 0, 0, 15, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            IntEventBus1::from([10, 56, 48, 205, 0, 0, 0, 15, 0, 0, 0])
+        })
     }
     /// Set Sx App Config - system power state for application configuration
     ///
@@ -171,23 +119,12 @@ impl<I> Registers<I> {
     #[doc(alias = "SxAppConfig")]
     pub fn sx_app_config(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        SxAppConfig,
-        u8,
-        ::device_driver::RW,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, SxAppConfig, u8, ::device_driver::RW, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 32;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || SxAppConfig::from([0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || SxAppConfig::from([0, 0]))
     }
     /// Discovered SVIDs
     ///
@@ -197,26 +134,16 @@ impl<I> Registers<I> {
     #[doc(alias = "DiscoveredSvids")]
     pub fn discovered_svids(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        DiscoveredSvids,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, DiscoveredSvids, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 33;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || DiscoveredSvids::from([
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0,
-            ]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            DiscoveredSvids::from([
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            ])
+        })
     }
     /// Interrupt clear for I2C1
     ///
@@ -226,23 +153,14 @@ impl<I> Registers<I> {
     #[doc(alias = "IntClearBus1")]
     pub fn int_clear_bus_1(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        IntEventBus1,
-        u8,
-        ::device_driver::RW,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, IntEventBus1, u8, ::device_driver::RW, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 24;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || IntEventBus1::from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            IntEventBus1::from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        })
     }
     /// Port status
     ///
@@ -250,25 +168,12 @@ impl<I> Registers<I> {
     /// - Address: `26`
     /// - Reset value: `0x0`
     #[doc(alias = "Status")]
-    pub fn status(
-        &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        Status,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    pub fn status(&mut self) -> ::device_driver::RegisterOperation<'_, Self, Status, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 26;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || Status::from([0, 0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || Status::from([0, 0, 0, 0, 0]))
     }
     /// Power path status
     ///
@@ -276,25 +181,12 @@ impl<I> Registers<I> {
     /// - Address: `36`
     /// - Reset value: `0x0`
     #[doc(alias = "UsbStatus")]
-    pub fn usb_status(
-        &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        UsbStatus,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    pub fn usb_status(&mut self) -> ::device_driver::RegisterOperation<'_, Self, UsbStatus, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 36;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || UsbStatus::from([0, 0, 0, 0, 0, 0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || UsbStatus::from([0, 0, 0, 0, 0, 0, 0, 0, 0]))
     }
     /// Power path status
     ///
@@ -304,23 +196,12 @@ impl<I> Registers<I> {
     #[doc(alias = "PowerPathStatus")]
     pub fn power_path_status(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        PowerPathStatus,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, PowerPathStatus, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 38;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || PowerPathStatus::from([0, 0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || PowerPathStatus::from([0, 0, 0, 0, 0]))
     }
     /// Global system configuration
     ///
@@ -330,23 +211,14 @@ impl<I> Registers<I> {
     #[doc(alias = "SystemConfig")]
     pub fn system_config(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        SystemConfig,
-        u8,
-        ::device_driver::RW,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, SystemConfig, u8, ::device_driver::RW, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 39;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || SystemConfig::from([5, 137, 51, 140, 25, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            SystemConfig::from([5, 137, 51, 140, 25, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        })
     }
     /// Port configuration
     ///
@@ -356,23 +228,14 @@ impl<I> Registers<I> {
     #[doc(alias = "PortConfig")]
     pub fn port_config(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        PortConfig,
-        u8,
-        ::device_driver::RW,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, PortConfig, u8, ::device_driver::RW, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 40;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || PortConfig::from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            PortConfig::from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        })
     }
     /// Port control
     ///
@@ -382,23 +245,12 @@ impl<I> Registers<I> {
     #[doc(alias = "PortControl")]
     pub fn port_control(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        PortControl,
-        u8,
-        ::device_driver::RW,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, PortControl, u8, ::device_driver::RW, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 41;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || PortControl::from([17, 195, 65, 0, 0, 6, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || PortControl::from([17, 195, 65, 0, 0, 6, 0, 0]))
     }
     /// Boot flags
     ///
@@ -406,28 +258,17 @@ impl<I> Registers<I> {
     /// - Address: `45`
     /// - Reset value: `0x0`
     #[doc(alias = "BootFlags")]
-    pub fn boot_flags(
-        &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        BootFlags,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    pub fn boot_flags(&mut self) -> ::device_driver::RegisterOperation<'_, Self, BootFlags, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 45;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || BootFlags::from([
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            ]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            BootFlags::from([
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            ])
+        })
     }
     /// Received source capabilities
     ///
@@ -437,26 +278,17 @@ impl<I> Registers<I> {
     #[doc(alias = "RxSrcCaps")]
     pub fn rx_src_caps(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        RxSrcCaps,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, RxSrcCaps, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 48;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || RxSrcCaps::from([
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            ]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            RxSrcCaps::from([
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            ])
+        })
     }
     /// Received sink capabilities
     ///
@@ -466,26 +298,17 @@ impl<I> Registers<I> {
     #[doc(alias = "RxSnkCaps")]
     pub fn rx_snk_caps(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        RxSrcCaps,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, RxSrcCaps, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 49;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || RxSrcCaps::from([
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            ]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            RxSrcCaps::from([
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            ])
+        })
     }
     /// Active PDO contract
     ///
@@ -495,23 +318,12 @@ impl<I> Registers<I> {
     #[doc(alias = "ActivePdoContract")]
     pub fn active_pdo_contract(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        ActivePdoContract,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, ActivePdoContract, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 52;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || ActivePdoContract::from([0, 0, 0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || ActivePdoContract::from([0, 0, 0, 0, 0, 0]))
     }
     /// Active PDO contract
     ///
@@ -521,23 +333,14 @@ impl<I> Registers<I> {
     #[doc(alias = "ActiveRdoContract")]
     pub fn active_rdo_contract(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        ActiveRdoContract,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, ActiveRdoContract, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 53;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || ActiveRdoContract::from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            ActiveRdoContract::from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        })
     }
     /// Autonegotiate Sink
     ///
@@ -547,26 +350,16 @@ impl<I> Registers<I> {
     #[doc(alias = "AutonegotiateSink")]
     pub fn autonegotiate_sink(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        AutonegotiateSink,
-        u8,
-        ::device_driver::RW,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, AutonegotiateSink, u8, ::device_driver::RW, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 55;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || AutonegotiateSink::from([
-                190, 64, 31, 15, 144, 145, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0,
-            ]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            AutonegotiateSink::from([
+                190, 64, 31, 15, 144, 145, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            ])
+        })
     }
     /// PD status
     ///
@@ -574,25 +367,12 @@ impl<I> Registers<I> {
     /// - Address: `64`
     /// - Reset value: `0x0`
     #[doc(alias = "PdStatus")]
-    pub fn pd_status(
-        &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        PdStatus,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    pub fn pd_status(&mut self) -> ::device_driver::RegisterOperation<'_, Self, PdStatus, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 64;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || PdStatus::from([0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || PdStatus::from([0, 0, 0, 0]))
     }
     /// Tx Identity
     ///
@@ -602,26 +382,16 @@ impl<I> Registers<I> {
     #[doc(alias = "TxIdentity")]
     pub fn tx_identity(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        TxIdentity,
-        u8,
-        ::device_driver::RW,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, TxIdentity, u8, ::device_driver::RW, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 71;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || TxIdentity::from([
-                6, 81, 4, 0, 213, 81, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0,
-            ]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            TxIdentity::from([
+                6, 81, 4, 0, 213, 81, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            ])
+        })
     }
     /// Received SOP Identity Data Object
     ///
@@ -631,25 +401,16 @@ impl<I> Registers<I> {
     #[doc(alias = "ReceivedSopIdentityData")]
     pub fn received_sop_identity_data(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        ReceivedSopIdentityData,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, ReceivedSopIdentityData, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 72;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || ReceivedSopIdentityData::from([
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            ReceivedSopIdentityData::from([
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            ]),
-        )
+            ])
+        })
     }
     /// Received SOP Prime Identity Data Object
     ///
@@ -659,25 +420,16 @@ impl<I> Registers<I> {
     #[doc(alias = "ReceivedSopPrimeIdentityData")]
     pub fn received_sop_prime_identity_data(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        ReceivedSopPrimeIdentityData,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, ReceivedSopPrimeIdentityData, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 73;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || ReceivedSopPrimeIdentityData::from([
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            ReceivedSopPrimeIdentityData::from([
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            ]),
-        )
+            ])
+        })
     }
     /// Display Port Configuration
     ///
@@ -685,49 +437,23 @@ impl<I> Registers<I> {
     /// - Address: `81`
     /// - Reset value: `0x010100001C0603`
     #[doc(alias = "DpConfig")]
-    pub fn dp_config(
-        &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        DpConfig,
-        u8,
-        ::device_driver::RW,
-        (),
-    >
+    pub fn dp_config(&mut self) -> ::device_driver::RegisterOperation<'_, Self, DpConfig, u8, ::device_driver::RW, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 81;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || DpConfig::from([3, 6, 28, 0, 0, 1, 1, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || DpConfig::from([3, 6, 28, 0, 0, 1, 1, 0, 0, 0]))
     }
     /// Register operation:
     /// - Address: `82`
     /// - Reset value: `0x0`
     #[doc(alias = "TbtConfig")]
-    pub fn tbt_config(
-        &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        TbtConfig,
-        u8,
-        ::device_driver::RW,
-        (),
-    >
+    pub fn tbt_config(&mut self) -> ::device_driver::RegisterOperation<'_, Self, TbtConfig, u8, ::device_driver::RW, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 82;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || TbtConfig::from([0, 0, 0, 0, 0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || TbtConfig::from([0, 0, 0, 0, 0, 0, 0, 0]))
     }
     /// Register operation:
     /// - Address: `87`
@@ -735,23 +461,12 @@ impl<I> Registers<I> {
     #[doc(alias = "UserVidStatus")]
     pub fn user_vid_status(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        UserVidStatus,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, UserVidStatus, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 87;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || UserVidStatus::from([0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || UserVidStatus::from([0, 0]))
     }
     /// DP status
     ///
@@ -759,28 +474,17 @@ impl<I> Registers<I> {
     /// - Address: `88`
     /// - Reset value: `0x0`
     #[doc(alias = "DpStatus")]
-    pub fn dp_status(
-        &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        DpStatus,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    pub fn dp_status(&mut self) -> ::device_driver::RegisterOperation<'_, Self, DpStatus, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 88;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || DpStatus::from([
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            ]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            DpStatus::from([
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0,
+            ])
+        })
     }
     /// Intel VID status
     ///
@@ -790,23 +494,14 @@ impl<I> Registers<I> {
     #[doc(alias = "IntelVidStatus")]
     pub fn intel_vid_status(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        IntelVidStatus,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, IntelVidStatus, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 89;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || IntelVidStatus::from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            IntelVidStatus::from([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        })
     }
     /// Received User SVID Attention VDM
     ///
@@ -816,23 +511,12 @@ impl<I> Registers<I> {
     #[doc(alias = "RxAttnVdm")]
     pub fn rx_attn_vdm(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        RxAttnVdm,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, RxAttnVdm, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 96;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || RxAttnVdm::from([0, 0, 0, 0, 0, 0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || RxAttnVdm::from([0, 0, 0, 0, 0, 0, 0, 0, 0]))
     }
     /// Received User SVID Other VDM
     ///
@@ -842,26 +526,16 @@ impl<I> Registers<I> {
     #[doc(alias = "RxOtherVdm")]
     pub fn rx_other_vdm(
         &mut self,
-    ) -> ::device_driver::RegisterOperation<
-        '_,
-        Self,
-        RxOtherVdm,
-        u8,
-        ::device_driver::RO,
-        (),
-    >
+    ) -> ::device_driver::RegisterOperation<'_, Self, RxOtherVdm, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 97;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || RxOtherVdm::from([
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0,
-            ]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || {
+            RxOtherVdm::from([
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            ])
+        })
     }
     /// Received ADO
     ///
@@ -869,18 +543,12 @@ impl<I> Registers<I> {
     /// - Address: `116`
     /// - Reset value: `0x0`
     #[doc(alias = "RxAdo")]
-    pub fn rx_ado(
-        &mut self,
-    ) -> ::device_driver::RegisterOperation<'_, Self, RxAdo, u8, ::device_driver::RO, ()>
+    pub fn rx_ado(&mut self) -> ::device_driver::RegisterOperation<'_, Self, RxAdo, u8, ::device_driver::RO, ()>
     where
         I: ::device_driver::RegisterInterfaceBase<AddressType = u8>,
     {
         let address = self.base_address + 116;
-        ::device_driver::RegisterOperation::new(
-            self,
-            address as u8,
-            || RxAdo::from([0, 0, 0, 0]),
-        )
+        ::device_driver::RegisterOperation::new(self, address as u8, || RxAdo::from([0, 0, 0, 0]))
     }
 }
 impl<I> ::device_driver::Block for Registers<I> {
@@ -901,8 +569,8 @@ pub struct RxAdo {
     bits: [u8; 4],
 }
 unsafe impl ::device_driver::Fieldset for RxAdo {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 4] };
 }
 impl RxAdo {
@@ -914,12 +582,7 @@ impl RxAdo {
     pub fn ado(&self) -> u32 {
         let start = 0;
         let end = 31;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `31:0` - Set the `ado` field.
@@ -930,12 +593,7 @@ impl RxAdo {
         let start = 0;
         let end = 31;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for RxAdo {
@@ -964,7 +622,7 @@ impl core::fmt::Debug for RxAdo {
 impl defmt::Format for RxAdo {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "RxAdo {{ ");
-        defmt::write!(f, "ado: {=u32}, ", & self.ado());
+        defmt::write!(f, "ado: {=u32}, ", &self.ado());
         defmt::write!(f, "}}");
     }
 }
@@ -1027,8 +685,8 @@ pub struct RxOtherVdm {
     bits: [u8; 29],
 }
 unsafe impl ::device_driver::Fieldset for RxOtherVdm {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 29] };
 }
 impl RxOtherVdm {
@@ -1040,12 +698,7 @@ impl RxOtherVdm {
     pub fn num_of_valid_vdos(&self) -> u8 {
         let start = 0;
         let end = 2;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `4:3` - Read the `sop_type` field.
@@ -1056,12 +709,7 @@ impl RxOtherVdm {
     pub fn sop_type(&self) -> u8 {
         let start = 3;
         let end = 4;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `7:5` - Read the `sequence_number` field.
@@ -1072,12 +720,7 @@ impl RxOtherVdm {
     pub fn sequence_number(&self) -> u8 {
         let start = 5;
         let end = 7;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `39:8` - Read the `vdo_1` field.
@@ -1088,12 +731,7 @@ impl RxOtherVdm {
     pub fn vdo_1(&self) -> u32 {
         let start = 8;
         let end = 39;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `71:40` - Read the `vdo_2` field.
@@ -1104,12 +742,7 @@ impl RxOtherVdm {
     pub fn vdo_2(&self) -> u32 {
         let start = 40;
         let end = 71;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `103:72` - Read the `vdo_3` field.
@@ -1120,12 +753,7 @@ impl RxOtherVdm {
     pub fn vdo_3(&self) -> u32 {
         let start = 72;
         let end = 103;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `135:104` - Read the `vdo_4` field.
@@ -1136,12 +764,7 @@ impl RxOtherVdm {
     pub fn vdo_4(&self) -> u32 {
         let start = 104;
         let end = 135;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `167:136` - Read the `vdo_5` field.
@@ -1152,12 +775,7 @@ impl RxOtherVdm {
     pub fn vdo_5(&self) -> u32 {
         let start = 136;
         let end = 167;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `199:168` - Read the `vdo_6` field.
@@ -1168,12 +786,7 @@ impl RxOtherVdm {
     pub fn vdo_6(&self) -> u32 {
         let start = 168;
         let end = 199;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `231:200` - Read the `vdo_7` field.
@@ -1184,12 +797,7 @@ impl RxOtherVdm {
     pub fn vdo_7(&self) -> u32 {
         let start = 200;
         let end = 231;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `2:0` - Set the `num_of_valid_vdos` field.
@@ -1200,12 +808,7 @@ impl RxOtherVdm {
         let start = 0;
         let end = 2;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `4:3` - Set the `sop_type` field.
     ///
@@ -1215,12 +818,7 @@ impl RxOtherVdm {
         let start = 3;
         let end = 4;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `7:5` - Set the `sequence_number` field.
     ///
@@ -1230,12 +828,7 @@ impl RxOtherVdm {
         let start = 5;
         let end = 7;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `39:8` - Set the `vdo_1` field.
     ///
@@ -1245,12 +838,7 @@ impl RxOtherVdm {
         let start = 8;
         let end = 39;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `71:40` - Set the `vdo_2` field.
     ///
@@ -1260,12 +848,7 @@ impl RxOtherVdm {
         let start = 40;
         let end = 71;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `103:72` - Set the `vdo_3` field.
     ///
@@ -1275,12 +858,7 @@ impl RxOtherVdm {
         let start = 72;
         let end = 103;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `135:104` - Set the `vdo_4` field.
     ///
@@ -1290,12 +868,7 @@ impl RxOtherVdm {
         let start = 104;
         let end = 135;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `167:136` - Set the `vdo_5` field.
     ///
@@ -1305,12 +878,7 @@ impl RxOtherVdm {
         let start = 136;
         let end = 167;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `199:168` - Set the `vdo_6` field.
     ///
@@ -1320,12 +888,7 @@ impl RxOtherVdm {
         let start = 168;
         let end = 199;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `231:200` - Set the `vdo_7` field.
     ///
@@ -1335,12 +898,7 @@ impl RxOtherVdm {
         let start = 200;
         let end = 231;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for RxOtherVdm {
@@ -1378,16 +936,16 @@ impl core::fmt::Debug for RxOtherVdm {
 impl defmt::Format for RxOtherVdm {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "RxOtherVdm {{ ");
-        defmt::write!(f, "num_of_valid_vdos: {=u8}, ", & self.num_of_valid_vdos());
-        defmt::write!(f, "sop_type: {=u8}, ", & self.sop_type());
-        defmt::write!(f, "sequence_number: {=u8}, ", & self.sequence_number());
-        defmt::write!(f, "vdo_1: {=u32}, ", & self.vdo_1());
-        defmt::write!(f, "vdo_2: {=u32}, ", & self.vdo_2());
-        defmt::write!(f, "vdo_3: {=u32}, ", & self.vdo_3());
-        defmt::write!(f, "vdo_4: {=u32}, ", & self.vdo_4());
-        defmt::write!(f, "vdo_5: {=u32}, ", & self.vdo_5());
-        defmt::write!(f, "vdo_6: {=u32}, ", & self.vdo_6());
-        defmt::write!(f, "vdo_7: {=u32}, ", & self.vdo_7());
+        defmt::write!(f, "num_of_valid_vdos: {=u8}, ", &self.num_of_valid_vdos());
+        defmt::write!(f, "sop_type: {=u8}, ", &self.sop_type());
+        defmt::write!(f, "sequence_number: {=u8}, ", &self.sequence_number());
+        defmt::write!(f, "vdo_1: {=u32}, ", &self.vdo_1());
+        defmt::write!(f, "vdo_2: {=u32}, ", &self.vdo_2());
+        defmt::write!(f, "vdo_3: {=u32}, ", &self.vdo_3());
+        defmt::write!(f, "vdo_4: {=u32}, ", &self.vdo_4());
+        defmt::write!(f, "vdo_5: {=u32}, ", &self.vdo_5());
+        defmt::write!(f, "vdo_6: {=u32}, ", &self.vdo_6());
+        defmt::write!(f, "vdo_7: {=u32}, ", &self.vdo_7());
         defmt::write!(f, "}}");
     }
 }
@@ -1450,8 +1008,8 @@ pub struct RxAttnVdm {
     bits: [u8; 9],
 }
 unsafe impl ::device_driver::Fieldset for RxAttnVdm {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 9] };
 }
 impl RxAttnVdm {
@@ -1463,12 +1021,7 @@ impl RxAttnVdm {
     pub fn num_of_valid_vdos(&self) -> u8 {
         let start = 0;
         let end = 2;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `7:5` - Read the `seq_num` field.
@@ -1479,12 +1032,7 @@ impl RxAttnVdm {
     pub fn seq_num(&self) -> u8 {
         let start = 5;
         let end = 7;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `39:8` - Read the `vdm_header` field.
@@ -1495,12 +1043,7 @@ impl RxAttnVdm {
     pub fn vdm_header(&self) -> u32 {
         let start = 8;
         let end = 39;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `71:40` - Read the `vdo` field.
@@ -1511,12 +1054,7 @@ impl RxAttnVdm {
     pub fn vdo(&self) -> u32 {
         let start = 40;
         let end = 71;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `2:0` - Set the `num_of_valid_vdos` field.
@@ -1527,12 +1065,7 @@ impl RxAttnVdm {
         let start = 0;
         let end = 2;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `7:5` - Set the `seq_num` field.
     ///
@@ -1542,12 +1075,7 @@ impl RxAttnVdm {
         let start = 5;
         let end = 7;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `39:8` - Set the `vdm_header` field.
     ///
@@ -1557,12 +1085,7 @@ impl RxAttnVdm {
         let start = 8;
         let end = 39;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `71:40` - Set the `vdo` field.
     ///
@@ -1572,12 +1095,7 @@ impl RxAttnVdm {
         let start = 40;
         let end = 71;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for RxAttnVdm {
@@ -1609,10 +1127,10 @@ impl core::fmt::Debug for RxAttnVdm {
 impl defmt::Format for RxAttnVdm {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "RxAttnVdm {{ ");
-        defmt::write!(f, "num_of_valid_vdos: {=u8}, ", & self.num_of_valid_vdos());
-        defmt::write!(f, "seq_num: {=u8}, ", & self.seq_num());
-        defmt::write!(f, "vdm_header: {=u32}, ", & self.vdm_header());
-        defmt::write!(f, "vdo: {=u32}, ", & self.vdo());
+        defmt::write!(f, "num_of_valid_vdos: {=u8}, ", &self.num_of_valid_vdos());
+        defmt::write!(f, "seq_num: {=u8}, ", &self.seq_num());
+        defmt::write!(f, "vdm_header: {=u32}, ", &self.vdm_header());
+        defmt::write!(f, "vdo: {=u32}, ", &self.vdo());
         defmt::write!(f, "}}");
     }
 }
@@ -1675,8 +1193,8 @@ pub struct IntelVidStatus {
     bits: [u8; 11],
 }
 unsafe impl ::device_driver::Fieldset for IntelVidStatus {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 11] };
 }
 impl IntelVidStatus {
@@ -1688,12 +1206,7 @@ impl IntelVidStatus {
     pub fn intel_vid_detected(&self) -> bool {
         let start = 0;
         let end = 0;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 1` - Read the `tbt_mode_active` field.
@@ -1704,12 +1217,7 @@ impl IntelVidStatus {
     pub fn tbt_mode_active(&self) -> bool {
         let start = 1;
         let end = 1;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 2` - Read the `forced_tbt_mode` field.
@@ -1720,12 +1228,7 @@ impl IntelVidStatus {
     pub fn forced_tbt_mode(&self) -> bool {
         let start = 2;
         let end = 2;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `38:8` - Read the `tbt_attention_data` field.
@@ -1736,12 +1239,7 @@ impl IntelVidStatus {
     pub fn tbt_attention_data(&self) -> u32 {
         let start = 8;
         let end = 38;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `55:40` - Read the `tbt_enter_mode_data` field.
@@ -1752,12 +1250,7 @@ impl IntelVidStatus {
     pub fn tbt_enter_mode_data(&self) -> u16 {
         let start = 40;
         let end = 55;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `71:56` - Read the `tbt_mode_data_rx_sop` field.
@@ -1768,12 +1261,7 @@ impl IntelVidStatus {
     pub fn tbt_mode_data_rx_sop(&self) -> u16 {
         let start = 56;
         let end = 71;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `87:72` - Read the `tbt_mode_data_rx_sop_prime` field.
@@ -1784,12 +1272,7 @@ impl IntelVidStatus {
     pub fn tbt_mode_data_rx_sop_prime(&self) -> u16 {
         let start = 72;
         let end = 87;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 0` - Set the `intel_vid_detected` field.
@@ -1800,12 +1283,7 @@ impl IntelVidStatus {
         let start = 0;
         let end = 0;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 1` - Set the `tbt_mode_active` field.
     ///
@@ -1815,12 +1293,7 @@ impl IntelVidStatus {
         let start = 1;
         let end = 1;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 2` - Set the `forced_tbt_mode` field.
     ///
@@ -1830,12 +1303,7 @@ impl IntelVidStatus {
         let start = 2;
         let end = 2;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `38:8` - Set the `tbt_attention_data` field.
     ///
@@ -1845,12 +1313,7 @@ impl IntelVidStatus {
         let start = 8;
         let end = 38;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `55:40` - Set the `tbt_enter_mode_data` field.
     ///
@@ -1860,12 +1323,7 @@ impl IntelVidStatus {
         let start = 40;
         let end = 55;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `71:56` - Set the `tbt_mode_data_rx_sop` field.
     ///
@@ -1875,12 +1333,7 @@ impl IntelVidStatus {
         let start = 56;
         let end = 71;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `87:72` - Set the `tbt_mode_data_rx_sop_prime` field.
     ///
@@ -1890,12 +1343,7 @@ impl IntelVidStatus {
         let start = 72;
         let end = 87;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for IntelVidStatus {
@@ -1930,17 +1378,16 @@ impl core::fmt::Debug for IntelVidStatus {
 impl defmt::Format for IntelVidStatus {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "IntelVidStatus {{ ");
-        defmt::write!(f, "intel_vid_detected: {=bool}, ", & self.intel_vid_detected());
-        defmt::write!(f, "tbt_mode_active: {=bool}, ", & self.tbt_mode_active());
-        defmt::write!(f, "forced_tbt_mode: {=bool}, ", & self.forced_tbt_mode());
-        defmt::write!(f, "tbt_attention_data: {=u32}, ", & self.tbt_attention_data());
-        defmt::write!(f, "tbt_enter_mode_data: {=u16}, ", & self.tbt_enter_mode_data());
+        defmt::write!(f, "intel_vid_detected: {=bool}, ", &self.intel_vid_detected());
+        defmt::write!(f, "tbt_mode_active: {=bool}, ", &self.tbt_mode_active());
+        defmt::write!(f, "forced_tbt_mode: {=bool}, ", &self.forced_tbt_mode());
+        defmt::write!(f, "tbt_attention_data: {=u32}, ", &self.tbt_attention_data());
+        defmt::write!(f, "tbt_enter_mode_data: {=u16}, ", &self.tbt_enter_mode_data());
+        defmt::write!(f, "tbt_mode_data_rx_sop: {=u16}, ", &self.tbt_mode_data_rx_sop());
         defmt::write!(
-            f, "tbt_mode_data_rx_sop: {=u16}, ", & self.tbt_mode_data_rx_sop()
-        );
-        defmt::write!(
-            f, "tbt_mode_data_rx_sop_prime: {=u16}, ", & self
-            .tbt_mode_data_rx_sop_prime()
+            f,
+            "tbt_mode_data_rx_sop_prime: {=u16}, ",
+            &self.tbt_mode_data_rx_sop_prime()
         );
         defmt::write!(f, "}}");
     }
@@ -2004,8 +1451,8 @@ pub struct DpStatus {
     bits: [u8; 38],
 }
 unsafe impl ::device_driver::Fieldset for DpStatus {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 38] };
 }
 impl DpStatus {
@@ -2017,12 +1464,7 @@ impl DpStatus {
     pub fn dp_detected(&self) -> bool {
         let start = 0;
         let end = 0;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 1` - Read the `dp_mode_active` field.
@@ -2033,12 +1475,7 @@ impl DpStatus {
     pub fn dp_mode_active(&self) -> bool {
         let start = 1;
         let end = 1;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `39:8` - Read the `dp_status_tx` field.
@@ -2049,12 +1486,7 @@ impl DpStatus {
     pub fn dp_status_tx(&self) -> u32 {
         let start = 8;
         let end = 39;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `71:40` - Read the `dp_status_rx` field.
@@ -2065,12 +1497,7 @@ impl DpStatus {
     pub fn dp_status_rx(&self) -> u32 {
         let start = 40;
         let end = 71;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `103:72` - Read the `dp_configure_message` field.
@@ -2081,12 +1508,7 @@ impl DpStatus {
     pub fn dp_configure_message(&self) -> u32 {
         let start = 72;
         let end = 103;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `135:104` - Read the `dp_mode_data` field.
@@ -2097,12 +1519,7 @@ impl DpStatus {
     pub fn dp_mode_data(&self) -> u32 {
         let start = 104;
         let end = 135;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `167:136` - Read the `dp_status_to_plug` field.
@@ -2113,12 +1530,7 @@ impl DpStatus {
     pub fn dp_status_to_plug(&self) -> u32 {
         let start = 136;
         let end = 167;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `199:168` - Read the `dp_status_ack_from_plug` field.
@@ -2129,12 +1541,7 @@ impl DpStatus {
     pub fn dp_status_ack_from_plug(&self) -> u32 {
         let start = 168;
         let end = 199;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `231:200` - Read the `dp_config_to_plug` field.
@@ -2145,12 +1552,7 @@ impl DpStatus {
     pub fn dp_config_to_plug(&self) -> u32 {
         let start = 200;
         let end = 231;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `263:232` - Read the `dp_config_from_plug` field.
@@ -2161,12 +1563,7 @@ impl DpStatus {
     pub fn dp_config_from_plug(&self) -> u32 {
         let start = 232;
         let end = 263;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `295:264` - Read the `dp_mode_data_sopprime` field.
@@ -2177,12 +1574,7 @@ impl DpStatus {
     pub fn dp_mode_data_sopprime(&self) -> u32 {
         let start = 264;
         let end = 295;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `299:296` - Read the `dp_signalling_rate` field.
@@ -2193,12 +1585,7 @@ impl DpStatus {
     pub fn dp_signalling_rate(&self) -> u8 {
         let start = 296;
         let end = 299;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 300` - Read the `cable_uhbr_13_5_support` field.
@@ -2209,12 +1596,7 @@ impl DpStatus {
     pub fn cable_uhbr_13_5_support(&self) -> bool {
         let start = 300;
         let end = 300;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `302:301` - Read the `cable_active_component` field.
@@ -2225,12 +1607,7 @@ impl DpStatus {
     pub fn cable_active_component(&self) -> u8 {
         let start = 301;
         let end = 302;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 303` - Read the `dp_ufp_vdo_version` field.
@@ -2241,12 +1618,7 @@ impl DpStatus {
     pub fn dp_ufp_vdo_version(&self) -> bool {
         let start = 303;
         let end = 303;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 0` - Set the `dp_detected` field.
@@ -2257,12 +1629,7 @@ impl DpStatus {
         let start = 0;
         let end = 0;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 1` - Set the `dp_mode_active` field.
     ///
@@ -2272,12 +1639,7 @@ impl DpStatus {
         let start = 1;
         let end = 1;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `39:8` - Set the `dp_status_tx` field.
     ///
@@ -2287,12 +1649,7 @@ impl DpStatus {
         let start = 8;
         let end = 39;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `71:40` - Set the `dp_status_rx` field.
     ///
@@ -2302,12 +1659,7 @@ impl DpStatus {
         let start = 40;
         let end = 71;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `103:72` - Set the `dp_configure_message` field.
     ///
@@ -2317,12 +1669,7 @@ impl DpStatus {
         let start = 72;
         let end = 103;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `135:104` - Set the `dp_mode_data` field.
     ///
@@ -2332,12 +1679,7 @@ impl DpStatus {
         let start = 104;
         let end = 135;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `167:136` - Set the `dp_status_to_plug` field.
     ///
@@ -2347,12 +1689,7 @@ impl DpStatus {
         let start = 136;
         let end = 167;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `199:168` - Set the `dp_status_ack_from_plug` field.
     ///
@@ -2362,12 +1699,7 @@ impl DpStatus {
         let start = 168;
         let end = 199;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `231:200` - Set the `dp_config_to_plug` field.
     ///
@@ -2377,12 +1709,7 @@ impl DpStatus {
         let start = 200;
         let end = 231;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `263:232` - Set the `dp_config_from_plug` field.
     ///
@@ -2392,12 +1719,7 @@ impl DpStatus {
         let start = 232;
         let end = 263;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `295:264` - Set the `dp_mode_data_sopprime` field.
     ///
@@ -2407,12 +1729,7 @@ impl DpStatus {
         let start = 264;
         let end = 295;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `299:296` - Set the `dp_signalling_rate` field.
     ///
@@ -2422,12 +1739,7 @@ impl DpStatus {
         let start = 296;
         let end = 299;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 300` - Set the `cable_uhbr_13_5_support` field.
     ///
@@ -2437,12 +1749,7 @@ impl DpStatus {
         let start = 300;
         let end = 300;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `302:301` - Set the `cable_active_component` field.
     ///
@@ -2452,12 +1759,7 @@ impl DpStatus {
         let start = 301;
         let end = 302;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 303` - Set the `dp_ufp_vdo_version` field.
     ///
@@ -2467,12 +1769,7 @@ impl DpStatus {
         let start = 303;
         let end = 303;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for DpStatus {
@@ -2515,31 +1812,21 @@ impl core::fmt::Debug for DpStatus {
 impl defmt::Format for DpStatus {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "DpStatus {{ ");
-        defmt::write!(f, "dp_detected: {=bool}, ", & self.dp_detected());
-        defmt::write!(f, "dp_mode_active: {=bool}, ", & self.dp_mode_active());
-        defmt::write!(f, "dp_status_tx: {=u32}, ", & self.dp_status_tx());
-        defmt::write!(f, "dp_status_rx: {=u32}, ", & self.dp_status_rx());
-        defmt::write!(
-            f, "dp_configure_message: {=u32}, ", & self.dp_configure_message()
-        );
-        defmt::write!(f, "dp_mode_data: {=u32}, ", & self.dp_mode_data());
-        defmt::write!(f, "dp_status_to_plug: {=u32}, ", & self.dp_status_to_plug());
-        defmt::write!(
-            f, "dp_status_ack_from_plug: {=u32}, ", & self.dp_status_ack_from_plug()
-        );
-        defmt::write!(f, "dp_config_to_plug: {=u32}, ", & self.dp_config_to_plug());
-        defmt::write!(f, "dp_config_from_plug: {=u32}, ", & self.dp_config_from_plug());
-        defmt::write!(
-            f, "dp_mode_data_sopprime: {=u32}, ", & self.dp_mode_data_sopprime()
-        );
-        defmt::write!(f, "dp_signalling_rate: {=u8}, ", & self.dp_signalling_rate());
-        defmt::write!(
-            f, "cable_uhbr_13_5_support: {=bool}, ", & self.cable_uhbr_13_5_support()
-        );
-        defmt::write!(
-            f, "cable_active_component: {=u8}, ", & self.cable_active_component()
-        );
-        defmt::write!(f, "dp_ufp_vdo_version: {=bool}, ", & self.dp_ufp_vdo_version());
+        defmt::write!(f, "dp_detected: {=bool}, ", &self.dp_detected());
+        defmt::write!(f, "dp_mode_active: {=bool}, ", &self.dp_mode_active());
+        defmt::write!(f, "dp_status_tx: {=u32}, ", &self.dp_status_tx());
+        defmt::write!(f, "dp_status_rx: {=u32}, ", &self.dp_status_rx());
+        defmt::write!(f, "dp_configure_message: {=u32}, ", &self.dp_configure_message());
+        defmt::write!(f, "dp_mode_data: {=u32}, ", &self.dp_mode_data());
+        defmt::write!(f, "dp_status_to_plug: {=u32}, ", &self.dp_status_to_plug());
+        defmt::write!(f, "dp_status_ack_from_plug: {=u32}, ", &self.dp_status_ack_from_plug());
+        defmt::write!(f, "dp_config_to_plug: {=u32}, ", &self.dp_config_to_plug());
+        defmt::write!(f, "dp_config_from_plug: {=u32}, ", &self.dp_config_from_plug());
+        defmt::write!(f, "dp_mode_data_sopprime: {=u32}, ", &self.dp_mode_data_sopprime());
+        defmt::write!(f, "dp_signalling_rate: {=u8}, ", &self.dp_signalling_rate());
+        defmt::write!(f, "cable_uhbr_13_5_support: {=bool}, ", &self.cable_uhbr_13_5_support());
+        defmt::write!(f, "cable_active_component: {=u8}, ", &self.cable_active_component());
+        defmt::write!(f, "dp_ufp_vdo_version: {=bool}, ", &self.dp_ufp_vdo_version());
         defmt::write!(f, "}}");
     }
 }
@@ -2602,8 +1889,8 @@ pub struct UserVidStatus {
     bits: [u8; 2],
 }
 unsafe impl ::device_driver::Fieldset for UserVidStatus {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 2] };
 }
 impl UserVidStatus {
@@ -2615,12 +1902,7 @@ impl UserVidStatus {
     pub fn usvid_detected(&self) -> bool {
         let start = 0;
         let end = 0;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 1` - Read the `usvid_active` field.
@@ -2631,12 +1913,7 @@ impl UserVidStatus {
     pub fn usvid_active(&self) -> bool {
         let start = 1;
         let end = 1;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `4:2` - Read the `usvid_error_code` field.
@@ -2647,12 +1924,7 @@ impl UserVidStatus {
     pub fn usvid_error_code(&self) -> u8 {
         let start = 2;
         let end = 4;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 9` - Read the `mode_1` field.
@@ -2663,12 +1935,7 @@ impl UserVidStatus {
     pub fn mode_1(&self) -> bool {
         let start = 9;
         let end = 9;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 10` - Read the `mode_2` field.
@@ -2679,12 +1946,7 @@ impl UserVidStatus {
     pub fn mode_2(&self) -> bool {
         let start = 10;
         let end = 10;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 11` - Read the `mode_3` field.
@@ -2695,12 +1957,7 @@ impl UserVidStatus {
     pub fn mode_3(&self) -> bool {
         let start = 11;
         let end = 11;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 12` - Read the `mode_4` field.
@@ -2711,12 +1968,7 @@ impl UserVidStatus {
     pub fn mode_4(&self) -> bool {
         let start = 12;
         let end = 12;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 0` - Set the `usvid_detected` field.
@@ -2727,12 +1979,7 @@ impl UserVidStatus {
         let start = 0;
         let end = 0;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 1` - Set the `usvid_active` field.
     ///
@@ -2742,12 +1989,7 @@ impl UserVidStatus {
         let start = 1;
         let end = 1;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `4:2` - Set the `usvid_error_code` field.
     ///
@@ -2757,12 +1999,7 @@ impl UserVidStatus {
         let start = 2;
         let end = 4;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 9` - Set the `mode_1` field.
     ///
@@ -2772,12 +2009,7 @@ impl UserVidStatus {
         let start = 9;
         let end = 9;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 10` - Set the `mode_2` field.
     ///
@@ -2787,12 +2019,7 @@ impl UserVidStatus {
         let start = 10;
         let end = 10;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 11` - Set the `mode_3` field.
     ///
@@ -2802,12 +2029,7 @@ impl UserVidStatus {
         let start = 11;
         let end = 11;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 12` - Set the `mode_4` field.
     ///
@@ -2817,12 +2039,7 @@ impl UserVidStatus {
         let start = 12;
         let end = 12;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for UserVidStatus {
@@ -2857,13 +2074,13 @@ impl core::fmt::Debug for UserVidStatus {
 impl defmt::Format for UserVidStatus {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "UserVidStatus {{ ");
-        defmt::write!(f, "usvid_detected: {=bool}, ", & self.usvid_detected());
-        defmt::write!(f, "usvid_active: {=bool}, ", & self.usvid_active());
-        defmt::write!(f, "usvid_error_code: {=u8}, ", & self.usvid_error_code());
-        defmt::write!(f, "mode_1: {=bool}, ", & self.mode_1());
-        defmt::write!(f, "mode_2: {=bool}, ", & self.mode_2());
-        defmt::write!(f, "mode_3: {=bool}, ", & self.mode_3());
-        defmt::write!(f, "mode_4: {=bool}, ", & self.mode_4());
+        defmt::write!(f, "usvid_detected: {=bool}, ", &self.usvid_detected());
+        defmt::write!(f, "usvid_active: {=bool}, ", &self.usvid_active());
+        defmt::write!(f, "usvid_error_code: {=u8}, ", &self.usvid_error_code());
+        defmt::write!(f, "mode_1: {=bool}, ", &self.mode_1());
+        defmt::write!(f, "mode_2: {=bool}, ", &self.mode_2());
+        defmt::write!(f, "mode_3: {=bool}, ", &self.mode_3());
+        defmt::write!(f, "mode_4: {=bool}, ", &self.mode_4());
         defmt::write!(f, "}}");
     }
 }
@@ -2926,8 +2143,8 @@ pub struct TbtConfig {
     bits: [u8; 8],
 }
 unsafe impl ::device_driver::Fieldset for TbtConfig {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 8] };
 }
 impl TbtConfig {
@@ -2939,12 +2156,7 @@ impl TbtConfig {
     pub fn tbt_vid_en(&self) -> bool {
         let start = 0;
         let end = 0;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 1` - Read the `tbt_mode_en` field.
@@ -2955,12 +2167,7 @@ impl TbtConfig {
     pub fn tbt_mode_en(&self) -> bool {
         let start = 1;
         let end = 1;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 2` - Read the `advertise_900_ma_implicit_contract` field.
@@ -2971,12 +2178,7 @@ impl TbtConfig {
     pub fn advertise_900_ma_implicit_contract(&self) -> bool {
         let start = 2;
         let end = 2;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `6:3` - Read the `i_2_c_3_power_on_delay` field.
@@ -2987,12 +2189,7 @@ impl TbtConfig {
     pub fn i_2_c_3_power_on_delay(&self) -> u8 {
         let start = 3;
         let end = 6;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 7` - Read the `pl_4_handling_en` field.
@@ -3003,12 +2200,7 @@ impl TbtConfig {
     pub fn pl_4_handling_en(&self) -> bool {
         let start = 7;
         let end = 7;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 9` - Read the `tbt_emarker_override` field.
@@ -3019,12 +2211,7 @@ impl TbtConfig {
     pub fn tbt_emarker_override(&self) -> bool {
         let start = 9;
         let end = 9;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 10` - Read the `an_min_power_required` field.
@@ -3035,12 +2222,7 @@ impl TbtConfig {
     pub fn an_min_power_required(&self) -> bool {
         let start = 10;
         let end = 10;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 12` - Read the `dual_tbt_retimer_present` field.
@@ -3051,12 +2233,7 @@ impl TbtConfig {
     pub fn dual_tbt_retimer_present(&self) -> bool {
         let start = 12;
         let end = 12;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 13` - Read the `tbt_retimer_present` field.
@@ -3067,12 +2244,7 @@ impl TbtConfig {
     pub fn tbt_retimer_present(&self) -> bool {
         let start = 13;
         let end = 13;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 14` - Read the `data_status_hpd_events` field.
@@ -3083,12 +2255,7 @@ impl TbtConfig {
     pub fn data_status_hpd_events(&self) -> bool {
         let start = 14;
         let end = 14;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 15` - Read the `retimer_compliance_support` field.
@@ -3099,12 +2266,7 @@ impl TbtConfig {
     pub fn retimer_compliance_support(&self) -> bool {
         let start = 15;
         let end = 15;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 16` - Read the `legacy_tbt_adapter` field.
@@ -3115,12 +2277,7 @@ impl TbtConfig {
     pub fn legacy_tbt_adapter(&self) -> bool {
         let start = 16;
         let end = 16;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 49` - Read the `tbt_auto_entry_allowed` field.
@@ -3131,12 +2288,7 @@ impl TbtConfig {
     pub fn tbt_auto_entry_allowed(&self) -> bool {
         let start = 49;
         let end = 49;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 54` - Read the `usb_data_path` field.
@@ -3147,12 +2299,7 @@ impl TbtConfig {
     pub fn usb_data_path(&self) -> TbtUsbDataPath {
         let start = 54;
         let end = 54;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `62:56` - Read the `source_vconn_delay` field.
@@ -3163,12 +2310,7 @@ impl TbtConfig {
     pub fn source_vconn_delay(&self) -> u8 {
         let start = 56;
         let end = 62;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 0` - Set the `tbt_vid_en` field.
@@ -3179,12 +2321,7 @@ impl TbtConfig {
         let start = 0;
         let end = 0;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 1` - Set the `tbt_mode_en` field.
     ///
@@ -3194,12 +2331,7 @@ impl TbtConfig {
         let start = 1;
         let end = 1;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 2` - Set the `advertise_900_ma_implicit_contract` field.
     ///
@@ -3209,12 +2341,7 @@ impl TbtConfig {
         let start = 2;
         let end = 2;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `6:3` - Set the `i_2_c_3_power_on_delay` field.
     ///
@@ -3224,12 +2351,7 @@ impl TbtConfig {
         let start = 3;
         let end = 6;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 7` - Set the `pl_4_handling_en` field.
     ///
@@ -3239,12 +2361,7 @@ impl TbtConfig {
         let start = 7;
         let end = 7;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 9` - Set the `tbt_emarker_override` field.
     ///
@@ -3254,12 +2371,7 @@ impl TbtConfig {
         let start = 9;
         let end = 9;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 10` - Set the `an_min_power_required` field.
     ///
@@ -3269,12 +2381,7 @@ impl TbtConfig {
         let start = 10;
         let end = 10;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 12` - Set the `dual_tbt_retimer_present` field.
     ///
@@ -3284,12 +2391,7 @@ impl TbtConfig {
         let start = 12;
         let end = 12;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 13` - Set the `tbt_retimer_present` field.
     ///
@@ -3299,12 +2401,7 @@ impl TbtConfig {
         let start = 13;
         let end = 13;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 14` - Set the `data_status_hpd_events` field.
     ///
@@ -3314,12 +2411,7 @@ impl TbtConfig {
         let start = 14;
         let end = 14;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 15` - Set the `retimer_compliance_support` field.
     ///
@@ -3329,12 +2421,7 @@ impl TbtConfig {
         let start = 15;
         let end = 15;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 16` - Set the `legacy_tbt_adapter` field.
     ///
@@ -3344,12 +2431,7 @@ impl TbtConfig {
         let start = 16;
         let end = 16;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 49` - Set the `tbt_auto_entry_allowed` field.
     ///
@@ -3359,12 +2441,7 @@ impl TbtConfig {
         let start = 49;
         let end = 49;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 54` - Set the `usb_data_path` field.
     ///
@@ -3374,12 +2451,7 @@ impl TbtConfig {
         let start = 54;
         let end = 54;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `62:56` - Set the `source_vconn_delay` field.
     ///
@@ -3389,12 +2461,7 @@ impl TbtConfig {
         let start = 56;
         let end = 62;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for TbtConfig {
@@ -3440,39 +2507,33 @@ impl core::fmt::Debug for TbtConfig {
 impl defmt::Format for TbtConfig {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "TbtConfig {{ ");
-        defmt::write!(f, "tbt_vid_en: {=bool}, ", & self.tbt_vid_en());
-        defmt::write!(f, "tbt_mode_en: {=bool}, ", & self.tbt_mode_en());
+        defmt::write!(f, "tbt_vid_en: {=bool}, ", &self.tbt_vid_en());
+        defmt::write!(f, "tbt_mode_en: {=bool}, ", &self.tbt_mode_en());
         defmt::write!(
-            f, "advertise_900_ma_implicit_contract: {=bool}, ", & self
-            .advertise_900_ma_implicit_contract()
+            f,
+            "advertise_900_ma_implicit_contract: {=bool}, ",
+            &self.advertise_900_ma_implicit_contract()
         );
+        defmt::write!(f, "i_2_c_3_power_on_delay: {=u8}, ", &self.i_2_c_3_power_on_delay());
+        defmt::write!(f, "pl_4_handling_en: {=bool}, ", &self.pl_4_handling_en());
+        defmt::write!(f, "tbt_emarker_override: {=bool}, ", &self.tbt_emarker_override());
+        defmt::write!(f, "an_min_power_required: {=bool}, ", &self.an_min_power_required());
         defmt::write!(
-            f, "i_2_c_3_power_on_delay: {=u8}, ", & self.i_2_c_3_power_on_delay()
+            f,
+            "dual_tbt_retimer_present: {=bool}, ",
+            &self.dual_tbt_retimer_present()
         );
-        defmt::write!(f, "pl_4_handling_en: {=bool}, ", & self.pl_4_handling_en());
+        defmt::write!(f, "tbt_retimer_present: {=bool}, ", &self.tbt_retimer_present());
+        defmt::write!(f, "data_status_hpd_events: {=bool}, ", &self.data_status_hpd_events());
         defmt::write!(
-            f, "tbt_emarker_override: {=bool}, ", & self.tbt_emarker_override()
+            f,
+            "retimer_compliance_support: {=bool}, ",
+            &self.retimer_compliance_support()
         );
-        defmt::write!(
-            f, "an_min_power_required: {=bool}, ", & self.an_min_power_required()
-        );
-        defmt::write!(
-            f, "dual_tbt_retimer_present: {=bool}, ", & self.dual_tbt_retimer_present()
-        );
-        defmt::write!(f, "tbt_retimer_present: {=bool}, ", & self.tbt_retimer_present());
-        defmt::write!(
-            f, "data_status_hpd_events: {=bool}, ", & self.data_status_hpd_events()
-        );
-        defmt::write!(
-            f, "retimer_compliance_support: {=bool}, ", & self
-            .retimer_compliance_support()
-        );
-        defmt::write!(f, "legacy_tbt_adapter: {=bool}, ", & self.legacy_tbt_adapter());
-        defmt::write!(
-            f, "tbt_auto_entry_allowed: {=bool}, ", & self.tbt_auto_entry_allowed()
-        );
-        defmt::write!(f, "usb_data_path: {}, ", & self.usb_data_path());
-        defmt::write!(f, "source_vconn_delay: {=u8}, ", & self.source_vconn_delay());
+        defmt::write!(f, "legacy_tbt_adapter: {=bool}, ", &self.legacy_tbt_adapter());
+        defmt::write!(f, "tbt_auto_entry_allowed: {=bool}, ", &self.tbt_auto_entry_allowed());
+        defmt::write!(f, "usb_data_path: {}, ", &self.usb_data_path());
+        defmt::write!(f, "source_vconn_delay: {=u8}, ", &self.source_vconn_delay());
         defmt::write!(f, "}}");
     }
 }
@@ -3535,8 +2596,8 @@ pub struct DpConfig {
     bits: [u8; 10],
 }
 unsafe impl ::device_driver::Fieldset for DpConfig {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 10] };
 }
 impl DpConfig {
@@ -3548,12 +2609,7 @@ impl DpConfig {
     pub fn enable_dp_svid(&self) -> bool {
         let start = 0;
         let end = 0;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 1` - Read the `enable_dp_mode` field.
@@ -3564,12 +2620,7 @@ impl DpConfig {
     pub fn enable_dp_mode(&self) -> bool {
         let start = 1;
         let end = 1;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `9:8` - Read the `dp_port_capability` field.
@@ -3580,12 +2631,7 @@ impl DpConfig {
     pub fn dp_port_capability(&self) -> DpPortCapability {
         let start = 8;
         let end = 9;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `13:10` - Read the `dp_transport_signalling` field.
@@ -3596,12 +2642,7 @@ impl DpConfig {
     pub fn dp_transport_signalling(&self) -> DpTransportSignalling {
         let start = 10;
         let end = 13;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `bit 15` - Read the `usb_data_path` field.
@@ -3612,12 +2653,7 @@ impl DpConfig {
     pub fn usb_data_path(&self) -> DpUsbDataPath {
         let start = 15;
         let end = 15;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `23:16` - Read the `dfpd_pin_assignment` field.
@@ -3628,12 +2664,7 @@ impl DpConfig {
     pub fn dfpd_pin_assignment(&self) -> u8 {
         let start = 16;
         let end = 23;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `31:24` - Read the `ufpd_pin_assignment` field.
@@ -3644,12 +2675,7 @@ impl DpConfig {
     pub fn ufpd_pin_assignment(&self) -> u8 {
         let start = 24;
         let end = 31;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 32` - Read the `multi_function_preferred` field.
@@ -3660,12 +2686,7 @@ impl DpConfig {
     pub fn multi_function_preferred(&self) -> bool {
         let start = 32;
         let end = 32;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `36:35` - Read the `dfpd_ufpd_connection_status` field.
@@ -3676,12 +2697,7 @@ impl DpConfig {
     pub fn dfpd_ufpd_connection_status(&self) -> DfpdUfpdConnected {
         let start = 35;
         let end = 36;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `38:37` - Read the `dp_vdo_version` field.
@@ -3692,12 +2708,7 @@ impl DpConfig {
     pub fn dp_vdo_version(&self) -> DpVdoVersion {
         let start = 37;
         let end = 38;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `bit 40` - Read the `dp_mode_auto_entry_allowed` field.
@@ -3708,12 +2719,7 @@ impl DpConfig {
     pub fn dp_mode_auto_entry_allowed(&self) -> bool {
         let start = 40;
         let end = 40;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `49:48` - Read the `port_capability` field.
@@ -3724,12 +2730,7 @@ impl DpConfig {
     pub fn port_capability(&self) -> PortCapability {
         let start = 48;
         let end = 49;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `53:50` - Read the `transport_signalling` field.
@@ -3740,12 +2741,7 @@ impl DpConfig {
     pub fn transport_signalling(&self) -> u8 {
         let start = 50;
         let end = 53;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 54` - Read the `receptacle_indication` field.
@@ -3756,12 +2752,7 @@ impl DpConfig {
     pub fn receptacle_indication(&self) -> ReceptacleIndication {
         let start = 54;
         let end = 54;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 55` - Read the `usb_2_signalling_not_used` field.
@@ -3772,12 +2763,7 @@ impl DpConfig {
     pub fn usb_2_signalling_not_used(&self) -> Usb2SignalingNotUsed {
         let start = 55;
         let end = 55;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `63:56` - Read the `dp_source_device_pin_assignments_supported` field.
@@ -3788,12 +2774,7 @@ impl DpConfig {
     pub fn dp_source_device_pin_assignments_supported(&self) -> u8 {
         let start = 56;
         let end = 63;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `71:64` - Read the `dp_sink_device_pin_assignments_supported` field.
@@ -3804,12 +2785,7 @@ impl DpConfig {
     pub fn dp_sink_device_pin_assignments_supported(&self) -> u8 {
         let start = 64;
         let end = 71;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 74` - Read the `uhbr_13` field.
@@ -3820,12 +2796,7 @@ impl DpConfig {
     pub fn uhbr_13(&self) -> bool {
         let start = 74;
         let end = 74;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `77:76` - Read the `active_component` field.
@@ -3836,12 +2807,7 @@ impl DpConfig {
     pub fn active_component(&self) -> ActiveComponent {
         let start = 76;
         let end = 77;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `79:78` - Read the `dpam_version` field.
@@ -3852,12 +2818,7 @@ impl DpConfig {
     pub fn dpam_version(&self) -> DpamVersion {
         let start = 78;
         let end = 79;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `bit 0` - Set the `enable_dp_svid` field.
@@ -3868,12 +2829,7 @@ impl DpConfig {
         let start = 0;
         let end = 0;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 1` - Set the `enable_dp_mode` field.
     ///
@@ -3883,12 +2839,7 @@ impl DpConfig {
         let start = 1;
         let end = 1;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `9:8` - Set the `dp_port_capability` field.
     ///
@@ -3898,12 +2849,7 @@ impl DpConfig {
         let start = 8;
         let end = 9;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `13:10` - Set the `dp_transport_signalling` field.
     ///
@@ -3913,12 +2859,7 @@ impl DpConfig {
         let start = 10;
         let end = 13;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 15` - Set the `usb_data_path` field.
     ///
@@ -3928,12 +2869,7 @@ impl DpConfig {
         let start = 15;
         let end = 15;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `23:16` - Set the `dfpd_pin_assignment` field.
     ///
@@ -3943,12 +2879,7 @@ impl DpConfig {
         let start = 16;
         let end = 23;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `31:24` - Set the `ufpd_pin_assignment` field.
     ///
@@ -3958,12 +2889,7 @@ impl DpConfig {
         let start = 24;
         let end = 31;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 32` - Set the `multi_function_preferred` field.
     ///
@@ -3973,12 +2899,7 @@ impl DpConfig {
         let start = 32;
         let end = 32;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `36:35` - Set the `dfpd_ufpd_connection_status` field.
     ///
@@ -3988,12 +2909,7 @@ impl DpConfig {
         let start = 35;
         let end = 36;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `38:37` - Set the `dp_vdo_version` field.
     ///
@@ -4003,12 +2919,7 @@ impl DpConfig {
         let start = 37;
         let end = 38;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 40` - Set the `dp_mode_auto_entry_allowed` field.
     ///
@@ -4018,12 +2929,7 @@ impl DpConfig {
         let start = 40;
         let end = 40;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `49:48` - Set the `port_capability` field.
     ///
@@ -4033,12 +2939,7 @@ impl DpConfig {
         let start = 48;
         let end = 49;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `53:50` - Set the `transport_signalling` field.
     ///
@@ -4048,12 +2949,7 @@ impl DpConfig {
         let start = 50;
         let end = 53;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 54` - Set the `receptacle_indication` field.
     ///
@@ -4063,12 +2959,7 @@ impl DpConfig {
         let start = 54;
         let end = 54;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 55` - Set the `usb_2_signalling_not_used` field.
     ///
@@ -4078,12 +2969,7 @@ impl DpConfig {
         let start = 55;
         let end = 55;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `63:56` - Set the `dp_source_device_pin_assignments_supported` field.
     ///
@@ -4093,12 +2979,7 @@ impl DpConfig {
         let start = 56;
         let end = 63;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `71:64` - Set the `dp_sink_device_pin_assignments_supported` field.
     ///
@@ -4108,12 +2989,7 @@ impl DpConfig {
         let start = 64;
         let end = 71;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 74` - Set the `uhbr_13` field.
     ///
@@ -4123,12 +2999,7 @@ impl DpConfig {
         let start = 74;
         let end = 74;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `77:76` - Set the `active_component` field.
     ///
@@ -4138,12 +3009,7 @@ impl DpConfig {
         let start = 76;
         let end = 77;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `79:78` - Set the `dpam_version` field.
     ///
@@ -4153,12 +3019,7 @@ impl DpConfig {
         let start = 78;
         let end = 79;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for DpConfig {
@@ -4212,43 +3073,46 @@ impl core::fmt::Debug for DpConfig {
 impl defmt::Format for DpConfig {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "DpConfig {{ ");
-        defmt::write!(f, "enable_dp_svid: {=bool}, ", & self.enable_dp_svid());
-        defmt::write!(f, "enable_dp_mode: {=bool}, ", & self.enable_dp_mode());
-        defmt::write!(f, "dp_port_capability: {}, ", & self.dp_port_capability());
+        defmt::write!(f, "enable_dp_svid: {=bool}, ", &self.enable_dp_svid());
+        defmt::write!(f, "enable_dp_mode: {=bool}, ", &self.enable_dp_mode());
+        defmt::write!(f, "dp_port_capability: {}, ", &self.dp_port_capability());
+        defmt::write!(f, "dp_transport_signalling: {}, ", &self.dp_transport_signalling());
+        defmt::write!(f, "usb_data_path: {}, ", &self.usb_data_path());
+        defmt::write!(f, "dfpd_pin_assignment: {=u8}, ", &self.dfpd_pin_assignment());
+        defmt::write!(f, "ufpd_pin_assignment: {=u8}, ", &self.ufpd_pin_assignment());
         defmt::write!(
-            f, "dp_transport_signalling: {}, ", & self.dp_transport_signalling()
-        );
-        defmt::write!(f, "usb_data_path: {}, ", & self.usb_data_path());
-        defmt::write!(f, "dfpd_pin_assignment: {=u8}, ", & self.dfpd_pin_assignment());
-        defmt::write!(f, "ufpd_pin_assignment: {=u8}, ", & self.ufpd_pin_assignment());
-        defmt::write!(
-            f, "multi_function_preferred: {=bool}, ", & self.multi_function_preferred()
-        );
-        defmt::write!(
-            f, "dfpd_ufpd_connection_status: {}, ", & self.dfpd_ufpd_connection_status()
-        );
-        defmt::write!(f, "dp_vdo_version: {}, ", & self.dp_vdo_version());
-        defmt::write!(
-            f, "dp_mode_auto_entry_allowed: {=bool}, ", & self
-            .dp_mode_auto_entry_allowed()
-        );
-        defmt::write!(f, "port_capability: {}, ", & self.port_capability());
-        defmt::write!(f, "transport_signalling: {=u8}, ", & self.transport_signalling());
-        defmt::write!(f, "receptacle_indication: {}, ", & self.receptacle_indication());
-        defmt::write!(
-            f, "usb_2_signalling_not_used: {}, ", & self.usb_2_signalling_not_used()
+            f,
+            "multi_function_preferred: {=bool}, ",
+            &self.multi_function_preferred()
         );
         defmt::write!(
-            f, "dp_source_device_pin_assignments_supported: {=u8}, ", & self
-            .dp_source_device_pin_assignments_supported()
+            f,
+            "dfpd_ufpd_connection_status: {}, ",
+            &self.dfpd_ufpd_connection_status()
+        );
+        defmt::write!(f, "dp_vdo_version: {}, ", &self.dp_vdo_version());
+        defmt::write!(
+            f,
+            "dp_mode_auto_entry_allowed: {=bool}, ",
+            &self.dp_mode_auto_entry_allowed()
+        );
+        defmt::write!(f, "port_capability: {}, ", &self.port_capability());
+        defmt::write!(f, "transport_signalling: {=u8}, ", &self.transport_signalling());
+        defmt::write!(f, "receptacle_indication: {}, ", &self.receptacle_indication());
+        defmt::write!(f, "usb_2_signalling_not_used: {}, ", &self.usb_2_signalling_not_used());
+        defmt::write!(
+            f,
+            "dp_source_device_pin_assignments_supported: {=u8}, ",
+            &self.dp_source_device_pin_assignments_supported()
         );
         defmt::write!(
-            f, "dp_sink_device_pin_assignments_supported: {=u8}, ", & self
-            .dp_sink_device_pin_assignments_supported()
+            f,
+            "dp_sink_device_pin_assignments_supported: {=u8}, ",
+            &self.dp_sink_device_pin_assignments_supported()
         );
-        defmt::write!(f, "uhbr_13: {=bool}, ", & self.uhbr_13());
-        defmt::write!(f, "active_component: {}, ", & self.active_component());
-        defmt::write!(f, "dpam_version: {}, ", & self.dpam_version());
+        defmt::write!(f, "uhbr_13: {=bool}, ", &self.uhbr_13());
+        defmt::write!(f, "active_component: {}, ", &self.active_component());
+        defmt::write!(f, "dpam_version: {}, ", &self.dpam_version());
         defmt::write!(f, "}}");
     }
 }
@@ -4311,8 +3175,8 @@ pub struct ReceivedSopPrimeIdentityData {
     bits: [u8; 25],
 }
 unsafe impl ::device_driver::Fieldset for ReceivedSopPrimeIdentityData {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 25] };
 }
 impl ReceivedSopPrimeIdentityData {
@@ -4324,12 +3188,7 @@ impl ReceivedSopPrimeIdentityData {
     pub fn number_valid_vdos(&self) -> u8 {
         let start = 0;
         let end = 2;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `7:6` - Read the `response_type` field.
@@ -4340,12 +3199,7 @@ impl ReceivedSopPrimeIdentityData {
     pub fn response_type(&self) -> u8 {
         let start = 6;
         let end = 7;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `39:8` - Read the `vdo_1` field.
@@ -4356,12 +3210,7 @@ impl ReceivedSopPrimeIdentityData {
     pub fn vdo_1(&self) -> u32 {
         let start = 8;
         let end = 39;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `71:40` - Read the `vdo_2` field.
@@ -4372,12 +3221,7 @@ impl ReceivedSopPrimeIdentityData {
     pub fn vdo_2(&self) -> u32 {
         let start = 40;
         let end = 71;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `103:72` - Read the `vdo_3` field.
@@ -4388,12 +3232,7 @@ impl ReceivedSopPrimeIdentityData {
     pub fn vdo_3(&self) -> u32 {
         let start = 72;
         let end = 103;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `135:104` - Read the `vdo_4` field.
@@ -4404,12 +3243,7 @@ impl ReceivedSopPrimeIdentityData {
     pub fn vdo_4(&self) -> u32 {
         let start = 104;
         let end = 135;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `167:136` - Read the `vdo_5` field.
@@ -4420,12 +3254,7 @@ impl ReceivedSopPrimeIdentityData {
     pub fn vdo_5(&self) -> u32 {
         let start = 136;
         let end = 167;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `199:168` - Read the `vdo_6` field.
@@ -4436,12 +3265,7 @@ impl ReceivedSopPrimeIdentityData {
     pub fn vdo_6(&self) -> u32 {
         let start = 168;
         let end = 199;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `2:0` - Set the `number_valid_vdos` field.
@@ -4452,12 +3276,7 @@ impl ReceivedSopPrimeIdentityData {
         let start = 0;
         let end = 2;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `7:6` - Set the `response_type` field.
     ///
@@ -4467,12 +3286,7 @@ impl ReceivedSopPrimeIdentityData {
         let start = 6;
         let end = 7;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `39:8` - Set the `vdo_1` field.
     ///
@@ -4482,12 +3296,7 @@ impl ReceivedSopPrimeIdentityData {
         let start = 8;
         let end = 39;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `71:40` - Set the `vdo_2` field.
     ///
@@ -4497,12 +3306,7 @@ impl ReceivedSopPrimeIdentityData {
         let start = 40;
         let end = 71;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `103:72` - Set the `vdo_3` field.
     ///
@@ -4512,12 +3316,7 @@ impl ReceivedSopPrimeIdentityData {
         let start = 72;
         let end = 103;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `135:104` - Set the `vdo_4` field.
     ///
@@ -4527,12 +3326,7 @@ impl ReceivedSopPrimeIdentityData {
         let start = 104;
         let end = 135;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `167:136` - Set the `vdo_5` field.
     ///
@@ -4542,12 +3336,7 @@ impl ReceivedSopPrimeIdentityData {
         let start = 136;
         let end = 167;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `199:168` - Set the `vdo_6` field.
     ///
@@ -4557,12 +3346,7 @@ impl ReceivedSopPrimeIdentityData {
         let start = 168;
         let end = 199;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for ReceivedSopPrimeIdentityData {
@@ -4598,14 +3382,14 @@ impl core::fmt::Debug for ReceivedSopPrimeIdentityData {
 impl defmt::Format for ReceivedSopPrimeIdentityData {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "ReceivedSopPrimeIdentityData {{ ");
-        defmt::write!(f, "number_valid_vdos: {=u8}, ", & self.number_valid_vdos());
-        defmt::write!(f, "response_type: {=u8}, ", & self.response_type());
-        defmt::write!(f, "vdo_1: {=u32}, ", & self.vdo_1());
-        defmt::write!(f, "vdo_2: {=u32}, ", & self.vdo_2());
-        defmt::write!(f, "vdo_3: {=u32}, ", & self.vdo_3());
-        defmt::write!(f, "vdo_4: {=u32}, ", & self.vdo_4());
-        defmt::write!(f, "vdo_5: {=u32}, ", & self.vdo_5());
-        defmt::write!(f, "vdo_6: {=u32}, ", & self.vdo_6());
+        defmt::write!(f, "number_valid_vdos: {=u8}, ", &self.number_valid_vdos());
+        defmt::write!(f, "response_type: {=u8}, ", &self.response_type());
+        defmt::write!(f, "vdo_1: {=u32}, ", &self.vdo_1());
+        defmt::write!(f, "vdo_2: {=u32}, ", &self.vdo_2());
+        defmt::write!(f, "vdo_3: {=u32}, ", &self.vdo_3());
+        defmt::write!(f, "vdo_4: {=u32}, ", &self.vdo_4());
+        defmt::write!(f, "vdo_5: {=u32}, ", &self.vdo_5());
+        defmt::write!(f, "vdo_6: {=u32}, ", &self.vdo_6());
         defmt::write!(f, "}}");
     }
 }
@@ -4668,8 +3452,8 @@ pub struct ReceivedSopIdentityData {
     bits: [u8; 25],
 }
 unsafe impl ::device_driver::Fieldset for ReceivedSopIdentityData {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 25] };
 }
 impl ReceivedSopIdentityData {
@@ -4681,12 +3465,7 @@ impl ReceivedSopIdentityData {
     pub fn number_valid_vdos(&self) -> u8 {
         let start = 0;
         let end = 2;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `7:6` - Read the `response_type` field.
@@ -4697,12 +3476,7 @@ impl ReceivedSopIdentityData {
     pub fn response_type(&self) -> u8 {
         let start = 6;
         let end = 7;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `39:8` - Read the `vdo_1` field.
@@ -4713,12 +3487,7 @@ impl ReceivedSopIdentityData {
     pub fn vdo_1(&self) -> u32 {
         let start = 8;
         let end = 39;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `71:40` - Read the `vdo_2` field.
@@ -4729,12 +3498,7 @@ impl ReceivedSopIdentityData {
     pub fn vdo_2(&self) -> u32 {
         let start = 40;
         let end = 71;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `103:72` - Read the `vdo_3` field.
@@ -4745,12 +3509,7 @@ impl ReceivedSopIdentityData {
     pub fn vdo_3(&self) -> u32 {
         let start = 72;
         let end = 103;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `135:104` - Read the `vdo_4` field.
@@ -4761,12 +3520,7 @@ impl ReceivedSopIdentityData {
     pub fn vdo_4(&self) -> u32 {
         let start = 104;
         let end = 135;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `167:136` - Read the `vdo_5` field.
@@ -4777,12 +3531,7 @@ impl ReceivedSopIdentityData {
     pub fn vdo_5(&self) -> u32 {
         let start = 136;
         let end = 167;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `199:168` - Read the `vdo_6` field.
@@ -4793,12 +3542,7 @@ impl ReceivedSopIdentityData {
     pub fn vdo_6(&self) -> u32 {
         let start = 168;
         let end = 199;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `2:0` - Set the `number_valid_vdos` field.
@@ -4809,12 +3553,7 @@ impl ReceivedSopIdentityData {
         let start = 0;
         let end = 2;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `7:6` - Set the `response_type` field.
     ///
@@ -4824,12 +3563,7 @@ impl ReceivedSopIdentityData {
         let start = 6;
         let end = 7;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `39:8` - Set the `vdo_1` field.
     ///
@@ -4839,12 +3573,7 @@ impl ReceivedSopIdentityData {
         let start = 8;
         let end = 39;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `71:40` - Set the `vdo_2` field.
     ///
@@ -4854,12 +3583,7 @@ impl ReceivedSopIdentityData {
         let start = 40;
         let end = 71;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `103:72` - Set the `vdo_3` field.
     ///
@@ -4869,12 +3593,7 @@ impl ReceivedSopIdentityData {
         let start = 72;
         let end = 103;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `135:104` - Set the `vdo_4` field.
     ///
@@ -4884,12 +3603,7 @@ impl ReceivedSopIdentityData {
         let start = 104;
         let end = 135;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `167:136` - Set the `vdo_5` field.
     ///
@@ -4899,12 +3613,7 @@ impl ReceivedSopIdentityData {
         let start = 136;
         let end = 167;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `199:168` - Set the `vdo_6` field.
     ///
@@ -4914,12 +3623,7 @@ impl ReceivedSopIdentityData {
         let start = 168;
         let end = 199;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for ReceivedSopIdentityData {
@@ -4955,14 +3659,14 @@ impl core::fmt::Debug for ReceivedSopIdentityData {
 impl defmt::Format for ReceivedSopIdentityData {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "ReceivedSopIdentityData {{ ");
-        defmt::write!(f, "number_valid_vdos: {=u8}, ", & self.number_valid_vdos());
-        defmt::write!(f, "response_type: {=u8}, ", & self.response_type());
-        defmt::write!(f, "vdo_1: {=u32}, ", & self.vdo_1());
-        defmt::write!(f, "vdo_2: {=u32}, ", & self.vdo_2());
-        defmt::write!(f, "vdo_3: {=u32}, ", & self.vdo_3());
-        defmt::write!(f, "vdo_4: {=u32}, ", & self.vdo_4());
-        defmt::write!(f, "vdo_5: {=u32}, ", & self.vdo_5());
-        defmt::write!(f, "vdo_6: {=u32}, ", & self.vdo_6());
+        defmt::write!(f, "number_valid_vdos: {=u8}, ", &self.number_valid_vdos());
+        defmt::write!(f, "response_type: {=u8}, ", &self.response_type());
+        defmt::write!(f, "vdo_1: {=u32}, ", &self.vdo_1());
+        defmt::write!(f, "vdo_2: {=u32}, ", &self.vdo_2());
+        defmt::write!(f, "vdo_3: {=u32}, ", &self.vdo_3());
+        defmt::write!(f, "vdo_4: {=u32}, ", &self.vdo_4());
+        defmt::write!(f, "vdo_5: {=u32}, ", &self.vdo_5());
+        defmt::write!(f, "vdo_6: {=u32}, ", &self.vdo_6());
         defmt::write!(f, "}}");
     }
 }
@@ -5025,8 +3729,8 @@ pub struct TxIdentity {
     bits: [u8; 25],
 }
 unsafe impl ::device_driver::Fieldset for TxIdentity {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 25] };
 }
 impl TxIdentity {
@@ -5038,12 +3742,7 @@ impl TxIdentity {
     pub fn number_valid_vdos(&self) -> u8 {
         let start = 0;
         let end = 2;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `23:8` - Read the `vendor_id` field.
@@ -5055,12 +3754,7 @@ impl TxIdentity {
     pub fn vendor_id(&self) -> u16 {
         let start = 8;
         let end = 23;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `33:31` - Read the `product_type_dfp` field.
@@ -5071,12 +3765,7 @@ impl TxIdentity {
     pub fn product_type_dfp(&self) -> ProductTypeDfp {
         let start = 31;
         let end = 33;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `bit 34` - Read the `modal_operation_supported` field.
@@ -5087,12 +3776,7 @@ impl TxIdentity {
     pub fn modal_operation_supported(&self) -> bool {
         let start = 34;
         let end = 34;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `37:35` - Read the `product_type_ufp` field.
@@ -5103,12 +3787,7 @@ impl TxIdentity {
     pub fn product_type_ufp(&self) -> ProductTypeUfp {
         let start = 35;
         let end = 37;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `bit 38` - Read the `usb_communication_capable_as_device` field.
@@ -5119,12 +3798,7 @@ impl TxIdentity {
     pub fn usb_communication_capable_as_device(&self) -> bool {
         let start = 38;
         let end = 38;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 39` - Read the `usb_communication_capable_as_host` field.
@@ -5135,12 +3809,7 @@ impl TxIdentity {
     pub fn usb_communication_capable_as_host(&self) -> bool {
         let start = 39;
         let end = 39;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `71:40` - Read the `certification_test_id` field.
@@ -5152,12 +3821,7 @@ impl TxIdentity {
     pub fn certification_test_id(&self) -> u32 {
         let start = 40;
         let end = 71;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `87:72` - Read the `bcd_device` field.
@@ -5168,12 +3832,7 @@ impl TxIdentity {
     pub fn bcd_device(&self) -> u16 {
         let start = 72;
         let end = 87;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `103:88` - Read the `usb_product_id` field.
@@ -5185,12 +3844,7 @@ impl TxIdentity {
     pub fn usb_product_id(&self) -> u16 {
         let start = 88;
         let end = 103;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `135:104` - Read the `ufp_1_vdo` field.
@@ -5201,12 +3855,7 @@ impl TxIdentity {
     pub fn ufp_1_vdo(&self) -> u32 {
         let start = 104;
         let end = 135;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `199:168` - Read the `dfp_1_vdo` field.
@@ -5217,12 +3866,7 @@ impl TxIdentity {
     pub fn dfp_1_vdo(&self) -> u32 {
         let start = 168;
         let end = 199;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `2:0` - Set the `number_valid_vdos` field.
@@ -5233,12 +3877,7 @@ impl TxIdentity {
         let start = 0;
         let end = 2;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `23:8` - Set the `vendor_id` field.
     ///
@@ -5249,12 +3888,7 @@ impl TxIdentity {
         let start = 8;
         let end = 23;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `33:31` - Set the `product_type_dfp` field.
     ///
@@ -5264,12 +3898,7 @@ impl TxIdentity {
         let start = 31;
         let end = 33;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 34` - Set the `modal_operation_supported` field.
     ///
@@ -5279,12 +3908,7 @@ impl TxIdentity {
         let start = 34;
         let end = 34;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `37:35` - Set the `product_type_ufp` field.
     ///
@@ -5294,12 +3918,7 @@ impl TxIdentity {
         let start = 35;
         let end = 37;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 38` - Set the `usb_communication_capable_as_device` field.
     ///
@@ -5309,12 +3928,7 @@ impl TxIdentity {
         let start = 38;
         let end = 38;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 39` - Set the `usb_communication_capable_as_host` field.
     ///
@@ -5324,12 +3938,7 @@ impl TxIdentity {
         let start = 39;
         let end = 39;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `71:40` - Set the `certification_test_id` field.
     ///
@@ -5340,12 +3949,7 @@ impl TxIdentity {
         let start = 40;
         let end = 71;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `87:72` - Set the `bcd_device` field.
     ///
@@ -5355,12 +3959,7 @@ impl TxIdentity {
         let start = 72;
         let end = 87;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `103:88` - Set the `usb_product_id` field.
     ///
@@ -5371,12 +3970,7 @@ impl TxIdentity {
         let start = 88;
         let end = 103;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `135:104` - Set the `ufp_1_vdo` field.
     ///
@@ -5386,12 +3980,7 @@ impl TxIdentity {
         let start = 104;
         let end = 135;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `199:168` - Set the `dfp_1_vdo` field.
     ///
@@ -5401,12 +3990,7 @@ impl TxIdentity {
         let start = 168;
         let end = 199;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for TxIdentity {
@@ -5452,28 +4036,30 @@ impl core::fmt::Debug for TxIdentity {
 impl defmt::Format for TxIdentity {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "TxIdentity {{ ");
-        defmt::write!(f, "number_valid_vdos: {=u8}, ", & self.number_valid_vdos());
-        defmt::write!(f, "vendor_id: {=u16}, ", & self.vendor_id());
-        defmt::write!(f, "product_type_dfp: {}, ", & self.product_type_dfp());
+        defmt::write!(f, "number_valid_vdos: {=u8}, ", &self.number_valid_vdos());
+        defmt::write!(f, "vendor_id: {=u16}, ", &self.vendor_id());
+        defmt::write!(f, "product_type_dfp: {}, ", &self.product_type_dfp());
         defmt::write!(
-            f, "modal_operation_supported: {=bool}, ", & self.modal_operation_supported()
+            f,
+            "modal_operation_supported: {=bool}, ",
+            &self.modal_operation_supported()
         );
-        defmt::write!(f, "product_type_ufp: {}, ", & self.product_type_ufp());
+        defmt::write!(f, "product_type_ufp: {}, ", &self.product_type_ufp());
         defmt::write!(
-            f, "usb_communication_capable_as_device: {=bool}, ", & self
-            .usb_communication_capable_as_device()
+            f,
+            "usb_communication_capable_as_device: {=bool}, ",
+            &self.usb_communication_capable_as_device()
         );
         defmt::write!(
-            f, "usb_communication_capable_as_host: {=bool}, ", & self
-            .usb_communication_capable_as_host()
+            f,
+            "usb_communication_capable_as_host: {=bool}, ",
+            &self.usb_communication_capable_as_host()
         );
-        defmt::write!(
-            f, "certification_test_id: {=u32}, ", & self.certification_test_id()
-        );
-        defmt::write!(f, "bcd_device: {=u16}, ", & self.bcd_device());
-        defmt::write!(f, "usb_product_id: {=u16}, ", & self.usb_product_id());
-        defmt::write!(f, "ufp_1_vdo: {=u32}, ", & self.ufp_1_vdo());
-        defmt::write!(f, "dfp_1_vdo: {=u32}, ", & self.dfp_1_vdo());
+        defmt::write!(f, "certification_test_id: {=u32}, ", &self.certification_test_id());
+        defmt::write!(f, "bcd_device: {=u16}, ", &self.bcd_device());
+        defmt::write!(f, "usb_product_id: {=u16}, ", &self.usb_product_id());
+        defmt::write!(f, "ufp_1_vdo: {=u32}, ", &self.ufp_1_vdo());
+        defmt::write!(f, "dfp_1_vdo: {=u32}, ", &self.dfp_1_vdo());
         defmt::write!(f, "}}");
     }
 }
@@ -5536,8 +4122,8 @@ pub struct PdStatus {
     bits: [u8; 4],
 }
 unsafe impl ::device_driver::Fieldset for PdStatus {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 4] };
 }
 impl PdStatus {
@@ -5549,12 +4135,7 @@ impl PdStatus {
     pub fn cc_pull_up(&self) -> PdCcPullUp {
         let start = 2;
         let end = 3;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `5:4` - Read the `port_type` field.
@@ -5565,12 +4146,7 @@ impl PdStatus {
     pub fn port_type(&self) -> PdPortType {
         let start = 4;
         let end = 5;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 6` - Read the `is_source` field.
@@ -5581,12 +4157,7 @@ impl PdStatus {
     pub fn is_source(&self) -> bool {
         let start = 6;
         let end = 6;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `12:8` - Read the `soft_reset_details` field.
@@ -5597,12 +4168,7 @@ impl PdStatus {
     pub fn soft_reset_details(&self) -> PdSoftResetDetails {
         let start = 8;
         let end = 12;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `21:16` - Read the `hard_reset_details` field.
@@ -5613,12 +4179,7 @@ impl PdStatus {
     pub fn hard_reset_details(&self) -> PdHardResetDetails {
         let start = 16;
         let end = 21;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `27:22` - Read the `error_recovery_details` field.
@@ -5629,12 +4190,7 @@ impl PdStatus {
     pub fn error_recovery_details(&self) -> PdErrorRecoveryDetails {
         let start = 22;
         let end = 27;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `30:28` - Read the `data_reset_details` field.
@@ -5645,12 +4201,7 @@ impl PdStatus {
     pub fn data_reset_details(&self) -> PdDataResetDetails {
         let start = 28;
         let end = 30;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `3:2` - Set the `cc_pull_up` field.
@@ -5661,12 +4212,7 @@ impl PdStatus {
         let start = 2;
         let end = 3;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `5:4` - Set the `port_type` field.
     ///
@@ -5676,12 +4222,7 @@ impl PdStatus {
         let start = 4;
         let end = 5;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 6` - Set the `is_source` field.
     ///
@@ -5691,12 +4232,7 @@ impl PdStatus {
         let start = 6;
         let end = 6;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `12:8` - Set the `soft_reset_details` field.
     ///
@@ -5706,12 +4242,7 @@ impl PdStatus {
         let start = 8;
         let end = 12;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `21:16` - Set the `hard_reset_details` field.
     ///
@@ -5721,12 +4252,7 @@ impl PdStatus {
         let start = 16;
         let end = 21;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `27:22` - Set the `error_recovery_details` field.
     ///
@@ -5736,12 +4262,7 @@ impl PdStatus {
         let start = 22;
         let end = 27;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `30:28` - Set the `data_reset_details` field.
     ///
@@ -5751,12 +4272,7 @@ impl PdStatus {
         let start = 28;
         let end = 30;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for PdStatus {
@@ -5791,15 +4307,13 @@ impl core::fmt::Debug for PdStatus {
 impl defmt::Format for PdStatus {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "PdStatus {{ ");
-        defmt::write!(f, "cc_pull_up: {}, ", & self.cc_pull_up());
-        defmt::write!(f, "port_type: {}, ", & self.port_type());
-        defmt::write!(f, "is_source: {=bool}, ", & self.is_source());
-        defmt::write!(f, "soft_reset_details: {}, ", & self.soft_reset_details());
-        defmt::write!(f, "hard_reset_details: {}, ", & self.hard_reset_details());
-        defmt::write!(
-            f, "error_recovery_details: {}, ", & self.error_recovery_details()
-        );
-        defmt::write!(f, "data_reset_details: {}, ", & self.data_reset_details());
+        defmt::write!(f, "cc_pull_up: {}, ", &self.cc_pull_up());
+        defmt::write!(f, "port_type: {}, ", &self.port_type());
+        defmt::write!(f, "is_source: {=bool}, ", &self.is_source());
+        defmt::write!(f, "soft_reset_details: {}, ", &self.soft_reset_details());
+        defmt::write!(f, "hard_reset_details: {}, ", &self.hard_reset_details());
+        defmt::write!(f, "error_recovery_details: {}, ", &self.error_recovery_details());
+        defmt::write!(f, "data_reset_details: {}, ", &self.data_reset_details());
         defmt::write!(f, "}}");
     }
 }
@@ -5862,8 +4376,8 @@ pub struct AutonegotiateSink {
     bits: [u8; 24],
 }
 unsafe impl ::device_driver::Fieldset for AutonegotiateSink {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 24] };
 }
 impl AutonegotiateSink {
@@ -5875,12 +4389,7 @@ impl AutonegotiateSink {
     pub fn auto_neg_rdo_priority(&self) -> AutoNegRdoPriority {
         let start = 0;
         let end = 0;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 1` - Read the `no_usb_suspend` field.
@@ -5891,12 +4400,7 @@ impl AutonegotiateSink {
     pub fn no_usb_suspend(&self) -> bool {
         let start = 1;
         let end = 1;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 2` - Read the `auto_compute_sink_min_power` field.
@@ -5907,12 +4411,7 @@ impl AutonegotiateSink {
     pub fn auto_compute_sink_min_power(&self) -> AutoComputeSinkMinPower {
         let start = 2;
         let end = 2;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 3` - Read the `no_capability_mismatch` field.
@@ -5923,12 +4422,7 @@ impl AutonegotiateSink {
     pub fn no_capability_mismatch(&self) -> NoCapabilityMismatch {
         let start = 3;
         let end = 3;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 4` - Read the `auto_compute_sink_min_voltage` field.
@@ -5939,12 +4433,7 @@ impl AutonegotiateSink {
     pub fn auto_compute_sink_min_voltage(&self) -> AutoComputeSinkMinVoltage {
         let start = 4;
         let end = 4;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 5` - Read the `auto_compute_sink_max_voltage` field.
@@ -5955,12 +4444,7 @@ impl AutonegotiateSink {
     pub fn auto_compute_sink_max_voltage(&self) -> AutoComputeSinkMaxVoltage {
         let start = 5;
         let end = 5;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 6` - Read the `auto_disable_sink_upon_capability_mismatch` field.
@@ -5971,12 +4455,7 @@ impl AutonegotiateSink {
     pub fn auto_disable_sink_upon_capability_mismatch(&self) -> bool {
         let start = 6;
         let end = 6;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 7` - Read the `auto_disable_input_for_sink_standby` field.
@@ -5987,12 +4466,7 @@ impl AutonegotiateSink {
     pub fn auto_disable_input_for_sink_standby(&self) -> bool {
         let start = 7;
         let end = 7;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 8` - Read the `auto_disable_input_for_sink_standby_in_dbm` field.
@@ -6003,12 +4477,7 @@ impl AutonegotiateSink {
     pub fn auto_disable_input_for_sink_standby_in_dbm(&self) -> bool {
         let start = 8;
         let end = 8;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 9` - Read the `auto_enable_standby_srdy` field.
@@ -6019,12 +4488,7 @@ impl AutonegotiateSink {
     pub fn auto_enable_standby_srdy(&self) -> bool {
         let start = 9;
         let end = 9;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 10` - Read the `auto_enable_input_after_snk_ready_in_dbm` field.
@@ -6035,12 +4499,7 @@ impl AutonegotiateSink {
     pub fn auto_enable_input_after_snk_ready_in_dbm(&self) -> bool {
         let start = 10;
         let end = 10;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `21:12` - Read the `auto_neg_max_current` field.
@@ -6051,12 +4510,7 @@ impl AutonegotiateSink {
     pub fn auto_neg_max_current(&self) -> u16 {
         let start = 12;
         let end = 21;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `31:22` - Read the `auto_neg_sink_min_required_power` field.
@@ -6067,12 +4521,7 @@ impl AutonegotiateSink {
     pub fn auto_neg_sink_min_required_power(&self) -> u16 {
         let start = 22;
         let end = 31;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `41:32` - Read the `auto_neg_max_voltage` field.
@@ -6083,12 +4532,7 @@ impl AutonegotiateSink {
     pub fn auto_neg_max_voltage(&self) -> u16 {
         let start = 32;
         let end = 41;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `51:42` - Read the `auto_neg_min_voltage` field.
@@ -6099,12 +4543,7 @@ impl AutonegotiateSink {
     pub fn auto_neg_min_voltage(&self) -> u16 {
         let start = 42;
         let end = 51;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `61:52` - Read the `auto_neg_capabilities_mismatch_power` field.
@@ -6115,12 +4554,7 @@ impl AutonegotiateSink {
     pub fn auto_neg_capabilities_mismatch_power(&self) -> u16 {
         let start = 52;
         let end = 61;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 64` - Read the `pps_enable_sink_mode` field.
@@ -6131,12 +4565,7 @@ impl AutonegotiateSink {
     pub fn pps_enable_sink_mode(&self) -> bool {
         let start = 64;
         let end = 64;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `66:65` - Read the `pps_request_interval` field.
@@ -6147,12 +4576,7 @@ impl AutonegotiateSink {
     pub fn pps_request_interval(&self) -> PpsRequestInterval {
         let start = 65;
         let end = 66;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 67` - Read the `pps_source_operating_mode` field.
@@ -6163,12 +4587,7 @@ impl AutonegotiateSink {
     pub fn pps_source_operating_mode(&self) -> bool {
         let start = 67;
         let end = 67;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 68` - Read the `pps_required_full_voltage_range` field.
@@ -6179,12 +4598,7 @@ impl AutonegotiateSink {
     pub fn pps_required_full_voltage_range(&self) -> bool {
         let start = 68;
         let end = 68;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 69` - Read the `pps_disable_sink_upon_non_apdo_contract` field.
@@ -6195,12 +4609,7 @@ impl AutonegotiateSink {
     pub fn pps_disable_sink_upon_non_apdo_contract(&self) -> bool {
         let start = 69;
         let end = 69;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 83` - Read the `enable_sink_path_above_pps_sink_voltage_threshold` field.
@@ -6211,12 +4620,7 @@ impl AutonegotiateSink {
     pub fn enable_sink_path_above_pps_sink_voltage_threshold(&self) -> bool {
         let start = 83;
         let end = 83;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 84` - Read the `disable_sink_if_not_in_pps_contract` field.
@@ -6227,12 +4631,7 @@ impl AutonegotiateSink {
     pub fn disable_sink_if_not_in_pps_contract(&self) -> bool {
         let start = 84;
         let end = 84;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `95:85` - Read the `pps_sink_voltage_threshold` field.
@@ -6243,12 +4642,7 @@ impl AutonegotiateSink {
     pub fn pps_sink_voltage_threshold(&self) -> u16 {
         let start = 85;
         let end = 95;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `102:96` - Read the `pps_operating_current` field.
@@ -6259,12 +4653,7 @@ impl AutonegotiateSink {
     pub fn pps_operating_current(&self) -> u8 {
         let start = 96;
         let end = 102;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `115:105` - Read the `pps_output_voltage` field.
@@ -6275,12 +4664,7 @@ impl AutonegotiateSink {
     pub fn pps_output_voltage(&self) -> u16 {
         let start = 105;
         let end = 115;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 128` - Read the `epr_avs_enable_sink_mode` field.
@@ -6291,12 +4675,7 @@ impl AutonegotiateSink {
     pub fn epr_avs_enable_sink_mode(&self) -> bool {
         let start = 128;
         let end = 128;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `166:160` - Read the `epr_avs_operating_current` field.
@@ -6307,12 +4686,7 @@ impl AutonegotiateSink {
     pub fn epr_avs_operating_current(&self) -> u8 {
         let start = 160;
         let end = 166;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `180:169` - Read the `epr_avs_output_voltage` field.
@@ -6323,12 +4697,7 @@ impl AutonegotiateSink {
     pub fn epr_avs_output_voltage(&self) -> u16 {
         let start = 169;
         let end = 180;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 0` - Set the `auto_neg_rdo_priority` field.
@@ -6339,12 +4708,7 @@ impl AutonegotiateSink {
         let start = 0;
         let end = 0;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 1` - Set the `no_usb_suspend` field.
     ///
@@ -6354,12 +4718,7 @@ impl AutonegotiateSink {
         let start = 1;
         let end = 1;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 2` - Set the `auto_compute_sink_min_power` field.
     ///
@@ -6369,12 +4728,7 @@ impl AutonegotiateSink {
         let start = 2;
         let end = 2;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 3` - Set the `no_capability_mismatch` field.
     ///
@@ -6384,48 +4738,27 @@ impl AutonegotiateSink {
         let start = 3;
         let end = 3;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 4` - Set the `auto_compute_sink_min_voltage` field.
     ///
     /// How to compute the minimum voltage that the sink requires
     #[doc(alias = "AutoComputeSinkMinVoltage")]
-    pub fn set_auto_compute_sink_min_voltage(
-        &mut self,
-        value: AutoComputeSinkMinVoltage,
-    ) {
+    pub fn set_auto_compute_sink_min_voltage(&mut self, value: AutoComputeSinkMinVoltage) {
         let start = 4;
         let end = 4;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 5` - Set the `auto_compute_sink_max_voltage` field.
     ///
     /// How to compute the maximum voltage that the sink requires
     #[doc(alias = "AutoComputeSinkMaxVoltage")]
-    pub fn set_auto_compute_sink_max_voltage(
-        &mut self,
-        value: AutoComputeSinkMaxVoltage,
-    ) {
+    pub fn set_auto_compute_sink_max_voltage(&mut self, value: AutoComputeSinkMaxVoltage) {
         let start = 5;
         let end = 5;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 6` - Set the `auto_disable_sink_upon_capability_mismatch` field.
     ///
@@ -6435,12 +4768,7 @@ impl AutonegotiateSink {
         let start = 6;
         let end = 6;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 7` - Set the `auto_disable_input_for_sink_standby` field.
     ///
@@ -6450,12 +4778,7 @@ impl AutonegotiateSink {
         let start = 7;
         let end = 7;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 8` - Set the `auto_disable_input_for_sink_standby_in_dbm` field.
     ///
@@ -6465,12 +4788,7 @@ impl AutonegotiateSink {
         let start = 8;
         let end = 8;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 9` - Set the `auto_enable_standby_srdy` field.
     ///
@@ -6480,12 +4798,7 @@ impl AutonegotiateSink {
         let start = 9;
         let end = 9;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 10` - Set the `auto_enable_input_after_snk_ready_in_dbm` field.
     ///
@@ -6495,12 +4808,7 @@ impl AutonegotiateSink {
         let start = 10;
         let end = 10;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `21:12` - Set the `auto_neg_max_current` field.
     ///
@@ -6510,12 +4818,7 @@ impl AutonegotiateSink {
         let start = 12;
         let end = 21;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `31:22` - Set the `auto_neg_sink_min_required_power` field.
     ///
@@ -6525,12 +4828,7 @@ impl AutonegotiateSink {
         let start = 22;
         let end = 31;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `41:32` - Set the `auto_neg_max_voltage` field.
     ///
@@ -6540,12 +4838,7 @@ impl AutonegotiateSink {
         let start = 32;
         let end = 41;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `51:42` - Set the `auto_neg_min_voltage` field.
     ///
@@ -6555,12 +4848,7 @@ impl AutonegotiateSink {
         let start = 42;
         let end = 51;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `61:52` - Set the `auto_neg_capabilities_mismatch_power` field.
     ///
@@ -6570,12 +4858,7 @@ impl AutonegotiateSink {
         let start = 52;
         let end = 61;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 64` - Set the `pps_enable_sink_mode` field.
     ///
@@ -6585,12 +4868,7 @@ impl AutonegotiateSink {
         let start = 64;
         let end = 64;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `66:65` - Set the `pps_request_interval` field.
     ///
@@ -6600,12 +4878,7 @@ impl AutonegotiateSink {
         let start = 65;
         let end = 66;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 67` - Set the `pps_source_operating_mode` field.
     ///
@@ -6615,12 +4888,7 @@ impl AutonegotiateSink {
         let start = 67;
         let end = 67;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 68` - Set the `pps_required_full_voltage_range` field.
     ///
@@ -6630,12 +4898,7 @@ impl AutonegotiateSink {
         let start = 68;
         let end = 68;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 69` - Set the `pps_disable_sink_upon_non_apdo_contract` field.
     ///
@@ -6645,30 +4908,17 @@ impl AutonegotiateSink {
         let start = 69;
         let end = 69;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 83` - Set the `enable_sink_path_above_pps_sink_voltage_threshold` field.
     ///
     /// Enable Sink Path above PPS Sink Voltage threshold
     #[doc(alias = "EnableSinkPathAbovePpsSinkVoltageThreshold")]
-    pub fn set_enable_sink_path_above_pps_sink_voltage_threshold(
-        &mut self,
-        value: bool,
-    ) {
+    pub fn set_enable_sink_path_above_pps_sink_voltage_threshold(&mut self, value: bool) {
         let start = 83;
         let end = 83;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 84` - Set the `disable_sink_if_not_in_pps_contract` field.
     ///
@@ -6678,12 +4928,7 @@ impl AutonegotiateSink {
         let start = 84;
         let end = 84;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `95:85` - Set the `pps_sink_voltage_threshold` field.
     ///
@@ -6693,12 +4938,7 @@ impl AutonegotiateSink {
         let start = 85;
         let end = 95;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `102:96` - Set the `pps_operating_current` field.
     ///
@@ -6708,12 +4948,7 @@ impl AutonegotiateSink {
         let start = 96;
         let end = 102;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `115:105` - Set the `pps_output_voltage` field.
     ///
@@ -6723,12 +4958,7 @@ impl AutonegotiateSink {
         let start = 105;
         let end = 115;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 128` - Set the `epr_avs_enable_sink_mode` field.
     ///
@@ -6738,12 +4968,7 @@ impl AutonegotiateSink {
         let start = 128;
         let end = 128;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `166:160` - Set the `epr_avs_operating_current` field.
     ///
@@ -6753,12 +4978,7 @@ impl AutonegotiateSink {
         let start = 160;
         let end = 166;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `180:169` - Set the `epr_avs_output_voltage` field.
     ///
@@ -6768,12 +4988,7 @@ impl AutonegotiateSink {
         let start = 169;
         let end = 180;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for AutonegotiateSink {
@@ -6860,98 +5075,107 @@ impl core::fmt::Debug for AutonegotiateSink {
 impl defmt::Format for AutonegotiateSink {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "AutonegotiateSink {{ ");
-        defmt::write!(f, "auto_neg_rdo_priority: {}, ", & self.auto_neg_rdo_priority());
-        defmt::write!(f, "no_usb_suspend: {=bool}, ", & self.no_usb_suspend());
+        defmt::write!(f, "auto_neg_rdo_priority: {}, ", &self.auto_neg_rdo_priority());
+        defmt::write!(f, "no_usb_suspend: {=bool}, ", &self.no_usb_suspend());
         defmt::write!(
-            f, "auto_compute_sink_min_power: {}, ", & self.auto_compute_sink_min_power()
+            f,
+            "auto_compute_sink_min_power: {}, ",
+            &self.auto_compute_sink_min_power()
+        );
+        defmt::write!(f, "no_capability_mismatch: {}, ", &self.no_capability_mismatch());
+        defmt::write!(
+            f,
+            "auto_compute_sink_min_voltage: {}, ",
+            &self.auto_compute_sink_min_voltage()
         );
         defmt::write!(
-            f, "no_capability_mismatch: {}, ", & self.no_capability_mismatch()
+            f,
+            "auto_compute_sink_max_voltage: {}, ",
+            &self.auto_compute_sink_max_voltage()
         );
         defmt::write!(
-            f, "auto_compute_sink_min_voltage: {}, ", & self
-            .auto_compute_sink_min_voltage()
+            f,
+            "auto_disable_sink_upon_capability_mismatch: {=bool}, ",
+            &self.auto_disable_sink_upon_capability_mismatch()
         );
         defmt::write!(
-            f, "auto_compute_sink_max_voltage: {}, ", & self
-            .auto_compute_sink_max_voltage()
+            f,
+            "auto_disable_input_for_sink_standby: {=bool}, ",
+            &self.auto_disable_input_for_sink_standby()
         );
         defmt::write!(
-            f, "auto_disable_sink_upon_capability_mismatch: {=bool}, ", & self
-            .auto_disable_sink_upon_capability_mismatch()
+            f,
+            "auto_disable_input_for_sink_standby_in_dbm: {=bool}, ",
+            &self.auto_disable_input_for_sink_standby_in_dbm()
         );
         defmt::write!(
-            f, "auto_disable_input_for_sink_standby: {=bool}, ", & self
-            .auto_disable_input_for_sink_standby()
+            f,
+            "auto_enable_standby_srdy: {=bool}, ",
+            &self.auto_enable_standby_srdy()
         );
         defmt::write!(
-            f, "auto_disable_input_for_sink_standby_in_dbm: {=bool}, ", & self
-            .auto_disable_input_for_sink_standby_in_dbm()
+            f,
+            "auto_enable_input_after_snk_ready_in_dbm: {=bool}, ",
+            &self.auto_enable_input_after_snk_ready_in_dbm()
+        );
+        defmt::write!(f, "auto_neg_max_current: {=u16}, ", &self.auto_neg_max_current());
+        defmt::write!(
+            f,
+            "auto_neg_sink_min_required_power: {=u16}, ",
+            &self.auto_neg_sink_min_required_power()
+        );
+        defmt::write!(f, "auto_neg_max_voltage: {=u16}, ", &self.auto_neg_max_voltage());
+        defmt::write!(f, "auto_neg_min_voltage: {=u16}, ", &self.auto_neg_min_voltage());
+        defmt::write!(
+            f,
+            "auto_neg_capabilities_mismatch_power: {=u16}, ",
+            &self.auto_neg_capabilities_mismatch_power()
+        );
+        defmt::write!(f, "pps_enable_sink_mode: {=bool}, ", &self.pps_enable_sink_mode());
+        defmt::write!(f, "pps_request_interval: {}, ", &self.pps_request_interval());
+        defmt::write!(
+            f,
+            "pps_source_operating_mode: {=bool}, ",
+            &self.pps_source_operating_mode()
         );
         defmt::write!(
-            f, "auto_enable_standby_srdy: {=bool}, ", & self.auto_enable_standby_srdy()
+            f,
+            "pps_required_full_voltage_range: {=bool}, ",
+            &self.pps_required_full_voltage_range()
         );
         defmt::write!(
-            f, "auto_enable_input_after_snk_ready_in_dbm: {=bool}, ", & self
-            .auto_enable_input_after_snk_ready_in_dbm()
+            f,
+            "pps_disable_sink_upon_non_apdo_contract: {=bool}, ",
+            &self.pps_disable_sink_upon_non_apdo_contract()
         );
         defmt::write!(
-            f, "auto_neg_max_current: {=u16}, ", & self.auto_neg_max_current()
+            f,
+            "enable_sink_path_above_pps_sink_voltage_threshold: {=bool}, ",
+            &self.enable_sink_path_above_pps_sink_voltage_threshold()
         );
         defmt::write!(
-            f, "auto_neg_sink_min_required_power: {=u16}, ", & self
-            .auto_neg_sink_min_required_power()
+            f,
+            "disable_sink_if_not_in_pps_contract: {=bool}, ",
+            &self.disable_sink_if_not_in_pps_contract()
         );
         defmt::write!(
-            f, "auto_neg_max_voltage: {=u16}, ", & self.auto_neg_max_voltage()
+            f,
+            "pps_sink_voltage_threshold: {=u16}, ",
+            &self.pps_sink_voltage_threshold()
+        );
+        defmt::write!(f, "pps_operating_current: {=u8}, ", &self.pps_operating_current());
+        defmt::write!(f, "pps_output_voltage: {=u16}, ", &self.pps_output_voltage());
+        defmt::write!(
+            f,
+            "epr_avs_enable_sink_mode: {=bool}, ",
+            &self.epr_avs_enable_sink_mode()
         );
         defmt::write!(
-            f, "auto_neg_min_voltage: {=u16}, ", & self.auto_neg_min_voltage()
+            f,
+            "epr_avs_operating_current: {=u8}, ",
+            &self.epr_avs_operating_current()
         );
-        defmt::write!(
-            f, "auto_neg_capabilities_mismatch_power: {=u16}, ", & self
-            .auto_neg_capabilities_mismatch_power()
-        );
-        defmt::write!(
-            f, "pps_enable_sink_mode: {=bool}, ", & self.pps_enable_sink_mode()
-        );
-        defmt::write!(f, "pps_request_interval: {}, ", & self.pps_request_interval());
-        defmt::write!(
-            f, "pps_source_operating_mode: {=bool}, ", & self.pps_source_operating_mode()
-        );
-        defmt::write!(
-            f, "pps_required_full_voltage_range: {=bool}, ", & self
-            .pps_required_full_voltage_range()
-        );
-        defmt::write!(
-            f, "pps_disable_sink_upon_non_apdo_contract: {=bool}, ", & self
-            .pps_disable_sink_upon_non_apdo_contract()
-        );
-        defmt::write!(
-            f, "enable_sink_path_above_pps_sink_voltage_threshold: {=bool}, ", & self
-            .enable_sink_path_above_pps_sink_voltage_threshold()
-        );
-        defmt::write!(
-            f, "disable_sink_if_not_in_pps_contract: {=bool}, ", & self
-            .disable_sink_if_not_in_pps_contract()
-        );
-        defmt::write!(
-            f, "pps_sink_voltage_threshold: {=u16}, ", & self
-            .pps_sink_voltage_threshold()
-        );
-        defmt::write!(
-            f, "pps_operating_current: {=u8}, ", & self.pps_operating_current()
-        );
-        defmt::write!(f, "pps_output_voltage: {=u16}, ", & self.pps_output_voltage());
-        defmt::write!(
-            f, "epr_avs_enable_sink_mode: {=bool}, ", & self.epr_avs_enable_sink_mode()
-        );
-        defmt::write!(
-            f, "epr_avs_operating_current: {=u8}, ", & self.epr_avs_operating_current()
-        );
-        defmt::write!(
-            f, "epr_avs_output_voltage: {=u16}, ", & self.epr_avs_output_voltage()
-        );
+        defmt::write!(f, "epr_avs_output_voltage: {=u16}, ", &self.epr_avs_output_voltage());
         defmt::write!(f, "}}");
     }
 }
@@ -7014,8 +5238,8 @@ pub struct ActiveRdoContract {
     bits: [u8; 16],
 }
 unsafe impl ::device_driver::Fieldset for ActiveRdoContract {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 16] };
 }
 impl ActiveRdoContract {
@@ -7027,12 +5251,7 @@ impl ActiveRdoContract {
     pub fn active_rdo(&self) -> u32 {
         let start = 0;
         let end = 31;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `63:32` - Read the `source_epr_mode_do` field.
@@ -7043,12 +5262,7 @@ impl ActiveRdoContract {
     pub fn source_epr_mode_do(&self) -> u32 {
         let start = 32;
         let end = 63;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `95:64` - Read the `sink_epr_mode_do` field.
@@ -7059,12 +5273,7 @@ impl ActiveRdoContract {
     pub fn sink_epr_mode_do(&self) -> u32 {
         let start = 64;
         let end = 95;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `127:96` - Read the `accepted_active_rdo` field.
@@ -7075,12 +5284,7 @@ impl ActiveRdoContract {
     pub fn accepted_active_rdo(&self) -> u32 {
         let start = 96;
         let end = 127;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `31:0` - Set the `active_rdo` field.
@@ -7091,12 +5295,7 @@ impl ActiveRdoContract {
         let start = 0;
         let end = 31;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `63:32` - Set the `source_epr_mode_do` field.
     ///
@@ -7106,12 +5305,7 @@ impl ActiveRdoContract {
         let start = 32;
         let end = 63;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `95:64` - Set the `sink_epr_mode_do` field.
     ///
@@ -7121,12 +5315,7 @@ impl ActiveRdoContract {
         let start = 64;
         let end = 95;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `127:96` - Set the `accepted_active_rdo` field.
     ///
@@ -7136,12 +5325,7 @@ impl ActiveRdoContract {
         let start = 96;
         let end = 127;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for ActiveRdoContract {
@@ -7173,10 +5357,10 @@ impl core::fmt::Debug for ActiveRdoContract {
 impl defmt::Format for ActiveRdoContract {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "ActiveRdoContract {{ ");
-        defmt::write!(f, "active_rdo: {=u32}, ", & self.active_rdo());
-        defmt::write!(f, "source_epr_mode_do: {=u32}, ", & self.source_epr_mode_do());
-        defmt::write!(f, "sink_epr_mode_do: {=u32}, ", & self.sink_epr_mode_do());
-        defmt::write!(f, "accepted_active_rdo: {=u32}, ", & self.accepted_active_rdo());
+        defmt::write!(f, "active_rdo: {=u32}, ", &self.active_rdo());
+        defmt::write!(f, "source_epr_mode_do: {=u32}, ", &self.source_epr_mode_do());
+        defmt::write!(f, "sink_epr_mode_do: {=u32}, ", &self.sink_epr_mode_do());
+        defmt::write!(f, "accepted_active_rdo: {=u32}, ", &self.accepted_active_rdo());
         defmt::write!(f, "}}");
     }
 }
@@ -7239,8 +5423,8 @@ pub struct ActivePdoContract {
     bits: [u8; 6],
 }
 unsafe impl ::device_driver::Fieldset for ActivePdoContract {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 6] };
 }
 impl ActivePdoContract {
@@ -7252,12 +5436,7 @@ impl ActivePdoContract {
     pub fn active_pdo(&self) -> u32 {
         let start = 0;
         let end = 31;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `41:32` - Read the `first_pdo_control` field.
@@ -7268,12 +5447,7 @@ impl ActivePdoContract {
     pub fn first_pdo_control(&self) -> u16 {
         let start = 32;
         let end = 41;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `31:0` - Set the `active_pdo` field.
@@ -7284,12 +5458,7 @@ impl ActivePdoContract {
         let start = 0;
         let end = 31;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `41:32` - Set the `first_pdo_control` field.
     ///
@@ -7299,12 +5468,7 @@ impl ActivePdoContract {
         let start = 32;
         let end = 41;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for ActivePdoContract {
@@ -7334,8 +5498,8 @@ impl core::fmt::Debug for ActivePdoContract {
 impl defmt::Format for ActivePdoContract {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "ActivePdoContract {{ ");
-        defmt::write!(f, "active_pdo: {=u32}, ", & self.active_pdo());
-        defmt::write!(f, "first_pdo_control: {=u16}, ", & self.first_pdo_control());
+        defmt::write!(f, "active_pdo: {=u32}, ", &self.active_pdo());
+        defmt::write!(f, "first_pdo_control: {=u16}, ", &self.first_pdo_control());
         defmt::write!(f, "}}");
     }
 }
@@ -7398,8 +5562,8 @@ pub struct RxSrcCaps {
     bits: [u8; 45],
 }
 unsafe impl ::device_driver::Fieldset for RxSrcCaps {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 45] };
 }
 impl RxSrcCaps {
@@ -7411,12 +5575,7 @@ impl RxSrcCaps {
     pub fn num_valid_pdos(&self) -> u8 {
         let start = 0;
         let end = 2;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `5:3` - Read the `num_valid_epr_pdos` field.
@@ -7427,12 +5586,7 @@ impl RxSrcCaps {
     pub fn num_valid_epr_pdos(&self) -> u8 {
         let start = 3;
         let end = 5;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 6` - Read the `last_src_cap_is_epr` field.
@@ -7443,12 +5597,7 @@ impl RxSrcCaps {
     pub fn last_src_cap_is_epr(&self) -> bool {
         let start = 6;
         let end = 6;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `39:8` - Read the `pdo_0` field.
@@ -7459,12 +5608,7 @@ impl RxSrcCaps {
     pub fn pdo_0(&self) -> u32 {
         let start = 8;
         let end = 39;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `71:40` - Read the `pdo_1` field.
@@ -7475,12 +5619,7 @@ impl RxSrcCaps {
     pub fn pdo_1(&self) -> u32 {
         let start = 40;
         let end = 71;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `103:72` - Read the `pdo_2` field.
@@ -7491,12 +5630,7 @@ impl RxSrcCaps {
     pub fn pdo_2(&self) -> u32 {
         let start = 72;
         let end = 103;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `135:104` - Read the `pdo_3` field.
@@ -7507,12 +5641,7 @@ impl RxSrcCaps {
     pub fn pdo_3(&self) -> u32 {
         let start = 104;
         let end = 135;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `167:136` - Read the `pdo_4` field.
@@ -7523,12 +5652,7 @@ impl RxSrcCaps {
     pub fn pdo_4(&self) -> u32 {
         let start = 136;
         let end = 167;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `199:168` - Read the `pdo_5` field.
@@ -7539,12 +5663,7 @@ impl RxSrcCaps {
     pub fn pdo_5(&self) -> u32 {
         let start = 168;
         let end = 199;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `231:200` - Read the `pdo_6` field.
@@ -7555,12 +5674,7 @@ impl RxSrcCaps {
     pub fn pdo_6(&self) -> u32 {
         let start = 200;
         let end = 231;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `263:232` - Read the `epr_pdo_0` field.
@@ -7571,12 +5685,7 @@ impl RxSrcCaps {
     pub fn epr_pdo_0(&self) -> u32 {
         let start = 232;
         let end = 263;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `295:264` - Read the `epr_pdo_1` field.
@@ -7587,12 +5696,7 @@ impl RxSrcCaps {
     pub fn epr_pdo_1(&self) -> u32 {
         let start = 264;
         let end = 295;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `327:296` - Read the `epr_pdo_2` field.
@@ -7603,12 +5707,7 @@ impl RxSrcCaps {
     pub fn epr_pdo_2(&self) -> u32 {
         let start = 296;
         let end = 327;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `359:328` - Read the `epr_pdo_3` field.
@@ -7619,12 +5718,7 @@ impl RxSrcCaps {
     pub fn epr_pdo_3(&self) -> u32 {
         let start = 328;
         let end = 359;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `2:0` - Set the `num_valid_pdos` field.
@@ -7635,12 +5729,7 @@ impl RxSrcCaps {
         let start = 0;
         let end = 2;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `5:3` - Set the `num_valid_epr_pdos` field.
     ///
@@ -7650,12 +5739,7 @@ impl RxSrcCaps {
         let start = 3;
         let end = 5;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 6` - Set the `last_src_cap_is_epr` field.
     ///
@@ -7665,12 +5749,7 @@ impl RxSrcCaps {
         let start = 6;
         let end = 6;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `39:8` - Set the `pdo_0` field.
     ///
@@ -7680,12 +5759,7 @@ impl RxSrcCaps {
         let start = 8;
         let end = 39;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `71:40` - Set the `pdo_1` field.
     ///
@@ -7695,12 +5769,7 @@ impl RxSrcCaps {
         let start = 40;
         let end = 71;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `103:72` - Set the `pdo_2` field.
     ///
@@ -7710,12 +5779,7 @@ impl RxSrcCaps {
         let start = 72;
         let end = 103;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `135:104` - Set the `pdo_3` field.
     ///
@@ -7725,12 +5789,7 @@ impl RxSrcCaps {
         let start = 104;
         let end = 135;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `167:136` - Set the `pdo_4` field.
     ///
@@ -7740,12 +5799,7 @@ impl RxSrcCaps {
         let start = 136;
         let end = 167;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `199:168` - Set the `pdo_5` field.
     ///
@@ -7755,12 +5809,7 @@ impl RxSrcCaps {
         let start = 168;
         let end = 199;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `231:200` - Set the `pdo_6` field.
     ///
@@ -7770,12 +5819,7 @@ impl RxSrcCaps {
         let start = 200;
         let end = 231;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `263:232` - Set the `epr_pdo_0` field.
     ///
@@ -7785,12 +5829,7 @@ impl RxSrcCaps {
         let start = 232;
         let end = 263;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `295:264` - Set the `epr_pdo_1` field.
     ///
@@ -7800,12 +5839,7 @@ impl RxSrcCaps {
         let start = 264;
         let end = 295;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `327:296` - Set the `epr_pdo_2` field.
     ///
@@ -7815,12 +5849,7 @@ impl RxSrcCaps {
         let start = 296;
         let end = 327;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `359:328` - Set the `epr_pdo_3` field.
     ///
@@ -7830,12 +5859,7 @@ impl RxSrcCaps {
         let start = 328;
         let end = 359;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for RxSrcCaps {
@@ -7877,20 +5901,20 @@ impl core::fmt::Debug for RxSrcCaps {
 impl defmt::Format for RxSrcCaps {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "RxSrcCaps {{ ");
-        defmt::write!(f, "num_valid_pdos: {=u8}, ", & self.num_valid_pdos());
-        defmt::write!(f, "num_valid_epr_pdos: {=u8}, ", & self.num_valid_epr_pdos());
-        defmt::write!(f, "last_src_cap_is_epr: {=bool}, ", & self.last_src_cap_is_epr());
-        defmt::write!(f, "pdo_0: {=u32}, ", & self.pdo_0());
-        defmt::write!(f, "pdo_1: {=u32}, ", & self.pdo_1());
-        defmt::write!(f, "pdo_2: {=u32}, ", & self.pdo_2());
-        defmt::write!(f, "pdo_3: {=u32}, ", & self.pdo_3());
-        defmt::write!(f, "pdo_4: {=u32}, ", & self.pdo_4());
-        defmt::write!(f, "pdo_5: {=u32}, ", & self.pdo_5());
-        defmt::write!(f, "pdo_6: {=u32}, ", & self.pdo_6());
-        defmt::write!(f, "epr_pdo_0: {=u32}, ", & self.epr_pdo_0());
-        defmt::write!(f, "epr_pdo_1: {=u32}, ", & self.epr_pdo_1());
-        defmt::write!(f, "epr_pdo_2: {=u32}, ", & self.epr_pdo_2());
-        defmt::write!(f, "epr_pdo_3: {=u32}, ", & self.epr_pdo_3());
+        defmt::write!(f, "num_valid_pdos: {=u8}, ", &self.num_valid_pdos());
+        defmt::write!(f, "num_valid_epr_pdos: {=u8}, ", &self.num_valid_epr_pdos());
+        defmt::write!(f, "last_src_cap_is_epr: {=bool}, ", &self.last_src_cap_is_epr());
+        defmt::write!(f, "pdo_0: {=u32}, ", &self.pdo_0());
+        defmt::write!(f, "pdo_1: {=u32}, ", &self.pdo_1());
+        defmt::write!(f, "pdo_2: {=u32}, ", &self.pdo_2());
+        defmt::write!(f, "pdo_3: {=u32}, ", &self.pdo_3());
+        defmt::write!(f, "pdo_4: {=u32}, ", &self.pdo_4());
+        defmt::write!(f, "pdo_5: {=u32}, ", &self.pdo_5());
+        defmt::write!(f, "pdo_6: {=u32}, ", &self.pdo_6());
+        defmt::write!(f, "epr_pdo_0: {=u32}, ", &self.epr_pdo_0());
+        defmt::write!(f, "epr_pdo_1: {=u32}, ", &self.epr_pdo_1());
+        defmt::write!(f, "epr_pdo_2: {=u32}, ", &self.epr_pdo_2());
+        defmt::write!(f, "epr_pdo_3: {=u32}, ", &self.epr_pdo_3());
         defmt::write!(f, "}}");
     }
 }
@@ -7953,8 +5977,8 @@ pub struct BootFlags {
     bits: [u8; 44],
 }
 unsafe impl ::device_driver::Fieldset for BootFlags {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 44] };
 }
 impl BootFlags {
@@ -7966,12 +5990,7 @@ impl BootFlags {
     pub fn boot_stage(&self) -> u8 {
         let start = 0;
         let end = 3;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `65:64` - Read the `total_num_pps` field.
@@ -7982,12 +6001,7 @@ impl BootFlags {
     pub fn total_num_pps(&self) -> u8 {
         let start = 64;
         let end = 65;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 66` - Read the `is_ext_pp_present` field.
@@ -7998,12 +6012,7 @@ impl BootFlags {
     pub fn is_ext_pp_present(&self) -> bool {
         let start = 66;
         let end = 66;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 128` - Read the `dead_battery_flag` field.
@@ -8014,12 +6023,7 @@ impl BootFlags {
     pub fn dead_battery_flag(&self) -> bool {
         let start = 128;
         let end = 128;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 129` - Read the `db_port_b_power_provider` field.
@@ -8030,12 +6034,7 @@ impl BootFlags {
     pub fn db_port_b_power_provider(&self) -> bool {
         let start = 129;
         let end = 129;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 130` - Read the `db_port_a_power_provider` field.
@@ -8046,12 +6045,7 @@ impl BootFlags {
     pub fn db_port_a_power_provider(&self) -> bool {
         let start = 130;
         let end = 130;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 131` - Read the `port_a_sink_switch` field.
@@ -8062,12 +6056,7 @@ impl BootFlags {
     pub fn port_a_sink_switch(&self) -> bool {
         let start = 131;
         let end = 131;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 132` - Read the `port_b_sink_switch` field.
@@ -8078,12 +6067,7 @@ impl BootFlags {
     pub fn port_b_sink_switch(&self) -> bool {
         let start = 132;
         let end = 132;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `167:160` - Read the `port_a_i_2_c_1_trgt_addr` field.
@@ -8094,12 +6078,7 @@ impl BootFlags {
     pub fn port_a_i_2_c_1_trgt_addr(&self) -> u8 {
         let start = 160;
         let end = 167;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `175:168` - Read the `port_b_i_2_c_1_trgt_addr` field.
@@ -8110,12 +6089,7 @@ impl BootFlags {
     pub fn port_b_i_2_c_1_trgt_addr(&self) -> u8 {
         let start = 168;
         let end = 175;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `183:176` - Read the `port_a_i_2_c_2_trgt_addr` field.
@@ -8126,12 +6100,7 @@ impl BootFlags {
     pub fn port_a_i_2_c_2_trgt_addr(&self) -> u8 {
         let start = 176;
         let end = 183;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `191:184` - Read the `port_b_i_2_c_2_trgt_addr` field.
@@ -8142,12 +6111,7 @@ impl BootFlags {
     pub fn port_b_i_2_c_2_trgt_addr(&self) -> u8 {
         let start = 184;
         let end = 191;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `199:192` - Read the `port_a_i_2_c_4_trgt_addr` field.
@@ -8158,12 +6122,7 @@ impl BootFlags {
     pub fn port_a_i_2_c_4_trgt_addr(&self) -> u8 {
         let start = 192;
         let end = 199;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `207:200` - Read the `port_b_i_2_c_4_trgt_addr` field.
@@ -8174,12 +6133,7 @@ impl BootFlags {
     pub fn port_b_i_2_c_4_trgt_addr(&self) -> u8 {
         let start = 200;
         let end = 207;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `225:224` - Read the `active_bank` field.
@@ -8190,12 +6144,7 @@ impl BootFlags {
     pub fn active_bank(&self) -> u8 {
         let start = 224;
         let end = 225;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 226` - Read the `bank_0_valid` field.
@@ -8206,12 +6155,7 @@ impl BootFlags {
     pub fn bank_0_valid(&self) -> bool {
         let start = 226;
         let end = 226;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 227` - Read the `bank_1_valid` field.
@@ -8222,12 +6166,7 @@ impl BootFlags {
     pub fn bank_1_valid(&self) -> bool {
         let start = 227;
         let end = 227;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `287:256` - Read the `bank_0_fw_version` field.
@@ -8238,12 +6177,7 @@ impl BootFlags {
     pub fn bank_0_fw_version(&self) -> u32 {
         let start = 256;
         let end = 287;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `319:288` - Read the `bank_1_fw_version` field.
@@ -8254,12 +6188,7 @@ impl BootFlags {
     pub fn bank_1_fw_version(&self) -> u32 {
         let start = 288;
         let end = 319;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `335:320` - Read the `adc_in_value` field.
@@ -8270,12 +6199,7 @@ impl BootFlags {
     pub fn adc_in_value(&self) -> u16 {
         let start = 320;
         let end = 335;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `351:336` - Read the `adc_in_index` field.
@@ -8286,12 +6210,7 @@ impl BootFlags {
     pub fn adc_in_index(&self) -> u16 {
         let start = 336;
         let end = 351;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `3:0` - Set the `boot_stage` field.
@@ -8302,12 +6221,7 @@ impl BootFlags {
         let start = 0;
         let end = 3;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `65:64` - Set the `total_num_pps` field.
     ///
@@ -8317,12 +6231,7 @@ impl BootFlags {
         let start = 64;
         let end = 65;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 66` - Set the `is_ext_pp_present` field.
     ///
@@ -8332,12 +6241,7 @@ impl BootFlags {
         let start = 66;
         let end = 66;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 128` - Set the `dead_battery_flag` field.
     ///
@@ -8347,12 +6251,7 @@ impl BootFlags {
         let start = 128;
         let end = 128;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 129` - Set the `db_port_b_power_provider` field.
     ///
@@ -8362,12 +6261,7 @@ impl BootFlags {
         let start = 129;
         let end = 129;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 130` - Set the `db_port_a_power_provider` field.
     ///
@@ -8377,12 +6271,7 @@ impl BootFlags {
         let start = 130;
         let end = 130;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 131` - Set the `port_a_sink_switch` field.
     ///
@@ -8392,12 +6281,7 @@ impl BootFlags {
         let start = 131;
         let end = 131;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 132` - Set the `port_b_sink_switch` field.
     ///
@@ -8407,12 +6291,7 @@ impl BootFlags {
         let start = 132;
         let end = 132;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `167:160` - Set the `port_a_i_2_c_1_trgt_addr` field.
     ///
@@ -8422,12 +6301,7 @@ impl BootFlags {
         let start = 160;
         let end = 167;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `175:168` - Set the `port_b_i_2_c_1_trgt_addr` field.
     ///
@@ -8437,12 +6311,7 @@ impl BootFlags {
         let start = 168;
         let end = 175;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `183:176` - Set the `port_a_i_2_c_2_trgt_addr` field.
     ///
@@ -8452,12 +6321,7 @@ impl BootFlags {
         let start = 176;
         let end = 183;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `191:184` - Set the `port_b_i_2_c_2_trgt_addr` field.
     ///
@@ -8467,12 +6331,7 @@ impl BootFlags {
         let start = 184;
         let end = 191;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `199:192` - Set the `port_a_i_2_c_4_trgt_addr` field.
     ///
@@ -8482,12 +6341,7 @@ impl BootFlags {
         let start = 192;
         let end = 199;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `207:200` - Set the `port_b_i_2_c_4_trgt_addr` field.
     ///
@@ -8497,12 +6351,7 @@ impl BootFlags {
         let start = 200;
         let end = 207;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `225:224` - Set the `active_bank` field.
     ///
@@ -8512,12 +6361,7 @@ impl BootFlags {
         let start = 224;
         let end = 225;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 226` - Set the `bank_0_valid` field.
     ///
@@ -8527,12 +6371,7 @@ impl BootFlags {
         let start = 226;
         let end = 226;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 227` - Set the `bank_1_valid` field.
     ///
@@ -8542,12 +6381,7 @@ impl BootFlags {
         let start = 227;
         let end = 227;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `287:256` - Set the `bank_0_fw_version` field.
     ///
@@ -8557,12 +6391,7 @@ impl BootFlags {
         let start = 256;
         let end = 287;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `319:288` - Set the `bank_1_fw_version` field.
     ///
@@ -8572,12 +6401,7 @@ impl BootFlags {
         let start = 288;
         let end = 319;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `335:320` - Set the `adc_in_value` field.
     ///
@@ -8587,12 +6411,7 @@ impl BootFlags {
         let start = 320;
         let end = 335;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `351:336` - Set the `adc_in_index` field.
     ///
@@ -8602,12 +6421,7 @@ impl BootFlags {
         let start = 336;
         let end = 351;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for BootFlags {
@@ -8656,43 +6470,35 @@ impl core::fmt::Debug for BootFlags {
 impl defmt::Format for BootFlags {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "BootFlags {{ ");
-        defmt::write!(f, "boot_stage: {=u8}, ", & self.boot_stage());
-        defmt::write!(f, "total_num_pps: {=u8}, ", & self.total_num_pps());
-        defmt::write!(f, "is_ext_pp_present: {=bool}, ", & self.is_ext_pp_present());
-        defmt::write!(f, "dead_battery_flag: {=bool}, ", & self.dead_battery_flag());
+        defmt::write!(f, "boot_stage: {=u8}, ", &self.boot_stage());
+        defmt::write!(f, "total_num_pps: {=u8}, ", &self.total_num_pps());
+        defmt::write!(f, "is_ext_pp_present: {=bool}, ", &self.is_ext_pp_present());
+        defmt::write!(f, "dead_battery_flag: {=bool}, ", &self.dead_battery_flag());
         defmt::write!(
-            f, "db_port_b_power_provider: {=bool}, ", & self.db_port_b_power_provider()
+            f,
+            "db_port_b_power_provider: {=bool}, ",
+            &self.db_port_b_power_provider()
         );
         defmt::write!(
-            f, "db_port_a_power_provider: {=bool}, ", & self.db_port_a_power_provider()
+            f,
+            "db_port_a_power_provider: {=bool}, ",
+            &self.db_port_a_power_provider()
         );
-        defmt::write!(f, "port_a_sink_switch: {=bool}, ", & self.port_a_sink_switch());
-        defmt::write!(f, "port_b_sink_switch: {=bool}, ", & self.port_b_sink_switch());
-        defmt::write!(
-            f, "port_a_i_2_c_1_trgt_addr: {=u8}, ", & self.port_a_i_2_c_1_trgt_addr()
-        );
-        defmt::write!(
-            f, "port_b_i_2_c_1_trgt_addr: {=u8}, ", & self.port_b_i_2_c_1_trgt_addr()
-        );
-        defmt::write!(
-            f, "port_a_i_2_c_2_trgt_addr: {=u8}, ", & self.port_a_i_2_c_2_trgt_addr()
-        );
-        defmt::write!(
-            f, "port_b_i_2_c_2_trgt_addr: {=u8}, ", & self.port_b_i_2_c_2_trgt_addr()
-        );
-        defmt::write!(
-            f, "port_a_i_2_c_4_trgt_addr: {=u8}, ", & self.port_a_i_2_c_4_trgt_addr()
-        );
-        defmt::write!(
-            f, "port_b_i_2_c_4_trgt_addr: {=u8}, ", & self.port_b_i_2_c_4_trgt_addr()
-        );
-        defmt::write!(f, "active_bank: {=u8}, ", & self.active_bank());
-        defmt::write!(f, "bank_0_valid: {=bool}, ", & self.bank_0_valid());
-        defmt::write!(f, "bank_1_valid: {=bool}, ", & self.bank_1_valid());
-        defmt::write!(f, "bank_0_fw_version: {=u32}, ", & self.bank_0_fw_version());
-        defmt::write!(f, "bank_1_fw_version: {=u32}, ", & self.bank_1_fw_version());
-        defmt::write!(f, "adc_in_value: {=u16}, ", & self.adc_in_value());
-        defmt::write!(f, "adc_in_index: {=u16}, ", & self.adc_in_index());
+        defmt::write!(f, "port_a_sink_switch: {=bool}, ", &self.port_a_sink_switch());
+        defmt::write!(f, "port_b_sink_switch: {=bool}, ", &self.port_b_sink_switch());
+        defmt::write!(f, "port_a_i_2_c_1_trgt_addr: {=u8}, ", &self.port_a_i_2_c_1_trgt_addr());
+        defmt::write!(f, "port_b_i_2_c_1_trgt_addr: {=u8}, ", &self.port_b_i_2_c_1_trgt_addr());
+        defmt::write!(f, "port_a_i_2_c_2_trgt_addr: {=u8}, ", &self.port_a_i_2_c_2_trgt_addr());
+        defmt::write!(f, "port_b_i_2_c_2_trgt_addr: {=u8}, ", &self.port_b_i_2_c_2_trgt_addr());
+        defmt::write!(f, "port_a_i_2_c_4_trgt_addr: {=u8}, ", &self.port_a_i_2_c_4_trgt_addr());
+        defmt::write!(f, "port_b_i_2_c_4_trgt_addr: {=u8}, ", &self.port_b_i_2_c_4_trgt_addr());
+        defmt::write!(f, "active_bank: {=u8}, ", &self.active_bank());
+        defmt::write!(f, "bank_0_valid: {=bool}, ", &self.bank_0_valid());
+        defmt::write!(f, "bank_1_valid: {=bool}, ", &self.bank_1_valid());
+        defmt::write!(f, "bank_0_fw_version: {=u32}, ", &self.bank_0_fw_version());
+        defmt::write!(f, "bank_1_fw_version: {=u32}, ", &self.bank_1_fw_version());
+        defmt::write!(f, "adc_in_value: {=u16}, ", &self.adc_in_value());
+        defmt::write!(f, "adc_in_index: {=u16}, ", &self.adc_in_index());
         defmt::write!(f, "}}");
     }
 }
@@ -8755,8 +6561,8 @@ pub struct PortControl {
     bits: [u8; 8],
 }
 unsafe impl ::device_driver::Fieldset for PortControl {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 8] };
 }
 impl PortControl {
@@ -8768,12 +6574,7 @@ impl PortControl {
     pub fn typec_current(&self) -> TypecCurrent {
         let start = 0;
         let end = 1;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `bit 4` - Read the `process_swap_to_sink` field.
@@ -8784,12 +6585,7 @@ impl PortControl {
     pub fn process_swap_to_sink(&self) -> bool {
         let start = 4;
         let end = 4;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 5` - Read the `initiate_swap_to_sink` field.
@@ -8800,12 +6596,7 @@ impl PortControl {
     pub fn initiate_swap_to_sink(&self) -> bool {
         let start = 5;
         let end = 5;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 6` - Read the `process_swap_to_source` field.
@@ -8816,12 +6607,7 @@ impl PortControl {
     pub fn process_swap_to_source(&self) -> bool {
         let start = 6;
         let end = 6;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 7` - Read the `initiate_swap_to_source` field.
@@ -8832,12 +6618,7 @@ impl PortControl {
     pub fn initiate_swap_to_source(&self) -> bool {
         let start = 7;
         let end = 7;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 8` - Read the `auto_alert_enable` field.
@@ -8848,12 +6629,7 @@ impl PortControl {
     pub fn auto_alert_enable(&self) -> bool {
         let start = 8;
         let end = 8;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 10` - Read the `auto_pps_status_enable` field.
@@ -8864,12 +6640,7 @@ impl PortControl {
     pub fn auto_pps_status_enable(&self) -> bool {
         let start = 10;
         let end = 10;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 11` - Read the `retimer_fw_update` field.
@@ -8880,12 +6651,7 @@ impl PortControl {
     pub fn retimer_fw_update(&self) -> bool {
         let start = 11;
         let end = 11;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 12` - Read the `process_swap_to_ufp` field.
@@ -8896,12 +6662,7 @@ impl PortControl {
     pub fn process_swap_to_ufp(&self) -> bool {
         let start = 12;
         let end = 12;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 13` - Read the `initiate_swap_to_ufp` field.
@@ -8912,12 +6673,7 @@ impl PortControl {
     pub fn initiate_swap_to_ufp(&self) -> bool {
         let start = 13;
         let end = 13;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 14` - Read the `process_swap_to_dfp` field.
@@ -8928,12 +6684,7 @@ impl PortControl {
     pub fn process_swap_to_dfp(&self) -> bool {
         let start = 14;
         let end = 14;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 15` - Read the `initiate_swap_to_dfp` field.
@@ -8944,12 +6695,7 @@ impl PortControl {
     pub fn initiate_swap_to_dfp(&self) -> bool {
         let start = 15;
         let end = 15;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 16` - Read the `automatic_id_request` field.
@@ -8960,12 +6706,7 @@ impl PortControl {
     pub fn automatic_id_request(&self) -> bool {
         let start = 16;
         let end = 16;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 17` - Read the `am_intrusive_mode` field.
@@ -8976,12 +6717,7 @@ impl PortControl {
     pub fn am_intrusive_mode(&self) -> bool {
         let start = 17;
         let end = 17;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 18` - Read the `force_usb_3_gen_1` field.
@@ -8992,12 +6728,7 @@ impl PortControl {
     pub fn force_usb_3_gen_1(&self) -> bool {
         let start = 18;
         let end = 18;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 19` - Read the `unconstrained_power` field.
@@ -9008,12 +6739,7 @@ impl PortControl {
     pub fn unconstrained_power(&self) -> bool {
         let start = 19;
         let end = 19;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 20` - Read the `enable_current_monitor` field.
@@ -9024,12 +6750,7 @@ impl PortControl {
     pub fn enable_current_monitor(&self) -> bool {
         let start = 20;
         let end = 20;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 21` - Read the `sink_control` field.
@@ -9040,12 +6761,7 @@ impl PortControl {
     pub fn sink_control(&self) -> bool {
         let start = 21;
         let end = 21;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 22` - Read the `fr_swap_enabled` field.
@@ -9056,12 +6772,7 @@ impl PortControl {
     pub fn fr_swap_enabled(&self) -> bool {
         let start = 22;
         let end = 22;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 29` - Read the `usb_disable` field.
@@ -9072,12 +6783,7 @@ impl PortControl {
     pub fn usb_disable(&self) -> bool {
         let start = 29;
         let end = 29;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `44:43` - Read the `vconn_current_limit` field.
@@ -9088,12 +6794,7 @@ impl PortControl {
     pub fn vconn_current_limit(&self) -> VconnCurrentLimit {
         let start = 43;
         let end = 44;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `46:45` - Read the `active_dbg_channel` field.
@@ -9104,12 +6805,7 @@ impl PortControl {
     pub fn active_dbg_channel(&self) -> ActiveDbgChannel {
         let start = 45;
         let end = 46;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `1:0` - Set the `typec_current` field.
@@ -9120,12 +6816,7 @@ impl PortControl {
         let start = 0;
         let end = 1;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 4` - Set the `process_swap_to_sink` field.
     ///
@@ -9135,12 +6826,7 @@ impl PortControl {
         let start = 4;
         let end = 4;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 5` - Set the `initiate_swap_to_sink` field.
     ///
@@ -9150,12 +6836,7 @@ impl PortControl {
         let start = 5;
         let end = 5;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 6` - Set the `process_swap_to_source` field.
     ///
@@ -9165,12 +6846,7 @@ impl PortControl {
         let start = 6;
         let end = 6;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 7` - Set the `initiate_swap_to_source` field.
     ///
@@ -9180,12 +6856,7 @@ impl PortControl {
         let start = 7;
         let end = 7;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 8` - Set the `auto_alert_enable` field.
     ///
@@ -9195,12 +6866,7 @@ impl PortControl {
         let start = 8;
         let end = 8;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 10` - Set the `auto_pps_status_enable` field.
     ///
@@ -9210,12 +6876,7 @@ impl PortControl {
         let start = 10;
         let end = 10;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 11` - Set the `retimer_fw_update` field.
     ///
@@ -9225,12 +6886,7 @@ impl PortControl {
         let start = 11;
         let end = 11;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 12` - Set the `process_swap_to_ufp` field.
     ///
@@ -9240,12 +6896,7 @@ impl PortControl {
         let start = 12;
         let end = 12;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 13` - Set the `initiate_swap_to_ufp` field.
     ///
@@ -9255,12 +6906,7 @@ impl PortControl {
         let start = 13;
         let end = 13;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 14` - Set the `process_swap_to_dfp` field.
     ///
@@ -9270,12 +6916,7 @@ impl PortControl {
         let start = 14;
         let end = 14;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 15` - Set the `initiate_swap_to_dfp` field.
     ///
@@ -9285,12 +6926,7 @@ impl PortControl {
         let start = 15;
         let end = 15;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 16` - Set the `automatic_id_request` field.
     ///
@@ -9300,12 +6936,7 @@ impl PortControl {
         let start = 16;
         let end = 16;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 17` - Set the `am_intrusive_mode` field.
     ///
@@ -9315,12 +6946,7 @@ impl PortControl {
         let start = 17;
         let end = 17;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 18` - Set the `force_usb_3_gen_1` field.
     ///
@@ -9330,12 +6956,7 @@ impl PortControl {
         let start = 18;
         let end = 18;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 19` - Set the `unconstrained_power` field.
     ///
@@ -9345,12 +6966,7 @@ impl PortControl {
         let start = 19;
         let end = 19;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 20` - Set the `enable_current_monitor` field.
     ///
@@ -9360,12 +6976,7 @@ impl PortControl {
         let start = 20;
         let end = 20;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 21` - Set the `sink_control` field.
     ///
@@ -9375,12 +6986,7 @@ impl PortControl {
         let start = 21;
         let end = 21;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 22` - Set the `fr_swap_enabled` field.
     ///
@@ -9390,12 +6996,7 @@ impl PortControl {
         let start = 22;
         let end = 22;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 29` - Set the `usb_disable` field.
     ///
@@ -9405,12 +7006,7 @@ impl PortControl {
         let start = 29;
         let end = 29;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `44:43` - Set the `vconn_current_limit` field.
     ///
@@ -9420,12 +7016,7 @@ impl PortControl {
         let start = 43;
         let end = 44;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `46:45` - Set the `active_dbg_channel` field.
     ///
@@ -9435,12 +7026,7 @@ impl PortControl {
         let start = 45;
         let end = 46;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for PortControl {
@@ -9490,46 +7076,28 @@ impl core::fmt::Debug for PortControl {
 impl defmt::Format for PortControl {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "PortControl {{ ");
-        defmt::write!(f, "typec_current: {}, ", & self.typec_current());
-        defmt::write!(
-            f, "process_swap_to_sink: {=bool}, ", & self.process_swap_to_sink()
-        );
-        defmt::write!(
-            f, "initiate_swap_to_sink: {=bool}, ", & self.initiate_swap_to_sink()
-        );
-        defmt::write!(
-            f, "process_swap_to_source: {=bool}, ", & self.process_swap_to_source()
-        );
-        defmt::write!(
-            f, "initiate_swap_to_source: {=bool}, ", & self.initiate_swap_to_source()
-        );
-        defmt::write!(f, "auto_alert_enable: {=bool}, ", & self.auto_alert_enable());
-        defmt::write!(
-            f, "auto_pps_status_enable: {=bool}, ", & self.auto_pps_status_enable()
-        );
-        defmt::write!(f, "retimer_fw_update: {=bool}, ", & self.retimer_fw_update());
-        defmt::write!(f, "process_swap_to_ufp: {=bool}, ", & self.process_swap_to_ufp());
-        defmt::write!(
-            f, "initiate_swap_to_ufp: {=bool}, ", & self.initiate_swap_to_ufp()
-        );
-        defmt::write!(f, "process_swap_to_dfp: {=bool}, ", & self.process_swap_to_dfp());
-        defmt::write!(
-            f, "initiate_swap_to_dfp: {=bool}, ", & self.initiate_swap_to_dfp()
-        );
-        defmt::write!(
-            f, "automatic_id_request: {=bool}, ", & self.automatic_id_request()
-        );
-        defmt::write!(f, "am_intrusive_mode: {=bool}, ", & self.am_intrusive_mode());
-        defmt::write!(f, "force_usb_3_gen_1: {=bool}, ", & self.force_usb_3_gen_1());
-        defmt::write!(f, "unconstrained_power: {=bool}, ", & self.unconstrained_power());
-        defmt::write!(
-            f, "enable_current_monitor: {=bool}, ", & self.enable_current_monitor()
-        );
-        defmt::write!(f, "sink_control: {=bool}, ", & self.sink_control());
-        defmt::write!(f, "fr_swap_enabled: {=bool}, ", & self.fr_swap_enabled());
-        defmt::write!(f, "usb_disable: {=bool}, ", & self.usb_disable());
-        defmt::write!(f, "vconn_current_limit: {}, ", & self.vconn_current_limit());
-        defmt::write!(f, "active_dbg_channel: {}, ", & self.active_dbg_channel());
+        defmt::write!(f, "typec_current: {}, ", &self.typec_current());
+        defmt::write!(f, "process_swap_to_sink: {=bool}, ", &self.process_swap_to_sink());
+        defmt::write!(f, "initiate_swap_to_sink: {=bool}, ", &self.initiate_swap_to_sink());
+        defmt::write!(f, "process_swap_to_source: {=bool}, ", &self.process_swap_to_source());
+        defmt::write!(f, "initiate_swap_to_source: {=bool}, ", &self.initiate_swap_to_source());
+        defmt::write!(f, "auto_alert_enable: {=bool}, ", &self.auto_alert_enable());
+        defmt::write!(f, "auto_pps_status_enable: {=bool}, ", &self.auto_pps_status_enable());
+        defmt::write!(f, "retimer_fw_update: {=bool}, ", &self.retimer_fw_update());
+        defmt::write!(f, "process_swap_to_ufp: {=bool}, ", &self.process_swap_to_ufp());
+        defmt::write!(f, "initiate_swap_to_ufp: {=bool}, ", &self.initiate_swap_to_ufp());
+        defmt::write!(f, "process_swap_to_dfp: {=bool}, ", &self.process_swap_to_dfp());
+        defmt::write!(f, "initiate_swap_to_dfp: {=bool}, ", &self.initiate_swap_to_dfp());
+        defmt::write!(f, "automatic_id_request: {=bool}, ", &self.automatic_id_request());
+        defmt::write!(f, "am_intrusive_mode: {=bool}, ", &self.am_intrusive_mode());
+        defmt::write!(f, "force_usb_3_gen_1: {=bool}, ", &self.force_usb_3_gen_1());
+        defmt::write!(f, "unconstrained_power: {=bool}, ", &self.unconstrained_power());
+        defmt::write!(f, "enable_current_monitor: {=bool}, ", &self.enable_current_monitor());
+        defmt::write!(f, "sink_control: {=bool}, ", &self.sink_control());
+        defmt::write!(f, "fr_swap_enabled: {=bool}, ", &self.fr_swap_enabled());
+        defmt::write!(f, "usb_disable: {=bool}, ", &self.usb_disable());
+        defmt::write!(f, "vconn_current_limit: {}, ", &self.vconn_current_limit());
+        defmt::write!(f, "active_dbg_channel: {}, ", &self.active_dbg_channel());
         defmt::write!(f, "}}");
     }
 }
@@ -9592,8 +7160,8 @@ pub struct PortConfig {
     bits: [u8; 18],
 }
 unsafe impl ::device_driver::Fieldset for PortConfig {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 18] };
 }
 impl PortConfig {
@@ -9605,12 +7173,7 @@ impl PortConfig {
     pub fn typec_state_machine(&self) -> TypeCStateMachine {
         let start = 0;
         let end = 1;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 2` - Read the `crossbar_type` field.
@@ -9621,12 +7184,7 @@ impl PortConfig {
     pub fn crossbar_type(&self) -> CrossbarType {
         let start = 2;
         let end = 2;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 7` - Read the `pp_ext_active_low` field.
@@ -9637,12 +7195,7 @@ impl PortConfig {
     pub fn pp_ext_active_low(&self) -> bool {
         let start = 7;
         let end = 7;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `9:8` - Read the `typec_support_options` field.
@@ -9653,12 +7206,7 @@ impl PortConfig {
     pub fn typec_support_options(&self) -> TypeCSupportOptions {
         let start = 8;
         let end = 9;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `bit 10` - Read the `disable_pd` field.
@@ -9669,12 +7217,7 @@ impl PortConfig {
     pub fn disable_pd(&self) -> bool {
         let start = 10;
         let end = 10;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 11` - Read the `usb_communication_capable` field.
@@ -9685,12 +7228,7 @@ impl PortConfig {
     pub fn usb_communication_capable(&self) -> bool {
         let start = 11;
         let end = 11;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 12` - Read the `debug_accessory_support` field.
@@ -9701,12 +7239,7 @@ impl PortConfig {
     pub fn debug_accessory_support(&self) -> bool {
         let start = 12;
         let end = 12;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `14:13` - Read the `usb_3_rate` field.
@@ -9717,12 +7250,7 @@ impl PortConfig {
     pub fn usb_3_rate(&self) -> Usb3Rate {
         let start = 13;
         let end = 14;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `bit 15` - Read the `crossbar_i_2_c_controller_enable` field.
@@ -9733,12 +7261,7 @@ impl PortConfig {
     pub fn crossbar_i_2_c_controller_enable(&self) -> bool {
         let start = 15;
         let end = 15;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `17:16` - Read the `vbus_ovp_usage` field.
@@ -9749,12 +7272,7 @@ impl PortConfig {
     pub fn vbus_ovp_usage(&self) -> VbusOvpUsage {
         let start = 16;
         let end = 17;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `21:20` - Read the `ovp_for_pp_5_v` field.
@@ -9765,12 +7283,7 @@ impl PortConfig {
     pub fn ovp_for_pp_5_v(&self) -> OvpForPp5V {
         let start = 20;
         let end = 21;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 22` - Read the `crossbar_config_type_1_extended` field.
@@ -9781,12 +7294,7 @@ impl PortConfig {
     pub fn crossbar_config_type_1_extended(&self) -> bool {
         let start = 22;
         let end = 22;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 23` - Read the `remove_safe_state_between_usb_3_to_dp_transition` field.
@@ -9797,12 +7305,7 @@ impl PortConfig {
     pub fn remove_safe_state_between_usb_3_to_dp_transition(&self) -> bool {
         let start = 23;
         let end = 23;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `26:24` - Read the `vbus_sink_uvp_trip_hv` field.
@@ -9813,12 +7316,7 @@ impl PortConfig {
     pub fn vbus_sink_uvp_trip_hv(&self) -> VbusSinkUvpTripHv {
         let start = 24;
         let end = 26;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `28:27` - Read the `apdo_vbus_uvp_threshold` field.
@@ -9829,12 +7327,7 @@ impl PortConfig {
     pub fn apdo_vbus_uvp_threshold(&self) -> u8 {
         let start = 27;
         let end = 28;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `30:29` - Read the `apdo_ilim_over_shoot` field.
@@ -9845,12 +7338,7 @@ impl PortConfig {
     pub fn apdo_ilim_over_shoot(&self) -> u8 {
         let start = 29;
         let end = 30;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `47:32` - Read the `apdo_vbus_uvp_trip_point_offset` field.
@@ -9861,12 +7349,7 @@ impl PortConfig {
     pub fn apdo_vbus_uvp_trip_point_offset(&self) -> u16 {
         let start = 32;
         let end = 47;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `63:48` - Read the `vbus_for_valid_pps_status` field.
@@ -9877,12 +7360,7 @@ impl PortConfig {
     pub fn vbus_for_valid_pps_status(&self) -> u16 {
         let start = 48;
         let end = 63;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `71:64` - Read the `external_dcdc_type` field.
@@ -9893,12 +7371,7 @@ impl PortConfig {
     pub fn external_dcdc_type(&self) -> ExternalDcdcType {
         let start = 64;
         let end = 71;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `bit 72` - Read the `sink_mode_i_2_c_irq_config` field.
@@ -9909,12 +7382,7 @@ impl PortConfig {
     pub fn sink_mode_i_2_c_irq_config(&self) -> bool {
         let start = 72;
         let end = 72;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `95:80` - Read the `gt_threshold_voltage` field.
@@ -9925,12 +7393,7 @@ impl PortConfig {
     pub fn gt_threshold_voltage(&self) -> u16 {
         let start = 80;
         let end = 95;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 124` - Read the `enable_internal_auxbiasing` field.
@@ -9941,12 +7404,7 @@ impl PortConfig {
     pub fn enable_internal_auxbiasing(&self) -> bool {
         let start = 124;
         let end = 124;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 125` - Read the `enable_internal_level_shifter` field.
@@ -9957,12 +7415,7 @@ impl PortConfig {
     pub fn enable_internal_level_shifter(&self) -> bool {
         let start = 125;
         let end = 125;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `127:126` - Read the `level_shifter_direction_cfg` field.
@@ -9973,12 +7426,7 @@ impl PortConfig {
     pub fn level_shifter_direction_cfg(&self) -> LevelShifterDirectionCfg {
         let start = 126;
         let end = 127;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `130:128` - Read the `sbu_mux_debug_setting` field.
@@ -9989,12 +7437,7 @@ impl PortConfig {
     pub fn sbu_mux_debug_setting(&self) -> SbuMuxDebugSetting {
         let start = 128;
         let end = 130;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `133:131` - Read the `sbu_mux_default_setting` field.
@@ -10005,12 +7448,7 @@ impl PortConfig {
     pub fn sbu_mux_default_setting(&self) -> SbuMuxDefaultSetting {
         let start = 131;
         let end = 133;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `135:134` - Read the `sbu_mux_usage` field.
@@ -10021,12 +7459,7 @@ impl PortConfig {
     pub fn sbu_mux_usage(&self) -> SbuMuxUsage {
         let start = 134;
         let end = 135;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `bit 136` - Read the `epr_supported_as_source` field.
@@ -10037,12 +7470,7 @@ impl PortConfig {
     pub fn epr_supported_as_source(&self) -> bool {
         let start = 136;
         let end = 136;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 137` - Read the `epr_supported_as_sink` field.
@@ -10053,12 +7481,7 @@ impl PortConfig {
     pub fn epr_supported_as_sink(&self) -> bool {
         let start = 137;
         let end = 137;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 138` - Read the `disable_sourcing_in_dbm` field.
@@ -10069,12 +7492,7 @@ impl PortConfig {
     pub fn disable_sourcing_in_dbm(&self) -> bool {
         let start = 138;
         let end = 138;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 139` - Read the `flip_crossbar_dbg_setting` field.
@@ -10085,12 +7503,7 @@ impl PortConfig {
     pub fn flip_crossbar_dbg_setting(&self) -> bool {
         let start = 139;
         let end = 139;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 140` - Read the `flip_crossbar_aux_setting` field.
@@ -10101,12 +7514,7 @@ impl PortConfig {
     pub fn flip_crossbar_aux_setting(&self) -> bool {
         let start = 140;
         let end = 140;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 141` - Read the `flip_crossbar_sbtx_setting` field.
@@ -10117,12 +7525,7 @@ impl PortConfig {
     pub fn flip_crossbar_sbtx_setting(&self) -> bool {
         let start = 141;
         let end = 141;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `1:0` - Set the `typec_state_machine` field.
@@ -10133,12 +7536,7 @@ impl PortConfig {
         let start = 0;
         let end = 1;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 2` - Set the `crossbar_type` field.
     ///
@@ -10148,12 +7546,7 @@ impl PortConfig {
         let start = 2;
         let end = 2;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 7` - Set the `pp_ext_active_low` field.
     ///
@@ -10163,12 +7556,7 @@ impl PortConfig {
         let start = 7;
         let end = 7;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `9:8` - Set the `typec_support_options` field.
     ///
@@ -10178,12 +7566,7 @@ impl PortConfig {
         let start = 8;
         let end = 9;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 10` - Set the `disable_pd` field.
     ///
@@ -10193,12 +7576,7 @@ impl PortConfig {
         let start = 10;
         let end = 10;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 11` - Set the `usb_communication_capable` field.
     ///
@@ -10208,12 +7586,7 @@ impl PortConfig {
         let start = 11;
         let end = 11;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 12` - Set the `debug_accessory_support` field.
     ///
@@ -10223,12 +7596,7 @@ impl PortConfig {
         let start = 12;
         let end = 12;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `14:13` - Set the `usb_3_rate` field.
     ///
@@ -10238,12 +7606,7 @@ impl PortConfig {
         let start = 13;
         let end = 14;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 15` - Set the `crossbar_i_2_c_controller_enable` field.
     ///
@@ -10253,12 +7616,7 @@ impl PortConfig {
         let start = 15;
         let end = 15;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `17:16` - Set the `vbus_ovp_usage` field.
     ///
@@ -10268,12 +7626,7 @@ impl PortConfig {
         let start = 16;
         let end = 17;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `21:20` - Set the `ovp_for_pp_5_v` field.
     ///
@@ -10283,12 +7636,7 @@ impl PortConfig {
         let start = 20;
         let end = 21;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 22` - Set the `crossbar_config_type_1_extended` field.
     ///
@@ -10298,12 +7646,7 @@ impl PortConfig {
         let start = 22;
         let end = 22;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 23` - Set the `remove_safe_state_between_usb_3_to_dp_transition` field.
     ///
@@ -10313,12 +7656,7 @@ impl PortConfig {
         let start = 23;
         let end = 23;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `26:24` - Set the `vbus_sink_uvp_trip_hv` field.
     ///
@@ -10328,12 +7666,7 @@ impl PortConfig {
         let start = 24;
         let end = 26;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `28:27` - Set the `apdo_vbus_uvp_threshold` field.
     ///
@@ -10343,12 +7676,7 @@ impl PortConfig {
         let start = 27;
         let end = 28;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `30:29` - Set the `apdo_ilim_over_shoot` field.
     ///
@@ -10358,12 +7686,7 @@ impl PortConfig {
         let start = 29;
         let end = 30;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `47:32` - Set the `apdo_vbus_uvp_trip_point_offset` field.
     ///
@@ -10373,12 +7696,7 @@ impl PortConfig {
         let start = 32;
         let end = 47;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `63:48` - Set the `vbus_for_valid_pps_status` field.
     ///
@@ -10388,12 +7706,7 @@ impl PortConfig {
         let start = 48;
         let end = 63;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `71:64` - Set the `external_dcdc_type` field.
     ///
@@ -10403,12 +7716,7 @@ impl PortConfig {
         let start = 64;
         let end = 71;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 72` - Set the `sink_mode_i_2_c_irq_config` field.
     ///
@@ -10418,12 +7726,7 @@ impl PortConfig {
         let start = 72;
         let end = 72;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `95:80` - Set the `gt_threshold_voltage` field.
     ///
@@ -10433,12 +7736,7 @@ impl PortConfig {
         let start = 80;
         let end = 95;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 124` - Set the `enable_internal_auxbiasing` field.
     ///
@@ -10448,12 +7746,7 @@ impl PortConfig {
         let start = 124;
         let end = 124;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 125` - Set the `enable_internal_level_shifter` field.
     ///
@@ -10463,12 +7756,7 @@ impl PortConfig {
         let start = 125;
         let end = 125;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `127:126` - Set the `level_shifter_direction_cfg` field.
     ///
@@ -10478,12 +7766,7 @@ impl PortConfig {
         let start = 126;
         let end = 127;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `130:128` - Set the `sbu_mux_debug_setting` field.
     ///
@@ -10493,12 +7776,7 @@ impl PortConfig {
         let start = 128;
         let end = 130;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `133:131` - Set the `sbu_mux_default_setting` field.
     ///
@@ -10508,12 +7786,7 @@ impl PortConfig {
         let start = 131;
         let end = 133;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `135:134` - Set the `sbu_mux_usage` field.
     ///
@@ -10523,12 +7796,7 @@ impl PortConfig {
         let start = 134;
         let end = 135;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 136` - Set the `epr_supported_as_source` field.
     ///
@@ -10538,12 +7806,7 @@ impl PortConfig {
         let start = 136;
         let end = 136;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 137` - Set the `epr_supported_as_sink` field.
     ///
@@ -10553,12 +7816,7 @@ impl PortConfig {
         let start = 137;
         let end = 137;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 138` - Set the `disable_sourcing_in_dbm` field.
     ///
@@ -10568,12 +7826,7 @@ impl PortConfig {
         let start = 138;
         let end = 138;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 139` - Set the `flip_crossbar_dbg_setting` field.
     ///
@@ -10583,12 +7836,7 @@ impl PortConfig {
         let start = 139;
         let end = 139;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 140` - Set the `flip_crossbar_aux_setting` field.
     ///
@@ -10598,12 +7846,7 @@ impl PortConfig {
         let start = 140;
         let end = 140;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 141` - Set the `flip_crossbar_sbtx_setting` field.
     ///
@@ -10613,12 +7856,7 @@ impl PortConfig {
         let start = 141;
         let end = 141;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for PortConfig {
@@ -10691,86 +7929,90 @@ impl core::fmt::Debug for PortConfig {
 impl defmt::Format for PortConfig {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "PortConfig {{ ");
-        defmt::write!(f, "typec_state_machine: {}, ", & self.typec_state_machine());
-        defmt::write!(f, "crossbar_type: {}, ", & self.crossbar_type());
-        defmt::write!(f, "pp_ext_active_low: {=bool}, ", & self.pp_ext_active_low());
-        defmt::write!(f, "typec_support_options: {}, ", & self.typec_support_options());
-        defmt::write!(f, "disable_pd: {=bool}, ", & self.disable_pd());
+        defmt::write!(f, "typec_state_machine: {}, ", &self.typec_state_machine());
+        defmt::write!(f, "crossbar_type: {}, ", &self.crossbar_type());
+        defmt::write!(f, "pp_ext_active_low: {=bool}, ", &self.pp_ext_active_low());
+        defmt::write!(f, "typec_support_options: {}, ", &self.typec_support_options());
+        defmt::write!(f, "disable_pd: {=bool}, ", &self.disable_pd());
         defmt::write!(
-            f, "usb_communication_capable: {=bool}, ", & self.usb_communication_capable()
+            f,
+            "usb_communication_capable: {=bool}, ",
+            &self.usb_communication_capable()
+        );
+        defmt::write!(f, "debug_accessory_support: {=bool}, ", &self.debug_accessory_support());
+        defmt::write!(f, "usb_3_rate: {}, ", &self.usb_3_rate());
+        defmt::write!(
+            f,
+            "crossbar_i_2_c_controller_enable: {=bool}, ",
+            &self.crossbar_i_2_c_controller_enable()
+        );
+        defmt::write!(f, "vbus_ovp_usage: {}, ", &self.vbus_ovp_usage());
+        defmt::write!(f, "ovp_for_pp_5_v: {}, ", &self.ovp_for_pp_5_v());
+        defmt::write!(
+            f,
+            "crossbar_config_type_1_extended: {=bool}, ",
+            &self.crossbar_config_type_1_extended()
         );
         defmt::write!(
-            f, "debug_accessory_support: {=bool}, ", & self.debug_accessory_support()
+            f,
+            "remove_safe_state_between_usb_3_to_dp_transition: {=bool}, ",
+            &self.remove_safe_state_between_usb_3_to_dp_transition()
         );
-        defmt::write!(f, "usb_3_rate: {}, ", & self.usb_3_rate());
+        defmt::write!(f, "vbus_sink_uvp_trip_hv: {}, ", &self.vbus_sink_uvp_trip_hv());
+        defmt::write!(f, "apdo_vbus_uvp_threshold: {=u8}, ", &self.apdo_vbus_uvp_threshold());
+        defmt::write!(f, "apdo_ilim_over_shoot: {=u8}, ", &self.apdo_ilim_over_shoot());
         defmt::write!(
-            f, "crossbar_i_2_c_controller_enable: {=bool}, ", & self
-            .crossbar_i_2_c_controller_enable()
-        );
-        defmt::write!(f, "vbus_ovp_usage: {}, ", & self.vbus_ovp_usage());
-        defmt::write!(f, "ovp_for_pp_5_v: {}, ", & self.ovp_for_pp_5_v());
-        defmt::write!(
-            f, "crossbar_config_type_1_extended: {=bool}, ", & self
-            .crossbar_config_type_1_extended()
-        );
-        defmt::write!(
-            f, "remove_safe_state_between_usb_3_to_dp_transition: {=bool}, ", & self
-            .remove_safe_state_between_usb_3_to_dp_transition()
-        );
-        defmt::write!(f, "vbus_sink_uvp_trip_hv: {}, ", & self.vbus_sink_uvp_trip_hv());
-        defmt::write!(
-            f, "apdo_vbus_uvp_threshold: {=u8}, ", & self.apdo_vbus_uvp_threshold()
-        );
-        defmt::write!(f, "apdo_ilim_over_shoot: {=u8}, ", & self.apdo_ilim_over_shoot());
-        defmt::write!(
-            f, "apdo_vbus_uvp_trip_point_offset: {=u16}, ", & self
-            .apdo_vbus_uvp_trip_point_offset()
+            f,
+            "apdo_vbus_uvp_trip_point_offset: {=u16}, ",
+            &self.apdo_vbus_uvp_trip_point_offset()
         );
         defmt::write!(
-            f, "vbus_for_valid_pps_status: {=u16}, ", & self.vbus_for_valid_pps_status()
+            f,
+            "vbus_for_valid_pps_status: {=u16}, ",
+            &self.vbus_for_valid_pps_status()
         );
-        defmt::write!(f, "external_dcdc_type: {}, ", & self.external_dcdc_type());
+        defmt::write!(f, "external_dcdc_type: {}, ", &self.external_dcdc_type());
         defmt::write!(
-            f, "sink_mode_i_2_c_irq_config: {=bool}, ", & self
-            .sink_mode_i_2_c_irq_config()
+            f,
+            "sink_mode_i_2_c_irq_config: {=bool}, ",
+            &self.sink_mode_i_2_c_irq_config()
         );
+        defmt::write!(f, "gt_threshold_voltage: {=u16}, ", &self.gt_threshold_voltage());
         defmt::write!(
-            f, "gt_threshold_voltage: {=u16}, ", & self.gt_threshold_voltage()
-        );
-        defmt::write!(
-            f, "enable_internal_auxbiasing: {=bool}, ", & self
-            .enable_internal_auxbiasing()
-        );
-        defmt::write!(
-            f, "enable_internal_level_shifter: {=bool}, ", & self
-            .enable_internal_level_shifter()
+            f,
+            "enable_internal_auxbiasing: {=bool}, ",
+            &self.enable_internal_auxbiasing()
         );
         defmt::write!(
-            f, "level_shifter_direction_cfg: {}, ", & self.level_shifter_direction_cfg()
-        );
-        defmt::write!(f, "sbu_mux_debug_setting: {}, ", & self.sbu_mux_debug_setting());
-        defmt::write!(
-            f, "sbu_mux_default_setting: {}, ", & self.sbu_mux_default_setting()
-        );
-        defmt::write!(f, "sbu_mux_usage: {}, ", & self.sbu_mux_usage());
-        defmt::write!(
-            f, "epr_supported_as_source: {=bool}, ", & self.epr_supported_as_source()
+            f,
+            "enable_internal_level_shifter: {=bool}, ",
+            &self.enable_internal_level_shifter()
         );
         defmt::write!(
-            f, "epr_supported_as_sink: {=bool}, ", & self.epr_supported_as_sink()
+            f,
+            "level_shifter_direction_cfg: {}, ",
+            &self.level_shifter_direction_cfg()
+        );
+        defmt::write!(f, "sbu_mux_debug_setting: {}, ", &self.sbu_mux_debug_setting());
+        defmt::write!(f, "sbu_mux_default_setting: {}, ", &self.sbu_mux_default_setting());
+        defmt::write!(f, "sbu_mux_usage: {}, ", &self.sbu_mux_usage());
+        defmt::write!(f, "epr_supported_as_source: {=bool}, ", &self.epr_supported_as_source());
+        defmt::write!(f, "epr_supported_as_sink: {=bool}, ", &self.epr_supported_as_sink());
+        defmt::write!(f, "disable_sourcing_in_dbm: {=bool}, ", &self.disable_sourcing_in_dbm());
+        defmt::write!(
+            f,
+            "flip_crossbar_dbg_setting: {=bool}, ",
+            &self.flip_crossbar_dbg_setting()
         );
         defmt::write!(
-            f, "disable_sourcing_in_dbm: {=bool}, ", & self.disable_sourcing_in_dbm()
+            f,
+            "flip_crossbar_aux_setting: {=bool}, ",
+            &self.flip_crossbar_aux_setting()
         );
         defmt::write!(
-            f, "flip_crossbar_dbg_setting: {=bool}, ", & self.flip_crossbar_dbg_setting()
-        );
-        defmt::write!(
-            f, "flip_crossbar_aux_setting: {=bool}, ", & self.flip_crossbar_aux_setting()
-        );
-        defmt::write!(
-            f, "flip_crossbar_sbtx_setting: {=bool}, ", & self
-            .flip_crossbar_sbtx_setting()
+            f,
+            "flip_crossbar_sbtx_setting: {=bool}, ",
+            &self.flip_crossbar_sbtx_setting()
         );
         defmt::write!(f, "}}");
     }
@@ -10834,8 +8076,8 @@ pub struct SystemConfig {
     bits: [u8; 15],
 }
 unsafe impl ::device_driver::Fieldset for SystemConfig {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 15] };
 }
 impl SystemConfig {
@@ -10847,12 +8089,7 @@ impl SystemConfig {
     pub fn pa_vconn_config(&self) -> bool {
         let start = 0;
         let end = 0;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 2` - Read the `pb_vconn_config` field.
@@ -10863,12 +8100,7 @@ impl SystemConfig {
     pub fn pb_vconn_config(&self) -> bool {
         let start = 2;
         let end = 2;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `10:8` - Read the `pa_pp_5_v_vbus_sw_config` field.
@@ -10879,12 +8111,7 @@ impl SystemConfig {
     pub fn pa_pp_5_v_vbus_sw_config(&self) -> VbusSwConfig {
         let start = 8;
         let end = 10;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `13:11` - Read the `pb_pp_5_v_vbus_sw_config` field.
@@ -10895,12 +8122,7 @@ impl SystemConfig {
     pub fn pb_pp_5_v_vbus_sw_config(&self) -> VbusSwConfig {
         let start = 11;
         let end = 13;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `15:14` - Read the `ilim_over_shoot` field.
@@ -10911,12 +8133,7 @@ impl SystemConfig {
     pub fn ilim_over_shoot(&self) -> IlimOverShoot {
         let start = 14;
         let end = 15;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `18:16` - Read the `pa_ppext_vbus_sw_config` field.
@@ -10927,12 +8144,7 @@ impl SystemConfig {
     pub fn pa_ppext_vbus_sw_config(&self) -> PpextVbusSwConfig {
         let start = 16;
         let end = 18;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `21:19` - Read the `pb_ppext_vbus_sw_config` field.
@@ -10943,12 +8155,7 @@ impl SystemConfig {
     pub fn pb_ppext_vbus_sw_config(&self) -> PpextVbusSwConfig {
         let start = 19;
         let end = 21;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `23:22` - Read the `rcp_threshold` field.
@@ -10959,12 +8166,7 @@ impl SystemConfig {
     pub fn rcp_threshold(&self) -> RcpThreshold {
         let start = 22;
         let end = 23;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 24` - Read the `multi_port_sink_policy_highest_power` field.
@@ -10975,12 +8177,7 @@ impl SystemConfig {
     pub fn multi_port_sink_policy_highest_power(&self) -> bool {
         let start = 24;
         let end = 24;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `28:26` - Read the `tbt_controller_type` field.
@@ -10991,12 +8188,7 @@ impl SystemConfig {
     pub fn tbt_controller_type(&self) -> TbtControllerType {
         let start = 26;
         let end = 28;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `bit 29` - Read the `enable_one_ufp_policy` field.
@@ -11007,12 +8199,7 @@ impl SystemConfig {
     pub fn enable_one_ufp_policy(&self) -> bool {
         let start = 29;
         let end = 29;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 30` - Read the `enable_spm` field.
@@ -11023,12 +8210,7 @@ impl SystemConfig {
     pub fn enable_spm(&self) -> bool {
         let start = 30;
         let end = 30;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `32:31` - Read the `multi_port_sink_non_overlap_time` field.
@@ -11039,12 +8221,7 @@ impl SystemConfig {
     pub fn multi_port_sink_non_overlap_time(&self) -> MultiPortSinkNonOverlapTime {
         let start = 31;
         let end = 32;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 33` - Read the `enable_i_2_c_multi_controller_mode` field.
@@ -11055,12 +8232,7 @@ impl SystemConfig {
     pub fn enable_i_2_c_multi_controller_mode(&self) -> bool {
         let start = 33;
         let end = 33;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `36:34` - Read the `i_2_c_timeout` field.
@@ -11071,12 +8243,7 @@ impl SystemConfig {
     pub fn i_2_c_timeout(&self) -> I2CTimeout {
         let start = 34;
         let end = 36;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 37` - Read the `disable_eeprom_updates` field.
@@ -11087,12 +8254,7 @@ impl SystemConfig {
     pub fn disable_eeprom_updates(&self) -> bool {
         let start = 37;
         let end = 37;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 38` - Read the `emulate_single_port` field.
@@ -11103,12 +8265,7 @@ impl SystemConfig {
     pub fn emulate_single_port(&self) -> bool {
         let start = 38;
         let end = 38;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 39` - Read the `minimum_current_advertisement_1_a_5` field.
@@ -11119,12 +8276,7 @@ impl SystemConfig {
     pub fn minimum_current_advertisement_1_a_5(&self) -> bool {
         let start = 39;
         let end = 39;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `44:43` - Read the `usb_default_current` field.
@@ -11135,12 +8287,7 @@ impl SystemConfig {
     pub fn usb_default_current(&self) -> UsbDefaultCurrent {
         let start = 43;
         let end = 44;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `bit 45` - Read the `epr_supported_as_source` field.
@@ -11151,12 +8298,7 @@ impl SystemConfig {
     pub fn epr_supported_as_source(&self) -> bool {
         let start = 45;
         let end = 45;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 46` - Read the `epr_supported_as_sink` field.
@@ -11167,12 +8309,7 @@ impl SystemConfig {
     pub fn epr_supported_as_sink(&self) -> bool {
         let start = 46;
         let end = 46;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 47` - Read the `enable_low_power_mode_am_entry_exit` field.
@@ -11183,12 +8320,7 @@ impl SystemConfig {
     pub fn enable_low_power_mode_am_entry_exit(&self) -> bool {
         let start = 47;
         let end = 47;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 54` - Read the `crossbar_polling_mode` field.
@@ -11199,12 +8331,7 @@ impl SystemConfig {
     pub fn crossbar_polling_mode(&self) -> bool {
         let start = 54;
         let end = 54;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 55` - Read the `crossbar_config_type_1_extended` field.
@@ -11215,12 +8342,7 @@ impl SystemConfig {
     pub fn crossbar_config_type_1_extended(&self) -> bool {
         let start = 55;
         let end = 55;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `63:56` - Read the `external_dcdc_status_polling_interval` field.
@@ -11231,12 +8353,7 @@ impl SystemConfig {
     pub fn external_dcdc_status_polling_interval(&self) -> u8 {
         let start = 56;
         let end = 63;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `71:64` - Read the `port_1_i_2_c_2_target_address` field.
@@ -11247,12 +8364,7 @@ impl SystemConfig {
     pub fn port_1_i_2_c_2_target_address(&self) -> u8 {
         let start = 64;
         let end = 71;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `79:72` - Read the `port_2_i_2_c_2_target_address` field.
@@ -11263,12 +8375,7 @@ impl SystemConfig {
     pub fn port_2_i_2_c_2_target_address(&self) -> u8 {
         let start = 72;
         let end = 79;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 80` - Read the `vsys_prevents_high_power` field.
@@ -11279,12 +8386,7 @@ impl SystemConfig {
     pub fn vsys_prevents_high_power(&self) -> bool {
         let start = 80;
         let end = 80;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 81` - Read the `wait_for_vin_3_v_3` field.
@@ -11295,12 +8397,7 @@ impl SystemConfig {
     pub fn wait_for_vin_3_v_3(&self) -> bool {
         let start = 81;
         let end = 81;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 82` - Read the `wait_for_minimum_power` field.
@@ -11311,12 +8408,7 @@ impl SystemConfig {
     pub fn wait_for_minimum_power(&self) -> bool {
         let start = 82;
         let end = 82;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 86` - Read the `auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3` field.
@@ -11327,12 +8419,7 @@ impl SystemConfig {
     pub fn auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3(&self) -> bool {
         let start = 86;
         let end = 86;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `104:103` - Read the `source_policy_mode` field.
@@ -11343,12 +8430,7 @@ impl SystemConfig {
     pub fn source_policy_mode(&self) -> u8 {
         let start = 103;
         let end = 104;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `bit 0` - Set the `pa_vconn_config` field.
@@ -11359,12 +8441,7 @@ impl SystemConfig {
         let start = 0;
         let end = 0;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 2` - Set the `pb_vconn_config` field.
     ///
@@ -11374,12 +8451,7 @@ impl SystemConfig {
         let start = 2;
         let end = 2;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `10:8` - Set the `pa_pp_5_v_vbus_sw_config` field.
     ///
@@ -11389,12 +8461,7 @@ impl SystemConfig {
         let start = 8;
         let end = 10;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `13:11` - Set the `pb_pp_5_v_vbus_sw_config` field.
     ///
@@ -11404,12 +8471,7 @@ impl SystemConfig {
         let start = 11;
         let end = 13;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `15:14` - Set the `ilim_over_shoot` field.
     ///
@@ -11419,12 +8481,7 @@ impl SystemConfig {
         let start = 14;
         let end = 15;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `18:16` - Set the `pa_ppext_vbus_sw_config` field.
     ///
@@ -11434,12 +8491,7 @@ impl SystemConfig {
         let start = 16;
         let end = 18;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `21:19` - Set the `pb_ppext_vbus_sw_config` field.
     ///
@@ -11449,12 +8501,7 @@ impl SystemConfig {
         let start = 19;
         let end = 21;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `23:22` - Set the `rcp_threshold` field.
     ///
@@ -11464,12 +8511,7 @@ impl SystemConfig {
         let start = 22;
         let end = 23;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 24` - Set the `multi_port_sink_policy_highest_power` field.
     ///
@@ -11479,12 +8521,7 @@ impl SystemConfig {
         let start = 24;
         let end = 24;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `28:26` - Set the `tbt_controller_type` field.
     ///
@@ -11494,12 +8531,7 @@ impl SystemConfig {
         let start = 26;
         let end = 28;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 29` - Set the `enable_one_ufp_policy` field.
     ///
@@ -11509,12 +8541,7 @@ impl SystemConfig {
         let start = 29;
         let end = 29;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 30` - Set the `enable_spm` field.
     ///
@@ -11524,30 +8551,17 @@ impl SystemConfig {
         let start = 30;
         let end = 30;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `32:31` - Set the `multi_port_sink_non_overlap_time` field.
     ///
     /// Delay configuration for MultiPortSinkPolicy
     #[doc(alias = "MultiPortSinkNonOverlapTime")]
-    pub fn set_multi_port_sink_non_overlap_time(
-        &mut self,
-        value: MultiPortSinkNonOverlapTime,
-    ) {
+    pub fn set_multi_port_sink_non_overlap_time(&mut self, value: MultiPortSinkNonOverlapTime) {
         let start = 31;
         let end = 32;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 33` - Set the `enable_i_2_c_multi_controller_mode` field.
     ///
@@ -11557,12 +8571,7 @@ impl SystemConfig {
         let start = 33;
         let end = 33;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `36:34` - Set the `i_2_c_timeout` field.
     ///
@@ -11572,12 +8581,7 @@ impl SystemConfig {
         let start = 34;
         let end = 36;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 37` - Set the `disable_eeprom_updates` field.
     ///
@@ -11587,12 +8591,7 @@ impl SystemConfig {
         let start = 37;
         let end = 37;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 38` - Set the `emulate_single_port` field.
     ///
@@ -11602,12 +8601,7 @@ impl SystemConfig {
         let start = 38;
         let end = 38;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 39` - Set the `minimum_current_advertisement_1_a_5` field.
     ///
@@ -11617,12 +8611,7 @@ impl SystemConfig {
         let start = 39;
         let end = 39;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `44:43` - Set the `usb_default_current` field.
     ///
@@ -11632,12 +8621,7 @@ impl SystemConfig {
         let start = 43;
         let end = 44;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 45` - Set the `epr_supported_as_source` field.
     ///
@@ -11647,12 +8631,7 @@ impl SystemConfig {
         let start = 45;
         let end = 45;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 46` - Set the `epr_supported_as_sink` field.
     ///
@@ -11662,12 +8641,7 @@ impl SystemConfig {
         let start = 46;
         let end = 46;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 47` - Set the `enable_low_power_mode_am_entry_exit` field.
     ///
@@ -11677,12 +8651,7 @@ impl SystemConfig {
         let start = 47;
         let end = 47;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 54` - Set the `crossbar_polling_mode` field.
     ///
@@ -11692,12 +8661,7 @@ impl SystemConfig {
         let start = 54;
         let end = 54;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 55` - Set the `crossbar_config_type_1_extended` field.
     ///
@@ -11707,12 +8671,7 @@ impl SystemConfig {
         let start = 55;
         let end = 55;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `63:56` - Set the `external_dcdc_status_polling_interval` field.
     ///
@@ -11722,12 +8681,7 @@ impl SystemConfig {
         let start = 56;
         let end = 63;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `71:64` - Set the `port_1_i_2_c_2_target_address` field.
     ///
@@ -11737,12 +8691,7 @@ impl SystemConfig {
         let start = 64;
         let end = 71;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `79:72` - Set the `port_2_i_2_c_2_target_address` field.
     ///
@@ -11752,12 +8701,7 @@ impl SystemConfig {
         let start = 72;
         let end = 79;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 80` - Set the `vsys_prevents_high_power` field.
     ///
@@ -11767,12 +8711,7 @@ impl SystemConfig {
         let start = 80;
         let end = 80;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 81` - Set the `wait_for_vin_3_v_3` field.
     ///
@@ -11782,12 +8721,7 @@ impl SystemConfig {
         let start = 81;
         let end = 81;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 82` - Set the `wait_for_minimum_power` field.
     ///
@@ -11797,30 +8731,17 @@ impl SystemConfig {
         let start = 82;
         let end = 82;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 86` - Set the `auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3` field.
     ///
     /// On detecting VIN_3V3, auto clear the dead battery flag and reset the connection on the source port to update PD contract negotiated when the battery was dead
     #[doc(alias = "AutoClrDeadBatteryFlagAndResetOnVin3v3")]
-    pub fn set_auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3(
-        &mut self,
-        value: bool,
-    ) {
+    pub fn set_auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3(&mut self, value: bool) {
         let start = 86;
         let end = 86;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `104:103` - Set the `source_policy_mode` field.
     ///
@@ -11830,12 +8751,7 @@ impl SystemConfig {
         let start = 103;
         let end = 104;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for SystemConfig {
@@ -11919,90 +8835,82 @@ impl core::fmt::Debug for SystemConfig {
 impl defmt::Format for SystemConfig {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "SystemConfig {{ ");
-        defmt::write!(f, "pa_vconn_config: {=bool}, ", & self.pa_vconn_config());
-        defmt::write!(f, "pb_vconn_config: {=bool}, ", & self.pb_vconn_config());
+        defmt::write!(f, "pa_vconn_config: {=bool}, ", &self.pa_vconn_config());
+        defmt::write!(f, "pb_vconn_config: {=bool}, ", &self.pb_vconn_config());
+        defmt::write!(f, "pa_pp_5_v_vbus_sw_config: {}, ", &self.pa_pp_5_v_vbus_sw_config());
+        defmt::write!(f, "pb_pp_5_v_vbus_sw_config: {}, ", &self.pb_pp_5_v_vbus_sw_config());
+        defmt::write!(f, "ilim_over_shoot: {}, ", &self.ilim_over_shoot());
+        defmt::write!(f, "pa_ppext_vbus_sw_config: {}, ", &self.pa_ppext_vbus_sw_config());
+        defmt::write!(f, "pb_ppext_vbus_sw_config: {}, ", &self.pb_ppext_vbus_sw_config());
+        defmt::write!(f, "rcp_threshold: {}, ", &self.rcp_threshold());
         defmt::write!(
-            f, "pa_pp_5_v_vbus_sw_config: {}, ", & self.pa_pp_5_v_vbus_sw_config()
+            f,
+            "multi_port_sink_policy_highest_power: {=bool}, ",
+            &self.multi_port_sink_policy_highest_power()
+        );
+        defmt::write!(f, "tbt_controller_type: {}, ", &self.tbt_controller_type());
+        defmt::write!(f, "enable_one_ufp_policy: {=bool}, ", &self.enable_one_ufp_policy());
+        defmt::write!(f, "enable_spm: {=bool}, ", &self.enable_spm());
+        defmt::write!(
+            f,
+            "multi_port_sink_non_overlap_time: {}, ",
+            &self.multi_port_sink_non_overlap_time()
         );
         defmt::write!(
-            f, "pb_pp_5_v_vbus_sw_config: {}, ", & self.pb_pp_5_v_vbus_sw_config()
+            f,
+            "enable_i_2_c_multi_controller_mode: {=bool}, ",
+            &self.enable_i_2_c_multi_controller_mode()
         );
-        defmt::write!(f, "ilim_over_shoot: {}, ", & self.ilim_over_shoot());
+        defmt::write!(f, "i_2_c_timeout: {}, ", &self.i_2_c_timeout());
+        defmt::write!(f, "disable_eeprom_updates: {=bool}, ", &self.disable_eeprom_updates());
+        defmt::write!(f, "emulate_single_port: {=bool}, ", &self.emulate_single_port());
         defmt::write!(
-            f, "pa_ppext_vbus_sw_config: {}, ", & self.pa_ppext_vbus_sw_config()
+            f,
+            "minimum_current_advertisement_1_a_5: {=bool}, ",
+            &self.minimum_current_advertisement_1_a_5()
         );
+        defmt::write!(f, "usb_default_current: {}, ", &self.usb_default_current());
+        defmt::write!(f, "epr_supported_as_source: {=bool}, ", &self.epr_supported_as_source());
+        defmt::write!(f, "epr_supported_as_sink: {=bool}, ", &self.epr_supported_as_sink());
         defmt::write!(
-            f, "pb_ppext_vbus_sw_config: {}, ", & self.pb_ppext_vbus_sw_config()
+            f,
+            "enable_low_power_mode_am_entry_exit: {=bool}, ",
+            &self.enable_low_power_mode_am_entry_exit()
         );
-        defmt::write!(f, "rcp_threshold: {}, ", & self.rcp_threshold());
+        defmt::write!(f, "crossbar_polling_mode: {=bool}, ", &self.crossbar_polling_mode());
         defmt::write!(
-            f, "multi_port_sink_policy_highest_power: {=bool}, ", & self
-            .multi_port_sink_policy_highest_power()
-        );
-        defmt::write!(f, "tbt_controller_type: {}, ", & self.tbt_controller_type());
-        defmt::write!(
-            f, "enable_one_ufp_policy: {=bool}, ", & self.enable_one_ufp_policy()
-        );
-        defmt::write!(f, "enable_spm: {=bool}, ", & self.enable_spm());
-        defmt::write!(
-            f, "multi_port_sink_non_overlap_time: {}, ", & self
-            .multi_port_sink_non_overlap_time()
-        );
-        defmt::write!(
-            f, "enable_i_2_c_multi_controller_mode: {=bool}, ", & self
-            .enable_i_2_c_multi_controller_mode()
-        );
-        defmt::write!(f, "i_2_c_timeout: {}, ", & self.i_2_c_timeout());
-        defmt::write!(
-            f, "disable_eeprom_updates: {=bool}, ", & self.disable_eeprom_updates()
-        );
-        defmt::write!(f, "emulate_single_port: {=bool}, ", & self.emulate_single_port());
-        defmt::write!(
-            f, "minimum_current_advertisement_1_a_5: {=bool}, ", & self
-            .minimum_current_advertisement_1_a_5()
-        );
-        defmt::write!(f, "usb_default_current: {}, ", & self.usb_default_current());
-        defmt::write!(
-            f, "epr_supported_as_source: {=bool}, ", & self.epr_supported_as_source()
+            f,
+            "crossbar_config_type_1_extended: {=bool}, ",
+            &self.crossbar_config_type_1_extended()
         );
         defmt::write!(
-            f, "epr_supported_as_sink: {=bool}, ", & self.epr_supported_as_sink()
+            f,
+            "external_dcdc_status_polling_interval: {=u8}, ",
+            &self.external_dcdc_status_polling_interval()
         );
         defmt::write!(
-            f, "enable_low_power_mode_am_entry_exit: {=bool}, ", & self
-            .enable_low_power_mode_am_entry_exit()
+            f,
+            "port_1_i_2_c_2_target_address: {=u8}, ",
+            &self.port_1_i_2_c_2_target_address()
         );
         defmt::write!(
-            f, "crossbar_polling_mode: {=bool}, ", & self.crossbar_polling_mode()
+            f,
+            "port_2_i_2_c_2_target_address: {=u8}, ",
+            &self.port_2_i_2_c_2_target_address()
         );
         defmt::write!(
-            f, "crossbar_config_type_1_extended: {=bool}, ", & self
-            .crossbar_config_type_1_extended()
+            f,
+            "vsys_prevents_high_power: {=bool}, ",
+            &self.vsys_prevents_high_power()
         );
+        defmt::write!(f, "wait_for_vin_3_v_3: {=bool}, ", &self.wait_for_vin_3_v_3());
+        defmt::write!(f, "wait_for_minimum_power: {=bool}, ", &self.wait_for_minimum_power());
         defmt::write!(
-            f, "external_dcdc_status_polling_interval: {=u8}, ", & self
-            .external_dcdc_status_polling_interval()
+            f,
+            "auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3: {=bool}, ",
+            &self.auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3()
         );
-        defmt::write!(
-            f, "port_1_i_2_c_2_target_address: {=u8}, ", & self
-            .port_1_i_2_c_2_target_address()
-        );
-        defmt::write!(
-            f, "port_2_i_2_c_2_target_address: {=u8}, ", & self
-            .port_2_i_2_c_2_target_address()
-        );
-        defmt::write!(
-            f, "vsys_prevents_high_power: {=bool}, ", & self.vsys_prevents_high_power()
-        );
-        defmt::write!(f, "wait_for_vin_3_v_3: {=bool}, ", & self.wait_for_vin_3_v_3());
-        defmt::write!(
-            f, "wait_for_minimum_power: {=bool}, ", & self.wait_for_minimum_power()
-        );
-        defmt::write!(
-            f, "auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3: {=bool}, ", & self
-            .auto_clr_dead_battery_flag_and_reset_on_vin_3_v_3()
-        );
-        defmt::write!(f, "source_policy_mode: {=u8}, ", & self.source_policy_mode());
+        defmt::write!(f, "source_policy_mode: {=u8}, ", &self.source_policy_mode());
         defmt::write!(f, "}}");
     }
 }
@@ -12065,8 +8973,8 @@ pub struct PowerPathStatus {
     bits: [u8; 5],
 }
 unsafe impl ::device_driver::Fieldset for PowerPathStatus {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 5] };
 }
 impl PowerPathStatus {
@@ -12078,12 +8986,7 @@ impl PowerPathStatus {
     pub fn pa_vconn_sw(&self) -> PpVconnSw {
         let start = 0;
         let end = 1;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `3:2` - Read the `pb_vconn_sw` field.
@@ -12094,12 +8997,7 @@ impl PowerPathStatus {
     pub fn pb_vconn_sw(&self) -> PpVconnSw {
         let start = 2;
         let end = 3;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `8:6` - Read the `pa_int_vbus_sw` field.
@@ -12110,12 +9008,7 @@ impl PowerPathStatus {
     pub fn pa_int_vbus_sw(&self) -> PpIntVbusSw {
         let start = 6;
         let end = 8;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `11:9` - Read the `pb_int_vbus_sw` field.
@@ -12126,12 +9019,7 @@ impl PowerPathStatus {
     pub fn pb_int_vbus_sw(&self) -> PpIntVbusSw {
         let start = 9;
         let end = 11;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `14:12` - Read the `pa_ext_vbus_sw` field.
@@ -12142,12 +9030,7 @@ impl PowerPathStatus {
     pub fn pa_ext_vbus_sw(&self) -> PpExtVbusSw {
         let start = 12;
         let end = 14;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `17:15` - Read the `pb_ext_vbus_sw` field.
@@ -12158,12 +9041,7 @@ impl PowerPathStatus {
     pub fn pb_ext_vbus_sw(&self) -> PpExtVbusSw {
         let start = 15;
         let end = 17;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `bit 28` - Read the `pa_int_vbus_oc` field.
@@ -12174,12 +9052,7 @@ impl PowerPathStatus {
     pub fn pa_int_vbus_oc(&self) -> bool {
         let start = 28;
         let end = 28;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 29` - Read the `pb_int_vbus_oc` field.
@@ -12190,12 +9063,7 @@ impl PowerPathStatus {
     pub fn pb_int_vbus_oc(&self) -> bool {
         let start = 29;
         let end = 29;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 34` - Read the `pa_vconn_oc` field.
@@ -12206,12 +9074,7 @@ impl PowerPathStatus {
     pub fn pa_vconn_oc(&self) -> bool {
         let start = 34;
         let end = 34;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 35` - Read the `pb_vconn_oc` field.
@@ -12222,12 +9085,7 @@ impl PowerPathStatus {
     pub fn pb_vconn_oc(&self) -> bool {
         let start = 35;
         let end = 35;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `39:38` - Read the `power_source` field.
@@ -12238,12 +9096,7 @@ impl PowerPathStatus {
     pub fn power_source(&self) -> PpPowerSource {
         let start = 38;
         let end = 39;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `1:0` - Set the `pa_vconn_sw` field.
@@ -12254,12 +9107,7 @@ impl PowerPathStatus {
         let start = 0;
         let end = 1;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `3:2` - Set the `pb_vconn_sw` field.
     ///
@@ -12269,12 +9117,7 @@ impl PowerPathStatus {
         let start = 2;
         let end = 3;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `8:6` - Set the `pa_int_vbus_sw` field.
     ///
@@ -12284,12 +9127,7 @@ impl PowerPathStatus {
         let start = 6;
         let end = 8;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `11:9` - Set the `pb_int_vbus_sw` field.
     ///
@@ -12299,12 +9137,7 @@ impl PowerPathStatus {
         let start = 9;
         let end = 11;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `14:12` - Set the `pa_ext_vbus_sw` field.
     ///
@@ -12314,12 +9147,7 @@ impl PowerPathStatus {
         let start = 12;
         let end = 14;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `17:15` - Set the `pb_ext_vbus_sw` field.
     ///
@@ -12329,12 +9157,7 @@ impl PowerPathStatus {
         let start = 15;
         let end = 17;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 28` - Set the `pa_int_vbus_oc` field.
     ///
@@ -12344,12 +9167,7 @@ impl PowerPathStatus {
         let start = 28;
         let end = 28;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 29` - Set the `pb_int_vbus_oc` field.
     ///
@@ -12359,12 +9177,7 @@ impl PowerPathStatus {
         let start = 29;
         let end = 29;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 34` - Set the `pa_vconn_oc` field.
     ///
@@ -12374,12 +9187,7 @@ impl PowerPathStatus {
         let start = 34;
         let end = 34;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 35` - Set the `pb_vconn_oc` field.
     ///
@@ -12389,12 +9197,7 @@ impl PowerPathStatus {
         let start = 35;
         let end = 35;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `39:38` - Set the `power_source` field.
     ///
@@ -12404,12 +9207,7 @@ impl PowerPathStatus {
         let start = 38;
         let end = 39;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for PowerPathStatus {
@@ -12448,17 +9246,17 @@ impl core::fmt::Debug for PowerPathStatus {
 impl defmt::Format for PowerPathStatus {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "PowerPathStatus {{ ");
-        defmt::write!(f, "pa_vconn_sw: {}, ", & self.pa_vconn_sw());
-        defmt::write!(f, "pb_vconn_sw: {}, ", & self.pb_vconn_sw());
-        defmt::write!(f, "pa_int_vbus_sw: {}, ", & self.pa_int_vbus_sw());
-        defmt::write!(f, "pb_int_vbus_sw: {}, ", & self.pb_int_vbus_sw());
-        defmt::write!(f, "pa_ext_vbus_sw: {}, ", & self.pa_ext_vbus_sw());
-        defmt::write!(f, "pb_ext_vbus_sw: {}, ", & self.pb_ext_vbus_sw());
-        defmt::write!(f, "pa_int_vbus_oc: {=bool}, ", & self.pa_int_vbus_oc());
-        defmt::write!(f, "pb_int_vbus_oc: {=bool}, ", & self.pb_int_vbus_oc());
-        defmt::write!(f, "pa_vconn_oc: {=bool}, ", & self.pa_vconn_oc());
-        defmt::write!(f, "pb_vconn_oc: {=bool}, ", & self.pb_vconn_oc());
-        defmt::write!(f, "power_source: {}, ", & self.power_source());
+        defmt::write!(f, "pa_vconn_sw: {}, ", &self.pa_vconn_sw());
+        defmt::write!(f, "pb_vconn_sw: {}, ", &self.pb_vconn_sw());
+        defmt::write!(f, "pa_int_vbus_sw: {}, ", &self.pa_int_vbus_sw());
+        defmt::write!(f, "pb_int_vbus_sw: {}, ", &self.pb_int_vbus_sw());
+        defmt::write!(f, "pa_ext_vbus_sw: {}, ", &self.pa_ext_vbus_sw());
+        defmt::write!(f, "pb_ext_vbus_sw: {}, ", &self.pb_ext_vbus_sw());
+        defmt::write!(f, "pa_int_vbus_oc: {=bool}, ", &self.pa_int_vbus_oc());
+        defmt::write!(f, "pb_int_vbus_oc: {=bool}, ", &self.pb_int_vbus_oc());
+        defmt::write!(f, "pa_vconn_oc: {=bool}, ", &self.pa_vconn_oc());
+        defmt::write!(f, "pb_vconn_oc: {=bool}, ", &self.pb_vconn_oc());
+        defmt::write!(f, "power_source: {}, ", &self.power_source());
         defmt::write!(f, "}}");
     }
 }
@@ -12521,8 +9319,8 @@ pub struct UsbStatus {
     bits: [u8; 9],
 }
 unsafe impl ::device_driver::Fieldset for UsbStatus {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 9] };
 }
 impl UsbStatus {
@@ -12534,12 +9332,7 @@ impl UsbStatus {
     pub fn eudo_sop_sent_status(&self) -> EudoSopSentStatus {
         let start = 0;
         let end = 1;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `3:2` - Read the `usb_4_required_plug_mode` field.
@@ -12550,12 +9343,7 @@ impl UsbStatus {
     pub fn usb_4_required_plug_mode(&self) -> Usb4RequiredPlugMode {
         let start = 2;
         let end = 3;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 4` - Read the `usb_mode_active_on_plug` field.
@@ -12566,12 +9354,7 @@ impl UsbStatus {
     pub fn usb_mode_active_on_plug(&self) -> bool {
         let start = 4;
         let end = 4;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 5` - Read the `vpro_entry_failed` field.
@@ -12582,12 +9365,7 @@ impl UsbStatus {
     pub fn vpro_entry_failed(&self) -> bool {
         let start = 5;
         let end = 5;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 6` - Read the `usb_reentry_needed` field.
@@ -12598,12 +9376,7 @@ impl UsbStatus {
     pub fn usb_reentry_needed(&self) -> bool {
         let start = 6;
         let end = 6;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `39:8` - Read the `enter_usb_data_object` field.
@@ -12614,12 +9387,7 @@ impl UsbStatus {
     pub fn enter_usb_data_object(&self) -> u32 {
         let start = 8;
         let end = 39;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `71:40` - Read the `tbt_enter_mode_vdo` field.
@@ -12630,12 +9398,7 @@ impl UsbStatus {
     pub fn tbt_enter_mode_vdo(&self) -> u32 {
         let start = 40;
         let end = 71;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `1:0` - Set the `eudo_sop_sent_status` field.
@@ -12646,12 +9409,7 @@ impl UsbStatus {
         let start = 0;
         let end = 1;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `3:2` - Set the `usb_4_required_plug_mode` field.
     ///
@@ -12661,12 +9419,7 @@ impl UsbStatus {
         let start = 2;
         let end = 3;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 4` - Set the `usb_mode_active_on_plug` field.
     ///
@@ -12676,12 +9429,7 @@ impl UsbStatus {
         let start = 4;
         let end = 4;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 5` - Set the `vpro_entry_failed` field.
     ///
@@ -12691,12 +9439,7 @@ impl UsbStatus {
         let start = 5;
         let end = 5;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 6` - Set the `usb_reentry_needed` field.
     ///
@@ -12706,12 +9449,7 @@ impl UsbStatus {
         let start = 6;
         let end = 6;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `39:8` - Set the `enter_usb_data_object` field.
     ///
@@ -12721,12 +9459,7 @@ impl UsbStatus {
         let start = 8;
         let end = 39;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `71:40` - Set the `tbt_enter_mode_vdo` field.
     ///
@@ -12736,12 +9469,7 @@ impl UsbStatus {
         let start = 40;
         let end = 71;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for UsbStatus {
@@ -12776,19 +9504,13 @@ impl core::fmt::Debug for UsbStatus {
 impl defmt::Format for UsbStatus {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "UsbStatus {{ ");
-        defmt::write!(f, "eudo_sop_sent_status: {}, ", & self.eudo_sop_sent_status());
-        defmt::write!(
-            f, "usb_4_required_plug_mode: {}, ", & self.usb_4_required_plug_mode()
-        );
-        defmt::write!(
-            f, "usb_mode_active_on_plug: {=bool}, ", & self.usb_mode_active_on_plug()
-        );
-        defmt::write!(f, "vpro_entry_failed: {=bool}, ", & self.vpro_entry_failed());
-        defmt::write!(f, "usb_reentry_needed: {=bool}, ", & self.usb_reentry_needed());
-        defmt::write!(
-            f, "enter_usb_data_object: {=u32}, ", & self.enter_usb_data_object()
-        );
-        defmt::write!(f, "tbt_enter_mode_vdo: {=u32}, ", & self.tbt_enter_mode_vdo());
+        defmt::write!(f, "eudo_sop_sent_status: {}, ", &self.eudo_sop_sent_status());
+        defmt::write!(f, "usb_4_required_plug_mode: {}, ", &self.usb_4_required_plug_mode());
+        defmt::write!(f, "usb_mode_active_on_plug: {=bool}, ", &self.usb_mode_active_on_plug());
+        defmt::write!(f, "vpro_entry_failed: {=bool}, ", &self.vpro_entry_failed());
+        defmt::write!(f, "usb_reentry_needed: {=bool}, ", &self.usb_reentry_needed());
+        defmt::write!(f, "enter_usb_data_object: {=u32}, ", &self.enter_usb_data_object());
+        defmt::write!(f, "tbt_enter_mode_vdo: {=u32}, ", &self.tbt_enter_mode_vdo());
         defmt::write!(f, "}}");
     }
 }
@@ -12851,8 +9573,8 @@ pub struct Status {
     bits: [u8; 5],
 }
 unsafe impl ::device_driver::Fieldset for Status {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 5] };
 }
 impl Status {
@@ -12864,12 +9586,7 @@ impl Status {
     pub fn plug_present(&self) -> bool {
         let start = 0;
         let end = 0;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `3:1` - Read the `connection_state` field.
@@ -12880,12 +9597,7 @@ impl Status {
     pub fn connection_state(&self) -> PlugMode {
         let start = 1;
         let end = 3;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 4` - Read the `plug_orientation` field.
@@ -12896,12 +9608,7 @@ impl Status {
     pub fn plug_orientation(&self) -> bool {
         let start = 4;
         let end = 4;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 5` - Read the `port_role` field.
@@ -12912,12 +9619,7 @@ impl Status {
     pub fn port_role(&self) -> bool {
         let start = 5;
         let end = 5;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 6` - Read the `data_role` field.
@@ -12928,12 +9630,7 @@ impl Status {
     pub fn data_role(&self) -> bool {
         let start = 6;
         let end = 6;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 7` - Read the `erp_mode` field.
@@ -12944,12 +9641,7 @@ impl Status {
     pub fn erp_mode(&self) -> bool {
         let start = 7;
         let end = 7;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `21:20` - Read the `vbus_status` field.
@@ -12960,12 +9652,7 @@ impl Status {
     pub fn vbus_status(&self) -> VbusMode {
         let start = 20;
         let end = 21;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `23:22` - Read the `usb_host` field.
@@ -12976,12 +9663,7 @@ impl Status {
     pub fn usb_host(&self) -> UsbHostMode {
         let start = 22;
         let end = 23;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `25:24` - Read the `legacy` field.
@@ -12992,12 +9674,7 @@ impl Status {
     pub fn legacy(&self) -> LegacyMode {
         let start = 24;
         let end = 25;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 27` - Read the `bist_in_progress` field.
@@ -13008,12 +9685,7 @@ impl Status {
     pub fn bist_in_progress(&self) -> bool {
         let start = 27;
         let end = 27;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 30` - Read the `soc_ack_timeout` field.
@@ -13024,12 +9696,7 @@ impl Status {
     pub fn soc_ack_timeout(&self) -> bool {
         let start = 30;
         let end = 30;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `33:32` - Read the `am_status` field.
@@ -13040,12 +9707,7 @@ impl Status {
     pub fn am_status(&self) -> AmStatus {
         let start = 32;
         let end = 33;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         unsafe { raw.try_into().unwrap_unchecked() }
     }
     /// `bit 0` - Set the `plug_present` field.
@@ -13056,12 +9718,7 @@ impl Status {
         let start = 0;
         let end = 0;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `3:1` - Set the `connection_state` field.
     ///
@@ -13071,12 +9728,7 @@ impl Status {
         let start = 1;
         let end = 3;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 4` - Set the `plug_orientation` field.
     ///
@@ -13086,12 +9738,7 @@ impl Status {
         let start = 4;
         let end = 4;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 5` - Set the `port_role` field.
     ///
@@ -13101,12 +9748,7 @@ impl Status {
         let start = 5;
         let end = 5;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 6` - Set the `data_role` field.
     ///
@@ -13116,12 +9758,7 @@ impl Status {
         let start = 6;
         let end = 6;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 7` - Set the `erp_mode` field.
     ///
@@ -13131,12 +9768,7 @@ impl Status {
         let start = 7;
         let end = 7;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `21:20` - Set the `vbus_status` field.
     ///
@@ -13146,12 +9778,7 @@ impl Status {
         let start = 20;
         let end = 21;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `23:22` - Set the `usb_host` field.
     ///
@@ -13161,12 +9788,7 @@ impl Status {
         let start = 22;
         let end = 23;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `25:24` - Set the `legacy` field.
     ///
@@ -13176,12 +9798,7 @@ impl Status {
         let start = 24;
         let end = 25;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 27` - Set the `bist_in_progress` field.
     ///
@@ -13191,12 +9808,7 @@ impl Status {
         let start = 27;
         let end = 27;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 30` - Set the `soc_ack_timeout` field.
     ///
@@ -13206,12 +9818,7 @@ impl Status {
         let start = 30;
         let end = 30;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `33:32` - Set the `am_status` field.
     ///
@@ -13221,12 +9828,7 @@ impl Status {
         let start = 32;
         let end = 33;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for Status {
@@ -13266,18 +9868,18 @@ impl core::fmt::Debug for Status {
 impl defmt::Format for Status {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "Status {{ ");
-        defmt::write!(f, "plug_present: {=bool}, ", & self.plug_present());
-        defmt::write!(f, "connection_state: {}, ", & self.connection_state());
-        defmt::write!(f, "plug_orientation: {=bool}, ", & self.plug_orientation());
-        defmt::write!(f, "port_role: {=bool}, ", & self.port_role());
-        defmt::write!(f, "data_role: {=bool}, ", & self.data_role());
-        defmt::write!(f, "erp_mode: {=bool}, ", & self.erp_mode());
-        defmt::write!(f, "vbus_status: {}, ", & self.vbus_status());
-        defmt::write!(f, "usb_host: {}, ", & self.usb_host());
-        defmt::write!(f, "legacy: {}, ", & self.legacy());
-        defmt::write!(f, "bist_in_progress: {=bool}, ", & self.bist_in_progress());
-        defmt::write!(f, "soc_ack_timeout: {=bool}, ", & self.soc_ack_timeout());
-        defmt::write!(f, "am_status: {}, ", & self.am_status());
+        defmt::write!(f, "plug_present: {=bool}, ", &self.plug_present());
+        defmt::write!(f, "connection_state: {}, ", &self.connection_state());
+        defmt::write!(f, "plug_orientation: {=bool}, ", &self.plug_orientation());
+        defmt::write!(f, "port_role: {=bool}, ", &self.port_role());
+        defmt::write!(f, "data_role: {=bool}, ", &self.data_role());
+        defmt::write!(f, "erp_mode: {=bool}, ", &self.erp_mode());
+        defmt::write!(f, "vbus_status: {}, ", &self.vbus_status());
+        defmt::write!(f, "usb_host: {}, ", &self.usb_host());
+        defmt::write!(f, "legacy: {}, ", &self.legacy());
+        defmt::write!(f, "bist_in_progress: {=bool}, ", &self.bist_in_progress());
+        defmt::write!(f, "soc_ack_timeout: {=bool}, ", &self.soc_ack_timeout());
+        defmt::write!(f, "am_status: {}, ", &self.am_status());
         defmt::write!(f, "}}");
     }
 }
@@ -13340,8 +9942,8 @@ pub struct DiscoveredSvids {
     bits: [u8; 33],
 }
 unsafe impl ::device_driver::Fieldset for DiscoveredSvids {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 33] };
 }
 impl DiscoveredSvids {
@@ -13353,12 +9955,7 @@ impl DiscoveredSvids {
     pub fn number_sop_svids(&self) -> u8 {
         let start = 0;
         let end = 3;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `7:4` - Read the `number_sop_prime_svids` field.
@@ -13369,12 +9966,7 @@ impl DiscoveredSvids {
     pub fn number_sop_prime_svids(&self) -> u8 {
         let start = 4;
         let end = 7;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `23:8` - Read the `svid_sop_0` field.
@@ -13385,12 +9977,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_0(&self) -> u16 {
         let start = 8;
         let end = 23;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `39:24` - Read the `svid_sop_1` field.
@@ -13401,12 +9988,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_1(&self) -> u16 {
         let start = 24;
         let end = 39;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `55:40` - Read the `svid_sop_2` field.
@@ -13417,12 +9999,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_2(&self) -> u16 {
         let start = 40;
         let end = 55;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `71:56` - Read the `svid_sop_3` field.
@@ -13433,12 +10010,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_3(&self) -> u16 {
         let start = 56;
         let end = 71;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `87:72` - Read the `svid_sop_4` field.
@@ -13449,12 +10021,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_4(&self) -> u16 {
         let start = 72;
         let end = 87;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `103:88` - Read the `svid_sop_5` field.
@@ -13465,12 +10032,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_5(&self) -> u16 {
         let start = 88;
         let end = 103;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `119:104` - Read the `svid_sop_6` field.
@@ -13481,12 +10043,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_6(&self) -> u16 {
         let start = 104;
         let end = 119;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `135:120` - Read the `svid_sop_7` field.
@@ -13497,12 +10054,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_7(&self) -> u16 {
         let start = 120;
         let end = 135;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `151:136` - Read the `svid_sop_prime_0` field.
@@ -13513,12 +10065,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_prime_0(&self) -> u16 {
         let start = 136;
         let end = 151;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `167:152` - Read the `svid_sop_prime_1` field.
@@ -13529,12 +10076,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_prime_1(&self) -> u16 {
         let start = 152;
         let end = 167;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `183:168` - Read the `svid_sop_prime_2` field.
@@ -13545,12 +10087,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_prime_2(&self) -> u16 {
         let start = 168;
         let end = 183;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `199:184` - Read the `svid_sop_prime_3` field.
@@ -13561,12 +10098,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_prime_3(&self) -> u16 {
         let start = 184;
         let end = 199;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `215:200` - Read the `svid_sop_prime_4` field.
@@ -13577,12 +10109,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_prime_4(&self) -> u16 {
         let start = 200;
         let end = 215;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `231:216` - Read the `svid_sop_prime_5` field.
@@ -13593,12 +10120,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_prime_5(&self) -> u16 {
         let start = 216;
         let end = 231;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `247:232` - Read the `svid_sop_prime_6` field.
@@ -13609,12 +10131,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_prime_6(&self) -> u16 {
         let start = 232;
         let end = 247;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `263:248` - Read the `svid_sop_prime_7` field.
@@ -13625,12 +10142,7 @@ impl DiscoveredSvids {
     pub fn svid_sop_prime_7(&self) -> u16 {
         let start = 248;
         let end = 263;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u16,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u16, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `3:0` - Set the `number_sop_svids` field.
@@ -13641,12 +10153,7 @@ impl DiscoveredSvids {
         let start = 0;
         let end = 3;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `7:4` - Set the `number_sop_prime_svids` field.
     ///
@@ -13656,12 +10163,7 @@ impl DiscoveredSvids {
         let start = 4;
         let end = 7;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `23:8` - Set the `svid_sop_0` field.
     ///
@@ -13671,12 +10173,7 @@ impl DiscoveredSvids {
         let start = 8;
         let end = 23;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `39:24` - Set the `svid_sop_1` field.
     ///
@@ -13686,12 +10183,7 @@ impl DiscoveredSvids {
         let start = 24;
         let end = 39;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `55:40` - Set the `svid_sop_2` field.
     ///
@@ -13701,12 +10193,7 @@ impl DiscoveredSvids {
         let start = 40;
         let end = 55;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `71:56` - Set the `svid_sop_3` field.
     ///
@@ -13716,12 +10203,7 @@ impl DiscoveredSvids {
         let start = 56;
         let end = 71;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `87:72` - Set the `svid_sop_4` field.
     ///
@@ -13731,12 +10213,7 @@ impl DiscoveredSvids {
         let start = 72;
         let end = 87;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `103:88` - Set the `svid_sop_5` field.
     ///
@@ -13746,12 +10223,7 @@ impl DiscoveredSvids {
         let start = 88;
         let end = 103;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `119:104` - Set the `svid_sop_6` field.
     ///
@@ -13761,12 +10233,7 @@ impl DiscoveredSvids {
         let start = 104;
         let end = 119;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `135:120` - Set the `svid_sop_7` field.
     ///
@@ -13776,12 +10243,7 @@ impl DiscoveredSvids {
         let start = 120;
         let end = 135;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `151:136` - Set the `svid_sop_prime_0` field.
     ///
@@ -13791,12 +10253,7 @@ impl DiscoveredSvids {
         let start = 136;
         let end = 151;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `167:152` - Set the `svid_sop_prime_1` field.
     ///
@@ -13806,12 +10263,7 @@ impl DiscoveredSvids {
         let start = 152;
         let end = 167;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `183:168` - Set the `svid_sop_prime_2` field.
     ///
@@ -13821,12 +10273,7 @@ impl DiscoveredSvids {
         let start = 168;
         let end = 183;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `199:184` - Set the `svid_sop_prime_3` field.
     ///
@@ -13836,12 +10283,7 @@ impl DiscoveredSvids {
         let start = 184;
         let end = 199;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `215:200` - Set the `svid_sop_prime_4` field.
     ///
@@ -13851,12 +10293,7 @@ impl DiscoveredSvids {
         let start = 200;
         let end = 215;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `231:216` - Set the `svid_sop_prime_5` field.
     ///
@@ -13866,12 +10303,7 @@ impl DiscoveredSvids {
         let start = 216;
         let end = 231;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `247:232` - Set the `svid_sop_prime_6` field.
     ///
@@ -13881,12 +10313,7 @@ impl DiscoveredSvids {
         let start = 232;
         let end = 247;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `263:248` - Set the `svid_sop_prime_7` field.
     ///
@@ -13896,12 +10323,7 @@ impl DiscoveredSvids {
         let start = 248;
         let end = 263;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u16,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u16, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for DiscoveredSvids {
@@ -13947,26 +10369,24 @@ impl core::fmt::Debug for DiscoveredSvids {
 impl defmt::Format for DiscoveredSvids {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "DiscoveredSvids {{ ");
-        defmt::write!(f, "number_sop_svids: {=u8}, ", & self.number_sop_svids());
-        defmt::write!(
-            f, "number_sop_prime_svids: {=u8}, ", & self.number_sop_prime_svids()
-        );
-        defmt::write!(f, "svid_sop_0: {=u16}, ", & self.svid_sop_0());
-        defmt::write!(f, "svid_sop_1: {=u16}, ", & self.svid_sop_1());
-        defmt::write!(f, "svid_sop_2: {=u16}, ", & self.svid_sop_2());
-        defmt::write!(f, "svid_sop_3: {=u16}, ", & self.svid_sop_3());
-        defmt::write!(f, "svid_sop_4: {=u16}, ", & self.svid_sop_4());
-        defmt::write!(f, "svid_sop_5: {=u16}, ", & self.svid_sop_5());
-        defmt::write!(f, "svid_sop_6: {=u16}, ", & self.svid_sop_6());
-        defmt::write!(f, "svid_sop_7: {=u16}, ", & self.svid_sop_7());
-        defmt::write!(f, "svid_sop_prime_0: {=u16}, ", & self.svid_sop_prime_0());
-        defmt::write!(f, "svid_sop_prime_1: {=u16}, ", & self.svid_sop_prime_1());
-        defmt::write!(f, "svid_sop_prime_2: {=u16}, ", & self.svid_sop_prime_2());
-        defmt::write!(f, "svid_sop_prime_3: {=u16}, ", & self.svid_sop_prime_3());
-        defmt::write!(f, "svid_sop_prime_4: {=u16}, ", & self.svid_sop_prime_4());
-        defmt::write!(f, "svid_sop_prime_5: {=u16}, ", & self.svid_sop_prime_5());
-        defmt::write!(f, "svid_sop_prime_6: {=u16}, ", & self.svid_sop_prime_6());
-        defmt::write!(f, "svid_sop_prime_7: {=u16}, ", & self.svid_sop_prime_7());
+        defmt::write!(f, "number_sop_svids: {=u8}, ", &self.number_sop_svids());
+        defmt::write!(f, "number_sop_prime_svids: {=u8}, ", &self.number_sop_prime_svids());
+        defmt::write!(f, "svid_sop_0: {=u16}, ", &self.svid_sop_0());
+        defmt::write!(f, "svid_sop_1: {=u16}, ", &self.svid_sop_1());
+        defmt::write!(f, "svid_sop_2: {=u16}, ", &self.svid_sop_2());
+        defmt::write!(f, "svid_sop_3: {=u16}, ", &self.svid_sop_3());
+        defmt::write!(f, "svid_sop_4: {=u16}, ", &self.svid_sop_4());
+        defmt::write!(f, "svid_sop_5: {=u16}, ", &self.svid_sop_5());
+        defmt::write!(f, "svid_sop_6: {=u16}, ", &self.svid_sop_6());
+        defmt::write!(f, "svid_sop_7: {=u16}, ", &self.svid_sop_7());
+        defmt::write!(f, "svid_sop_prime_0: {=u16}, ", &self.svid_sop_prime_0());
+        defmt::write!(f, "svid_sop_prime_1: {=u16}, ", &self.svid_sop_prime_1());
+        defmt::write!(f, "svid_sop_prime_2: {=u16}, ", &self.svid_sop_prime_2());
+        defmt::write!(f, "svid_sop_prime_3: {=u16}, ", &self.svid_sop_prime_3());
+        defmt::write!(f, "svid_sop_prime_4: {=u16}, ", &self.svid_sop_prime_4());
+        defmt::write!(f, "svid_sop_prime_5: {=u16}, ", &self.svid_sop_prime_5());
+        defmt::write!(f, "svid_sop_prime_6: {=u16}, ", &self.svid_sop_prime_6());
+        defmt::write!(f, "svid_sop_prime_7: {=u16}, ", &self.svid_sop_prime_7());
         defmt::write!(f, "}}");
     }
 }
@@ -14029,8 +10449,8 @@ pub struct SxAppConfig {
     bits: [u8; 2],
 }
 unsafe impl ::device_driver::Fieldset for SxAppConfig {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 2] };
 }
 impl SxAppConfig {
@@ -14042,12 +10462,7 @@ impl SxAppConfig {
     pub fn sleep_state(&self) -> SystemPowerState {
         let start = 0;
         let end = 2;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw.into()
     }
     /// `2:0` - Set the `sleep_state` field.
@@ -14058,12 +10473,7 @@ impl SxAppConfig {
         let start = 0;
         let end = 2;
         let raw = value.into();
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for SxAppConfig {
@@ -14092,7 +10502,7 @@ impl core::fmt::Debug for SxAppConfig {
 impl defmt::Format for SxAppConfig {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "SxAppConfig {{ ");
-        defmt::write!(f, "sleep_state: {}, ", & self.sleep_state());
+        defmt::write!(f, "sleep_state: {}, ", &self.sleep_state());
         defmt::write!(f, "}}");
     }
 }
@@ -14155,8 +10565,8 @@ pub struct IntEventBus1 {
     bits: [u8; 11],
 }
 unsafe impl ::device_driver::Fieldset for IntEventBus1 {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 11] };
 }
 impl IntEventBus1 {
@@ -14168,12 +10578,7 @@ impl IntEventBus1 {
     pub fn hard_reset(&self) -> bool {
         let start = 1;
         let end = 1;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 3` - Read the `plug_event` field.
@@ -14184,12 +10589,7 @@ impl IntEventBus1 {
     pub fn plug_event(&self) -> bool {
         let start = 3;
         let end = 3;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 4` - Read the `power_swap_completed` field.
@@ -14200,12 +10600,7 @@ impl IntEventBus1 {
     pub fn power_swap_completed(&self) -> bool {
         let start = 4;
         let end = 4;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 5` - Read the `data_swap_completed` field.
@@ -14216,12 +10611,7 @@ impl IntEventBus1 {
     pub fn data_swap_completed(&self) -> bool {
         let start = 5;
         let end = 5;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 6` - Read the `fast_role_swap_completed` field.
@@ -14232,12 +10622,7 @@ impl IntEventBus1 {
     pub fn fast_role_swap_completed(&self) -> bool {
         let start = 6;
         let end = 6;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 7` - Read the `source_cap_updated` field.
@@ -14248,12 +10633,7 @@ impl IntEventBus1 {
     pub fn source_cap_updated(&self) -> bool {
         let start = 7;
         let end = 7;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 8` - Read the `sink_ready` field.
@@ -14264,12 +10644,7 @@ impl IntEventBus1 {
     pub fn sink_ready(&self) -> bool {
         let start = 8;
         let end = 8;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 9` - Read the `overcurrent` field.
@@ -14280,12 +10655,7 @@ impl IntEventBus1 {
     pub fn overcurrent(&self) -> bool {
         let start = 9;
         let end = 9;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 10` - Read the `attention_received` field.
@@ -14296,12 +10666,7 @@ impl IntEventBus1 {
     pub fn attention_received(&self) -> bool {
         let start = 10;
         let end = 10;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 11` - Read the `vdm_received` field.
@@ -14312,12 +10677,7 @@ impl IntEventBus1 {
     pub fn vdm_received(&self) -> bool {
         let start = 11;
         let end = 11;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 12` - Read the `new_consumer_contract` field.
@@ -14328,12 +10688,7 @@ impl IntEventBus1 {
     pub fn new_consumer_contract(&self) -> bool {
         let start = 12;
         let end = 12;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 13` - Read the `new_provider_contract` field.
@@ -14344,12 +10699,7 @@ impl IntEventBus1 {
     pub fn new_provider_contract(&self) -> bool {
         let start = 13;
         let end = 13;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 14` - Read the `source_caps_received` field.
@@ -14360,12 +10710,7 @@ impl IntEventBus1 {
     pub fn source_caps_received(&self) -> bool {
         let start = 14;
         let end = 14;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 15` - Read the `sink_caps_received` field.
@@ -14376,12 +10721,7 @@ impl IntEventBus1 {
     pub fn sink_caps_received(&self) -> bool {
         let start = 15;
         let end = 15;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 17` - Read the `power_swap_requested` field.
@@ -14392,12 +10732,7 @@ impl IntEventBus1 {
     pub fn power_swap_requested(&self) -> bool {
         let start = 17;
         let end = 17;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 18` - Read the `data_swap_requested` field.
@@ -14408,12 +10743,7 @@ impl IntEventBus1 {
     pub fn data_swap_requested(&self) -> bool {
         let start = 18;
         let end = 18;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 20` - Read the `usb_host_present` field.
@@ -14424,12 +10754,7 @@ impl IntEventBus1 {
     pub fn usb_host_present(&self) -> bool {
         let start = 20;
         let end = 20;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 21` - Read the `usb_host_not_present` field.
@@ -14440,12 +10765,7 @@ impl IntEventBus1 {
     pub fn usb_host_not_present(&self) -> bool {
         let start = 21;
         let end = 21;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 23` - Read the `power_path_switch_changed` field.
@@ -14456,12 +10776,7 @@ impl IntEventBus1 {
     pub fn power_path_switch_changed(&self) -> bool {
         let start = 23;
         let end = 23;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 25` - Read the `data_status_updated` field.
@@ -14472,12 +10787,7 @@ impl IntEventBus1 {
     pub fn data_status_updated(&self) -> bool {
         let start = 25;
         let end = 25;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 26` - Read the `status_updated` field.
@@ -14488,12 +10798,7 @@ impl IntEventBus1 {
     pub fn status_updated(&self) -> bool {
         let start = 26;
         let end = 26;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 27` - Read the `pd_status_updated` field.
@@ -14504,12 +10809,7 @@ impl IntEventBus1 {
     pub fn pd_status_updated(&self) -> bool {
         let start = 27;
         let end = 27;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 30` - Read the `cmd_1_completed` field.
@@ -14520,12 +10820,7 @@ impl IntEventBus1 {
     pub fn cmd_1_completed(&self) -> bool {
         let start = 30;
         let end = 30;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 31` - Read the `cmd_2_completed` field.
@@ -14536,12 +10831,7 @@ impl IntEventBus1 {
     pub fn cmd_2_completed(&self) -> bool {
         let start = 31;
         let end = 31;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 32` - Read the `device_incompatible` field.
@@ -14552,12 +10842,7 @@ impl IntEventBus1 {
     pub fn device_incompatible(&self) -> bool {
         let start = 32;
         let end = 32;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 33` - Read the `cannot_source` field.
@@ -14568,12 +10853,7 @@ impl IntEventBus1 {
     pub fn cannot_source(&self) -> bool {
         let start = 33;
         let end = 33;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 34` - Read the `can_source_later` field.
@@ -14584,12 +10864,7 @@ impl IntEventBus1 {
     pub fn can_source_later(&self) -> bool {
         let start = 34;
         let end = 34;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 35` - Read the `power_event_error` field.
@@ -14600,12 +10875,7 @@ impl IntEventBus1 {
     pub fn power_event_error(&self) -> bool {
         let start = 35;
         let end = 35;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 36` - Read the `no_caps_response` field.
@@ -14616,12 +10886,7 @@ impl IntEventBus1 {
     pub fn no_caps_response(&self) -> bool {
         let start = 36;
         let end = 36;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 38` - Read the `protocol_error` field.
@@ -14632,12 +10897,7 @@ impl IntEventBus1 {
     pub fn protocol_error(&self) -> bool {
         let start = 38;
         let end = 38;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 42` - Read the `sink_transition_completed` field.
@@ -14648,12 +10908,7 @@ impl IntEventBus1 {
     pub fn sink_transition_completed(&self) -> bool {
         let start = 42;
         let end = 42;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 43` - Read the `plug_early_notification` field.
@@ -14664,12 +10919,7 @@ impl IntEventBus1 {
     pub fn plug_early_notification(&self) -> bool {
         let start = 43;
         let end = 43;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 44` - Read the `prochot_notification` field.
@@ -14680,12 +10930,7 @@ impl IntEventBus1 {
     pub fn prochot_notification(&self) -> bool {
         let start = 44;
         let end = 44;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 46` - Read the `source_cannot_provide` field.
@@ -14696,12 +10941,7 @@ impl IntEventBus1 {
     pub fn source_cannot_provide(&self) -> bool {
         let start = 46;
         let end = 46;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 48` - Read the `am_entry_fail` field.
@@ -14712,12 +10952,7 @@ impl IntEventBus1 {
     pub fn am_entry_fail(&self) -> bool {
         let start = 48;
         let end = 48;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 49` - Read the `am_entered` field.
@@ -14728,12 +10963,7 @@ impl IntEventBus1 {
     pub fn am_entered(&self) -> bool {
         let start = 49;
         let end = 49;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 51` - Read the `discover_mode_completed` field.
@@ -14744,12 +10974,7 @@ impl IntEventBus1 {
     pub fn discover_mode_completed(&self) -> bool {
         let start = 51;
         let end = 51;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 52` - Read the `exit_mode_completed` field.
@@ -14760,12 +10985,7 @@ impl IntEventBus1 {
     pub fn exit_mode_completed(&self) -> bool {
         let start = 52;
         let end = 52;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 53` - Read the `data_reset_started` field.
@@ -14776,12 +10996,7 @@ impl IntEventBus1 {
     pub fn data_reset_started(&self) -> bool {
         let start = 53;
         let end = 53;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 54` - Read the `usb_status_updated` field.
@@ -14792,12 +11007,7 @@ impl IntEventBus1 {
     pub fn usb_status_updated(&self) -> bool {
         let start = 54;
         let end = 54;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 55` - Read the `connection_manager_updated` field.
@@ -14808,12 +11018,7 @@ impl IntEventBus1 {
     pub fn connection_manager_updated(&self) -> bool {
         let start = 55;
         let end = 55;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 56` - Read the `usvid_mode_entered` field.
@@ -14824,12 +11029,7 @@ impl IntEventBus1 {
     pub fn usvid_mode_entered(&self) -> bool {
         let start = 56;
         let end = 56;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 57` - Read the `usvid_mode_exited` field.
@@ -14840,12 +11040,7 @@ impl IntEventBus1 {
     pub fn usvid_mode_exited(&self) -> bool {
         let start = 57;
         let end = 57;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 58` - Read the `usvid_attention_vdm_received` field.
@@ -14856,12 +11051,7 @@ impl IntEventBus1 {
     pub fn usvid_attention_vdm_received(&self) -> bool {
         let start = 58;
         let end = 58;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 59` - Read the `usvid_other_vdm_received` field.
@@ -14872,12 +11062,7 @@ impl IntEventBus1 {
     pub fn usvid_other_vdm_received(&self) -> bool {
         let start = 59;
         let end = 59;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 61` - Read the `external_dc_dc_event` field.
@@ -14888,12 +11073,7 @@ impl IntEventBus1 {
     pub fn external_dc_dc_event(&self) -> bool {
         let start = 61;
         let end = 61;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 62` - Read the `dp_sid_status_updated` field.
@@ -14904,12 +11084,7 @@ impl IntEventBus1 {
     pub fn dp_sid_status_updated(&self) -> bool {
         let start = 62;
         let end = 62;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 63` - Read the `intel_vid_status_updated` field.
@@ -14920,12 +11095,7 @@ impl IntEventBus1 {
     pub fn intel_vid_status_updated(&self) -> bool {
         let start = 63;
         let end = 63;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 64` - Read the `pd_3_status_updated` field.
@@ -14936,12 +11106,7 @@ impl IntEventBus1 {
     pub fn pd_3_status_updated(&self) -> bool {
         let start = 64;
         let end = 64;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 65` - Read the `tx_memory_buffer_empty` field.
@@ -14952,12 +11117,7 @@ impl IntEventBus1 {
     pub fn tx_memory_buffer_empty(&self) -> bool {
         let start = 65;
         let end = 65;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 66` - Read the `mbrd_buffer_ready` field.
@@ -14968,12 +11128,7 @@ impl IntEventBus1 {
     pub fn mbrd_buffer_ready(&self) -> bool {
         let start = 66;
         let end = 66;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 70` - Read the `soc_ack_timeout` field.
@@ -14984,12 +11139,7 @@ impl IntEventBus1 {
     pub fn soc_ack_timeout(&self) -> bool {
         let start = 70;
         let end = 70;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 71` - Read the `not_supported_received` field.
@@ -15000,12 +11150,7 @@ impl IntEventBus1 {
     pub fn not_supported_received(&self) -> bool {
         let start = 71;
         let end = 71;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 72` - Read the `crossbar_error` field.
@@ -15016,12 +11161,7 @@ impl IntEventBus1 {
     pub fn crossbar_error(&self) -> bool {
         let start = 72;
         let end = 72;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 73` - Read the `mailbox_updated` field.
@@ -15032,12 +11172,7 @@ impl IntEventBus1 {
     pub fn mailbox_updated(&self) -> bool {
         let start = 73;
         let end = 73;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 74` - Read the `bus_error` field.
@@ -15048,12 +11183,7 @@ impl IntEventBus1 {
     pub fn bus_error(&self) -> bool {
         let start = 74;
         let end = 74;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 75` - Read the `external_dc_dc_status_changed` field.
@@ -15064,12 +11194,7 @@ impl IntEventBus1 {
     pub fn external_dc_dc_status_changed(&self) -> bool {
         let start = 75;
         let end = 75;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 76` - Read the `frs_signal_received` field.
@@ -15080,12 +11205,7 @@ impl IntEventBus1 {
     pub fn frs_signal_received(&self) -> bool {
         let start = 76;
         let end = 76;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 77` - Read the `chunk_response_received` field.
@@ -15096,12 +11216,7 @@ impl IntEventBus1 {
     pub fn chunk_response_received(&self) -> bool {
         let start = 77;
         let end = 77;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 78` - Read the `chunk_request_received` field.
@@ -15112,12 +11227,7 @@ impl IntEventBus1 {
     pub fn chunk_request_received(&self) -> bool {
         let start = 78;
         let end = 78;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 79` - Read the `alert_message_received` field.
@@ -15128,12 +11238,7 @@ impl IntEventBus1 {
     pub fn alert_message_received(&self) -> bool {
         let start = 79;
         let end = 79;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 80` - Read the `patch_loaded` field.
@@ -15144,12 +11249,7 @@ impl IntEventBus1 {
     pub fn patch_loaded(&self) -> bool {
         let start = 80;
         let end = 80;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 81` - Read the `ready_f_211` field.
@@ -15160,12 +11260,7 @@ impl IntEventBus1 {
     pub fn ready_f_211(&self) -> bool {
         let start = 81;
         let end = 81;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 84` - Read the `boot_error` field.
@@ -15176,12 +11271,7 @@ impl IntEventBus1 {
     pub fn boot_error(&self) -> bool {
         let start = 84;
         let end = 84;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 85` - Read the `ready_for_data_block` field.
@@ -15192,12 +11282,7 @@ impl IntEventBus1 {
     pub fn ready_for_data_block(&self) -> bool {
         let start = 85;
         let end = 85;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u8,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u8, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw > 0
     }
     /// `bit 1` - Set the `hard_reset` field.
@@ -15208,12 +11293,7 @@ impl IntEventBus1 {
         let start = 1;
         let end = 1;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 3` - Set the `plug_event` field.
     ///
@@ -15223,12 +11303,7 @@ impl IntEventBus1 {
         let start = 3;
         let end = 3;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 4` - Set the `power_swap_completed` field.
     ///
@@ -15238,12 +11313,7 @@ impl IntEventBus1 {
         let start = 4;
         let end = 4;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 5` - Set the `data_swap_completed` field.
     ///
@@ -15253,12 +11323,7 @@ impl IntEventBus1 {
         let start = 5;
         let end = 5;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 6` - Set the `fast_role_swap_completed` field.
     ///
@@ -15268,12 +11333,7 @@ impl IntEventBus1 {
         let start = 6;
         let end = 6;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 7` - Set the `source_cap_updated` field.
     ///
@@ -15283,12 +11343,7 @@ impl IntEventBus1 {
         let start = 7;
         let end = 7;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 8` - Set the `sink_ready` field.
     ///
@@ -15298,12 +11353,7 @@ impl IntEventBus1 {
         let start = 8;
         let end = 8;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 9` - Set the `overcurrent` field.
     ///
@@ -15313,12 +11363,7 @@ impl IntEventBus1 {
         let start = 9;
         let end = 9;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 10` - Set the `attention_received` field.
     ///
@@ -15328,12 +11373,7 @@ impl IntEventBus1 {
         let start = 10;
         let end = 10;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 11` - Set the `vdm_received` field.
     ///
@@ -15343,12 +11383,7 @@ impl IntEventBus1 {
         let start = 11;
         let end = 11;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 12` - Set the `new_consumer_contract` field.
     ///
@@ -15358,12 +11393,7 @@ impl IntEventBus1 {
         let start = 12;
         let end = 12;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 13` - Set the `new_provider_contract` field.
     ///
@@ -15373,12 +11403,7 @@ impl IntEventBus1 {
         let start = 13;
         let end = 13;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 14` - Set the `source_caps_received` field.
     ///
@@ -15388,12 +11413,7 @@ impl IntEventBus1 {
         let start = 14;
         let end = 14;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 15` - Set the `sink_caps_received` field.
     ///
@@ -15403,12 +11423,7 @@ impl IntEventBus1 {
         let start = 15;
         let end = 15;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 17` - Set the `power_swap_requested` field.
     ///
@@ -15418,12 +11433,7 @@ impl IntEventBus1 {
         let start = 17;
         let end = 17;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 18` - Set the `data_swap_requested` field.
     ///
@@ -15433,12 +11443,7 @@ impl IntEventBus1 {
         let start = 18;
         let end = 18;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 20` - Set the `usb_host_present` field.
     ///
@@ -15448,12 +11453,7 @@ impl IntEventBus1 {
         let start = 20;
         let end = 20;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 21` - Set the `usb_host_not_present` field.
     ///
@@ -15463,12 +11463,7 @@ impl IntEventBus1 {
         let start = 21;
         let end = 21;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 23` - Set the `power_path_switch_changed` field.
     ///
@@ -15478,12 +11473,7 @@ impl IntEventBus1 {
         let start = 23;
         let end = 23;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 25` - Set the `data_status_updated` field.
     ///
@@ -15493,12 +11483,7 @@ impl IntEventBus1 {
         let start = 25;
         let end = 25;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 26` - Set the `status_updated` field.
     ///
@@ -15508,12 +11493,7 @@ impl IntEventBus1 {
         let start = 26;
         let end = 26;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 27` - Set the `pd_status_updated` field.
     ///
@@ -15523,12 +11503,7 @@ impl IntEventBus1 {
         let start = 27;
         let end = 27;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 30` - Set the `cmd_1_completed` field.
     ///
@@ -15538,12 +11513,7 @@ impl IntEventBus1 {
         let start = 30;
         let end = 30;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 31` - Set the `cmd_2_completed` field.
     ///
@@ -15553,12 +11523,7 @@ impl IntEventBus1 {
         let start = 31;
         let end = 31;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 32` - Set the `device_incompatible` field.
     ///
@@ -15568,12 +11533,7 @@ impl IntEventBus1 {
         let start = 32;
         let end = 32;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 33` - Set the `cannot_source` field.
     ///
@@ -15583,12 +11543,7 @@ impl IntEventBus1 {
         let start = 33;
         let end = 33;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 34` - Set the `can_source_later` field.
     ///
@@ -15598,12 +11553,7 @@ impl IntEventBus1 {
         let start = 34;
         let end = 34;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 35` - Set the `power_event_error` field.
     ///
@@ -15613,12 +11563,7 @@ impl IntEventBus1 {
         let start = 35;
         let end = 35;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 36` - Set the `no_caps_response` field.
     ///
@@ -15628,12 +11573,7 @@ impl IntEventBus1 {
         let start = 36;
         let end = 36;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 38` - Set the `protocol_error` field.
     ///
@@ -15643,12 +11583,7 @@ impl IntEventBus1 {
         let start = 38;
         let end = 38;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 42` - Set the `sink_transition_completed` field.
     ///
@@ -15658,12 +11593,7 @@ impl IntEventBus1 {
         let start = 42;
         let end = 42;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 43` - Set the `plug_early_notification` field.
     ///
@@ -15673,12 +11603,7 @@ impl IntEventBus1 {
         let start = 43;
         let end = 43;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 44` - Set the `prochot_notification` field.
     ///
@@ -15688,12 +11613,7 @@ impl IntEventBus1 {
         let start = 44;
         let end = 44;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 46` - Set the `source_cannot_provide` field.
     ///
@@ -15703,12 +11623,7 @@ impl IntEventBus1 {
         let start = 46;
         let end = 46;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 48` - Set the `am_entry_fail` field.
     ///
@@ -15718,12 +11633,7 @@ impl IntEventBus1 {
         let start = 48;
         let end = 48;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 49` - Set the `am_entered` field.
     ///
@@ -15733,12 +11643,7 @@ impl IntEventBus1 {
         let start = 49;
         let end = 49;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 51` - Set the `discover_mode_completed` field.
     ///
@@ -15748,12 +11653,7 @@ impl IntEventBus1 {
         let start = 51;
         let end = 51;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 52` - Set the `exit_mode_completed` field.
     ///
@@ -15763,12 +11663,7 @@ impl IntEventBus1 {
         let start = 52;
         let end = 52;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 53` - Set the `data_reset_started` field.
     ///
@@ -15778,12 +11673,7 @@ impl IntEventBus1 {
         let start = 53;
         let end = 53;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 54` - Set the `usb_status_updated` field.
     ///
@@ -15793,12 +11683,7 @@ impl IntEventBus1 {
         let start = 54;
         let end = 54;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 55` - Set the `connection_manager_updated` field.
     ///
@@ -15808,12 +11693,7 @@ impl IntEventBus1 {
         let start = 55;
         let end = 55;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 56` - Set the `usvid_mode_entered` field.
     ///
@@ -15823,12 +11703,7 @@ impl IntEventBus1 {
         let start = 56;
         let end = 56;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 57` - Set the `usvid_mode_exited` field.
     ///
@@ -15838,12 +11713,7 @@ impl IntEventBus1 {
         let start = 57;
         let end = 57;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 58` - Set the `usvid_attention_vdm_received` field.
     ///
@@ -15853,12 +11723,7 @@ impl IntEventBus1 {
         let start = 58;
         let end = 58;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 59` - Set the `usvid_other_vdm_received` field.
     ///
@@ -15868,12 +11733,7 @@ impl IntEventBus1 {
         let start = 59;
         let end = 59;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 61` - Set the `external_dc_dc_event` field.
     ///
@@ -15883,12 +11743,7 @@ impl IntEventBus1 {
         let start = 61;
         let end = 61;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 62` - Set the `dp_sid_status_updated` field.
     ///
@@ -15898,12 +11753,7 @@ impl IntEventBus1 {
         let start = 62;
         let end = 62;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 63` - Set the `intel_vid_status_updated` field.
     ///
@@ -15913,12 +11763,7 @@ impl IntEventBus1 {
         let start = 63;
         let end = 63;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 64` - Set the `pd_3_status_updated` field.
     ///
@@ -15928,12 +11773,7 @@ impl IntEventBus1 {
         let start = 64;
         let end = 64;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 65` - Set the `tx_memory_buffer_empty` field.
     ///
@@ -15943,12 +11783,7 @@ impl IntEventBus1 {
         let start = 65;
         let end = 65;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 66` - Set the `mbrd_buffer_ready` field.
     ///
@@ -15958,12 +11793,7 @@ impl IntEventBus1 {
         let start = 66;
         let end = 66;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 70` - Set the `soc_ack_timeout` field.
     ///
@@ -15973,12 +11803,7 @@ impl IntEventBus1 {
         let start = 70;
         let end = 70;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 71` - Set the `not_supported_received` field.
     ///
@@ -15988,12 +11813,7 @@ impl IntEventBus1 {
         let start = 71;
         let end = 71;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 72` - Set the `crossbar_error` field.
     ///
@@ -16003,12 +11823,7 @@ impl IntEventBus1 {
         let start = 72;
         let end = 72;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 73` - Set the `mailbox_updated` field.
     ///
@@ -16018,12 +11833,7 @@ impl IntEventBus1 {
         let start = 73;
         let end = 73;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 74` - Set the `bus_error` field.
     ///
@@ -16033,12 +11843,7 @@ impl IntEventBus1 {
         let start = 74;
         let end = 74;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 75` - Set the `external_dc_dc_status_changed` field.
     ///
@@ -16048,12 +11853,7 @@ impl IntEventBus1 {
         let start = 75;
         let end = 75;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 76` - Set the `frs_signal_received` field.
     ///
@@ -16063,12 +11863,7 @@ impl IntEventBus1 {
         let start = 76;
         let end = 76;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 77` - Set the `chunk_response_received` field.
     ///
@@ -16078,12 +11873,7 @@ impl IntEventBus1 {
         let start = 77;
         let end = 77;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 78` - Set the `chunk_request_received` field.
     ///
@@ -16093,12 +11883,7 @@ impl IntEventBus1 {
         let start = 78;
         let end = 78;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 79` - Set the `alert_message_received` field.
     ///
@@ -16108,12 +11893,7 @@ impl IntEventBus1 {
         let start = 79;
         let end = 79;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 80` - Set the `patch_loaded` field.
     ///
@@ -16123,12 +11903,7 @@ impl IntEventBus1 {
         let start = 80;
         let end = 80;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 81` - Set the `ready_f_211` field.
     ///
@@ -16138,12 +11913,7 @@ impl IntEventBus1 {
         let start = 81;
         let end = 81;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 84` - Set the `boot_error` field.
     ///
@@ -16153,12 +11923,7 @@ impl IntEventBus1 {
         let start = 84;
         let end = 84;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
     /// `bit 85` - Set the `ready_for_data_block` field.
     ///
@@ -16168,12 +11933,7 @@ impl IntEventBus1 {
         let start = 85;
         let end = 85;
         let raw = value as _;
-        unsafe {
-            ::device_driver::ops::store::<
-                u8,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u8, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for IntEventBus1 {
@@ -16266,126 +12026,103 @@ impl core::fmt::Debug for IntEventBus1 {
 impl defmt::Format for IntEventBus1 {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "IntEventBus1 {{ ");
-        defmt::write!(f, "hard_reset: {=bool}, ", & self.hard_reset());
-        defmt::write!(f, "plug_event: {=bool}, ", & self.plug_event());
+        defmt::write!(f, "hard_reset: {=bool}, ", &self.hard_reset());
+        defmt::write!(f, "plug_event: {=bool}, ", &self.plug_event());
+        defmt::write!(f, "power_swap_completed: {=bool}, ", &self.power_swap_completed());
+        defmt::write!(f, "data_swap_completed: {=bool}, ", &self.data_swap_completed());
         defmt::write!(
-            f, "power_swap_completed: {=bool}, ", & self.power_swap_completed()
+            f,
+            "fast_role_swap_completed: {=bool}, ",
+            &self.fast_role_swap_completed()
         );
-        defmt::write!(f, "data_swap_completed: {=bool}, ", & self.data_swap_completed());
+        defmt::write!(f, "source_cap_updated: {=bool}, ", &self.source_cap_updated());
+        defmt::write!(f, "sink_ready: {=bool}, ", &self.sink_ready());
+        defmt::write!(f, "overcurrent: {=bool}, ", &self.overcurrent());
+        defmt::write!(f, "attention_received: {=bool}, ", &self.attention_received());
+        defmt::write!(f, "vdm_received: {=bool}, ", &self.vdm_received());
+        defmt::write!(f, "new_consumer_contract: {=bool}, ", &self.new_consumer_contract());
+        defmt::write!(f, "new_provider_contract: {=bool}, ", &self.new_provider_contract());
+        defmt::write!(f, "source_caps_received: {=bool}, ", &self.source_caps_received());
+        defmt::write!(f, "sink_caps_received: {=bool}, ", &self.sink_caps_received());
+        defmt::write!(f, "power_swap_requested: {=bool}, ", &self.power_swap_requested());
+        defmt::write!(f, "data_swap_requested: {=bool}, ", &self.data_swap_requested());
+        defmt::write!(f, "usb_host_present: {=bool}, ", &self.usb_host_present());
+        defmt::write!(f, "usb_host_not_present: {=bool}, ", &self.usb_host_not_present());
         defmt::write!(
-            f, "fast_role_swap_completed: {=bool}, ", & self.fast_role_swap_completed()
+            f,
+            "power_path_switch_changed: {=bool}, ",
+            &self.power_path_switch_changed()
         );
-        defmt::write!(f, "source_cap_updated: {=bool}, ", & self.source_cap_updated());
-        defmt::write!(f, "sink_ready: {=bool}, ", & self.sink_ready());
-        defmt::write!(f, "overcurrent: {=bool}, ", & self.overcurrent());
-        defmt::write!(f, "attention_received: {=bool}, ", & self.attention_received());
-        defmt::write!(f, "vdm_received: {=bool}, ", & self.vdm_received());
+        defmt::write!(f, "data_status_updated: {=bool}, ", &self.data_status_updated());
+        defmt::write!(f, "status_updated: {=bool}, ", &self.status_updated());
+        defmt::write!(f, "pd_status_updated: {=bool}, ", &self.pd_status_updated());
+        defmt::write!(f, "cmd_1_completed: {=bool}, ", &self.cmd_1_completed());
+        defmt::write!(f, "cmd_2_completed: {=bool}, ", &self.cmd_2_completed());
+        defmt::write!(f, "device_incompatible: {=bool}, ", &self.device_incompatible());
+        defmt::write!(f, "cannot_source: {=bool}, ", &self.cannot_source());
+        defmt::write!(f, "can_source_later: {=bool}, ", &self.can_source_later());
+        defmt::write!(f, "power_event_error: {=bool}, ", &self.power_event_error());
+        defmt::write!(f, "no_caps_response: {=bool}, ", &self.no_caps_response());
+        defmt::write!(f, "protocol_error: {=bool}, ", &self.protocol_error());
         defmt::write!(
-            f, "new_consumer_contract: {=bool}, ", & self.new_consumer_contract()
+            f,
+            "sink_transition_completed: {=bool}, ",
+            &self.sink_transition_completed()
         );
+        defmt::write!(f, "plug_early_notification: {=bool}, ", &self.plug_early_notification());
+        defmt::write!(f, "prochot_notification: {=bool}, ", &self.prochot_notification());
+        defmt::write!(f, "source_cannot_provide: {=bool}, ", &self.source_cannot_provide());
+        defmt::write!(f, "am_entry_fail: {=bool}, ", &self.am_entry_fail());
+        defmt::write!(f, "am_entered: {=bool}, ", &self.am_entered());
+        defmt::write!(f, "discover_mode_completed: {=bool}, ", &self.discover_mode_completed());
+        defmt::write!(f, "exit_mode_completed: {=bool}, ", &self.exit_mode_completed());
+        defmt::write!(f, "data_reset_started: {=bool}, ", &self.data_reset_started());
+        defmt::write!(f, "usb_status_updated: {=bool}, ", &self.usb_status_updated());
         defmt::write!(
-            f, "new_provider_contract: {=bool}, ", & self.new_provider_contract()
+            f,
+            "connection_manager_updated: {=bool}, ",
+            &self.connection_manager_updated()
         );
+        defmt::write!(f, "usvid_mode_entered: {=bool}, ", &self.usvid_mode_entered());
+        defmt::write!(f, "usvid_mode_exited: {=bool}, ", &self.usvid_mode_exited());
         defmt::write!(
-            f, "source_caps_received: {=bool}, ", & self.source_caps_received()
-        );
-        defmt::write!(f, "sink_caps_received: {=bool}, ", & self.sink_caps_received());
-        defmt::write!(
-            f, "power_swap_requested: {=bool}, ", & self.power_swap_requested()
-        );
-        defmt::write!(f, "data_swap_requested: {=bool}, ", & self.data_swap_requested());
-        defmt::write!(f, "usb_host_present: {=bool}, ", & self.usb_host_present());
-        defmt::write!(
-            f, "usb_host_not_present: {=bool}, ", & self.usb_host_not_present()
-        );
-        defmt::write!(
-            f, "power_path_switch_changed: {=bool}, ", & self.power_path_switch_changed()
-        );
-        defmt::write!(f, "data_status_updated: {=bool}, ", & self.data_status_updated());
-        defmt::write!(f, "status_updated: {=bool}, ", & self.status_updated());
-        defmt::write!(f, "pd_status_updated: {=bool}, ", & self.pd_status_updated());
-        defmt::write!(f, "cmd_1_completed: {=bool}, ", & self.cmd_1_completed());
-        defmt::write!(f, "cmd_2_completed: {=bool}, ", & self.cmd_2_completed());
-        defmt::write!(f, "device_incompatible: {=bool}, ", & self.device_incompatible());
-        defmt::write!(f, "cannot_source: {=bool}, ", & self.cannot_source());
-        defmt::write!(f, "can_source_later: {=bool}, ", & self.can_source_later());
-        defmt::write!(f, "power_event_error: {=bool}, ", & self.power_event_error());
-        defmt::write!(f, "no_caps_response: {=bool}, ", & self.no_caps_response());
-        defmt::write!(f, "protocol_error: {=bool}, ", & self.protocol_error());
-        defmt::write!(
-            f, "sink_transition_completed: {=bool}, ", & self.sink_transition_completed()
-        );
-        defmt::write!(
-            f, "plug_early_notification: {=bool}, ", & self.plug_early_notification()
-        );
-        defmt::write!(
-            f, "prochot_notification: {=bool}, ", & self.prochot_notification()
-        );
-        defmt::write!(
-            f, "source_cannot_provide: {=bool}, ", & self.source_cannot_provide()
-        );
-        defmt::write!(f, "am_entry_fail: {=bool}, ", & self.am_entry_fail());
-        defmt::write!(f, "am_entered: {=bool}, ", & self.am_entered());
-        defmt::write!(
-            f, "discover_mode_completed: {=bool}, ", & self.discover_mode_completed()
-        );
-        defmt::write!(f, "exit_mode_completed: {=bool}, ", & self.exit_mode_completed());
-        defmt::write!(f, "data_reset_started: {=bool}, ", & self.data_reset_started());
-        defmt::write!(f, "usb_status_updated: {=bool}, ", & self.usb_status_updated());
-        defmt::write!(
-            f, "connection_manager_updated: {=bool}, ", & self
-            .connection_manager_updated()
-        );
-        defmt::write!(f, "usvid_mode_entered: {=bool}, ", & self.usvid_mode_entered());
-        defmt::write!(f, "usvid_mode_exited: {=bool}, ", & self.usvid_mode_exited());
-        defmt::write!(
-            f, "usvid_attention_vdm_received: {=bool}, ", & self
-            .usvid_attention_vdm_received()
+            f,
+            "usvid_attention_vdm_received: {=bool}, ",
+            &self.usvid_attention_vdm_received()
         );
         defmt::write!(
-            f, "usvid_other_vdm_received: {=bool}, ", & self.usvid_other_vdm_received()
+            f,
+            "usvid_other_vdm_received: {=bool}, ",
+            &self.usvid_other_vdm_received()
         );
+        defmt::write!(f, "external_dc_dc_event: {=bool}, ", &self.external_dc_dc_event());
+        defmt::write!(f, "dp_sid_status_updated: {=bool}, ", &self.dp_sid_status_updated());
         defmt::write!(
-            f, "external_dc_dc_event: {=bool}, ", & self.external_dc_dc_event()
+            f,
+            "intel_vid_status_updated: {=bool}, ",
+            &self.intel_vid_status_updated()
         );
+        defmt::write!(f, "pd_3_status_updated: {=bool}, ", &self.pd_3_status_updated());
+        defmt::write!(f, "tx_memory_buffer_empty: {=bool}, ", &self.tx_memory_buffer_empty());
+        defmt::write!(f, "mbrd_buffer_ready: {=bool}, ", &self.mbrd_buffer_ready());
+        defmt::write!(f, "soc_ack_timeout: {=bool}, ", &self.soc_ack_timeout());
+        defmt::write!(f, "not_supported_received: {=bool}, ", &self.not_supported_received());
+        defmt::write!(f, "crossbar_error: {=bool}, ", &self.crossbar_error());
+        defmt::write!(f, "mailbox_updated: {=bool}, ", &self.mailbox_updated());
+        defmt::write!(f, "bus_error: {=bool}, ", &self.bus_error());
         defmt::write!(
-            f, "dp_sid_status_updated: {=bool}, ", & self.dp_sid_status_updated()
+            f,
+            "external_dc_dc_status_changed: {=bool}, ",
+            &self.external_dc_dc_status_changed()
         );
-        defmt::write!(
-            f, "intel_vid_status_updated: {=bool}, ", & self.intel_vid_status_updated()
-        );
-        defmt::write!(f, "pd_3_status_updated: {=bool}, ", & self.pd_3_status_updated());
-        defmt::write!(
-            f, "tx_memory_buffer_empty: {=bool}, ", & self.tx_memory_buffer_empty()
-        );
-        defmt::write!(f, "mbrd_buffer_ready: {=bool}, ", & self.mbrd_buffer_ready());
-        defmt::write!(f, "soc_ack_timeout: {=bool}, ", & self.soc_ack_timeout());
-        defmt::write!(
-            f, "not_supported_received: {=bool}, ", & self.not_supported_received()
-        );
-        defmt::write!(f, "crossbar_error: {=bool}, ", & self.crossbar_error());
-        defmt::write!(f, "mailbox_updated: {=bool}, ", & self.mailbox_updated());
-        defmt::write!(f, "bus_error: {=bool}, ", & self.bus_error());
-        defmt::write!(
-            f, "external_dc_dc_status_changed: {=bool}, ", & self
-            .external_dc_dc_status_changed()
-        );
-        defmt::write!(f, "frs_signal_received: {=bool}, ", & self.frs_signal_received());
-        defmt::write!(
-            f, "chunk_response_received: {=bool}, ", & self.chunk_response_received()
-        );
-        defmt::write!(
-            f, "chunk_request_received: {=bool}, ", & self.chunk_request_received()
-        );
-        defmt::write!(
-            f, "alert_message_received: {=bool}, ", & self.alert_message_received()
-        );
-        defmt::write!(f, "patch_loaded: {=bool}, ", & self.patch_loaded());
-        defmt::write!(f, "ready_f_211: {=bool}, ", & self.ready_f_211());
-        defmt::write!(f, "boot_error: {=bool}, ", & self.boot_error());
-        defmt::write!(
-            f, "ready_for_data_block: {=bool}, ", & self.ready_for_data_block()
-        );
+        defmt::write!(f, "frs_signal_received: {=bool}, ", &self.frs_signal_received());
+        defmt::write!(f, "chunk_response_received: {=bool}, ", &self.chunk_response_received());
+        defmt::write!(f, "chunk_request_received: {=bool}, ", &self.chunk_request_received());
+        defmt::write!(f, "alert_message_received: {=bool}, ", &self.alert_message_received());
+        defmt::write!(f, "patch_loaded: {=bool}, ", &self.patch_loaded());
+        defmt::write!(f, "ready_f_211: {=bool}, ", &self.ready_f_211());
+        defmt::write!(f, "boot_error: {=bool}, ", &self.boot_error());
+        defmt::write!(f, "ready_for_data_block: {=bool}, ", &self.ready_for_data_block());
         defmt::write!(f, "}}");
     }
 }
@@ -16448,8 +12185,8 @@ pub struct Version {
     bits: [u8; 4],
 }
 unsafe impl ::device_driver::Fieldset for Version {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 4] };
 }
 impl Version {
@@ -16461,12 +12198,7 @@ impl Version {
     pub fn version(&self) -> u32 {
         let start = 0;
         let end = 31;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `31:0` - Set the `version` field.
@@ -16477,12 +12209,7 @@ impl Version {
         let start = 0;
         let end = 31;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for Version {
@@ -16511,7 +12238,7 @@ impl core::fmt::Debug for Version {
 impl defmt::Format for Version {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "Version {{ ");
-        defmt::write!(f, "version: {=u32}, ", & self.version());
+        defmt::write!(f, "version: {=u32}, ", &self.version());
         defmt::write!(f, "}}");
     }
 }
@@ -16574,8 +12301,8 @@ pub struct Cmd1 {
     bits: [u8; 4],
 }
 unsafe impl ::device_driver::Fieldset for Cmd1 {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 4] };
 }
 impl Cmd1 {
@@ -16587,12 +12314,7 @@ impl Cmd1 {
     pub fn command(&self) -> u32 {
         let start = 0;
         let end = 31;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `31:0` - Set the `command` field.
@@ -16603,12 +12325,7 @@ impl Cmd1 {
         let start = 0;
         let end = 31;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for Cmd1 {
@@ -16637,7 +12354,7 @@ impl core::fmt::Debug for Cmd1 {
 impl defmt::Format for Cmd1 {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "Cmd1 {{ ");
-        defmt::write!(f, "command: {=u32}, ", & self.command());
+        defmt::write!(f, "command: {=u32}, ", &self.command());
         defmt::write!(f, "}}");
     }
 }
@@ -16700,8 +12417,8 @@ pub struct CustomerUse {
     bits: [u8; 8],
 }
 unsafe impl ::device_driver::Fieldset for CustomerUse {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 8] };
 }
 impl CustomerUse {
@@ -16713,12 +12430,7 @@ impl CustomerUse {
     pub fn customer_use(&self) -> u64 {
         let start = 0;
         let end = 63;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u64,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u64, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `63:0` - Set the `customer_use` field.
@@ -16729,12 +12441,7 @@ impl CustomerUse {
         let start = 0;
         let end = 63;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u64,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u64, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for CustomerUse {
@@ -16763,7 +12470,7 @@ impl core::fmt::Debug for CustomerUse {
 impl defmt::Format for CustomerUse {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "CustomerUse {{ ");
-        defmt::write!(f, "customer_use: {=u64}, ", & self.customer_use());
+        defmt::write!(f, "customer_use: {=u64}, ", &self.customer_use());
         defmt::write!(f, "}}");
     }
 }
@@ -16826,8 +12533,8 @@ pub struct Mode {
     bits: [u8; 4],
 }
 unsafe impl ::device_driver::Fieldset for Mode {
-    const METADATA: ::device_driver::FieldsetMetadata = ::device_driver::FieldsetMetadata::new()
-        .with_byte_order(::device_driver::ByteOrder::LE);
+    const METADATA: ::device_driver::FieldsetMetadata =
+        ::device_driver::FieldsetMetadata::new().with_byte_order(::device_driver::ByteOrder::LE);
     const ZERO: Self = Self { bits: [0; 4] };
 }
 impl Mode {
@@ -16839,12 +12546,7 @@ impl Mode {
     pub fn mode(&self) -> u32 {
         let start = 0;
         let end = 31;
-        let raw = unsafe {
-            ::device_driver::ops::load::<
-                u32,
-                ::device_driver::ops::LE,
-            >(&self.bits, start, end)
-        };
+        let raw = unsafe { ::device_driver::ops::load::<u32, ::device_driver::ops::LE>(&self.bits, start, end) };
         raw
     }
     /// `31:0` - Set the `mode` field.
@@ -16855,12 +12557,7 @@ impl Mode {
         let start = 0;
         let end = 31;
         let raw = value;
-        unsafe {
-            ::device_driver::ops::store::<
-                u32,
-                ::device_driver::ops::LE,
-            >(raw, start, end, &mut self.bits)
-        };
+        unsafe { ::device_driver::ops::store::<u32, ::device_driver::ops::LE>(raw, start, end, &mut self.bits) };
     }
 }
 impl Default for Mode {
@@ -16889,7 +12586,7 @@ impl core::fmt::Debug for Mode {
 impl defmt::Format for Mode {
     fn format(&self, f: defmt::Formatter) {
         defmt::write!(f, "Mode {{ ");
-        defmt::write!(f, "mode: {=u32}, ", & self.mode());
+        defmt::write!(f, "mode: {=u32}, ", &self.mode());
         defmt::write!(f, "}}");
     }
 }
@@ -16957,12 +12654,10 @@ impl core::convert::TryFrom<u8> for TbtUsbDataPath {
         match val {
             0 => Ok(Self::MayBeRequired),
             1 => Ok(Self::NotRequired),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "TbtUsbDataPath",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "TbtUsbDataPath",
+            }),
         }
     }
 }
@@ -17034,12 +12729,10 @@ impl core::convert::TryFrom<u8> for ActiveComponent {
             1 => Ok(Self::Retimer),
             2 => Ok(Self::Redriver),
             3 => Ok(Self::Optical),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "ActiveComponent",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "ActiveComponent",
+            }),
         }
     }
 }
@@ -17074,12 +12767,10 @@ impl core::convert::TryFrom<u8> for Usb2SignalingNotUsed {
         match val {
             0 => Ok(Self::MayBeRequired),
             1 => Ok(Self::NotNeededOnA6A7),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "Usb2SignalingNotUsed",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "Usb2SignalingNotUsed",
+            }),
         }
     }
 }
@@ -17112,12 +12803,10 @@ impl core::convert::TryFrom<u8> for ReceptacleIndication {
         match val {
             0 => Ok(Self::Plug),
             1 => Ok(Self::Receptacle),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "ReceptacleIndication",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "ReceptacleIndication",
+            }),
         }
     }
 }
@@ -17154,12 +12843,10 @@ impl core::convert::TryFrom<u8> for PortCapability {
             1 => Ok(Self::DpSink),
             2 => Ok(Self::DpSource),
             3 => Ok(Self::BothDpSourceAndSink),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "PortCapability",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "PortCapability",
+            }),
         }
     }
 }
@@ -17232,12 +12919,10 @@ impl core::convert::TryFrom<u8> for DfpdUfpdConnected {
             1 => Ok(Self::DfpD),
             2 => Ok(Self::UfpD),
             3 => Ok(Self::Both),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "DfpdUfpdConnected",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "DfpdUfpdConnected",
+            }),
         }
     }
 }
@@ -17272,12 +12957,10 @@ impl core::convert::TryFrom<u8> for DpUsbDataPath {
         match val {
             0 => Ok(Self::MayBeRequired),
             1 => Ok(Self::NotRequired),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "DpUsbDataPath",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "DpUsbDataPath",
+            }),
         }
     }
 }
@@ -17348,12 +13031,10 @@ impl core::convert::TryFrom<u8> for DpPortCapability {
             1 => Ok(Self::UfpD),
             2 => Ok(Self::DfpD),
             3 => Ok(Self::Reserved2),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "DpPortCapability",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "DpPortCapability",
+            }),
         }
     }
 }
@@ -17847,12 +13528,10 @@ impl core::convert::TryFrom<u8> for PdPortType {
             1 => Ok(Self::Sink),
             2 => Ok(Self::Source),
             3 => Ok(Self::SourceSink),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "PdPortType",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "PdPortType",
+            }),
         }
     }
 }
@@ -17891,12 +13570,10 @@ impl core::convert::TryFrom<u8> for PdCcPullUp {
             1 => Ok(Self::UsbDefault),
             2 => Ok(Self::Current1A5),
             3 => Ok(Self::Current3A0),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "PdCcPullUp",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "PdCcPullUp",
+            }),
         }
     }
 }
@@ -17935,12 +13612,10 @@ impl core::convert::TryFrom<u8> for PpsRequestInterval {
             1 => Ok(Self::FourSeconds),
             2 => Ok(Self::TwoSeconds),
             3 => Ok(Self::OneSecond),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "PpsRequestInterval",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "PpsRequestInterval",
+            }),
         }
     }
 }
@@ -17975,12 +13650,10 @@ impl core::convert::TryFrom<u8> for AutoComputeSinkMaxVoltage {
         match val {
             0 => Ok(Self::ProvidedByHost),
             1 => Ok(Self::ComputedByPdController),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "AutoComputeSinkMaxVoltage",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "AutoComputeSinkMaxVoltage",
+            }),
         }
     }
 }
@@ -18013,12 +13686,10 @@ impl core::convert::TryFrom<u8> for AutoComputeSinkMinVoltage {
         match val {
             0 => Ok(Self::ProvidedByHost),
             1 => Ok(Self::ComputedByPdController),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "AutoComputeSinkMinVoltage",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "AutoComputeSinkMinVoltage",
+            }),
         }
     }
 }
@@ -18051,12 +13722,10 @@ impl core::convert::TryFrom<u8> for NoCapabilityMismatch {
         match val {
             0 => Ok(Self::Enabled),
             1 => Ok(Self::Disabled),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "NoCapabilityMismatch",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "NoCapabilityMismatch",
+            }),
         }
     }
 }
@@ -18089,12 +13758,10 @@ impl core::convert::TryFrom<u8> for AutoComputeSinkMinPower {
         match val {
             0 => Ok(Self::ProvidedByHost),
             1 => Ok(Self::ComputedByPdController),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "AutoComputeSinkMinPower",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "AutoComputeSinkMinPower",
+            }),
         }
     }
 }
@@ -18127,12 +13794,10 @@ impl core::convert::TryFrom<u8> for AutoNegRdoPriority {
         match val {
             0 => Ok(Self::HigherVoltage),
             1 => Ok(Self::LowerVoltage),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "AutoNegRdoPriority",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "AutoNegRdoPriority",
+            }),
         }
     }
 }
@@ -18169,12 +13834,10 @@ impl core::convert::TryFrom<u8> for ActiveDbgChannel {
             1 => Ok(Self::SbRxTx),
             2 => Ok(Self::Aux),
             3 => Ok(Self::Open),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "ActiveDbgChannel",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "ActiveDbgChannel",
+            }),
         }
     }
 }
@@ -18526,12 +14189,10 @@ impl core::convert::TryFrom<u8> for OvpForPp5V {
             1 => Ok(Self::V5P5),
             2 => Ok(Self::V5P8),
             3 => Ok(Self::V6P1),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "OvpForPp5V",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "OvpForPp5V",
+            }),
         }
     }
 }
@@ -18570,12 +14231,10 @@ impl core::convert::TryFrom<u8> for VbusOvpUsage {
             1 => Ok(Self::Pct105),
             2 => Ok(Self::Pct111),
             3 => Ok(Self::Pct114),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "VbusOvpUsage",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "VbusOvpUsage",
+            }),
         }
     }
 }
@@ -18681,12 +14340,10 @@ impl core::convert::TryFrom<u8> for CrossbarType {
         match val {
             0 => Ok(Self::Type1),
             1 => Ok(Self::Type2),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "CrossbarType",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "CrossbarType",
+            }),
         }
     }
 }
@@ -18723,12 +14380,10 @@ impl core::convert::TryFrom<u8> for TypeCStateMachine {
             1 => Ok(Self::Source),
             2 => Ok(Self::Drp),
             3 => Ok(Self::Disabled),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "TypeCStateMachine",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "TypeCStateMachine",
+            }),
         }
     }
 }
@@ -18823,12 +14478,10 @@ impl core::convert::TryFrom<u8> for I2CTimeout {
             5 => Ok(Self::Timeout150Ms),
             6 => Ok(Self::Timeout175Ms),
             7 => Ok(Self::Timeout1000Ms),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "I2CTimeout",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "I2CTimeout",
+            }),
         }
     }
 }
@@ -18875,12 +14528,10 @@ impl core::convert::TryFrom<u8> for MultiPortSinkNonOverlapTime {
             1 => Ok(Self::Delay5Ms),
             2 => Ok(Self::Delay10Ms),
             3 => Ok(Self::Delay15Ms),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "MultiPortSinkNonOverlapTime",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "MultiPortSinkNonOverlapTime",
+            }),
         }
     }
 }
@@ -18969,12 +14620,10 @@ impl core::convert::TryFrom<u8> for RcpThreshold {
             1 => Ok(Self::Threshold8Mv),
             2 => Ok(Self::Threshold10Mv),
             3 => Ok(Self::Threshold12Mv),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "RcpThreshold",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "RcpThreshold",
+            }),
         }
     }
 }
@@ -19021,12 +14670,10 @@ impl core::convert::TryFrom<u8> for PpextVbusSwConfig {
             5 => Ok(Self::BiDirectionalWaitSrdy),
             6 => Ok(Self::SinkWaitSrdy),
             7 => Ok(Self::BiDirectionalPpextDisabled),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "PpextVbusSwConfig",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "PpextVbusSwConfig",
+            }),
         }
     }
 }
@@ -19250,12 +14897,10 @@ impl core::convert::TryFrom<u8> for PpVconnSw {
             1 => Ok(Self::DisabledFault),
             2 => Ok(Self::Cc1),
             3 => Ok(Self::Cc2),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "PpVconnSw",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "PpVconnSw",
+            }),
         }
     }
 }
@@ -19296,12 +14941,10 @@ impl core::convert::TryFrom<u8> for Usb4RequiredPlugMode {
             1 => Ok(Self::Reserved),
             2 => Ok(Self::Usb4),
             3 => Ok(Self::Tbt3),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "Usb4RequiredPlugMode",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "Usb4RequiredPlugMode",
+            }),
         }
     }
 }
@@ -19340,12 +14983,10 @@ impl core::convert::TryFrom<u8> for EudoSopSentStatus {
             1 => Ok(Self::EnterUsbTimeout),
             2 => Ok(Self::EnterUsbFailure),
             3 => Ok(Self::SuccessfulEnterUsb),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "EudoSopSentStatus",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "EudoSopSentStatus",
+            }),
         }
     }
 }
@@ -19384,12 +15025,10 @@ impl core::convert::TryFrom<u8> for AmStatus {
             1 => Ok(Self::EntrySuccessful),
             2 => Ok(Self::EntryFailed),
             3 => Ok(Self::PartialSuccess),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "AmStatus",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "AmStatus",
+            }),
         }
     }
 }
@@ -19428,12 +15067,10 @@ impl core::convert::TryFrom<u8> for LegacyMode {
             1 => Ok(Self::LegacySink),
             2 => Ok(Self::LegacySource),
             3 => Ok(Self::LegacySinkDeadBattery),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "LegacyMode",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "LegacyMode",
+            }),
         }
     }
 }
@@ -19472,12 +15109,10 @@ impl core::convert::TryFrom<u8> for UsbHostMode {
             1 => Ok(Self::AttachedNoData),
             2 => Ok(Self::AttachedNoPd),
             3 => Ok(Self::HostPresent),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "UsbHostMode",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "UsbHostMode",
+            }),
         }
     }
 }
@@ -19516,12 +15151,10 @@ impl core::convert::TryFrom<u8> for VbusMode {
             1 => Ok(Self::Atvsafe5),
             2 => Ok(Self::Normal),
             3 => Ok(Self::Other),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "VbusMode",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "VbusMode",
+            }),
         }
     }
 }
@@ -19568,12 +15201,10 @@ impl core::convert::TryFrom<u8> for PlugMode {
             5 => Ok(Self::DebugRpRp),
             6 => Ok(Self::ConnectedNoRa),
             7 => Ok(Self::Connected),
-            val => {
-                Err(::device_driver::ConversionError {
-                    source: val,
-                    target: "PlugMode",
-                })
-            }
+            val => Err(::device_driver::ConversionError {
+                source: val,
+                target: "PlugMode",
+            }),
         }
     }
 }
