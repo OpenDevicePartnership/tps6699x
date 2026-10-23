@@ -7,13 +7,14 @@ This driver uses the [device-driver](https://crates.io/crates/device-driver) cra
 
 ```bash
 $ rustup toolchain install 1.94.0 --profile minimal --component rustfmt
-$ cargo +1.94.0 install device-driver-cli --version '=2.1.0' --locked
+$ cargo +1.94.0 install device-driver-cli --version '=2.1.1' --locked
 $ ddc build rust -s device.ddsl -o src/registers/generated.rs --rust-defmt-feature=defmt
-$ rustup run 1.94.0 rustfmt --edition 2024 --config newline_style=Unix src/registers/generated.rs
 ```
 
-CI uses `tullom/device-driver-pregen-check@v1.2.0` with these exact compiler
-and formatter versions. The runtime dependency is unchanged.
+CI uses `tullom/device-driver-pregen-check@v1.2.0`, pinned to CLI 2.1.1 and
+Rust 1.94.0. The committed generated file remains unformatted. CI formats
+only its disposable checkout copy before comparing it with the action's
+formatted generator output. The runtime dependency is unchanged.
 
 ## Integration with Other ODP crates
 This crate provides implementations for traits defined in the `embedded-services` crate, gated behind these features:
