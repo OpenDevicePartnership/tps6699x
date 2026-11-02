@@ -5425,7 +5425,7 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/bq257
 
 [[trusted.bytes]]
 criteria = "safe-to-run"
-user-id = 6741
+user-id = 6741 # Alice Ryhl (Darksonn)
 start = "2021-01-11"
 end = "2027-05-16"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp108/refs/heads/main/supply-chain/audits.toml"
@@ -5698,21 +5698,21 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/odp-s
 
 [[trusted.loom]]
 criteria = "safe-to-deploy"
-user-id = 6741
+user-id = 6741 # Alice Ryhl (Darksonn)
 start = "2021-04-12"
 end = "2026-09-03"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embedded-services/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.loom]]
 criteria = "safe-to-run"
-user-id = 6741
+user-id = 6741 # Alice Ryhl (Darksonn)
 start = "2020-01-01"
 end = "2027-04-07"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embassy-imxrt/refs/heads/main/supply-chain/audits.toml"
 
 [[trusted.loom]]
 criteria = "safe-to-run"
-user-id = 6741
+user-id = 6741 # Alice Ryhl (Darksonn)
 start = "2021-04-12"
 end = "2027-05-16"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp108/refs/heads/main/supply-chain/audits.toml"
@@ -6314,7 +6314,7 @@ aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/patin
 
 [[trusted.tokio]]
 criteria = "safe-to-run"
-user-id = 6741
+user-id = 6741 # Alice Ryhl (Darksonn)
 start = "2020-12-25"
 end = "2027-05-16"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp108/refs/heads/main/supply-chain/audits.toml"
