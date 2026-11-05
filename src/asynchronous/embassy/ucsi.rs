@@ -1,13 +1,11 @@
 //! UCSI related functionality
-//!
-//! This is the only remaining user of `bincode` in this crate. The rest of the driver serializes
-//! commands with `bytemuck` + `pack1` raw structs, but the UCSI command and response types are
-//! defined in `embedded-usb-pd` and only implement the `bincode` traits.
-//! TODO: drop `bincode` entirely once `embedded-usb-pd` migrates away from it.
-use bincode::{decode_from_slice_with_context, encode_into_slice};
+use core::array::from_fn;
+
 use embedded_usb_pd::PowerRole;
 use embedded_usb_pd::pdo::PDO_LEN;
-use embedded_usb_pd::ucsi::v1_2::lpm;
+use embedded_usb_pd::ucsi::ConnectorNumber;
+use embedded_usb_pd::ucsi::v1_2::lpm::RESPONSE_DATA_MAX_LEN;
+use embedded_usb_pd::ucsi::v1_2::{COMMAND_LEN, CommandRaw, ResponseDataRaw, lpm};
 
 use super::*;
 use crate::registers::REG_DATA1_LEN;
@@ -35,13 +33,13 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     async fn execute_get_pdos(
         &mut self,
         port: LocalPortId,
-        args: &lpm::get_pdos::Args,
+        args: &lpm::get_pdos::Args<LocalPortId>,
         indata: &[u8],
         outdata: &mut [u8],
     ) -> Result<ReturnValue, Error<B::Error>> {
-        if args.partner() {
+        if args.partner {
             // Getting port partner PDOs can trigger a renegotiation so read the cached PDOs instead
-            let caps: rx_caps::RxCaps<pdo::Pdo> = match args.role() {
+            let caps: rx_caps::RxCaps<pdo::Pdo> = match args.role {
                 PowerRole::Source => self.get_rx_src_caps(port).await?.into(),
                 PowerRole::Sink => self.get_rx_snk_caps(port).await?.into(),
             };
@@ -51,8 +49,8 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
                 raw_pdos,
                 caps.spr_iter()
                     .chain(caps.epr_iter())
-                    .skip(args.pdo_offset() as usize)
-                    .take(args.num_pdos() as usize),
+                    .skip(args.pdo_offset as usize)
+                    .take(args.num_pdos as usize),
             ) {
                 let encoded_pdo: u32 = (*pdo).into();
                 *raw_pdo = encoded_pdo.to_le_bytes();
@@ -77,19 +75,17 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     ) -> Result<Option<lpm::ResponseData>, Error<B::Error>> {
         let mut indata = [0u8; REG_DATA1_LEN];
         // -1 because the first byte is used for the standard TPS6699x command return value
-        let mut outdata = [0u8; REG_DATA1_LEN - 1];
-        let port = command.port();
+        const OUTDATA_LEN: usize = REG_DATA1_LEN - 1;
+        let mut outdata = [0u8; OUTDATA_LEN];
+        let port = command.connector_number();
 
         // Internally the controller uses 1-based port numbering
         let mut command = *command;
-        command.set_port(LocalPortId(command.port().0 + 1));
+        command.set_connector_number(LocalPortId(command.connector_number().0 + 1));
 
-        encode_into_slice(
-            command,
-            &mut indata,
-            bincode::config::standard().with_fixed_int_encoding(),
-        )
-        .map_err(|_| Error::Pd(PdError::Serialize))?;
+        let raw: CommandRaw = command.try_into().map_err(|_| Error::Pd(PdError::Serialize))?;
+        let raw_bytes = bytemuck::must_cast::<_, [u8; COMMAND_LEN]>(raw);
+        indata[..COMMAND_LEN].copy_from_slice(&raw_bytes);
 
         let ret = match command.operation() {
             lpm::CommandData::GetAlternateModes(_) => {
@@ -109,12 +105,14 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
 
         trace!("UCSI command response: {:?}", outdata);
         if command.command_type().has_response() {
-            let (response_data, _) = decode_from_slice_with_context(
-                &outdata,
-                bincode::config::standard().with_fixed_int_encoding(),
-                command.command_type(),
-            )
-            .map_err(|_| Error::Pd(PdError::Serialize))?;
+            const _: () = assert!(RESPONSE_DATA_MAX_LEN <= OUTDATA_LEN);
+            // Panic safety: bounds of outdata are guaranteed by the static assert above
+            #[allow(clippy::indexing_slicing)]
+            let response_bytes: [u8; RESPONSE_DATA_MAX_LEN] = from_fn(|i| outdata[i]);
+            let response_data_raw = bytemuck::must_cast::<_, ResponseDataRaw>(response_bytes);
+            let response_data = (command.command_type(), response_data_raw)
+                .try_into()
+                .map_err(|_| Error::Pd(PdError::Serialize))?;
             Ok(Some(response_data))
         } else {
             Ok(None)
