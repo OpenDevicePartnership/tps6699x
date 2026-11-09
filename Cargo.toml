@@ -20,9 +20,6 @@ defmt = { version = "0.3.0", optional = true }
 log = { version = "0.4.14", optional = true }
 embassy-sync = { version = "0.8.0", optional = true }
 embassy-time = { version = "0.5.0", optional = true }
-# Only used for UCSI serialization, which relies on the bincode impls provided by `embedded-usb-pd`.
-# TODO: drop this once `embedded-usb-pd` migrates away from bincode.
-bincode = { version = "2.0.0", default-features = false, features = ["derive"] }
 bytemuck = { version = "1.25.0", features = [
     "derive",
     "must_cast",
