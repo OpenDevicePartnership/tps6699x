@@ -1,5 +1,6 @@
 //! This module implements functions to access the command register and its associate data register.
-//! The data register is larger than what device_driver can handle so access is done directly through the `AsyncRegisterInterface` trait.
+//! Data writes use `AsyncRegisterInterface` to preserve variable-length command payloads;
+//! the register address and fixed-size result reads use the generated register mapping.
 use device_driver::{AsyncRegisterInterface, FieldsetMetadata};
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::i2c::I2c;
@@ -22,8 +23,11 @@ impl<B: I2c> Tps6699x<B> {
             let mut buf = [0u8; 256];
             let buf = buf.get_mut(..data.len()).ok_or(PdError::InvalidParams)?;
             buf.copy_from_slice(data);
-            self.borrow_port(port)?
-                .write_register(regs::REG_DATA1, buf, &FieldsetMetadata::DEFAULT)
+            let mut registers = self.borrow_port(port)?.into_registers();
+            let address = registers.data_1().address();
+            registers
+                .free()
+                .write_register(address, buf, &FieldsetMetadata::DEFAULT)
                 .await?;
         }
 
@@ -84,10 +88,13 @@ impl<B: I2c> Tps6699x<B> {
         }
 
         // Read and return value and data
-        let mut buf = [0u8; regs::REG_DATA1_LEN];
-        self.borrow_port(port)?
-            .read_register(regs::REG_DATA1, &mut buf, &FieldsetMetadata::DEFAULT)
-            .await?;
+        let buf: [u8; regs::REG_DATA1_LEN] = self
+            .borrow_port(port)?
+            .into_registers()
+            .data_1()
+            .read_async()
+            .await?
+            .into();
 
         if has_return_value {
             let return_code = buf[0] & CMD_4CC_TASK_RETURN_CODE_MASK;
@@ -164,7 +171,6 @@ impl<B: I2c> Tps6699x<B> {
 #[cfg(test)]
 mod test {
     use embedded_hal_mock::eh1::i2c::Mock;
-    use regs::REG_DATA1;
 
     use crate::asynchronous::internal::Tps6699x;
     use crate::{ADDR0, PORT0, PORT1};
@@ -189,7 +195,7 @@ mod test {
 
         // Create data write if supplied
         if let Some(data) = expected_data {
-            transactions.push(create_register_write(expected_addr, REG_DATA1, data));
+            transactions.push(create_register_write(expected_addr, 0x09, data));
         }
 
         transactions.push(create_register_write(
@@ -244,7 +250,7 @@ mod test {
 
         let arg_bytes: [u8; RESET_ARGS_LEN] = bytemuck::must_cast(ResetArgsRaw::from(expected_args));
 
-        transactions.push(create_register_write(PORT0_ADDR0, REG_DATA1, arg_bytes));
+        transactions.push(create_register_write(PORT0_ADDR0, 0x09, arg_bytes));
         transactions.push(create_register_write(
             PORT0_ADDR0,
             0x08,
@@ -284,7 +290,7 @@ mod test {
         let mut delay = Delay {};
         let mut transactions = Vec::new();
 
-        transactions.push(create_register_write(PORT0_ADDR0, REG_DATA1, [0, RESET_FEATURE_ENABLE]));
+        transactions.push(create_register_write(PORT0_ADDR0, 0x09, [0, RESET_FEATURE_ENABLE]));
         transactions.push(create_register_write(
             PORT0_ADDR0,
             0x08,
