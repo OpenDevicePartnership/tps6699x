@@ -1,6 +1,13 @@
 
 # cargo-vet imports lock
 
+[[publisher.tokio]]
+version = "1.54.1"
+when = "2026-10-21"
+user-id = 6741
+user-login = "Darksonn"
+user-name = "Alice Ryhl"
+
 [[audits.OpenDevicePartnership.audits.addr2line]]
 who = "Robert Zieba <robertzieba@microsoft.com>"
 criteria = "safe-to-run"
@@ -97,17 +104,12 @@ criteria = "safe-to-deploy"
 version = "2.0.1"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/mcxa-pac/refs/heads/main/supply-chain/audits.toml"
 
-[[audits.OpenDevicePartnership.audits.tokio]]
-who = "Robert Zieba <robertzieba@microsoft.com>"
-criteria = "safe-to-run"
-version = "1.45.0"
-aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embedded-services/refs/heads/main/supply-chain/audits.toml"
-
 [[audits.OpenDevicePartnership.audits.tokio-macros]]
-who = "Robert Zieba <robertzieba@microsoft.com>"
+who = "Felipe Balbi <felipe@balbi.sh>"
 criteria = "safe-to-run"
-version = "2.5.0"
-aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embedded-services/refs/heads/main/supply-chain/audits.toml"
+version = "2.7.0"
+notes = "Proc-macro crate providing #[tokio::main] / #[tokio::test] - the only entry points the dev-deps use. Zero unsafe, no build script, no I/O - pure token manipulation. Assisted-by: opencode:claude-opus-4.7-1m-internal"
+aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/tmp108/refs/heads/main/supply-chain/audits.toml"
 
 [[audits.OpenDevicePartnership.audits.windows-targets]]
 who = "Robert Zieba <robertzieba@microsoft.com>"
@@ -422,37 +424,37 @@ aggregated-from = "https://chromium.googlesource.com/chromiumos/third_party/rust
 who = "Erich Gubler <erichdongubler@gmail.com>"
 criteria = "safe-to-deploy"
 version = "0.2.8"
-aggregated-from = "https://hg.mozilla.org/mozilla-central/raw-file/tip/supply-chain/audits.toml"
+aggregated-from = "https://raw.githubusercontent.com/mozilla-firefox/firefox/main/supply-chain/audits.toml"
 
 [[audits.mozilla.audits.document-features]]
 who = "Erich Gubler <erichdongubler@gmail.com>"
 criteria = "safe-to-deploy"
 delta = "0.2.8 -> 0.2.9"
-aggregated-from = "https://hg.mozilla.org/mozilla-central/raw-file/tip/supply-chain/audits.toml"
+aggregated-from = "https://raw.githubusercontent.com/mozilla-firefox/firefox/main/supply-chain/audits.toml"
 
 [[audits.mozilla.audits.document-features]]
 who = "Erich Gubler <erichdongubler@gmail.com>"
 criteria = "safe-to-deploy"
 delta = "0.2.9 -> 0.2.10"
-aggregated-from = "https://hg.mozilla.org/mozilla-central/raw-file/tip/supply-chain/audits.toml"
+aggregated-from = "https://raw.githubusercontent.com/mozilla-firefox/firefox/main/supply-chain/audits.toml"
 
 [[audits.mozilla.audits.document-features]]
 who = "Teodor Tanasoaia <ttanasoaia@mozilla.com>"
 criteria = "safe-to-deploy"
 delta = "0.2.10 -> 0.2.11"
-aggregated-from = "https://hg.mozilla.org/mozilla-central/raw-file/tip/supply-chain/audits.toml"
+aggregated-from = "https://raw.githubusercontent.com/mozilla-firefox/firefox/main/supply-chain/audits.toml"
 
 [[audits.mozilla.audits.litrs]]
 who = "Erich Gubler <erichdongubler@gmail.com>"
 criteria = "safe-to-deploy"
 version = "0.4.1"
-aggregated-from = "https://hg.mozilla.org/mozilla-central/raw-file/tip/supply-chain/audits.toml"
+aggregated-from = "https://raw.githubusercontent.com/mozilla-firefox/firefox/main/supply-chain/audits.toml"
 
 [[audits.mozilla.audits.pin-project-lite]]
 who = "Mike Hommey <mh+mozilla@glandium.org>"
 criteria = "safe-to-deploy"
 delta = "0.2.13 -> 0.2.14"
-aggregated-from = "https://hg.mozilla.org/mozilla-central/raw-file/tip/supply-chain/audits.toml"
+aggregated-from = "https://raw.githubusercontent.com/mozilla-firefox/firefox/main/supply-chain/audits.toml"
 
 [[audits.mozilla.audits.pin-project-lite]]
 who = "Nika Layzell <nika@thelayzells.com>"
