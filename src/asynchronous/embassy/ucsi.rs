@@ -23,11 +23,16 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
         let alt_mode = self.get_alt_mode_status(port).await?;
         if alt_mode != AltMode::none() {
             self.execute_command(port, Command::Ucsi, Some(indata), Some(outdata))
-                .await
-        } else {
-            // No alt mode supported so return no data
-            Ok(ReturnValue::Success)
+                .await?;
+
+            // First byte returned is number of bytes written, we don't use it so erase it
+            outdata.rotate_left(1);
+            if let Some(b) = outdata.last_mut() {
+                *b = 0;
+            }
         }
+
+        Ok(ReturnValue::Success)
     }
 
     async fn execute_get_pdos(
