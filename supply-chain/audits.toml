@@ -25,7 +25,7 @@ version = "0.5.0"
 who = "Robert Zieba <robertzieba@microsoft.com>"
 criteria = "safe-to-deploy"
 delta = "0.9.3 -> 0.9.4"
-notes = "No intentionally malicious behavior that I can see. There's a known issue with `BinaryHeap::retain` (https://github.com/rust-embedded/heapless/issues/715), an upstream PR is currently underview. LLM alerted on two locations where a pointer is created by through created an intermediate reference (`&*data`) instead of directly using `addr_of!`. But the intermediate reference are not actually used for anything aside from casting."
+notes = "No intentionally malicious behavior that I can see. There's a known issue with `BinaryHeap::retain` (https://github.com/rust-embedded/heapless/issues/715), an upstream PR is currently under review. LLM alerted on two locations where a pointer is created through an intermediate reference (`&*data`) instead of directly using `addr_of!`. But the intermediate reference are not actually used for anything aside from casting."
 
 [[audits.include_dir]]
 who = "Robert Zieba <robertzieba@microsoft.com>"
