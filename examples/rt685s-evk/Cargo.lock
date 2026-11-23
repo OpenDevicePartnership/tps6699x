@@ -1178,7 +1178,7 @@ dependencies = [
  "embedded-hal-async",
  "embedded-io-async 0.6.1",
  "embedded-usb-pd",
- "heapless 0.8.0",
+ "heapless 0.9.2",
  "itertools 0.14.0",
 ]
 
