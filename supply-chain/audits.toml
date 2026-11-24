@@ -2044,6 +2044,12 @@ delta = "0.9.2 -> 0.9.3"
 notes = "Delta 0.9.2->0.9.3: Fixes unsoundness in Deque/HistoryBuf/IndexMap::clear when Drop panics (Guard pattern). Adds CString conversions (into_string, into_bytes, from_bytes_truncating_at_nul), Deque::pop_front_if/pop_back_if, const Vec::from_array. New transmute_copy in as_len_type is sound (closed type enum). Pointer-cast cleanups. Assisted-by: copilot-cli:claude-opus-4.6"
 aggregated-from = "https://raw.githubusercontent.com/OpenDevicePartnership/embedded-services/refs/heads/main/supply-chain/audits.toml"
 
+[[audits.heapless]]
+who = "Robert Zieba <robertzieba@microsoft.com>"
+criteria = "safe-to-deploy"
+delta = "0.9.3 -> 0.9.4"
+notes = "No intentionally malicious behavior that I can see. There's a known issue with `BinaryHeap::retain` (https://github.com/rust-embedded/heapless/issues/715), an upstream PR is currently under review. LLM alerted on two locations where a pointer is created through an intermediate reference (`&*data`) instead of directly using `addr_of!`. But the intermediate reference are not actually used for anything aside from casting."
+
 [[audits.heck]]
 who = "Matteo Tullo <matteotullo@microsoft.com>"
 criteria = "safe-to-deploy"
