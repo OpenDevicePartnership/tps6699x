@@ -24,6 +24,11 @@ use crate::registers::autonegotiate_sink::AutoComputeSinkMaxVoltage;
 use crate::registers::field_sets::IntEventBus1;
 use crate::{error, registers, trace, warn, DeviceError, Mode, MAX_SUPPORTED_PORTS};
 
+/// Number of `SRDY` attempts in [`Tps6699x::enable_sink_path`].
+const SRDY_ATTEMPTS: usize = 3;
+/// Delay between `SRDY` attempts. The retry window is longer than the USB PD source transition time (tPSTransition).
+const SRDY_RETRY_DELAY: Duration = Duration::from_millis(500);
+
 pub mod fw_update;
 pub mod rx_caps;
 pub mod task;
@@ -367,22 +372,53 @@ impl<'a, M: RawMutex, B: I2c> Tps6699x<'a, M, B> {
     }
 
     /// Enable or disable the given power path
+    ///
+    /// Enable makes up to 3 `SRDY` attempts. An attempt after `Busy` reads the pending result and does not send
+    /// `SRDY` again. It returns the last error if no attempt succeeds.
     pub async fn enable_sink_path(&mut self, port: LocalPortId, enable: bool) -> Result<(), Error<B::Error>> {
-        if enable {
-            self.execute_srdy(
-                port,
-                match port.0 {
-                    0 => Ok(SrdySwitch::PpExt1),
-                    1 => Ok(SrdySwitch::PpExt2),
-                    _ => PdError::InvalidPort.into(),
-                }?,
-            )
-            .await?;
-        } else {
+        if !enable {
             self.execute_sryr(port).await?;
+            return Ok(());
         }
 
-        Ok(())
+        let switch = match port.0 {
+            0 => Ok(SrdySwitch::PpExt1),
+            1 => Ok(SrdySwitch::PpExt2),
+            _ => PdError::InvalidPort.into(),
+        }?;
+
+        let mut result = Ok(());
+        let mut pending = false;
+        for attempt in 1..=SRDY_ATTEMPTS {
+            if attempt > 1 {
+                Timer::after(SRDY_RETRY_DELAY).await;
+            }
+
+            let outcome = if pending {
+                let mut inner = self.lock_inner().await;
+                inner
+                    .read_command_result(port, None, Command::Srdy.has_return_value())
+                    .await
+            } else {
+                self.execute_srdy(port, switch).await
+            };
+
+            // A failed status read does not show that a pending `SRDY` completed.
+            pending = match &outcome {
+                Err(Error::Pd(PdError::Busy)) => true,
+                Err(Error::Bus(_)) => pending,
+                _ => false,
+            };
+            result = match outcome {
+                Ok(ReturnValue::Success) => return Ok(()),
+                Ok(ReturnValue::Rejected) => PdError::Rejected.into(),
+                Ok(_) => PdError::Failed.into(),
+                Err(e) => Err(e),
+            };
+            warn!("Port{}: SRDY attempt {} of {} failed", port.0, attempt, SRDY_ATTEMPTS);
+        }
+
+        result
     }
 
     /// Trigger an `ANeg` command to autonegotiate the sink contract.
@@ -1043,6 +1079,8 @@ impl<M: RawMutex, B: I2c> Drop for AccumulatedFlagsAny<'_, M, B> {
 
 #[cfg(test)]
 mod test {
+    extern crate std;
+
     use core::convert::Infallible;
     use core::future::pending;
 
@@ -1369,6 +1407,71 @@ mod test {
             pd.execute_command_with_timeout(Duration::from_millis(1), PORT0, Command::Tfuq, None, None)
                 .await,
             Err(Error::Bus(ErrorKind::Other))
+        );
+        pd.lock_inner().await.bus.done();
+    }
+
+    fn srdy_attempt(return_value: ReturnValue) -> [embedded_hal_mock::eh1::i2c::Transaction; 4] {
+        [
+            create_register_write(PORT0_ADDR0, registers::REG_DATA1, [u8::from(SrdySwitch::PpExt1)]),
+            create_register_write(PORT0_ADDR0, 0x08, (Command::Srdy as u32).to_le_bytes()),
+            create_register_read(PORT0_ADDR0, 0x08, (Command::Success as u32).to_le_bytes()),
+            create_register_read(
+                PORT0_ADDR0,
+                registers::REG_DATA1,
+                command_result_data(return_value as u8, &[]),
+            ),
+        ]
+    }
+
+    #[tokio::test]
+    async fn test_enable_sink_path_retries_failed_srdy() {
+        let mut transactions =
+            std::vec![
+                create_register_write(PORT0_ADDR0, registers::REG_DATA1, [u8::from(SrdySwitch::PpExt1)])
+                    .with_error(ErrorKind::Other),
+            ];
+        transactions.extend(srdy_attempt(ReturnValue::Success));
+        let mut controller: Controller<NoopRawMutex, _> =
+            Controller::new_tps66993(Mock::new(&transactions), PORT0_ADDR0).unwrap();
+        let (mut pd, _interrupt) = controller.make_parts();
+
+        assert_eq!(pd.enable_sink_path(PORT0, true).await, Ok(()));
+        pd.lock_inner().await.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_enable_sink_path_reads_busy_srdy_result_without_resend() {
+        let transactions = [
+            create_register_write(PORT0_ADDR0, registers::REG_DATA1, [u8::from(SrdySwitch::PpExt1)]),
+            create_register_write(PORT0_ADDR0, 0x08, (Command::Srdy as u32).to_le_bytes()),
+            create_register_read(PORT0_ADDR0, 0x08, (Command::Srdy as u32).to_le_bytes()),
+            create_register_read(PORT0_ADDR0, 0x08, (Command::Srdy as u32).to_le_bytes()).with_error(ErrorKind::Other),
+            create_register_read(PORT0_ADDR0, 0x08, (Command::Success as u32).to_le_bytes()),
+            create_register_read(
+                PORT0_ADDR0,
+                registers::REG_DATA1,
+                command_result_data(ReturnValue::Success as u8, &[]),
+            ),
+        ];
+        let mut controller: Controller<NoopRawMutex, _> =
+            Controller::new_tps66993(Mock::new(&transactions), PORT0_ADDR0).unwrap();
+        let (mut pd, _interrupt) = controller.make_parts();
+
+        assert_eq!(pd.enable_sink_path(PORT0, true).await, Ok(()));
+        pd.lock_inner().await.bus.done();
+    }
+
+    #[tokio::test]
+    async fn test_enable_sink_path_reports_rejected_srdy_after_bounded_attempts() {
+        let transactions: std::vec::Vec<_> = (0..3).flat_map(|_| srdy_attempt(ReturnValue::Rejected)).collect();
+        let mut controller: Controller<NoopRawMutex, _> =
+            Controller::new_tps66993(Mock::new(&transactions), PORT0_ADDR0).unwrap();
+        let (mut pd, _interrupt) = controller.make_parts();
+
+        assert_eq!(
+            pd.enable_sink_path(PORT0, true).await,
+            Err(Error::Pd(PdError::Rejected))
         );
         pd.lock_inner().await.bus.done();
     }
